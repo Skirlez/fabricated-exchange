@@ -3,7 +3,10 @@ package com.skirlez.fabricatedexchange;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,13 +23,14 @@ import com.skirlez.fabricatedexchange.sound.ModSounds;
 public class FabricatedExchange implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("fabricated-exchange");
     public static final String MOD_ID = "fabricated-exchange";
-
+    
     // this map tells the philosopher's stone what block to transform when right clicked
     public static Map<Block, Block> blockRotationMap = new HashMap<>();
-
+    public static Map<Item, BigInteger> emcMap = new HashMap<>();
 
     @Override
     public void onInitialize() {
+        emcMap.put(Items.STONE, BigInteger.valueOf(1));
         ModItemGroups.registerItemGroups();
         ModItems.registerModItems();
         ModSounds.registerSoundEvents();
@@ -36,7 +40,16 @@ public class FabricatedExchange implements ModInitializer {
         fillBlockRotationMap();
     }
 
-
+    public static BigInteger getItemEmc(Item item) {
+        if (item == null)
+            return BigInteger.ZERO; 
+        LOGGER.info(item.toString());
+        if (emcMap.containsKey(item)) {
+            
+            return emcMap.get(item);
+        }
+        return BigInteger.ZERO; 
+    }
 
     private void fillBlockRotationMap() {
         addTwoWayRelation(Blocks.GRASS_BLOCK, Blocks.SAND);
@@ -60,6 +73,8 @@ public class FabricatedExchange implements ModInitializer {
         }
         blockRotationMap.put(arr[i], arr[0]);
     };
+
+    
     
 
 }
