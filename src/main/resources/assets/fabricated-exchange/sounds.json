@@ -1,0 +1,8 @@
+{
+    "philosophers_stone_use": {
+        "subtitle": "sounds.fabricated-exchange.philosophers_stone_use",
+        "sounds": [
+            "fabricated-exchange:philosophers_stone_use"
+        ]
+    }
+}
