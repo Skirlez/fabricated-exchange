@@ -2,7 +2,8 @@ package com.skirlez.fabricatedexchange.block;
 
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.block.Block;
+import com.skirlez.fabricatedexchange.FabricatedExchange;
+
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -40,11 +41,13 @@ public class TransmutationTable extends BlockWithEntity implements BlockEntityPr
 
     @Override
     public ActionResult onUse(BlockState state, World world, 
-            BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        FabricatedExchange.LOGGER.info("HELLO1");
         if (!world.isClient) {
-            NamedScreenHandlerFactory screenHandlerFactory = state.createScreenHandlerFactory(world, pos);
+            NamedScreenHandlerFactory screenHandlerFactory = ((TransmutationTableBlockEntity) world.getBlockEntity(pos));
 
             if (screenHandlerFactory != null) {
+                FabricatedExchange.LOGGER.info("HELLO2");
                 player.openHandledScreen(screenHandlerFactory);
             }
         }

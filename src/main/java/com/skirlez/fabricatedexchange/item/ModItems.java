@@ -29,7 +29,7 @@ public class ModItems {
     }
 
     public static void registerModItems() { 
-        FabricatedExchange.LOGGER.info("Registering Mod Items for " + FabricatedExchange.MOD_ID);
+        
         addItemsToItemGroup();
     }   
 }

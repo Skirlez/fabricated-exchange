@@ -16,7 +16,7 @@ public class ModBlockEntities {
         
     public static void registerBlockEntities() {
         TRANSMUTATION_TABLE = Registry.register(Registries.BLOCK_ENTITY_TYPE,
-            new Identifier(FabricatedExchange.MOD_ID, "transmutation_table"), 
+            new Identifier(FabricatedExchange.MOD_ID, "transmutation_table_entity"), 
             FabricBlockEntityTypeBuilder.create(TransmutationTableBlockEntity::new, 
             ModBlocks.TRANSMUTATION_TABLE).build(null));
 

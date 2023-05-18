@@ -14,6 +14,7 @@ import com.skirlez.fabricatedexchange.block.ModBlockEntities;
 import com.skirlez.fabricatedexchange.block.ModBlocks;
 import com.skirlez.fabricatedexchange.item.ModItemGroups;
 import com.skirlez.fabricatedexchange.item.ModItems;
+import com.skirlez.fabricatedexchange.screen.ModScreenHandlers;
 import com.skirlez.fabricatedexchange.sound.ModSounds;
 
 public class FabricatedExchange implements ModInitializer {
@@ -31,7 +32,7 @@ public class FabricatedExchange implements ModInitializer {
         ModSounds.registerSoundEvents();
         ModBlocks.registerModBlocks();
         ModBlockEntities.registerBlockEntities();
-
+        ModScreenHandlers.registerAllScreenHandlers();
         fillBlockRotationMap();
     }
 
