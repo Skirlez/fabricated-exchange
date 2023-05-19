@@ -1,16 +1,16 @@
 package com.skirlez.fabricatedexchange;
 
-import java.math.BigInteger;
-
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.ModScreenHandlers;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreen;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
+import net.minecraft.nbt.NbtCompound;
+
 
 public class FabricatedExchangeClient implements ClientModInitializer {
-    public static BigInteger clientEmc = BigInteger.ZERO;
+    public static NbtCompound nbt;
 
 
     @Override

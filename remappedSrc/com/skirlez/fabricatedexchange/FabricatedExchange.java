@@ -1,14 +1,10 @@
 package com.skirlez.fabricatedexchange;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -24,9 +20,6 @@ import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.ModScreenHandlers;
 import com.skirlez.fabricatedexchange.sound.ModSounds;
-import com.skirlez.fabricatedexchange.util.EmcData;
-import com.skirlez.fabricatedexchange.util.PlayerState;
-import com.skirlez.fabricatedexchange.util.ServerState;
 
 public class FabricatedExchange implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("fabricated-exchange");
@@ -49,15 +42,6 @@ public class FabricatedExchange implements ModInitializer {
         fillBlockRotationMap();
         ModMessages.registerC2SPackets();
         
-
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> { 
-            PlayerState playerState = ServerState.getPlayerState(handler.player);
-            LOGGER.info(playerState.emc.toString());
-            // Sending the packet to the player (look at the networking page for more information)
-            EmcData.syncEmc((ServerPlayerEntity)handler.player, playerState.emc);
-        });
-
-
    
     }
 

@@ -3,7 +3,6 @@ package com.skirlez.fabricatedexchange.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
-import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.util.IPlayerDataSaver;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -45,7 +44,9 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
     @Override
     protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
         this.textRenderer.draw(matrices, this.title, (float)this.titleX, (float)this.titleY, 0x404040);
-        String emc = FabricatedExchangeClient.clientEmc.toString();
+        NbtCompound nbt = (NbtCompound) ((IPlayerDataSaver) (this.client.player)).getPersistentData();
+        String emc = nbt.getString("emc");
+        FabricatedExchange.LOGGER.info(emc);
         this.textRenderer.draw(matrices, Text.empty().append("EMC: " + emc), -20, 70, 0x404040);
     }
 

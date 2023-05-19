@@ -26,11 +26,7 @@
 		]
 	},
 	"mixins": [
-		"fabricated-exchange.mixins.json",
-		{
-			"config": "fabricated-exchange.client.mixins.json",
-			"environment": "client"
-		}
+		"fabricated-exchange.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.14.19",

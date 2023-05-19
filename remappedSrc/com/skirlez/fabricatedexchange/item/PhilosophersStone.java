@@ -8,7 +8,7 @@ import com.skirlez.fabricatedexchange.util.EmcData;
 import com.skirlez.fabricatedexchange.util.IPlayerDataSaver;
 
 import net.minecraft.block.Block;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.util.ActionResult;
@@ -41,8 +41,8 @@ public class PhilosophersStone extends Item {
                 context.getPlayer().playSound(ModSounds.PS_USE, 1F, 1F);
             else {
                 world.setBlockState(blockPos, FabricatedExchange.blockRotationMap.get(block).getDefaultState());
-                LivingEntity player = context.getPlayer();
-                EmcData.setEmc(player, BigInteger.valueOf(3));
+                PlayerEntity player = context.getPlayer();
+                EmcData.setEmc((IPlayerDataSaver) player, BigInteger.valueOf(3));
                 
             }
         }
