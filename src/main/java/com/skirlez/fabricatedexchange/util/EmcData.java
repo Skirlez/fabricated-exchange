@@ -25,11 +25,10 @@ public class EmcData {
 
     public static void addEmc(LivingEntity player, BigInteger amount) {
         PlayerState playerState = ServerState.getPlayerState(player);
-        playerState.emc.add(amount);
+        playerState.emc = playerState.emc.add(amount);
         playerState.markDirty();
         syncEmc((ServerPlayerEntity) player, playerState.emc);
     }    
-
 
     public static void syncEmc(ServerPlayerEntity player, BigInteger emc) {
         PacketByteBuf buffer = PacketByteBufs.create();

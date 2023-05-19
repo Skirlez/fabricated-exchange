@@ -14,9 +14,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
+import com.skirlez.fabricatedexchange.util.ModItemInterface;
 
 @Mixin(ItemStack.class)
-public class ModItemEMC {
+public class ModItemEMC implements ModItemInterface {
 	private BigInteger baseEMC = BigInteger.ZERO;
 
 	private BigInteger fetchEMC() {

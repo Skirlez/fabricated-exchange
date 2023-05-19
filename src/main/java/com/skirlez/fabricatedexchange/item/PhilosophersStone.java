@@ -5,7 +5,6 @@ import java.math.BigInteger;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.sound.ModSounds;
 import com.skirlez.fabricatedexchange.util.EmcData;
-import com.skirlez.fabricatedexchange.util.IPlayerDataSaver;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.LivingEntity;
