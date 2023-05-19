@@ -17,6 +17,7 @@ import com.skirlez.fabricatedexchange.block.ModBlockEntities;
 import com.skirlez.fabricatedexchange.block.ModBlocks;
 import com.skirlez.fabricatedexchange.item.ModItemGroups;
 import com.skirlez.fabricatedexchange.item.ModItems;
+import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.ModScreenHandlers;
 import com.skirlez.fabricatedexchange.sound.ModSounds;
 
@@ -31,6 +32,7 @@ public class FabricatedExchange implements ModInitializer {
     @Override
     public void onInitialize() {
         emcMap.put(Items.STONE, BigInteger.valueOf(1));
+        emcMap.put(Items.DIAMOND, BigInteger.valueOf(8192));
         ModItemGroups.registerItemGroups();
         ModItems.registerModItems();
         ModSounds.registerSoundEvents();
@@ -38,12 +40,14 @@ public class FabricatedExchange implements ModInitializer {
         ModBlockEntities.registerBlockEntities();
         ModScreenHandlers.registerAllScreenHandlers();
         fillBlockRotationMap();
+        ModMessages.registerC2SPackets();
+        
+   
     }
 
     public static BigInteger getItemEmc(Item item) {
         if (item == null)
             return BigInteger.ZERO; 
-        LOGGER.info(item.toString());
         if (emcMap.containsKey(item)) {
             
             return emcMap.get(item);

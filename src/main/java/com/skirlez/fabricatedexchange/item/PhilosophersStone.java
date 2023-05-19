@@ -1,9 +1,14 @@
 package com.skirlez.fabricatedexchange.item;
 
+import java.math.BigInteger;
+
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.sound.ModSounds;
-import net.minecraft.block.Block;
+import com.skirlez.fabricatedexchange.util.EmcData;
+import com.skirlez.fabricatedexchange.util.IPlayerDataSaver;
 
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.util.ActionResult;
@@ -24,8 +29,6 @@ public class PhilosophersStone extends Item {
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
-
-
         BlockPos blockPos = context.getBlockPos();
         World world = context.getWorld();
         Block block = world.getBlockState(blockPos).getBlock();
@@ -36,8 +39,12 @@ public class PhilosophersStone extends Item {
         if (valid) {
             if (world.isClient())
                 context.getPlayer().playSound(ModSounds.PS_USE, 1F, 1F);
-            else
+            else {
                 world.setBlockState(blockPos, FabricatedExchange.blockRotationMap.get(block).getDefaultState());
+                PlayerEntity player = context.getPlayer();
+                EmcData.setEmc((IPlayerDataSaver) player, BigInteger.valueOf(3));
+                
+            }
         }
 
         return ActionResult.success(valid);

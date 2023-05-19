@@ -3,7 +3,8 @@
 	"package": "com.skirlez.fabricatedexchange.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"ModItemEMC"
+		"ModItemEMC",
+		"ModPlayerData"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -22,7 +22,6 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         inventory.onOpen(playerInventory.player);
 
         this.addSlot(new Slot(inventory, 0, 80, 66));
-
         addPlayerInventory(playerInventory);
         addPlayerHotbar(playerInventory);
     }

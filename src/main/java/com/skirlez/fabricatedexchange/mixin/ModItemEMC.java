@@ -1,6 +1,6 @@
 package com.skirlez.fabricatedexchange.mixin;
 
-import net.minecraft.item.Item;
+import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 
@@ -10,17 +10,14 @@ import java.util.ArrayList;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 
 @Mixin(ItemStack.class)
 public class ModItemEMC {
-	// TODO mixin into constructor
 	private BigInteger baseEMC = BigInteger.ZERO;
-	private boolean fetchedEMC = false;
 
 	private BigInteger fetchEMC() {
 		ItemStack itemStack = (ItemStack)(Object)this;
@@ -28,10 +25,6 @@ public class ModItemEMC {
 	}
 
 	public BigInteger getEMC() {
-		if (!fetchedEMC) {
-			baseEMC = fetchEMC();
-			fetchedEMC = true;
-		}
 		ItemStack itemStack = (ItemStack)(Object)this;
 		return baseEMC.multiply(BigInteger.valueOf(itemStack.getCount()));
 	}
@@ -46,6 +39,10 @@ public class ModItemEMC {
 			if (cir != null)
 				list.add(Text.empty().append("EMC: " + emc));
 		}
-		
 	};
+	@Inject(method = "<init>(Lnet/minecraft/item/ItemConvertible;I)V", at = @At(value = "TAIL"))
+	protected void injectItemStackConstructor(ItemConvertible item, int count, CallbackInfo info) {
+		baseEMC = fetchEMC();
+	};
+
 }
