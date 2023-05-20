@@ -1,8 +1,10 @@
 package com.skirlez.fabricatedexchange.screen;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collector;
@@ -25,14 +27,14 @@ import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Pair;
 import net.minecraft.util.collection.DefaultedList;
 
 public class TransmutationTableScreenHandler extends ScreenHandler {
     private final Inventory inventory;
     private final LivingEntity player;
     private ConsumeSlot emcSlot;
-    private Map<Item, BigInteger> knowledgeMap;
-
+    private List<Pair<Item, BigInteger>> knowledge = new ArrayList<Pair<Item,BigInteger>>();
     private final DefaultedList<Slot> transmutationSlots = DefaultedList.of();
     public TransmutationTableScreenHandler(int syncId, PlayerInventory inventory) {
         this(syncId, inventory, new SimpleInventory(3));
@@ -45,33 +47,51 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         this.inventory = inventory;
         this.player = playerInventory.player;
         inventory.onOpen(playerInventory.player);
-        emcSlot = new ConsumeSlot(inventory, 0, 80, 66, player);
+        emcSlot = new ConsumeSlot(inventory, 0, 80, 66, player, this);
         this.addSlot(emcSlot);
 
-        addTransmutationSlot(new TransmutationSlot(inventory, 1, 130, -22, player));
-        addTransmutationSlot(new TransmutationSlot(inventory, 2, 160, -12, player));
+        addTransmutationSlot(new TransmutationSlot(inventory, 1, 130, -22, player, this));
+        addTransmutationSlot(new TransmutationSlot(inventory, 2, 165, -6, player, this));
 
         addPlayerInventory(playerInventory);
         addPlayerHotbar(playerInventory);
 
         if (!player.getWorld().isClient()) {
-            Map<Item, BigInteger> unsortedKnowledgeMap = new HashMap<>();
             PlayerState playerState = ServerState.getPlayerState(player);
             for (int i = 0; i < playerState.knowledge.size(); i++) {
                 String location = playerState.knowledge.get(i);
                 String[] parts = location.split(":");
                 Item item = Registries.ITEM.get(new Identifier(parts[0], parts[1]));
                 BigInteger emc = FabricatedExchange.getItemEmc(item);
-                unsortedKnowledgeMap.put(item, emc);
+                Pair<Item, BigInteger> pair = new Pair<Item,BigInteger>(item, emc);
+                addKnowledgePair(pair);
             }
-
-            // hell (sort knowledgeMap based on the biginteger value)
-            knowledgeMap = unsortedKnowledgeMap.entrySet().stream().sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
 
             refreshOffering();
         }
     }
+
+    public void refreshOffering() {
+        BigInteger emc = ServerState.getPlayerState(this.player).emc;
+        int num = 0;
+        for (int i = 0; i < transmutationSlots.size(); i++) {
+            transmutationSlots.get(i).setStack(ItemStack.EMPTY);
+        }
+        for (int i = 0; i < knowledge.size(); i++) {
+            Item item = knowledge.get(i).getLeft();
+            BigInteger itemEmc = knowledge.get(i).getRight();
+            FabricatedExchange.LOGGER.info("hie");
+            FabricatedExchange.LOGGER.info(item.getName().toString());
+            if (emc.compareTo(itemEmc) == -1)
+                continue;
+            transmutationSlots.get(num).setStack(new ItemStack(item));
+            num++;
+            if (num >= transmutationSlots.size())
+                return;
+        }
+    }
+
+
 
     @Override
     public ItemStack quickMove(PlayerEntity player, int invSlot) {
@@ -90,6 +110,38 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
     public boolean canUse(PlayerEntity player) {
         return this.inventory.canPlayerUse(player);
     }
+
+
+    public void addKnowledgePair(Pair<Item, BigInteger> pair) {
+        if (knowledge.size() == 0) {
+            knowledge.add(pair);
+            return;
+        }
+
+        BigInteger num = pair.getRight();
+        int low = 0;
+        int high = knowledge.size() - 1;
+        
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            Pair<Item, BigInteger> midPair = knowledge.get(mid);
+            BigInteger midNum = midPair.getRight();
+            
+            if (num.compareTo(midNum) == 1) {
+                high = mid - 1;
+            } 
+            else if (num.compareTo(midNum) == -1) {
+                low = mid + 1;
+            } 
+            else {
+                knowledge.add(mid + 1, pair);
+                return;
+            }
+        }
+        
+        knowledge.add(low, pair);
+    }
+
 
     private void addPlayerInventory(PlayerInventory playerInventory) {
         for (int i = 0; i < 3; ++i) {
@@ -110,15 +162,4 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         transmutationSlots.add(slot);
     }
     
-    public void refreshOffering() {
-        int num = 0;
-        for (Item item : knowledgeMap.keySet()) {
-            FabricatedExchange.LOGGER.info(String.valueOf(num));
-            FabricatedExchange.LOGGER.info(item.getName().toString());
-            transmutationSlots.get(num).setStack(new ItemStack(item));
-            num++;
-            if (num > 1)
-                return;
-        }
-    }
 }

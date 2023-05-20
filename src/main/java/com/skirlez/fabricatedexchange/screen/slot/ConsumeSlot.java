@@ -3,6 +3,7 @@ package com.skirlez.fabricatedexchange.screen.slot;
 import java.math.BigInteger;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
+import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandler;
 import com.skirlez.fabricatedexchange.util.EmcData;
 import com.skirlez.fabricatedexchange.util.ModItemInterface;
 import com.skirlez.fabricatedexchange.util.PlayerState;
@@ -11,18 +12,22 @@ import com.skirlez.fabricatedexchange.util.ServerState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.Pair;
 
 public class ConsumeSlot extends Slot {
     // This slot destroys any item put inside and adds its EMC to it to a player.
     // if the item doesn't have EMC, it rejects it.
 
     private LivingEntity player;
-    public ConsumeSlot(Inventory inventory, int index, int x, int y, LivingEntity player) {
+    private TransmutationTableScreenHandler screenHandler;
+    public ConsumeSlot(Inventory inventory, int index, int x, int y, LivingEntity player, TransmutationTableScreenHandler screenHandler) {
         super(inventory, index, x, y);
         this.player = player;
+        this.screenHandler = screenHandler;
     }
 
     @Override
@@ -37,9 +42,15 @@ public class ConsumeSlot extends Slot {
             EmcData.addEmc(player, emc);
             PlayerState playerState = ServerState.getPlayerState(player);
             String idName = Registries.ITEM.getId(stack.getItem()).toString();
-            if (!playerState.knowledge.contains(idName))
+            Item item = stack.getItem();
+            if (!playerState.knowledge.contains(idName)) {
                 playerState.knowledge.add(idName);
+                screenHandler.addKnowledgePair(new Pair<Item, BigInteger>(item, FabricatedExchange.getItemEmc(item)));
+            }
             playerState.markDirty();
+            
+            
+            screenHandler.refreshOffering();    
         }
 
         // diff is the amount of the item the player had minus the amount they put in. if it's zero we give empty, otherwise we give what's left back.

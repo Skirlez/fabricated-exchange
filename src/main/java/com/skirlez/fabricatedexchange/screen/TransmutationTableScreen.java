@@ -42,7 +42,7 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 
     @Override
     protected boolean isClickOutsideBounds(double mouseX, double mouseY, int left, int top, int button) {
-        return false;
+        return false; // TODO: check if you're outside of the window bounds
     }
 
     @Override
