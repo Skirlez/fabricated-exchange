@@ -5,15 +5,20 @@ import java.math.BigInteger;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.util.EmcData;
 import com.skirlez.fabricatedexchange.util.ModItemInterface;
+import com.skirlez.fabricatedexchange.util.PlayerState;
+import com.skirlez.fabricatedexchange.util.ServerState;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.Slot;
 
 public class ConsumeSlot extends Slot {
+    // This slot destroys any item put inside and adds its EMC to it to a player.
+    // if the item doesn't have EMC, it rejects it.
+
     private LivingEntity player;
     public ConsumeSlot(Inventory inventory, int index, int x, int y, LivingEntity player) {
         super(inventory, index, x, y);
@@ -22,21 +27,47 @@ public class ConsumeSlot extends Slot {
 
     @Override
     public ItemStack insertStack(ItemStack stack, int count) {
-        ModItemInterface modStack = (ModItemInterface) (Object) stack;
+        ItemStack newStack = stack.copy();
+        newStack.setCount(count);
+        ModItemInterface modStack = (ModItemInterface) (Object) newStack;
         BigInteger emc = modStack.getEMC();
         if (emc.equals(BigInteger.ZERO))
             return stack;
-        if (!player.getWorld().isClient())
+        if (!player.getWorld().isClient()) {
             EmcData.addEmc(player, emc);
-        return new ItemStack(Items.AIR);
+            PlayerState playerState = ServerState.getPlayerState(player);
+            String idName = Registries.ITEM.getId(stack.getItem()).toString();
+            if (!playerState.knowledge.contains(idName))
+                playerState.knowledge.add(idName);
+            playerState.markDirty();
+        }
+
+        // diff is the amount of the item the player had minus the amount they put in. if it's zero we give empty, otherwise we give what's left back.
+        int diff = stack.getCount() - count;
+        if (diff == 0) 
+            return ItemStack.EMPTY; 
+        stack.setCount(diff);
+        return stack;
     }
+
+
+
 
     @Override
     public ItemStack takeStackRange(int min, int max, PlayerEntity player) {
-        FabricatedExchange.LOGGER.info("takeStackRange");
         return super.takeStackRange(min, max, player);
     }
 
+    // these two methods make sure that you can't actually insert anything into the slot by any means
+    // well, inventory *is* public, so you could, but i would not like you
+    @Override
+    public void setStack(ItemStack stack) {
+        
+    }
+
+    public boolean canInsert(ItemStack stack) {
+        return false;
+    }
 
 
     

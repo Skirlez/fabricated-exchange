@@ -8,6 +8,9 @@ import com.skirlez.fabricatedexchange.FabricatedExchange;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateManager;
@@ -23,12 +26,16 @@ public class ServerState extends PersistentState {
             NbtCompound playerStateNbt = new NbtCompound();
  
             playerStateNbt.putString("emc", playerState.emc.toString());
- 
+
+            NbtList knowledgeList = new NbtList();
+            for (int i = 0; i < playerState.knowledge.size(); i++) {
+                knowledgeList.add(NbtString.of(playerState.knowledge.get(i)));
+            }
+            playerStateNbt.put("knowledge", knowledgeList);
+
             playersNbtCompound.put(String.valueOf(UUID), playerStateNbt);
         });
         nbt.put("players", playersNbtCompound);
-        nbt.putInt("balls", 33);
-        FabricatedExchange.LOGGER.info("I DID THE THING");
         return nbt;
     }
 
@@ -41,7 +48,14 @@ public class ServerState extends PersistentState {
             PlayerState playerState = new PlayerState(serverState);
  
             playerState.emc = new BigInteger(playersTag.getCompound(key).getString("emc"));
- 
+            NbtList knowledgeNbtList = playersTag.getCompound(key).getList("knowledge", NbtElement.STRING_TYPE);
+            FabricatedExchange.LOGGER.info("hey guys");
+            for (int i = 0; i < knowledgeNbtList.size(); i++) {
+                playerState.knowledge.add(knowledgeNbtList.getString(i));
+                FabricatedExchange.LOGGER.info(knowledgeNbtList.getString(i));
+                
+            }
+
             UUID uuid = UUID.fromString(key);
             serverState.players.put(uuid, playerState);
         });

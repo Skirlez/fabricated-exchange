@@ -41,9 +41,6 @@ public class PhilosophersStone extends Item {
                 context.getPlayer().playSound(ModSounds.PS_USE, 1F, 1F);
             else {
                 world.setBlockState(blockPos, FabricatedExchange.blockRotationMap.get(block).getDefaultState());
-                PlayerEntity player = context.getPlayer();
-                EmcData.setEmc((IPlayerDataSaver) player, BigInteger.valueOf(3));
-                
             }
         }
 

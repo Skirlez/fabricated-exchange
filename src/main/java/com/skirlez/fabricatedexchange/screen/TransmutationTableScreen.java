@@ -19,7 +19,7 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
     public TransmutationTableScreen(TransmutationTableScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
     }
-
+    
     @Override
     protected void init() {
         super.init();
@@ -38,6 +38,11 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         int x = (width - backgroundWidth) / 2 - 1;
         int y = (height - backgroundHeight) / 2 - 16;
         drawTexture(matrices, x, y, 0, 0, backgroundWidth, backgroundHeight);
+    }
+
+    @Override
+    protected boolean isClickOutsideBounds(double mouseX, double mouseY, int left, int top, int button) {
+        return false;
     }
 
     @Override
