@@ -28,7 +28,10 @@ public class TransmutationSlot extends Slot {
         this.setStack(ItemStack.EMPTY);
     }
 
-
+    @Override
+    public boolean canTakeItems(PlayerEntity playerEntity) {
+        return true;
+    }
 
     @Override
     public ItemStack takeStack(int amount) {
@@ -57,7 +60,7 @@ public class TransmutationSlot extends Slot {
     public boolean canInsert(ItemStack stack) {
         return false;
     }
-    
+
     // you're not supposed to be able to grab the item by double clicking on a stack of the same that isn't full
     @Override
     public ItemStack takeStackRange(int min, int max, PlayerEntity player) {

@@ -10,6 +10,8 @@ import java.util.Map.Entry;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.screen.slot.ConsumeSlot;
 import com.skirlez.fabricatedexchange.screen.slot.TransmutationSlot;
@@ -26,6 +28,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.collection.DefaultedList;
@@ -37,21 +40,44 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
     private List<Pair<Item, BigInteger>> knowledge = new ArrayList<Pair<Item,BigInteger>>();
     private final DefaultedList<Slot> transmutationSlots = DefaultedList.of();
     public TransmutationTableScreenHandler(int syncId, PlayerInventory inventory) {
-        this(syncId, inventory, new SimpleInventory(3));
+        this(syncId, inventory, new SimpleInventory(18));
         
     }
 
     public TransmutationTableScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory) {
         super(ModScreenHandlers.TRANSMUTATION_TABLE_SCREEN_HANDLER, syncId);
-        checkSize(inventory, 2);
+        checkSize(inventory, 18);
         this.inventory = inventory;
         this.player = playerInventory.player;
         inventory.onOpen(playerInventory.player);
         emcSlot = new ConsumeSlot(inventory, 0, 80, 66, player, this);
         this.addSlot(emcSlot);
+        // use trigonometry to create the transmutation slots
 
-        addTransmutationSlot(new TransmutationSlot(inventory, 1, 130, -22, player, this));
-        addTransmutationSlot(new TransmutationSlot(inventory, 2, 165, -6, player, this));
+        // outer ring
+        double angle = 270.0;
+        for (int i = 0; i < 12; i++) {
+            double radianAngle = Math.toRadians(angle);
+            int yOffset = (int)(Math.sin(radianAngle) * 41);
+            int xOffset = (int)(Math.cos(radianAngle) * 41);
+            addTransmutationSlot(new TransmutationSlot(inventory, i + 1, 131 + xOffset, 18 + yOffset, player, this));
+            angle += 360.0 / 12.0;
+        }
+
+        // inner ring
+        angle = 270.0;
+        for (int i = 0; i < 4; i++) {
+            double radianAngle = Math.toRadians(angle);
+            int yOffset = (int)(Math.sin(radianAngle) * 19);
+            int xOffset = (int)(Math.cos(radianAngle) * 19);
+            addTransmutationSlot(new TransmutationSlot(inventory, i + 13, 131 + xOffset, 18 + yOffset, player, this));
+            angle += 360.0 / 4.0;
+        }
+
+
+        addSlot(new Slot(inventory, 17, 131, 18));
+
+
 
         addPlayerInventory(playerInventory);
         addPlayerHotbar(playerInventory);
@@ -77,11 +103,10 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         for (int i = 0; i < transmutationSlots.size(); i++) {
             transmutationSlots.get(i).setStack(ItemStack.EMPTY);
         }
-        for (int i = 0; i < knowledge.size(); i++) {
+        int len = Math.min(knowledge.size(), 8);
+        for (int i = 0; i < len; i++) {
             Item item = knowledge.get(i).getLeft();
             BigInteger itemEmc = knowledge.get(i).getRight();
-            FabricatedExchange.LOGGER.info("hie");
-            FabricatedExchange.LOGGER.info(item.getName().toString());
             if (emc.compareTo(itemEmc) == -1)
                 continue;
             transmutationSlots.get(num).setStack(new ItemStack(item));
@@ -91,11 +116,34 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         }
     }
 
-
+    @Override
+    public void onSlotClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player) {
+        super.onSlotClick(slotIndex, button, actionType, player);
+    }
 
     @Override
     public ItemStack quickMove(PlayerEntity player, int invSlot) {
-        // since shift clicking means transmute, this method is different to a regular container
+
+        if (invSlot >= 1 && invSlot < 17) {
+            ItemStack stack = ItemStack.EMPTY;
+            TransmutationSlot slot = (TransmutationSlot)this.slots.get(invSlot);
+            if (slot != null && slot.hasStack()) {
+                stack = slot.takeStack(64).copy();
+                
+                if (invSlot < this.inventory.size()) {
+                    if (!this.insertItem(stack, this.inventory.size(), this.slots.size(), true)) {
+                        return ItemStack.EMPTY;
+                    }
+                } else if (!this.insertItem(stack, 0, this.inventory.size(), false)) {
+                    return ItemStack.EMPTY;
+                }
+
+            }
+            
+        
+            return stack;
+        }
+        // if it is not one of those slots it must mean we're shift clicking the inventory, meaning transmute this item
         Slot slot = this.slots.get(invSlot);
         ItemStack slotItemStack = slot.getStack();
         ItemStack itemStack = emcSlot.insertStack(slotItemStack, slotItemStack.getCount());

@@ -1,6 +1,8 @@
 package com.skirlez.fabricatedexchange.screen;
 
 
+import java.lang.reflect.Field;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
@@ -12,14 +14,35 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-public class TransmutationTableScreen extends HandledScreen<TransmutationTableScreenHandler>  {
+public class TransmutationTableScreen extends HandledScreen<TransmutationTableScreenHandler> {
+    
+    
     private static final Identifier TEXTURE =
             new Identifier(FabricatedExchange.MOD_ID, "textures/gui/transmute.png");
 
+    private Field fieldDoubleClicked;
+
     public TransmutationTableScreen(TransmutationTableScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
+        try {
+            fieldDoubleClicked = this.getClass().getSuperclass().getDeclaredField("doubleClicking");
+            fieldDoubleClicked.setAccessible(true);
+        } catch (NoSuchFieldException | SecurityException e) {
+            FabricatedExchange.LOGGER.error("", e);
+        }
+
     }
     
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        try {
+            fieldDoubleClicked.set(this, Boolean.FALSE);
+        } catch (SecurityException | IllegalAccessException e) {
+            FabricatedExchange.LOGGER.error("", e);
+        }
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
     @Override
     protected void init() {
         super.init();
@@ -58,5 +81,4 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         super.render(matrices, mouseX, mouseY, delta);
         drawMouseoverTooltip(matrices, mouseX, mouseY);
     }
-    
 }

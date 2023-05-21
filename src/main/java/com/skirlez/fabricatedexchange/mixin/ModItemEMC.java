@@ -17,7 +17,7 @@ import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.util.ModItemInterface;
 
 @Mixin(ItemStack.class)
-public class ModItemEMC implements ModItemInterface {
+public abstract class ModItemEMC implements ModItemInterface {
 	private BigInteger baseEMC = BigInteger.ZERO;
 
 	private BigInteger fetchEMC() {

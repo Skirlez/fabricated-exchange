@@ -40,7 +40,8 @@ public class FabricatedExchange implements ModInitializer {
     public void onInitialize() {
         emcMap.put(Items.STONE, BigInteger.valueOf(1));
         emcMap.put(Items.DIRT, BigInteger.valueOf(1));
-        emcMap.put(Items.OAK_PLANKS, BigInteger.valueOf(1));
+        emcMap.put(Items.OAK_PLANKS, BigInteger.valueOf(8));
+        emcMap.put(Items.STICK, BigInteger.valueOf(4));
         emcMap.put(Items.GRASS, BigInteger.valueOf(1));
         emcMap.put(Items.DIAMOND, BigInteger.valueOf(8192));
         ModItemGroups.registerItemGroups();
