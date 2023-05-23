@@ -95,8 +95,8 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
     @Override
     protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
         this.textRenderer.draw(matrices, this.title, (float)this.titleX, (float)this.titleY, 0x404040);
-        String emc = FabricatedExchangeClient.clientEmc.toString();
-        this.textRenderer.draw(matrices, Text.empty().append("EMC: "), -20, 70, 0x404040);
+        String emc = FabricatedExchangeClient.clientEmc.toString(3);
+        this.textRenderer.draw(matrices, Text.empty().append("EMC: " + emc), -20, 70, 0x404040);
     }
 
     @Override

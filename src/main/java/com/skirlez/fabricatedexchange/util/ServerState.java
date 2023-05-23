@@ -25,7 +25,7 @@ public class ServerState extends PersistentState {
         players.forEach((UUID, playerState) -> {
             NbtCompound playerStateNbt = new NbtCompound();
  
-            playerStateNbt.putString("emc", playerState.emc.toString());
+            playerStateNbt.putString("emc", playerState.emc.divisonString());
 
             NbtList knowledgeList = new NbtList();
             for (int i = 0; i < playerState.knowledge.size(); i++) {
@@ -47,7 +47,7 @@ public class ServerState extends PersistentState {
         playersTag.getKeys().forEach(key -> {
             PlayerState playerState = new PlayerState(serverState);
  
-            playerState.emc = new BigInteger(playersTag.getCompound(key).getString("emc"));
+            playerState.emc = new SuperNumber(playersTag.getCompound(key).getString("emc"));
             NbtList knowledgeNbtList = playersTag.getCompound(key).getList("knowledge", NbtElement.STRING_TYPE);
             for (int i = 0; i < knowledgeNbtList.size(); i++) 
                 playerState.knowledge.add(knowledgeNbtList.getString(i));

@@ -1,6 +1,5 @@
 package com.skirlez.fabricatedexchange.screen.slot;
 
-import java.math.BigInteger;
 import java.util.Optional;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
@@ -9,6 +8,7 @@ import com.skirlez.fabricatedexchange.screen.TransmutationTableScreen;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandler;
 import com.skirlez.fabricatedexchange.util.EmcData;
 import com.skirlez.fabricatedexchange.util.ModItemInterface;
+import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -41,11 +41,11 @@ public class TransmutationSlot extends Slot {
         ItemStack stack = this.getStack().copy();
         stack.setCount(amount);
         ModItemInterface modStack = (ModItemInterface) (Object) stack;
-        BigInteger itemCost = modStack.getEMC();
+        SuperNumber itemCost = modStack.getEMC();
         if (!player.world.isClient()) {
-            BigInteger emc = EmcData.getEmc(player);
+            SuperNumber emc = EmcData.getEmc(player);
             if (emc.compareTo(itemCost) != -1) {
-                EmcData.addEmc(player, itemCost.negate());
+                EmcData.subtractEmc(player, itemCost);
                 screenHandler.refreshOffering();
                 return stack;
             }

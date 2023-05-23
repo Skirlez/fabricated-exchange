@@ -1,6 +1,5 @@
 package com.skirlez.fabricatedexchange.screen.slot;
 
-import java.math.BigInteger;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandler;
@@ -8,6 +7,7 @@ import com.skirlez.fabricatedexchange.util.EmcData;
 import com.skirlez.fabricatedexchange.util.ModItemInterface;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
+import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -35,8 +35,8 @@ public class ConsumeSlot extends Slot {
         ItemStack newStack = stack.copy();
         newStack.setCount(count);
         ModItemInterface modStack = (ModItemInterface) (Object) newStack;
-        BigInteger emc = modStack.getEMC();
-        if (emc.equals(BigInteger.ZERO))
+        SuperNumber emc = modStack.getEMC();
+        if (emc.equalsZero())
             return stack;
         if (!player.getWorld().isClient()) {
             EmcData.addEmc(player, emc);
@@ -45,7 +45,7 @@ public class ConsumeSlot extends Slot {
             Item item = stack.getItem();
             if (!playerState.knowledge.contains(idName)) {
                 playerState.knowledge.add(idName);
-                screenHandler.addKnowledgePair(new Pair<Item, BigInteger>(item, FabricatedExchange.getItemEmc(item)));
+                screenHandler.addKnowledgePair(new Pair<Item, SuperNumber>(item, FabricatedExchange.getItemEmc(item)));
             }
             playerState.markDirty();
             

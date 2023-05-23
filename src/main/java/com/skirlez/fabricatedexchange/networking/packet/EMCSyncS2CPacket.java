@@ -5,11 +5,11 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
 
-import java.math.BigInteger;
-
+import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
+import com.skirlez.fabricatedexchange.util.SuperNumber;
 public class EMCSyncS2CPacket {
    public static void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-      FabricatedExchangeClient.clientEmc = new BigInteger(buf.readString());
+      FabricatedExchangeClient.clientEmc = new SuperNumber(buf.readString());
    }
 }

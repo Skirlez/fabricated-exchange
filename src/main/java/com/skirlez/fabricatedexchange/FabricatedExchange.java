@@ -25,7 +25,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Pair;
 import net.minecraft.world.World;
 
-import java.math.BigInteger;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -47,14 +47,15 @@ import com.skirlez.fabricatedexchange.sound.ModSounds;
 import com.skirlez.fabricatedexchange.util.EmcData;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
+import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 public class FabricatedExchange implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("fabricated-exchange");
     public static final String MOD_ID = "fabricated-exchange";
-    
+    public static DecimalFormat formatter = new DecimalFormat("#,###.0000");
     // this map tells the philosopher's stone what block to transform when right clicked
     public static Map<Block, Block> blockRotationMap = new HashMap<>();
-    public static Map<Item, BigInteger> emcMap = new HashMap<>();
+    public static Map<Item, SuperNumber> emcMap = new HashMap<>();
 
     @Override
     public void onInitialize() {
@@ -81,13 +82,13 @@ public class FabricatedExchange implements ModInitializer {
    
     }
 
-    public static BigInteger getItemEmc(Item item) {
+    public static SuperNumber getItemEmc(Item item) {
         if (item == null)
-            return BigInteger.ZERO; 
+            return SuperNumber.Zero(); 
         if (emcMap.containsKey(item)) {
-            return emcMap.get(item);
+            return new SuperNumber(emcMap.get(item));
         }
-        return BigInteger.ZERO; 
+        return SuperNumber.Zero(); 
     }
 
     private void fillBlockRotationMap() {
@@ -127,18 +128,18 @@ public class FabricatedExchange implements ModInitializer {
 
         // the seed values
         // TODO: read from json
-        emcMap.put(Items.COBBLESTONE, BigInteger.valueOf(1));
-        emcMap.put(Items.DIRT, BigInteger.valueOf(1));
-        emcMap.put(Items.GRASS_BLOCK, BigInteger.valueOf(1));
-        emcMap.put(Items.OAK_PLANKS, BigInteger.valueOf(8));
-        emcMap.put(Items.WHITE_WOOL, BigInteger.valueOf(48));
-        emcMap.put(Items.BONE, BigInteger.valueOf(96));
-        emcMap.put(Items.IRON_INGOT, BigInteger.valueOf(256));
-        emcMap.put(Items.REDSTONE, BigInteger.valueOf(64));
-        emcMap.put(Items.EMERALD, BigInteger.valueOf(16384));
-        emcMap.put(Items.ENDER_PEARL, BigInteger.valueOf(1024));
-        emcMap.put(Items.DIAMOND, BigInteger.valueOf(8192));
-        emcMap.put(Items.NETHERITE_INGOT, BigInteger.valueOf(57344));
+        putEmcMap(Items.COBBLESTONE, 1);
+        putEmcMap(Items.DIRT, 1);
+        putEmcMap(Items.GRASS_BLOCK, 1);
+        putEmcMap(Items.OAK_PLANKS,8);
+        putEmcMap(Items.WHITE_WOOL, 48);
+        putEmcMap(Items.BONE, 96);
+        putEmcMap(Items.IRON_INGOT, 256);
+        putEmcMap(Items.REDSTONE, 64);
+        putEmcMap(Items.EMERALD, 16384);
+        putEmcMap(Items.ENDER_PEARL, 1024);
+        putEmcMap(Items.DIAMOND, 8192);
+        putEmcMap(Items.NETHERITE_INGOT, 57344);
 
 
         RecipeManager recipeManager = world.getRecipeManager();
@@ -188,43 +189,36 @@ public class FabricatedExchange implements ModInitializer {
             if (outputStack.getCount() == 0)
                 continue; 
 
-            BigInteger outputEmc = getItemEmc(outputItem).multiply(BigInteger.valueOf(outputStack.getCount()));
-            Pair<BigInteger, BigInteger> equation = new Pair<BigInteger, BigInteger>(BigInteger.ZERO, BigInteger.ZERO);
+            SuperNumber outputEmc = getItemEmc(outputItem);
+            outputEmc.multiply(outputStack.getCount());
+            Pair<SuperNumber, SuperNumber> equation = new Pair<SuperNumber, SuperNumber>(SuperNumber.Zero(), SuperNumber.Zero());
           
 
 
-            if (outputEmc.equals(BigInteger.ZERO)) {
+            if (outputEmc.equalsZero()) {
                 unknownSide = 2;
             }
             else {
-                BigInteger equationValue = equation.getRight();
-                equationValue = equationValue.add(outputEmc);
-                equation.setRight(equationValue);
+                equation.getRight().add(outputEmc);
             }
             
-            boolean log = false;
 
             for (Ingredient ingredient : ingredients) {
                 ItemStack[] itemStackArr = ingredient.getMatchingStacks();
                 if (itemStackArr.length == 0)
                     continue;
-                BigInteger emcWorth = BigInteger.ZERO;
+                SuperNumber emcWorth = SuperNumber.Zero();
 
                 for (ItemStack stack : itemStackArr) {
-                    if (ItemStack.areItemsEqual(stack, new ItemStack(Items.DIAMOND_BLOCK))) {
-                        LOGGER.info("here");
-                        log = true;
-                    }
-                    else
-                        log = false;
+
                     Item item = stack.getItem();
-                    BigInteger itemEmc = getItemEmc(item);
-                    if (!itemEmc.equals(BigInteger.ZERO)) {
+                    SuperNumber itemEmc = getItemEmc(item);
+                    if (!itemEmc.equalsZero()) {
                         emcWorth = itemEmc;
                         break;
                     }
                 }
-                if (emcWorth.equals(BigInteger.ZERO)) {
+                if (emcWorth.equalsZero()) {
                     if (unknownSide != 0) { // if there's already another unknown
                         giveUp = true;
                         break;
@@ -236,15 +230,13 @@ public class FabricatedExchange implements ModInitializer {
                 else {
                     for (ItemStack stack : itemStackArr) {
                         Item item = stack.getItem();
-                        BigInteger itemEmc = getItemEmc(item);
-                        if (itemEmc.equals(BigInteger.ZERO) && !emcMap.containsKey(item)) {
+                        SuperNumber itemEmc = getItemEmc(item);
+                        if (itemEmc.equals(SuperNumber.Zero()) && !emcMap.containsKey(item)) {
                             putEmcMap(item, emcWorth);
                             break;
                         }
                     }
-                    BigInteger equationValue = equation.getLeft();
-                    equationValue = equationValue.add(emcWorth);
-                    equation.setLeft(equationValue);
+                    equation.getLeft().add(emcWorth);
                 }
                 
             }
@@ -260,14 +252,10 @@ public class FabricatedExchange implements ModInitializer {
                 continue;
             }
             else if (unknownSide == 1) {
-                BigInteger leftValue = equation.getLeft();
-                BigInteger rightValue = equation.getRight();
-                if (log) {
-                    LOGGER.info(leftValue.toString());
-                    LOGGER.info(rightValue.toString());
-                }
-                rightValue = rightValue.subtract(leftValue);
-                if (rightValue.compareTo(BigInteger.ZERO) == -1) {
+                SuperNumber leftValue = equation.getLeft();
+                SuperNumber rightValue = equation.getRight();
+                rightValue.subtract(leftValue);
+                if (rightValue.compareTo(SuperNumber.Zero()) == -1) {
                     LOGGER.error("ERROR: NEGATIVE EMC VALUE! Recipe: " + recipe.getId().toString());
                 } 
                 for (Item item : unknownItems) {
@@ -286,11 +274,8 @@ public class FabricatedExchange implements ModInitializer {
                         */
                 }
                 if (!emcMap.containsKey(outputItem)) {
-
-                    BigInteger result = equation.getLeft().divide(BigInteger.valueOf(outputStack.getCount()));
-                    if (result.equals(BigInteger.ZERO)) {
-
-                    }
+                    SuperNumber result = equation.getLeft();
+                    result.divide(outputStack.getCount());
                     putEmcMap(outputItem, result);
                     newInfo = true;
                 }
@@ -310,14 +295,16 @@ public class FabricatedExchange implements ModInitializer {
 
             // get the item (there should only be one, hopefully)
             Item inputItem = recipe.getIngredients().get(0).getMatchingStacks()[0].getItem();
-            LOGGER.info(inputItem.getName().toString());
+            if (inputItem.equals(Items.OAK_WOOD)) {
+                LOGGER.info("WOOOD");
+            }
 
             Item outputItem = recipe.getOutput(dynamicRegistryManager).getItem();
 
-            BigInteger outEmc = getItemEmc(outputItem);
-            BigInteger inEmc = getItemEmc(inputItem);
-            if (outEmc.equals(BigInteger.ZERO)) {
-                if (inEmc.equals(BigInteger.ZERO))
+            SuperNumber outEmc = getItemEmc(outputItem);
+            SuperNumber inEmc = getItemEmc(inputItem);
+            if (outEmc.equalsZero()) {
+                if (inEmc.equalsZero())
                     continue; // not enough info
 
                 // if in emc is defined but out emc is not
@@ -326,7 +313,7 @@ public class FabricatedExchange implements ModInitializer {
                     newInfo = true;
                 }
             }
-            else if (inEmc.equals(BigInteger.ZERO)) {
+            else if (inEmc.equalsZero()) {
                  // if out emc is defined but in emc is not
                  if (!emcMap.containsKey(inputItem)) {
                     putEmcMap(inputItem, outEmc);
@@ -347,9 +334,11 @@ public class FabricatedExchange implements ModInitializer {
     }
 
 
-    private void putEmcMap(Item item, BigInteger value) {
-        if (ItemStack.areItemsEqual(new ItemStack(item), new ItemStack(Items.DIAMOND_BLOCK)))
-            LOGGER.info("here");
+    private void putEmcMap(Item item, int value) {
+        emcMap.put(item, new SuperNumber(value));
+    }
+
+    private void putEmcMap(Item item, SuperNumber value) {
         emcMap.put(item, value);
     }
 

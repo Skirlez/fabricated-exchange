@@ -49,7 +49,6 @@ public class PhilosophersStone extends Item {
             else {
                 world.setBlockState(blockPos, FabricatedExchange.blockRotationMap.get(block).getDefaultState());
                 LivingEntity player = context.getPlayer();
-                EmcData.setEmc(player, BigInteger.valueOf(3));
             }
         }
 

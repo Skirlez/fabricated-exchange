@@ -1,6 +1,5 @@
 package com.skirlez.fabricatedexchange.screen;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -21,6 +20,7 @@ import com.skirlez.fabricatedexchange.util.EmcData;
 import com.skirlez.fabricatedexchange.util.ModItemInterface;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
+import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -41,7 +41,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
     private final Inventory inventory;
     private final LivingEntity player;
     private ConsumeSlot emcSlot;
-    private List<Pair<Item, BigInteger>> knowledge = new ArrayList<Pair<Item,BigInteger>>();
+    private List<Pair<Item, SuperNumber>> knowledge = new ArrayList<Pair<Item,SuperNumber>>();
     private final DefaultedList<Slot> transmutationSlots = DefaultedList.of();
     public TransmutationTableScreenHandler(int syncId, PlayerInventory inventory) {
         this(syncId, inventory, new SimpleInventory(18));
@@ -92,8 +92,8 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
                 String location = playerState.knowledge.get(i);
                 String[] parts = location.split(":");
                 Item item = Registries.ITEM.get(new Identifier(parts[0], parts[1]));
-                BigInteger emc = FabricatedExchange.getItemEmc(item);
-                Pair<Item, BigInteger> pair = new Pair<Item,BigInteger>(item, emc);
+                SuperNumber emc = FabricatedExchange.getItemEmc(item);
+                Pair<Item, SuperNumber> pair = new Pair<Item,SuperNumber>(item, emc);
                 addKnowledgePair(pair);
             }
 
@@ -103,7 +103,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 
 
     public void refreshOffering() {
-        BigInteger emc = ServerState.getPlayerState(this.player).emc;
+        SuperNumber emc = ServerState.getPlayerState(this.player).emc;
         int num = 0;
         for (int i = 0; i < transmutationSlots.size(); i++) {
             transmutationSlots.get(i).setStack(ItemStack.EMPTY);
@@ -111,7 +111,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         int len = Math.min(knowledge.size(), 12);
         for (int i = 0; i < len; i++) {
             Item item = knowledge.get(i).getLeft();
-            BigInteger itemEmc = knowledge.get(i).getRight();
+            SuperNumber itemEmc = knowledge.get(i).getRight();
             if (emc.compareTo(itemEmc) == -1)
                 continue;
             transmutationSlots.get(num).setStack(new ItemStack(item));
@@ -134,17 +134,28 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
             TransmutationSlot slot = (TransmutationSlot)this.slots.get(invSlot);
             if (slot != null && slot.hasStack()) {
                 stack = slot.getStack().copy();
-                stack.setCount(stack.getMaxCount());
-                ModItemInterface modItemStack = (ModItemInterface)(Object)stack;
-                BigInteger itemCost = modItemStack.getEMC();
                 
-                BigInteger emc;
+                SuperNumber emc;
                 boolean client = player.getWorld().isClient();
                 if (client)
                     emc = FabricatedExchangeClient.clientEmc;
                 else
                     emc = EmcData.getEmc(player);
                 
+
+                ModItemInterface modItemStack = (ModItemInterface)(Object)stack;
+                SuperNumber itemCount = new SuperNumber(emc);
+                itemCount.divide(modItemStack.getBaseEMC());
+                itemCount.floor();
+
+                int intItemCount = itemCount.toInt();
+                if (intItemCount == 0)
+                    stack.setCount(stack.getMaxCount());
+                stack.setCount(Math.min(stack.getMaxCount(), intItemCount));
+
+                modItemStack = (ModItemInterface)(Object)stack;
+                SuperNumber itemCost = modItemStack.getEMC();
+
 
                 if (emc.compareTo(itemCost) != -1) {
                     if (invSlot < this.inventory.size()) {
@@ -156,7 +167,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
                         return ItemStack.EMPTY;
                     
                     if (!client) {
-                        EmcData.addEmc(player, itemCost.negate());
+                        EmcData.subtractEmc(player, itemCost);
                         refreshOffering();
                     }
                     return stack;
@@ -189,20 +200,20 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
     }
 
 
-    public void addKnowledgePair(Pair<Item, BigInteger> pair) {
+    public void addKnowledgePair(Pair<Item, SuperNumber> pair) {
         if (knowledge.size() == 0) {
             knowledge.add(pair);
             return;
         }
 
-        BigInteger num = pair.getRight();
+        SuperNumber num = pair.getRight();
         int low = 0;
         int high = knowledge.size() - 1;
         
         while (low <= high) {
             int mid = (low + high) / 2;
-            Pair<Item, BigInteger> midPair = knowledge.get(mid);
-            BigInteger midNum = midPair.getRight();
+            Pair<Item, SuperNumber> midPair = knowledge.get(mid);
+            SuperNumber midNum = midPair.getRight();
             
             if (num.compareTo(midNum) == 1) {
                 high = mid - 1;
