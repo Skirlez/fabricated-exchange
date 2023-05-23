@@ -52,7 +52,6 @@ import com.skirlez.fabricatedexchange.util.SuperNumber;
 public class FabricatedExchange implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("fabricated-exchange");
     public static final String MOD_ID = "fabricated-exchange";
-    public static DecimalFormat formatter = new DecimalFormat("#,###.0000");
     // this map tells the philosopher's stone what block to transform when right clicked
     public static Map<Block, Block> blockRotationMap = new HashMap<>();
     public static Map<Item, SuperNumber> emcMap = new HashMap<>();
@@ -134,37 +133,44 @@ public class FabricatedExchange implements ModInitializer {
         putEmcMap(Items.OAK_PLANKS,8);
         putEmcMap(Items.WHITE_WOOL, 48);
         putEmcMap(Items.BONE, 96);
-        putEmcMap(Items.IRON_INGOT, 256);
+        
         putEmcMap(Items.REDSTONE, 64);
         putEmcMap(Items.EMERALD, 16384);
         putEmcMap(Items.ENDER_PEARL, 1024);
+        putEmcMap(Items.COAL, 32);
+        putEmcMap(Items.IRON_INGOT, 256);
+        putEmcMap(Items.GOLD_INGOT, 2048);
+        putEmcMap(Items.NETHERITE_SCRAP, 12288);
         putEmcMap(Items.DIAMOND, 8192);
-        putEmcMap(Items.NETHERITE_INGOT, 57344);
-
-
+        putEmcMap(Items.NETHER_STAR, 139264);
+        // blacklisted recipes
+        String[] smeltingRecipesBlacklist = {"minecraft:iron_nugget_from_smelting"};
         RecipeManager recipeManager = world.getRecipeManager();
         // i don't know what this thing is, but you need it for some functions
         DynamicRegistryManager dynamicRegistryManager = world.getRegistryManager();
 
+        LinkedList<SmeltingRecipe> smeltingRecipes = new LinkedList<SmeltingRecipe>(recipeManager.listAllOfType(RecipeType.SMELTING));
+        for (String s : smeltingRecipesBlacklist) {
+            int len = smeltingRecipes.size();
+            for (int i = 0; i < len; i++) {
+                if (smeltingRecipes.get(i).getId().toString().equals(s)) {
+                    smeltingRecipes.remove(i);
+                    i--;
+                    len--;
+                }
+            }
+        }
+        LinkedList<CraftingRecipe> craftingRecipes = new LinkedList<CraftingRecipe>(recipeManager.listAllOfType(RecipeType.CRAFTING));
 
-        for (int i = 0; i < 3; i++) {
+
+        for (int i = 0; i < 4; i++) {
             // Smelting recipes
-
-            // Attempted goal is:
-            // Item smelt = output item
-            LinkedList<SmeltingRecipe> smeltingRecipes = new LinkedList<SmeltingRecipe>(recipeManager.listAllOfType(RecipeType.SMELTING));
             for (int j = 0; j < 100; j++) { 
                 if (!iterateSmeltingRecipes(recipeManager, dynamicRegistryManager, smeltingRecipes))
                     break;
             }
 
             // Crafting recipes
-
-            // Attempted goal is:
-            // (Sum of all ingredients) = output
-
-
-            LinkedList<CraftingRecipe> craftingRecipes = new LinkedList<CraftingRecipe>(recipeManager.listAllOfType(RecipeType.CRAFTING));
             for (int j = 0; j < 100; j++) {
                 if (!iterateCraftingRecipes(recipeManager, dynamicRegistryManager, craftingRecipes))
                     break;
@@ -180,6 +186,8 @@ public class FabricatedExchange implements ModInitializer {
         int len = recipesList.size();
         for (int i = 0; i < len; i++) {
             CraftingRecipe recipe = recipesList.get(i);
+            if (recipe.getId().toString().equals("minecraft:stick"))
+                LOGGER.info("here");
             int unknownSide = 0; // 0 - unset, 1 - left, 2 - right
             List<Item> unknownItems = new ArrayList<Item>();
             boolean giveUp = false;
@@ -210,7 +218,6 @@ public class FabricatedExchange implements ModInitializer {
                 SuperNumber emcWorth = SuperNumber.Zero();
 
                 for (ItemStack stack : itemStackArr) {
-
                     Item item = stack.getItem();
                     SuperNumber itemEmc = getItemEmc(item);
                     if (!itemEmc.equalsZero()) {
@@ -223,15 +230,16 @@ public class FabricatedExchange implements ModInitializer {
                         giveUp = true;
                         break;
                     }
-                    for (ItemStack stack : itemStackArr)
+                    for (ItemStack stack : itemStackArr) {
                         unknownItems.add(stack.getItem());
+                    }
                     unknownSide = 1;
                 }
                 else {
                     for (ItemStack stack : itemStackArr) {
                         Item item = stack.getItem();
                         SuperNumber itemEmc = getItemEmc(item);
-                        if (itemEmc.equals(SuperNumber.Zero()) && !emcMap.containsKey(item)) {
+                        if (itemEmc.equalsZero() && !emcMap.containsKey(item)) {
                             putEmcMap(item, emcWorth);
                             break;
                         }
@@ -245,7 +253,7 @@ public class FabricatedExchange implements ModInitializer {
 
             
 
-            if (unknownSide == 0) { // if we know the emc value of everything, remove this entry and move on
+            if (unknownSide == 0) { // if we know the emc value of everything,  move on
                 recipesList.remove(i);
                 i--;
                 len--;
@@ -255,8 +263,8 @@ public class FabricatedExchange implements ModInitializer {
                 SuperNumber leftValue = equation.getLeft();
                 SuperNumber rightValue = equation.getRight();
                 rightValue.subtract(leftValue);
-                if (rightValue.compareTo(SuperNumber.Zero()) == -1) {
-                    LOGGER.error("ERROR: NEGATIVE EMC VALUE! Recipe: " + recipe.getId().toString());
+                if (rightValue.compareTo(SuperNumber.ZERO) == -1) {
+                    LOGGER.error("ERROR: Negative EMC value! Recipe: " + recipe.getId().toString());
                 } 
                 for (Item item : unknownItems) {
                     if (!emcMap.containsKey(item)) {
@@ -293,16 +301,40 @@ public class FabricatedExchange implements ModInitializer {
         for (int i = 0; i < len; i++) {
             SmeltingRecipe recipe = recipesList.get(i);
 
-            // get the item (there should only be one, hopefully)
-            Item inputItem = recipe.getIngredients().get(0).getMatchingStacks()[0].getItem();
-            if (inputItem.equals(Items.OAK_WOOD)) {
-                LOGGER.info("WOOOD");
-            }
 
+
+
+            Ingredient inputIngredient = recipe.getIngredients().get(0);
+            ItemStack[] itemStacks = inputIngredient.getMatchingStacks();
+            SuperNumber inEmc = SuperNumber.Zero();
+            int foundIndex = 0;
+            for (int j = 0; j < itemStacks.length; j++) {
+                ItemStack itemStack = itemStacks[j];
+                SuperNumber itemEmc = getItemEmc(itemStack.getItem());
+                if (itemEmc.equalsZero())
+                    continue;
+                if (inEmc.equalsZero()) {
+                    inEmc = itemEmc;
+                    foundIndex = j;
+                    continue;
+                }
+                int comparison = itemEmc.compareTo(inEmc);
+                if (comparison != 0) {
+                    FabricatedExchange.LOGGER.warn("WARNING: EMC conflict detected! for recipe " + recipe.getId().toString() + ", for items "  
+                    + itemStacks[foundIndex].getName() + " with value " + inEmc.toString() + ", "
+                    + itemStacks[j].getName() + " with value " + itemEmc.toString() + ". choosing the lower value."); 
+                    inEmc = SuperNumber.min(inEmc, itemEmc);
+                }
+            }
+            boolean log = false;
             Item outputItem = recipe.getOutput(dynamicRegistryManager).getItem();
 
             SuperNumber outEmc = getItemEmc(outputItem);
-            SuperNumber inEmc = getItemEmc(inputItem);
+           
+            if (log) {
+                LOGGER.info(outEmc.toString());
+                LOGGER.info(inEmc.toString());
+            }
             if (outEmc.equalsZero()) {
                 if (inEmc.equalsZero())
                     continue; // not enough info
@@ -315,10 +347,13 @@ public class FabricatedExchange implements ModInitializer {
             }
             else if (inEmc.equalsZero()) {
                  // if out emc is defined but in emc is not
-                 if (!emcMap.containsKey(inputItem)) {
-                    putEmcMap(inputItem, outEmc);
-                    newInfo = true;
-                 }
+                for (int j = 0; j < itemStacks.length; j++) {
+                    Item inputItem = itemStacks[j].getItem();
+                    if (!emcMap.containsKey(inputItem)) {
+                        putEmcMap(inputItem, outEmc);
+                        newInfo = true;
+                    }
+                }
             }
             else { // we already know these EMC values
                 recipesList.remove(i);

@@ -50,9 +50,9 @@ public abstract class ModItemEMC implements ModItemInterface {
 		if (!emc.equalsZero()) {
 			ArrayList<Text> list = cir.getReturnValue();
 			if (cir != null) {
-				list.add(Text.literal("§eEMC§r: " + baseEMC.toString(3)));
+				list.add(Text.literal("§eEMC§r: " + baseEMC.toString()));
 				if (count > 1) 
-					list.add(Text.literal("§eStack EMC: §r" + emc.toString(3)));
+					list.add(Text.literal("§eStack EMC: §r" + emc.toString()));
 			}
 
 			

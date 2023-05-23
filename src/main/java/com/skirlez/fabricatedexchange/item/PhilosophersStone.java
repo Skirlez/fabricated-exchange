@@ -8,6 +8,7 @@ import com.skirlez.fabricatedexchange.sound.ModSounds;
 import com.skirlez.fabricatedexchange.util.EmcData;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;

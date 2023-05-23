@@ -151,7 +151,8 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
                 int intItemCount = itemCount.toInt();
                 if (intItemCount == 0)
                     stack.setCount(stack.getMaxCount());
-                stack.setCount(Math.min(stack.getMaxCount(), intItemCount));
+                else
+                    stack.setCount(Math.min(stack.getMaxCount(), intItemCount));
 
                 modItemStack = (ModItemInterface)(Object)stack;
                 SuperNumber itemCost = modItemStack.getEMC();

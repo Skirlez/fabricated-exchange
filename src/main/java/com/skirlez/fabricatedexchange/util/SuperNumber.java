@@ -48,7 +48,12 @@ public class SuperNumber {
         String[] parts = divisionString.split("/");
         
         this.numerator = new BigInteger(parts[0]);
-        this.denominator = (parts.length > 1) ? new BigInteger(parts[1]) : BigInteger.ONE;
+        if (parts.length > 1) {
+            this.denominator = new BigInteger(parts[1]);
+            simplify();
+            return;
+        }
+        this.denominator = BigInteger.ONE;
     }
     public SuperNumber(SuperNumber other) {
         this.numerator = other.numerator;
@@ -57,7 +62,7 @@ public class SuperNumber {
     }
 
 
-    public int toInt() {
+    public int toInt() { // TODO: this is dumb
         if (this.compareTo(INTEGER_LIMIT) == 1 || numerator.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) == 1) {
             return 0;
         }
@@ -139,32 +144,30 @@ public class SuperNumber {
 
 
     public String toString() {
+        if (this.equalsZero())
+            return "0";
         BigDecimal a = new BigDecimal(numerator);
         a = a.divide(new BigDecimal(denominator), 10, RoundingMode.HALF_EVEN);
-        return a.toString();
+        if (a.compareTo(new BigDecimal("1000000000")) == 1)
+            return scientificNotation(a);
+        return normalNotation(a);
     }
-
-    public String toString(int digitsAfterPoint) {
-        BigDecimal a = new BigDecimal(numerator);
-        a = a.divide(new BigDecimal(denominator), digitsAfterPoint, RoundingMode.HALF_EVEN);
-        return a.toString();
-    }
-
-    public String scientificNotation() {
-        BigDecimal a = new BigDecimal(numerator);
-        DecimalFormat format = new DecimalFormat("0.####E0");
+    private String scientificNotation(BigDecimal a) {
+        DecimalFormat format = new DecimalFormat("0.#####E0");
         return format.format(a);
     }
-
-    public String scientificNotation(int digits) {
-        BigDecimal a = new BigDecimal(numerator);
-        String pattern = "";
-        for (int i = 0; i < digits; i++) {
-            pattern += "#";
-        }
-        DecimalFormat format = new DecimalFormat("0." + pattern + "E0");
-        return format.format(a);
+    private String normalNotation(BigDecimal a) {
+        DecimalFormat formatter = new DecimalFormat("#,###.000");
+        String s = formatter.format(a);
+        while (s.endsWith("0")) 
+            s = s.substring(0, s.length() - 1);
+        if (s.endsWith("."))
+            s = s.substring(0, s.length() - 1);
+        if (s.startsWith("."))
+            s = "0" + s;
+        return s;
     }
+
     public String divisonString() {
         return numerator.toString() + "/" + denominator.toString();
     }
