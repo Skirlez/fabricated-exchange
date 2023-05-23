@@ -49,13 +49,8 @@ public class ServerState extends PersistentState {
  
             playerState.emc = new BigInteger(playersTag.getCompound(key).getString("emc"));
             NbtList knowledgeNbtList = playersTag.getCompound(key).getList("knowledge", NbtElement.STRING_TYPE);
-            FabricatedExchange.LOGGER.info("hey guys");
-            for (int i = 0; i < knowledgeNbtList.size(); i++) {
+            for (int i = 0; i < knowledgeNbtList.size(); i++) 
                 playerState.knowledge.add(knowledgeNbtList.getString(i));
-                FabricatedExchange.LOGGER.info(knowledgeNbtList.getString(i));
-                
-            }
-
             UUID uuid = UUID.fromString(key);
             serverState.players.put(uuid, playerState);
         });

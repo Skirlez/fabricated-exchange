@@ -42,12 +42,10 @@ public class TransmutationTable extends BlockWithEntity implements BlockEntityPr
     @Override
     public ActionResult onUse(BlockState state, World world, 
         BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        FabricatedExchange.LOGGER.info("HELLO1");
         if (!world.isClient) {
             NamedScreenHandlerFactory screenHandlerFactory = ((TransmutationTableBlockEntity) world.getBlockEntity(pos));
 
             if (screenHandlerFactory != null) {
-                FabricatedExchange.LOGGER.info("HELLO2");
                 player.openHandledScreen(screenHandlerFactory);
             }
         }

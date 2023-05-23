@@ -13,8 +13,12 @@ import java.util.stream.Collectors;
 import org.jetbrains.annotations.Nullable;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
+import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
+import com.skirlez.fabricatedexchange.mixin.ModItemEMC;
 import com.skirlez.fabricatedexchange.screen.slot.ConsumeSlot;
 import com.skirlez.fabricatedexchange.screen.slot.TransmutationSlot;
+import com.skirlez.fabricatedexchange.util.EmcData;
+import com.skirlez.fabricatedexchange.util.ModItemInterface;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
 
@@ -97,13 +101,14 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         }
     }
 
+
     public void refreshOffering() {
         BigInteger emc = ServerState.getPlayerState(this.player).emc;
         int num = 0;
         for (int i = 0; i < transmutationSlots.size(); i++) {
             transmutationSlots.get(i).setStack(ItemStack.EMPTY);
         }
-        int len = Math.min(knowledge.size(), 8);
+        int len = Math.min(knowledge.size(), 12);
         for (int i = 0; i < len; i++) {
             Item item = knowledge.get(i).getLeft();
             BigInteger itemEmc = knowledge.get(i).getRight();
@@ -128,15 +133,39 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
             ItemStack stack = ItemStack.EMPTY;
             TransmutationSlot slot = (TransmutationSlot)this.slots.get(invSlot);
             if (slot != null && slot.hasStack()) {
-                stack = slot.takeStack(64).copy();
+                stack = slot.getStack().copy();
+                stack.setCount(stack.getMaxCount());
+                ModItemInterface modItemStack = (ModItemInterface)(Object)stack;
+                BigInteger itemCost = modItemStack.getEMC();
                 
-                if (invSlot < this.inventory.size()) {
-                    if (!this.insertItem(stack, this.inventory.size(), this.slots.size(), true)) {
+                BigInteger emc;
+                boolean client = player.getWorld().isClient();
+                if (client)
+                    emc = FabricatedExchangeClient.clientEmc;
+                else
+                    emc = EmcData.getEmc(player);
+                
+
+                if (emc.compareTo(itemCost) != -1) {
+                    if (invSlot < this.inventory.size()) {
+                        if (!this.insertItem(stack, this.inventory.size(), this.slots.size(), true)) {
+                            return ItemStack.EMPTY;
+                        }
+                    } 
+                    else if (!this.insertItem(stack, 0, this.inventory.size(), false))
                         return ItemStack.EMPTY;
+                    
+                    if (!client) {
+                        EmcData.addEmc(player, itemCost.negate());
+                        refreshOffering();
                     }
-                } else if (!this.insertItem(stack, 0, this.inventory.size(), false)) {
-                    return ItemStack.EMPTY;
+                    return stack;
                 }
+                else
+                    return ItemStack.EMPTY;
+            
+
+
 
             }
             

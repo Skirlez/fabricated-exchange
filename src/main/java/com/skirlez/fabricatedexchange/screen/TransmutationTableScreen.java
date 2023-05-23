@@ -6,11 +6,14 @@ import java.lang.reflect.Field;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
+import com.skirlez.fabricatedexchange.screen.slot.TransmutationSlot;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -20,7 +23,7 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
     private static final Identifier TEXTURE =
             new Identifier(FabricatedExchange.MOD_ID, "textures/gui/transmute.png");
 
-    private Field fieldDoubleClicked;
+    public Field fieldDoubleClicked;
 
     public TransmutationTableScreen(TransmutationTableScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -35,12 +38,33 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
     
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        try {
-            fieldDoubleClicked.set(this, Boolean.FALSE);
-        } catch (SecurityException | IllegalAccessException e) {
-            FabricatedExchange.LOGGER.error("", e);
-        }
+        // todo make this only for when clicking on the transmutation slots
+
         return super.mouseReleased(mouseX, mouseY, button);
+    }
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        boolean result = super.mouseClicked(mouseX, mouseY, button);
+        Slot slot = getSlotAt(mouseX, mouseY);
+
+        // this double clicking variable creates a lot of trouble for transmutation slots, so we attempt to make it false here
+        if (slot instanceof TransmutationSlot) {
+            try {
+                fieldDoubleClicked.set(this, Boolean.FALSE);
+            } catch (SecurityException | IllegalAccessException e) {
+                FabricatedExchange.LOGGER.error("", e);
+            }
+        }
+        return result;
+    }
+
+    private Slot getSlotAt(double x, double y) {
+        for (int i = 0; i < ((ScreenHandler)this.handler).slots.size(); ++i) {
+            Slot slot = ((ScreenHandler)this.handler).slots.get(i);
+            if (!isPointWithinBounds(slot.x, slot.y, 16, 16, x, y) || !slot.isEnabled()) continue;
+                return slot;
+        }
+        return null;
     }
 
     @Override
@@ -72,7 +96,7 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
     protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
         this.textRenderer.draw(matrices, this.title, (float)this.titleX, (float)this.titleY, 0x404040);
         String emc = FabricatedExchangeClient.clientEmc.toString();
-        this.textRenderer.draw(matrices, Text.empty().append("EMC: " + emc), -20, 70, 0x404040);
+        this.textRenderer.draw(matrices, Text.empty().append("EMC: "), -20, 70, 0x404040);
     }
 
     @Override
