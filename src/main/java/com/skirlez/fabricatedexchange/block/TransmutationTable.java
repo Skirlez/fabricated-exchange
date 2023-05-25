@@ -2,7 +2,6 @@ package com.skirlez.fabricatedexchange.block;
 
 import org.jetbrains.annotations.Nullable;
 
-import com.skirlez.fabricatedexchange.FabricatedExchange;
 
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;

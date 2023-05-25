@@ -169,7 +169,7 @@ public class SuperNumber {
     }
 
     public String divisonString() {
-        return numerator.toString() + "/" + denominator.toString();
+        return numerator.toString() + "/" + ((denominator.toString().equals("1")) ? "" : denominator.toString());
     }
 
 

@@ -34,8 +34,7 @@ public class ConsumeSlot extends Slot {
     public ItemStack insertStack(ItemStack stack, int count) {
         ItemStack newStack = stack.copy();
         newStack.setCount(count);
-        ModItemInterface modStack = (ModItemInterface) (Object) newStack;
-        SuperNumber emc = modStack.getEMC();
+        SuperNumber emc = EmcData.getItemStackEmc(stack);
         if (emc.equalsZero())
             return stack;
         if (!player.getWorld().isClient()) {
@@ -45,7 +44,7 @@ public class ConsumeSlot extends Slot {
             Item item = stack.getItem();
             if (!playerState.knowledge.contains(idName)) {
                 playerState.knowledge.add(idName);
-                screenHandler.addKnowledgePair(new Pair<Item, SuperNumber>(item, FabricatedExchange.getItemEmc(item)));
+                screenHandler.addKnowledgePair(new Pair<Item, SuperNumber>(item, EmcData.getItemEmc(item)));
             }
             playerState.markDirty();
             

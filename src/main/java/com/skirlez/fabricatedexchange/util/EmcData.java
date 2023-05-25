@@ -1,6 +1,8 @@
 package com.skirlez.fabricatedexchange.util;
 
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
@@ -8,10 +10,43 @@ import com.skirlez.fabricatedexchange.networking.ModMessages;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class EmcData {
+
+    // both the server and the client can use these
+    public static Map<String, SuperNumber> emcMap = new HashMap<>();
+
+    public static SuperNumber getItemEmc(Item item) {
+        if (item == null)
+            return SuperNumber.Zero(); 
+        String id = Registries.ITEM.getId(item).toString();
+        return getItemEmc(id);
+    }
+    public static SuperNumber getItemStackEmc(ItemStack itemStack) {
+        Item item = itemStack.getItem();
+        if (item == null)
+            return SuperNumber.Zero(); 
+        String id = Registries.ITEM.getId(item).toString();
+        SuperNumber baseEmc = getItemEmc(id);
+        baseEmc.multiply(itemStack.getCount());
+        return baseEmc;
+    }
+
+
+
+    public static SuperNumber getItemEmc(String id) {
+        if (emcMap.containsKey(id)) {
+            return new SuperNumber(emcMap.get(id));
+        }
+        return SuperNumber.Zero(); 
+    }
+
+    // only the server can use these
     public static SuperNumber getEmc(LivingEntity player) {
         PlayerState playerState = ServerState.getPlayerState(player);
         return playerState.emc;
@@ -23,7 +58,6 @@ public class EmcData {
         playerState.markDirty();
         syncEmc((ServerPlayerEntity) player, playerState.emc);
     }    
-
     public static void addEmc(LivingEntity player, SuperNumber amount) {
         PlayerState playerState = ServerState.getPlayerState(player);
         playerState.emc.add(amount);
@@ -36,7 +70,6 @@ public class EmcData {
         playerState.markDirty();
         syncEmc((ServerPlayerEntity) player, playerState.emc);
     }    
-
     public static void syncEmc(ServerPlayerEntity player, SuperNumber emc) {
         PacketByteBuf buffer = PacketByteBufs.create();
         buffer.writeString(emc.divisonString());

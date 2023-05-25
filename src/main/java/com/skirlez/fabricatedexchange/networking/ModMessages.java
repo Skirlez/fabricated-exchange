@@ -10,13 +10,15 @@ import net.minecraft.util.Identifier;
 public class ModMessages {
     public static final Identifier EMC_USE_IDENTIFIER = new Identifier(FabricatedExchange.MOD_ID, "emc_use");
     public static final Identifier EMC_SYNC_IDENTIFIER = new Identifier(FabricatedExchange.MOD_ID, "emc_sync");
+    public static final Identifier EMC_MAP_SYNC_IDENTIFIER = new Identifier(FabricatedExchange.MOD_ID, "emc_map_sync");
 
     public static void registerC2SPackets() {
-        ServerPlayNetworking.registerGlobalReceiver(EMC_USE_IDENTIFIER, EMCUseC2SPacket::receive);
+        ServerPlayNetworking.registerGlobalReceiver(EMC_USE_IDENTIFIER, EmcUseC2SPacket::receive);
+        
     }
 
     public static void registerS2CPackets() {
-        ClientPlayNetworking.registerGlobalReceiver(EMC_SYNC_IDENTIFIER, EMCSyncS2CPacket::receive);
-    
+        ClientPlayNetworking.registerGlobalReceiver(EMC_SYNC_IDENTIFIER, EmcSyncS2CPacket::receive);
+        ClientPlayNetworking.registerGlobalReceiver(EMC_MAP_SYNC_IDENTIFIER, EmcMapSyncS2CPacket::receive);
     }
 }

@@ -14,6 +14,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -37,11 +38,14 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
     }
     
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        // todo make this only for when clicking on the transmutation slots
-
-        return super.mouseReleased(mouseX, mouseY, button);
+    protected void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType) {
+        // SWAP is when you press number keys to put slots in the hotbar. it does not consult the slot,
+        // which for our case, means it duplicates the item. so we tell it to leave
+        if (actionType == SlotActionType.SWAP && slot instanceof TransmutationSlot)
+            return;
+        super.onMouseClick(slot, slotId, button, actionType);
     }
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         boolean result = super.mouseClicked(mouseX, mouseY, button);

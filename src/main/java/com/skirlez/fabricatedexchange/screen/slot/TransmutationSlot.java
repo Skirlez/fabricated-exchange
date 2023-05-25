@@ -32,16 +32,25 @@ public class TransmutationSlot extends Slot {
     }
 
     @Override
+    public void setStack(ItemStack stack) {
+            ModItemInterface moddedStack = (ModItemInterface)(Object)stack;
+        moddedStack.setDisplayMaxStack(3);
+        stack = (ItemStack)(Object)(moddedStack);
+        this.setStackNoCallbacks(stack);
+    }
+
+
+    @Override
     public boolean canTakeItems(PlayerEntity playerEntity) {
         return true;
     }
 
     @Override
     public ItemStack takeStack(int amount) {
+
         ItemStack stack = this.getStack().copy();
         stack.setCount(amount);
-        ModItemInterface modStack = (ModItemInterface) (Object) stack;
-        SuperNumber itemCost = modStack.getEMC();
+        SuperNumber itemCost = EmcData.getItemStackEmc(stack);
         if (!player.world.isClient()) {
             SuperNumber emc = EmcData.getEmc(player);
             if (emc.compareTo(itemCost) != -1) {
