@@ -1,29 +1,16 @@
 package com.skirlez.fabricatedexchange.screen;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-
-import org.jetbrains.annotations.Nullable;
-
-import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
-import com.skirlez.fabricatedexchange.mixin.ModItemEMC;
 import com.skirlez.fabricatedexchange.screen.slot.ConsumeSlot;
 import com.skirlez.fabricatedexchange.screen.slot.MidSlot;
 import com.skirlez.fabricatedexchange.screen.slot.TransmutationSlot;
 import com.skirlez.fabricatedexchange.util.EmcData;
-import com.skirlez.fabricatedexchange.util.ModItemInterface;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
-import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;

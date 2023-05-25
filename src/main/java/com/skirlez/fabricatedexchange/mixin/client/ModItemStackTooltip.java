@@ -1,10 +1,7 @@
-package com.skirlez.fabricatedexchange.mixin;
+package com.skirlez.fabricatedexchange.mixin.client;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemConvertible;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
@@ -13,18 +10,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.skirlez.fabricatedexchange.FabricatedExchange;
-import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.util.EmcData;
-import com.skirlez.fabricatedexchange.util.ModItemInterface;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 @Mixin(ItemStack.class)
-public abstract class ModItemEMC implements ModItemInterface {
-	/*
+public class ModItemStackTooltip {
 	@Shadow
 	private int count;
 
@@ -41,8 +33,7 @@ public abstract class ModItemEMC implements ModItemInterface {
 		SuperNumber emc = EmcData.getItemEmc(itemStack.getItem());
 		return emc;
 	}
-
-
+	
 	public void setDisplayMaxStack(int set) {
 		displayMaxStack = set;
 	}
@@ -57,15 +48,7 @@ public abstract class ModItemEMC implements ModItemInterface {
 			ArrayList<Text> list = cir.getReturnValue();
 			if (cir != null) {
 				list.add(Text.literal("§eEMC§r: " + emc.toString()));
-				if (displayMaxStack != 0) {
-					ItemStack itemStack = (ItemStack)(Object)this;
-					int maxCount = itemStack.getMaxCount();
-					if (maxCount != 1) {
-						emc.multiply(maxCount);
-						list.add(Text.literal("§eEMC for " + maxCount + ": §r" + emc.toString()));
-					}
-				}
-				else if (count > 1) {
+				if (count > 1) {
 					emc.multiply(count);
 					list.add(Text.literal("§eStack EMC: §r" + emc.toString()));
 				}
@@ -74,7 +57,7 @@ public abstract class ModItemEMC implements ModItemInterface {
 			
 		}
 	};
-	
+	/* 
 	@Inject(method = "copy", at = @At("RETURN"))
 	public void injectCopy(CallbackInfoReturnable<ItemStack> cir) {
 		if (displayMaxStack == 0)
@@ -84,5 +67,4 @@ public abstract class ModItemEMC implements ModItemInterface {
 		return;
 	};
 	*/
-
 }

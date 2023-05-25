@@ -1,13 +1,10 @@
 package com.skirlez.fabricatedexchange;
-import com.skirlez.fabricatedexchange.emc.EmcMapper;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.ModScreenHandlers;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreen;
-import com.skirlez.fabricatedexchange.util.EmcData;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 public class FabricatedExchangeClient implements ClientModInitializer {

@@ -1,22 +1,14 @@
 package com.skirlez.fabricatedexchange.screen.slot;
 
-import java.util.Optional;
-
-import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
-import com.skirlez.fabricatedexchange.screen.TransmutationTableScreen;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandler;
 import com.skirlez.fabricatedexchange.util.EmcData;
-import com.skirlez.fabricatedexchange.util.ModItemInterface;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 
 public class TransmutationSlot extends Slot {
@@ -33,9 +25,6 @@ public class TransmutationSlot extends Slot {
 
     @Override
     public void setStack(ItemStack stack) {
-            ModItemInterface moddedStack = (ModItemInterface)(Object)stack;
-        moddedStack.setDisplayMaxStack(3);
-        stack = (ItemStack)(Object)(moddedStack);
         this.setStackNoCallbacks(stack);
     }
 

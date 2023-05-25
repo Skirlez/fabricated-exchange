@@ -1,15 +1,9 @@
 package com.skirlez.fabricatedexchange.item;
 
-import java.math.BigInteger;
 import java.util.Random;
-
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.sound.ModSounds;
-import com.skirlez.fabricatedexchange.util.EmcData;
-
 import net.minecraft.block.Block;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.particle.ParticleTypes;
@@ -49,7 +43,6 @@ public class PhilosophersStone extends Item {
             }
             else {
                 world.setBlockState(blockPos, FabricatedExchange.blockRotationMap.get(block).getDefaultState());
-                LivingEntity player = context.getPlayer();
             }
         }
 

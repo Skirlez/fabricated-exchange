@@ -1,9 +1,5 @@
 package com.skirlez.fabricatedexchange.networking.packet;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.util.EmcData;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
@@ -29,7 +25,6 @@ public class EmcMapSyncS2CPacket {
      */
     public static void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
         EmcData.emcMap.clear();
-        Map<String, SuperNumber> emcMap = new HashMap<String, SuperNumber>();
         int iterations = buf.readInt();
         for (int i = 0; i < iterations; i++) {
             String s = buf.readString();

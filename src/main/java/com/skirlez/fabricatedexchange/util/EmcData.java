@@ -1,10 +1,8 @@
 package com.skirlez.fabricatedexchange.util;
 
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;

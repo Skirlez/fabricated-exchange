@@ -2,8 +2,6 @@ package com.skirlez.fabricatedexchange.block;
 
 import org.jetbrains.annotations.Nullable;
 
-
-import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -20,7 +18,7 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
-public class TransmutationTable extends BlockWithEntity implements BlockEntityProvider {
+public class TransmutationTable extends BlockWithEntity {
 
     public TransmutationTable(Settings settings) {
         super(settings);
