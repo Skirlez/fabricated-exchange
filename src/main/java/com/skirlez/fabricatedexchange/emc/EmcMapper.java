@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
+import com.skirlez.fabricatedexchange.mixin.LegacySmithingRecipeAccessor;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.minecraft.item.Item;
@@ -13,12 +14,17 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.LegacySmithingRecipe;
+import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.SmeltingRecipe;
+import net.minecraft.recipe.SmithingRecipe;
+import net.minecraft.recipe.SmithingTransformRecipe;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Pair;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 
 public class EmcMapper {
@@ -45,7 +51,6 @@ public class EmcMapper {
         putEmcMap(Items.OAK_PLANKS,8);
         putEmcMap(Items.WHITE_WOOL, 48);
         putEmcMap(Items.BONE, 96);
-        
         putEmcMap(Items.REDSTONE, 64);
         putEmcMap(Items.EMERALD, 16384);
         putEmcMap(Items.ENDER_PEARL, 1024);
@@ -55,33 +60,31 @@ public class EmcMapper {
         putEmcMap(Items.NETHERITE_SCRAP, 12288);
         putEmcMap(Items.DIAMOND, 8192);
         putEmcMap(Items.NETHER_STAR, 139264);
+
         // blacklisted recipes
         String[] smeltingRecipesBlacklist = {"minecraft:iron_nugget_from_smelting", "minecraft:gold_nugget_from_smelting"};
         
         // i don't know what this thing is, but you need it for some functions
         DynamicRegistryManager dynamicRegistryManager = world.getRegistryManager();
 
+        LinkedList<SmithingRecipe> smithingRecipes = new LinkedList<SmithingRecipe>(recipeManager.listAllOfType(RecipeType.SMITHING));
+
         LinkedList<SmeltingRecipe> smeltingRecipes = new LinkedList<SmeltingRecipe>(recipeManager.listAllOfType(RecipeType.SMELTING));
-        for (String s : smeltingRecipesBlacklist) {
-            int len = smeltingRecipes.size();
-            for (int i = 0; i < len; i++) {
-                if (smeltingRecipes.get(i).getId().toString().equals(s)) {
-                    smeltingRecipes.remove(i);
-                    i--;
-                    len--;
-                }
-            }
-        }
+        removeArrayFromRecipeList(smeltingRecipesBlacklist, smeltingRecipes);
         LinkedList<CraftingRecipe> craftingRecipes = new LinkedList<CraftingRecipe>(recipeManager.listAllOfType(RecipeType.CRAFTING));
 
 
         for (int i = 0; i < 4; i++) {
             // Smelting recipes
             for (int j = 0; j < 100; j++) { 
+                if (!iterateSmithingRecipes(recipeManager, dynamicRegistryManager, smithingRecipes))
+                    break;
+            }
+            // Smelting recipes
+            for (int j = 0; j < 100; j++) { 
                 if (!iterateSmeltingRecipes(recipeManager, dynamicRegistryManager, smeltingRecipes))
                     break;
             }
-
             // Crafting recipes
             for (int j = 0; j < 100; j++) {
                 if (!iterateCraftingRecipes(recipeManager, dynamicRegistryManager, craftingRecipes))
@@ -204,9 +207,6 @@ public class EmcMapper {
         for (int i = 0; i < len; i++) {
             SmeltingRecipe recipe = recipesList.get(i);
 
-
-
-
             Ingredient inputIngredient = recipe.getIngredients().get(0);
             ItemStack[] itemStacks = inputIngredient.getMatchingStacks();
             SuperNumber inEmc = SuperNumber.Zero();
@@ -267,6 +267,56 @@ public class EmcMapper {
     }
 
 
+    private boolean iterateSmithingRecipes(RecipeManager recipeManager, DynamicRegistryManager dynamicRegistryManager, LinkedList<SmithingRecipe> recipesList) {
+        boolean newInfo = false;
+
+        int len = recipesList.size();
+        for (int i = 0; i < len; i++) {
+            // this is deprecated but at the moment the recipe list function gives us LegacySmithingRecipe,
+            // when they change it we will properly use SmithingTransformRecipe and SmithingTrimRecipe
+            LegacySmithingRecipe recipe = (LegacySmithingRecipe)recipesList.get(i);
+
+            LegacySmithingRecipeAccessor recipeAccessor = (LegacySmithingRecipeAccessor) recipe;
+            Ingredient base = recipeAccessor.getBase();
+            Ingredient addition = recipeAccessor.getAddition();
+            Item a = base.getMatchingStacks()[0].getItem();
+            Item b = addition.getMatchingStacks()[0].getItem();
+            SuperNumber aEmc = getItemEmc(a);
+            SuperNumber bEmc = getItemEmc(b);
+
+            if (aEmc.equalsZero() || bEmc.equalsZero())
+                continue; // not enough info / will probably lead to inaccurate results
+
+
+
+            Item output = recipe.getOutput(dynamicRegistryManager).getItem();
+            SuperNumber outEmc = getItemEmc(output);
+
+
+            if (outEmc.equalsZero()) {
+                aEmc.add(bEmc);
+                if (!emcMapHasEntry(output)) {
+                    putEmcMap(output, aEmc);
+                    newInfo = true;
+                }
+                continue;
+            }
+            if (aEmc.equalsZero()) {
+                if (!emcMapHasEntry(a)) {
+                    bEmc.add(outEmc);
+                    putEmcMap(a, bEmc);
+                }
+                continue;
+            }
+            if (!emcMapHasEntry(b)) {
+                aEmc.add(outEmc);
+                putEmcMap(b, aEmc);
+            }
+            
+        }
+        return newInfo;
+    }
+
     private void putEmcMap(Item item, int value) {
         emcMap.put(Registries.ITEM.getId(item).toString(), new SuperNumber(value));
     }
@@ -287,4 +337,19 @@ public class EmcMapper {
     private boolean emcMapHasEntry(Item item) {
         return emcMap.containsKey(Registries.ITEM.getId(item).toString());
     }
+
+    private void removeArrayFromRecipeList(String[] arr, LinkedList<?> list) {
+        for (String str : arr) {
+            int len = list.size();
+            for (int i = 0; i < len; i++) {
+                if (((Recipe<?>)list.get(i)).getId().toString().equals(str)) {
+                    list.remove(i);
+                    i--;
+                    len--;
+                }
+            }
+        }
+    }
+
 }
+

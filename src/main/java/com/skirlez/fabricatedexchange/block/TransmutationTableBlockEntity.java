@@ -2,6 +2,7 @@ package com.skirlez.fabricatedexchange.block;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.skirlez.fabricatedexchange.interfaces.ImplementedInventory;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandler;
 
 import net.minecraft.block.BlockState;

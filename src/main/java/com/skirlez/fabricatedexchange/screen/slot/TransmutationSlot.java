@@ -1,8 +1,9 @@
 package com.skirlez.fabricatedexchange.screen.slot;
 
 import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
+import com.skirlez.fabricatedexchange.emc.EmcData;
+import com.skirlez.fabricatedexchange.interfaces.ModItemStackInterface;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandler;
-import com.skirlez.fabricatedexchange.util.EmcData;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.minecraft.entity.LivingEntity;
@@ -25,6 +26,8 @@ public class TransmutationSlot extends Slot {
 
     @Override
     public void setStack(ItemStack stack) {
+        ModItemStackInterface moddedStack = (ModItemStackInterface)(Object)stack;
+        moddedStack.setDisplayMaxStack(3);
         this.setStackNoCallbacks(stack);
     }
 

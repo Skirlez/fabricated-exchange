@@ -1,6 +1,6 @@
 package com.skirlez.fabricatedexchange.networking.packet;
 
-import com.skirlez.fabricatedexchange.util.EmcData;
+import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.fabricmc.fabric.api.networking.v1.PacketSender;

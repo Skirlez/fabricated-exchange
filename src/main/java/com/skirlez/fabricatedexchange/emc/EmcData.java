@@ -1,9 +1,12 @@
-package com.skirlez.fabricatedexchange.util;
+package com.skirlez.fabricatedexchange.emc;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import com.skirlez.fabricatedexchange.networking.ModMessages;
+import com.skirlez.fabricatedexchange.util.PlayerState;
+import com.skirlez.fabricatedexchange.util.ServerState;
+import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -34,9 +37,6 @@ public class EmcData {
         baseEmc.multiply(itemStack.getCount());
         return baseEmc;
     }
-
-
-
     public static SuperNumber getItemEmc(String id) {
         if (emcMap.containsKey(id)) {
             return new SuperNumber(emcMap.get(id));
@@ -44,6 +44,7 @@ public class EmcData {
         return SuperNumber.Zero(); 
     }
 
+    
     // only the server can use these
     public static SuperNumber getEmc(LivingEntity player) {
         PlayerState playerState = ServerState.getPlayerState(player);

@@ -1,4 +1,4 @@
-package com.skirlez.fabricatedexchange.block;
+package com.skirlez.fabricatedexchange.interfaces;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
