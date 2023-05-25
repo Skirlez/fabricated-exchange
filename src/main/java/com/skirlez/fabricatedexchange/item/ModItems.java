@@ -29,7 +29,6 @@ public class ModItems {
     }
 
     public static void registerModItems() { 
-        
         addItemsToItemGroup();
     }   
 }
