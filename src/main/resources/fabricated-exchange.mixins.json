@@ -3,7 +3,8 @@
 	"package": "com.skirlez.fabricatedexchange.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"LegacySmithingRecipeAccessor"
+		"LegacySmithingRecipeAccessor",
+		"ModHandledScreen"
 	],
 	"injectors": {
 		"defaultRequire": 1

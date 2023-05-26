@@ -12,15 +12,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.interfaces.ModItemStackInterface;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 @Mixin(ItemStack.class)
-public class ModItemStackTooltip implements ModItemStackInterface {
+public abstract class ModItemStackTooltip implements ModItemStackInterface {
 	@Shadow
 	private int count;
 
+	
 
 	// If this is not zero (and shift is down), the item will display how much emc it is for a stack as large as it's maxCount value.
 	// it is an integer because, somewhere along placing the item in the transmutation slot and it displaying, the game
@@ -48,13 +50,20 @@ public class ModItemStackTooltip implements ModItemStackInterface {
 		if (!emc.equalsZero()) {
 			ArrayList<Text> list = cir.getReturnValue();
 			if (cir != null) {
-				if (displayMaxStack != 0 && Screen.hasShiftDown()) {
-					ItemStack itemStack = (ItemStack)(Object)this;
-					int maxCount = itemStack.getMaxCount();
-					if (maxCount != 1) {
-						emc.multiply(maxCount);
-						list.add(Text.literal("§eEMC for " + maxCount + ": §r" + emc.toString()));
-					}
+				ItemStack itemStack = (ItemStack)(Object)this;
+				int maxCount = itemStack.getMaxCount();
+
+				if (displayMaxStack != 0 && Screen.hasShiftDown() && maxCount != 1) {
+					SuperNumber itemCount = new SuperNumber(FabricatedExchangeClient.clientEmc);
+					itemCount.divide(emc);
+					itemCount.floor();
+	
+					int intItemCount = itemCount.toInt();
+					if (intItemCount != 0)
+						maxCount = Math.min(maxCount, intItemCount);
+
+					emc.multiply(maxCount);
+					list.add(Text.literal("§eEMC for " + maxCount + ": §r" + emc.toString()));
 				}
 				else {
 					list.add(Text.literal("§eEMC§r: " + emc.toString()));
@@ -67,7 +76,7 @@ public class ModItemStackTooltip implements ModItemStackInterface {
 
 			
 		}
-	};
+	}
 	
 	@Inject(method = "copy", at = @At("RETURN"))
 	public void injectCopy(CallbackInfoReturnable<ItemStack> cir) {

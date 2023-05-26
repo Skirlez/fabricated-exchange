@@ -30,6 +30,7 @@ public class EmcMapSyncS2CPacket {
             String s = buf.readString();
             EmcData.emcMap.put(s, new SuperNumber(buf.readString()));
         }
+        
     }
 }
 

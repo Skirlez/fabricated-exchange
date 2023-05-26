@@ -6,7 +6,7 @@ import java.math.RoundingMode;
 /*
     SuperNumber:
 -has two bigintegers: numerator and denominator
--can represent any number if you have enough memory
+-can represent any real number if you have enough memory
 -used for emc values
 -really cool name
 -"super" for "super slow"
@@ -78,10 +78,14 @@ public class SuperNumber {
     }
 
     public void floor() {
-        denominator = BigInteger.ONE;
+        BigInteger mod = numerator.mod(denominator);
+        numerator.subtract(mod);
     }
-
-
+    public void ceil() {
+        BigInteger mod = numerator.mod(denominator);
+        numerator.add(denominator.subtract(mod));
+    }
+    
     public void add(BigInteger other) {
         numerator = numerator.add(other.multiply(denominator));
         simplify();
@@ -91,6 +95,11 @@ public class SuperNumber {
         numerator = numerator.multiply(other.denominator);
         numerator = numerator.add(other.numerator.multiply(denominator));
         denominator = denominator.multiply(other.denominator);
+        simplify();
+    }
+
+    public void subtract(BigInteger other) {
+        numerator = numerator.subtract(other.multiply(denominator));
         simplify();
     }
 

@@ -1,0 +1,24 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+      "RGR",
+      "GDG",
+      "RGR"
+    ],
+    "key": {
+      "D": {
+        "item": "minecraft:diamond"
+      },
+      "R": {
+        "item": "minecraft:redstone"
+      },
+      "G": {
+        "item": "minecraft:glowstone_dust"
+      }
+    },
+    "result": {
+      "item": "fabricated-exchange:philosophers_stone",
+      "count": 1
+    }
+  }
+

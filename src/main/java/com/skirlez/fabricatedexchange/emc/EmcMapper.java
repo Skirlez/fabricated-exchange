@@ -20,11 +20,9 @@ import net.minecraft.recipe.RecipeManager;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.SmeltingRecipe;
 import net.minecraft.recipe.SmithingRecipe;
-import net.minecraft.recipe.SmithingTransformRecipe;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Pair;
-import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 
 public class EmcMapper {
@@ -52,6 +50,7 @@ public class EmcMapper {
         putEmcMap(Items.WHITE_WOOL, 48);
         putEmcMap(Items.BONE, 96);
         putEmcMap(Items.REDSTONE, 64);
+        putEmcMap(Items.GLOWSTONE_DUST, 384);
         putEmcMap(Items.EMERALD, 16384);
         putEmcMap(Items.ENDER_PEARL, 1024);
         putEmcMap(Items.COAL, 32);
@@ -284,9 +283,10 @@ public class EmcMapper {
             SuperNumber aEmc = getItemEmc(a);
             SuperNumber bEmc = getItemEmc(b);
 
+            // if outEmc is zero there is not enough info and if it does have a value
+            // then we don't know how we should distribute it to the two items
             if (aEmc.equalsZero() || bEmc.equalsZero())
-                continue; // not enough info / will probably lead to inaccurate results
-
+                continue; 
 
 
             Item output = recipe.getOutput(dynamicRegistryManager).getItem();

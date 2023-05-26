@@ -32,7 +32,7 @@ public class ConsumeSlot extends Slot {
     public ItemStack insertStack(ItemStack stack, int count) {
         ItemStack newStack = stack.copy();
         newStack.setCount(count);
-        SuperNumber emc = EmcData.getItemStackEmc(stack);
+        SuperNumber emc = EmcData.getItemStackEmc(newStack);
         if (emc.equalsZero())
             return stack;
         if (!player.getWorld().isClient()) {

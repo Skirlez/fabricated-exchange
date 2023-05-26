@@ -31,6 +31,11 @@ public class TransmutationSlot extends Slot {
         this.setStackNoCallbacks(stack);
     }
 
+    @Override
+    public boolean isEnabled() {
+        return super.hasStack();
+    }
+
 
     @Override
     public boolean canTakeItems(PlayerEntity playerEntity) {

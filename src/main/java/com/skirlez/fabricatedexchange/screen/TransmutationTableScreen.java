@@ -36,7 +36,9 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         }
 
     }
-    
+
+
+
     @Override
     protected void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType) {
         // SWAP is when you press number keys to put slots in the hotbar. it does not consult the slot,
