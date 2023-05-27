@@ -1,7 +1,12 @@
 {
     "item.fabricated-exchange.philosophers_stone": "Philosopher's Stone",
-    
     "block.fabricated-exchange.transmutation_table": "Transmutation Table",
+    "itemgroup.fabricated-exchange": "Fabricated Exchange",
 
-    "itemgroup.fabricated-exchange": "Fabricated Exchange"
+    "sounds.fabricated-exchange.philosophers_stone_use": "Block transmuted",
+    "sounds.fabricated-exchange.item_charge": "Item charged",
+    "sounds.fabricated-exchange.item_discharge": "Item discharged",
+    
+    "key.category.fabricated-exchange": "Fabricated Exchange keys",
+    "key.fabricated-exchange.charge": "Charge item"
 }

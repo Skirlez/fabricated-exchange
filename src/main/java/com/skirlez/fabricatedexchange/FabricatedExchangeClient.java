@@ -1,4 +1,5 @@
 package com.skirlez.fabricatedexchange;
+import com.skirlez.fabricatedexchange.event.KeyInputHandler;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.ModScreenHandlers;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreen;
@@ -27,7 +28,6 @@ public class FabricatedExchangeClient implements ClientModInitializer {
             */
         });
 
-
-        
+        KeyInputHandler.register();
     }
 }

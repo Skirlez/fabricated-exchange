@@ -4,6 +4,7 @@ import java.util.Random;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.sound.ModSounds;
 import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageSources;
 import net.minecraft.entity.player.PlayerEntity;
@@ -23,7 +24,7 @@ public class PhilosophersStone extends Item {
     }
  
     public static final String CHARGE_KEY = "Charge";
-    private final int maxCharge = 4;
+    public static final int maxCharge = 4;
     private Random r = new Random();
 
     @Override
@@ -42,20 +43,14 @@ public class PhilosophersStone extends Item {
         return Math.round((float)charge * 13.0f / (float)maxCharge);
     }
 
+
+
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
         BlockPos blockPos = context.getBlockPos();
         World world = context.getWorld();
         Block block = world.getBlockState(blockPos).getBlock();
-        PlayerEntity player = context.getPlayer();
         
-
-        ItemStack stack = player.getStackInHand(context.getHand());
-        NbtCompound stackNbt = stack.getOrCreateNbt();
-        int charge = stackNbt.getInt(CHARGE_KEY);
-        if (charge < maxCharge)
-            stackNbt.putInt(CHARGE_KEY, charge + 1);
-     
         boolean valid = FabricatedExchange.blockRotationMap.containsKey(block);
         if (valid) {
             if (world.isClient()) {

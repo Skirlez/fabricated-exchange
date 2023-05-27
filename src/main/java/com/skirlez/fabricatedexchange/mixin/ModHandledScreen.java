@@ -17,8 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class ModHandledScreen {
     @Shadow
     protected boolean isPointWithinBounds(int x, int y, int width, int height, double pointX, double pointY) {
-        // this code never gets executed, the function needs to have a body 
-        // to get the compiler to shut up. what a sad fate for this line. to never be executed.
+
         return false;
     }
 
