@@ -2,16 +2,23 @@ package com.skirlez.fabricatedexchange.screen;
 
 
 import java.lang.reflect.Field;
+import java.util.function.Consumer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
+import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.slot.TransmutationSlot;
 
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
@@ -20,12 +27,12 @@ import net.minecraft.util.Identifier;
 
 public class TransmutationTableScreen extends HandledScreen<TransmutationTableScreenHandler> {
     
-    
+    public TextFieldWidget searchBar;
     private static final Identifier TEXTURE =
             new Identifier(FabricatedExchange.MOD_ID, "textures/gui/transmute.png");
 
+    private String oldSearchText = "";
     public Field fieldDoubleClicked;
-
     public TransmutationTableScreen(TransmutationTableScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
         try {
@@ -34,10 +41,7 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         } catch (NoSuchFieldException | SecurityException e) {
             FabricatedExchange.LOGGER.error("", e);
         }
-
     }
-
-
 
     @Override
     protected void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType) {
@@ -76,11 +80,32 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
     @Override
     protected void init() {
         super.init();
-        titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2 - 55; 
-        titleY = -24; 
+        
+        titleX = -20;     
+        titleY = -26; 
         this.backgroundWidth = 228;
         this.backgroundHeight = 196;
         
+        Consumer<String> updater = searchText -> updateSearchText(searchText);
+
+        searchBar = new TextFieldWidget(this.textRenderer, x + 38,  y - 45, 100, 10, Text.empty());
+        searchBar.setMaxLength(30);
+        searchBar.setChangedListener(updater);
+        
+        addDrawableChild(searchBar);
+
+        addDrawableChild(ButtonWidget.builder(
+            Text.of("<"),
+            button -> updatePage(1)
+        ).dimensions(x + 99, y + 67, 15, 15)
+        .build());
+
+        addDrawableChild(ButtonWidget.builder(
+            Text.of(">"),
+            button -> updatePage(2)
+        ).dimensions(x + 164, y + 67, 15, 15)
+        .build());
+
     }
 
     @Override
@@ -98,12 +123,23 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         return false; // TODO: check if you're outside of the window bounds
     }
 
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (searchBar.isFocused() && !(keyCode == 256 && scanCode == 1)) { // keycode == 256 && scanCode == 1 is escape key
+            if (this.client.options.inventoryKey.matchesKey(keyCode, scanCode)) 
+                return true;
+
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
     @Override
     protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
         this.textRenderer.draw(matrices, this.title, (float)this.titleX, (float)this.titleY, 0x404040);
         String emc = FabricatedExchangeClient.clientEmc.toString();
-        this.textRenderer.draw(matrices, Text.empty().append("EMC:"), -20, 60, 0x404040);
-        this.textRenderer.draw(matrices, Text.empty().append(emc), -20, 70, 0x404040);
+        this.textRenderer.draw(matrices, Text.literal("EMC:"), -20, 60, 0x404040);
+        this.textRenderer.draw(matrices, Text.literal(emc), -20, 70, 0x404040);
     }
 
     @Override
@@ -111,5 +147,22 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         renderBackground(matrices);
         super.render(matrices, mouseX, mouseY, delta);
         drawMouseoverTooltip(matrices, mouseX, mouseY);
+    }
+
+    private void updateSearchText(String searchText) {
+        if (searchText.equals(oldSearchText))
+            return;
+        oldSearchText = searchText;
+        FabricatedExchange.LOGGER.info(searchText);
+        PacketByteBuf buffer = PacketByteBufs.create();
+        buffer.writeInt(0);
+        buffer.writeString(searchText);
+        
+        ClientPlayNetworking.send(ModMessages.TRANSMUTATION_TABLE_WIDGETS, buffer);
+    }
+    private void updatePage(int num) {
+        PacketByteBuf buffer = PacketByteBufs.create();
+        buffer.writeInt(num);
+        ClientPlayNetworking.send(ModMessages.TRANSMUTATION_TABLE_WIDGETS, buffer);
     }
 }

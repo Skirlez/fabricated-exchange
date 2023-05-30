@@ -1,7 +1,5 @@
 package com.skirlez.fabricatedexchange.networking.packet;
 
-
-import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.item.PhilosophersStone;
 import com.skirlez.fabricatedexchange.sound.ModSounds;

@@ -12,7 +12,6 @@ public class FabricatedExchangeClient implements ClientModInitializer {
     public static SuperNumber clientEmc = SuperNumber.Zero();
     
 
-
     @Override
     public void onInitializeClient() {
         
@@ -27,7 +26,6 @@ public class FabricatedExchangeClient implements ClientModInitializer {
             mapper.fillEmcMap(client.world, client.getNetworkHandler().getRecipeManager());
             */
         });
-
         KeyInputHandler.register();
     }
 }

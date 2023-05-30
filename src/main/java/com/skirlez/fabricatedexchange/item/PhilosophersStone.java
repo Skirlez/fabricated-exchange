@@ -4,18 +4,14 @@ import java.util.Random;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.sound.ModSounds;
 import net.minecraft.block.Block;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.DamageSources;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 public class PhilosophersStone extends Item {
@@ -50,7 +46,6 @@ public class PhilosophersStone extends Item {
         BlockPos blockPos = context.getBlockPos();
         World world = context.getWorld();
         Block block = world.getBlockState(blockPos).getBlock();
-        
         boolean valid = FabricatedExchange.blockRotationMap.containsKey(block);
         if (valid) {
             if (world.isClient()) {
@@ -62,7 +57,9 @@ public class PhilosophersStone extends Item {
                 }
             }
             else {
-                world.setBlockState(blockPos, FabricatedExchange.blockRotationMap.get(block).getDefaultState());
+                
+                switchBlock(world, blockPos, context.getStack(), context.getSide());
+                
             }
         }
 
@@ -70,7 +67,51 @@ public class PhilosophersStone extends Item {
     }
 
 
-
-
+    private void switchBlock(World world, BlockPos pos, ItemStack stack, Direction d) {
+        int charge = stack.getOrCreateNbt().getInt("Charge");
+        Block block = world.getBlockState(pos).getBlock();
+        if (charge == 0) {
+            world.setBlockState(pos, FabricatedExchange.blockRotationMap.get(block).getDefaultState());
+            return;
+        }
+        int xOff = -charge, yOff = -charge, zOff = -charge;
+        switch (d) {
+            case DOWN:
+                yOff += charge;
+                break;
+            case UP:
+                yOff -= charge;
+                break;
+            case NORTH:
+                zOff += charge;
+                break;
+            case SOUTH:
+                zOff -= charge;
+                break;
+            case WEST:
+                xOff += charge;
+                break;
+            case EAST:
+                xOff -= charge;
+                break;
+            default:
+                FabricatedExchange.LOGGER.error("Unknown block side philospher's stone block replacement. Side: " + d.toString());
+                break;
+        };
+        pos = pos.add(xOff, yOff, zOff);
+        int len = charge * 2 + 1;
+        for (int x = 0; x < len; x++) {
+            for (int y = 0; y < len; y++) {
+                for (int z = 0; z < len; z++) {
+                    BlockPos newPos = pos.add(x, y, z);
+                    Block newBlock = world.getBlockState(newPos).getBlock();
+                    if (!newBlock.equals(block))
+                        continue;
+                    world.setBlockState(newPos, FabricatedExchange.blockRotationMap.get(block).getDefaultState());
+                }
+            }
+        }
+        
+    }
 }
 

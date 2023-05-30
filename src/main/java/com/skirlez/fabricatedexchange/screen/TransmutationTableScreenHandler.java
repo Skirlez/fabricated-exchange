@@ -30,6 +30,8 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
     private final Inventory inventory;
     private final LivingEntity player;
     private ConsumeSlot emcSlot;
+    private String searchText = "";
+    private int offeringPageNum = 0;
     private List<Pair<Item, SuperNumber>> knowledge = new ArrayList<Pair<Item,SuperNumber>>();
     private final DefaultedList<Slot> transmutationSlots = DefaultedList.of();
     public TransmutationTableScreenHandler(int syncId, PlayerInventory inventory) {
@@ -90,6 +92,17 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         }
     }
 
+    public void setSearchText(String searchText) {
+        this.searchText = searchText;
+    }
+    public void changeOfferingPage(int value) {
+        this.offeringPageNum += value;
+        if (this.offeringPageNum * 8 > knowledge.size())
+            offeringPageNum--;
+        else if (this.offeringPageNum < 0)
+            offeringPageNum = 0;
+        refreshOffering();
+    }
 
     public void refreshOffering() {
         SuperNumber emc = ServerState.getPlayerState(this.player).emc;
@@ -101,11 +114,17 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
             transmutationSlots.get(i).setStack(ItemStack.EMPTY);
         }
         int len = Math.min(knowledge.size(), 12);
-        for (int i = 0; i < len; i++) {
+        for (int i = offeringPageNum * 8; i < len; i++) {
             Item item = knowledge.get(i).getLeft();
+
+            String name = Registries.ITEM.getId(item).getPath().toString();
+            if (!searchText.isEmpty() && !name.toLowerCase().contains(searchText.toLowerCase())) 
+                continue; // search filter - items who don't have the search text as a substring shouldn't be displayed.
+                // TODO: does this work for other languages?
+            
             SuperNumber itemEmc = knowledge.get(i).getRight();
             if (emc.compareTo(itemEmc) == -1)
-                continue;
+                continue; // emc filter - items who's emc value is bigger than the player's shouldn't be displayed
             
             ItemStack stack = new ItemStack(item);
             transmutationSlots.get(num).setStack(stack);
@@ -243,5 +262,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         this.addSlot(slot);
         transmutationSlots.add(slot);
     }
+
+
     
 }

@@ -3,7 +3,8 @@
 	"package": "com.skirlez.fabricatedexchange.mixin.client",
 	"compatibilityLevel": "JAVA_17",
 	"client": [
-		"ModItemStackTooltip"
+		"ModItemStackTooltip",
+		"ModWorldRendererOutline"
 	],
 	"injectors": {
 		"defaultRequire": 1

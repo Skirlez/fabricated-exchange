@@ -14,7 +14,7 @@ public class ModScreenHandlers {
         new ScreenHandlerType<>(TransmutationTableScreenHandler::new, FeatureSet.empty());
 
     public static void registerAllScreenHandlers() {
-        Registry.register(Registries.SCREEN_HANDLER, new Identifier(FabricatedExchange.MOD_ID, "transmuting"),
+        Registry.register(Registries.SCREEN_HANDLER, new Identifier(FabricatedExchange.MOD_ID, "transmutation"),
             TRANSMUTATION_TABLE_SCREEN_HANDLER);
     }
 }

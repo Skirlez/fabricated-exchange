@@ -24,7 +24,7 @@ public class TransmutationTableBlockEntity extends BlockEntity implements NamedS
     }
 
     public Text getDisplayName() {
-        return Text.literal("Transmutation Table"); // todo translate
+        return Text.translatable("block.fabricated-exchange.transmutation_table_title");
     }
 
     @Nullable

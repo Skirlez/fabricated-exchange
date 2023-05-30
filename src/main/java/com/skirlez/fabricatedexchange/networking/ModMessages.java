@@ -8,14 +8,14 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.util.Identifier;
 
 public class ModMessages {
-    public static final Identifier EMC_USE_IDENTIFIER = new Identifier(FabricatedExchange.MOD_ID, "emc_use");
+    public static final Identifier TRANSMUTATION_TABLE_WIDGETS = new Identifier(FabricatedExchange.MOD_ID, "transmutation_table_widgets");
     public static final Identifier ITEM_CHARGE_IDENTIFIER = new Identifier(FabricatedExchange.MOD_ID, "charge_item");
     public static final Identifier EMC_SYNC_IDENTIFIER = new Identifier(FabricatedExchange.MOD_ID, "emc_sync");
     public static final Identifier EMC_MAP_SYNC_IDENTIFIER = new Identifier(FabricatedExchange.MOD_ID, "emc_map_sync");
 
     public static void registerC2SPackets() {
         ServerPlayNetworking.registerGlobalReceiver(ITEM_CHARGE_IDENTIFIER, ItemChargeC2SPacket::receive);
-
+        ServerPlayNetworking.registerGlobalReceiver(TRANSMUTATION_TABLE_WIDGETS, TransmutationTableWidgetsC2SPacket::receive);
         
     }
 
