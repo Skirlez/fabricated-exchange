@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
+import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.mixin.LegacySmithingRecipeAccessor;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
@@ -59,7 +60,7 @@ public class EmcMapper {
         putEmcMap(Items.NETHERITE_SCRAP, 12288);
         putEmcMap(Items.DIAMOND, 8192);
         putEmcMap(Items.NETHER_STAR, 139264);
-
+        
         // blacklisted recipes
         String[] smeltingRecipesBlacklist = {"minecraft:iron_nugget_from_smelting", "minecraft:gold_nugget_from_smelting"};
         
@@ -132,10 +133,21 @@ public class EmcMapper {
                 for (ItemStack stack : itemStackArr) {
                     Item item = stack.getItem();
                     SuperNumber itemEmc = getItemEmc(item);
-                    if (!itemEmc.equalsZero()) {
-                        emcWorth = itemEmc;
-                        break;
+                    if (itemEmc.equalsZero())
+                        continue;
+                    if (item.hasRecipeRemainder()) {
+                        Item remainder = item.getRecipeRemainder();
+                        itemEmc.subtract(getItemEmc(remainder));
+                        if (itemEmc.compareTo(SuperNumber.ZERO) == -1) {
+                            FabricatedExchange.LOGGER.error("ERROR: Negative EMC value upon subtracting recipe remainder! Recipe: " + recipe.getId().toString());
+                            giveUp = true;
+                            break;
+                        }
+                        if (itemEmc.equalsZero())
+                            continue;
                     }
+                    emcWorth = itemEmc;
+                    
                 }
                 if (emcWorth.equalsZero()) {
                     if (unknownSide != 0) { // if there's already another unknown
@@ -179,6 +191,10 @@ public class EmcMapper {
                     FabricatedExchange.LOGGER.error("ERROR: Negative EMC value! Recipe: " + recipe.getId().toString());
                 } 
                 for (Item item : unknownItems) {
+                    if (rightValue.equalsZero()) {
+                        FabricatedExchange.LOGGER.warn("WARNING: Mapper thinks " + item.getTranslationKey() + " should have 0 EMC. Recipe: " + recipe.getId().toString());
+                        continue;
+                    }
                     if (!emcMapHasEntry(item)) {
                         putEmcMap(item, rightValue);
                         newInfo = true;

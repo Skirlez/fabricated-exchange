@@ -12,7 +12,6 @@ import net.minecraft.util.Identifier;
 
 
 public class ModItems {
-    
     public static final Item PHILOSOPHERS_STONE = registerItem("philosophers_stone", 
         new PhilosophersStone(new FabricItemSettings().maxCount(1)));
     public static final Item TRANSMUTATION_TABLET = registerItem("transmutation_tablet", 
@@ -33,5 +32,6 @@ public class ModItems {
 
     public static void registerModItems() { 
         addItemsToItemGroup();
+        
     }   
 }

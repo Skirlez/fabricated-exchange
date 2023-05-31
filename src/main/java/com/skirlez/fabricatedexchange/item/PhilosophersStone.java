@@ -2,6 +2,7 @@ package com.skirlez.fabricatedexchange.item;
 
 import java.util.Random;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
+import com.skirlez.fabricatedexchange.mixin.ItemAccessor;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandlerFactory;
 import com.skirlez.fabricatedexchange.sound.ModSounds;
 import net.minecraft.block.Block;
@@ -19,8 +20,9 @@ import net.minecraft.world.World;
 public class PhilosophersStone extends Item {
     public PhilosophersStone(Settings settings) {
         super(settings);
+        ItemAccessor self = (ItemAccessor) this;
+        self.setRecipeRemainder(this);
     }
- 
     public static final String CHARGE_KEY = "Charge";
     public static final int maxCharge = 4;
     private Random r = new Random();
