@@ -23,7 +23,7 @@ public class ServerState extends PersistentState {
         players.forEach((UUID, playerState) -> {
             NbtCompound playerStateNbt = new NbtCompound();
  
-            playerStateNbt.putString("emc", playerState.emc.divisonString());
+            playerStateNbt.putString("emc", playerState.emc.divisionString());
 
             NbtList knowledgeList = new NbtList();
             for (int i = 0; i < playerState.knowledge.size(); i++) {

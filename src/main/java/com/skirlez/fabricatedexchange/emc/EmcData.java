@@ -71,7 +71,7 @@ public class EmcData {
     }    
     public static void syncEmc(ServerPlayerEntity player, SuperNumber emc) {
         PacketByteBuf buffer = PacketByteBufs.create();
-        buffer.writeString(emc.divisonString());
+        buffer.writeString(emc.divisionString());
         ServerPlayNetworking.send(player, ModMessages.EMC_SYNC_IDENTIFIER, buffer);
     }
 }

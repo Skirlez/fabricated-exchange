@@ -60,7 +60,7 @@ public class FabricatedExchange implements ModInitializer {
             for (int i = 0; i < iterations; i++) {
                 String s = (String)iterator.next();
                 buffer.writeString(s);
-                buffer.writeString(EmcData.emcMap.get(s).divisonString());
+                buffer.writeString(EmcData.emcMap.get(s).divisionString());
             }
             ServerPlayNetworking.send(handler.player, ModMessages.EMC_MAP_SYNC_IDENTIFIER, buffer);
         });

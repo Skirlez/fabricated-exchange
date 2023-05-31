@@ -1,20 +1,12 @@
 package com.skirlez.fabricatedexchange.block;
 
-import org.jetbrains.annotations.Nullable;
-
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandlerFactory;
 
-import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.ShapeContext;
-import net.minecraft.block.AbstractBlock.Settings;
 import net.minecraft.block.Block;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;

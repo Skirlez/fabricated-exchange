@@ -192,7 +192,7 @@ public class EmcMapper {
                 } 
                 for (Item item : unknownItems) {
                     if (rightValue.equalsZero()) {
-                        FabricatedExchange.LOGGER.warn("WARNING: Mapper thinks " + item.getTranslationKey() + " should have 0 EMC. Recipe: " + recipe.getId().toString());
+                        FabricatedExchange.LOGGER.warn("WARNING: EMC Mapper thinks " + item.getTranslationKey() + " should have 0 EMC. Recipe: " + recipe.getId().toString());
                         continue;
                     }
                     if (!emcMapHasEntry(item)) {
