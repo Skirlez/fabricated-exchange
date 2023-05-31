@@ -51,6 +51,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         inventory.onOpen(playerInventory.player);
         emcSlot = new ConsumeSlot(inventory, 0, 80, 66, player, this);
         this.addSlot(emcSlot);
+        
         // use trigonometry to create the transmutation slots
 
         // outer ring
@@ -73,9 +74,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
             angle += 360.0 / 4.0;
         }
 
-
         addSlot(new MidSlot(inventory, 17, 131, 18, this, player.world.isClient));
-
         addPlayerInventory(playerInventory);
         addPlayerHotbar(playerInventory);
 
@@ -89,7 +88,6 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
                 Pair<Item, SuperNumber> pair = new Pair<Item,SuperNumber>(item, emc);
                 addKnowledgePair(pair);
             }
-
             refreshOffering();
         }
     }
@@ -117,7 +115,6 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
                 i--;
                 len--;
             }
-                
         }
 
         // make sure offering page is within bounds

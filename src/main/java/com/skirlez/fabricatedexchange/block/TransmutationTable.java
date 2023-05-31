@@ -2,12 +2,18 @@ package com.skirlez.fabricatedexchange.block;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandlerFactory;
+
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.ShapeContext;
+import net.minecraft.block.AbstractBlock.Settings;
+import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -18,7 +24,7 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
-public class TransmutationTable extends BlockWithEntity {
+public class TransmutationTable extends Block {
 
     public TransmutationTable(Settings settings) {
         super(settings);
@@ -40,22 +46,17 @@ public class TransmutationTable extends BlockWithEntity {
     public ActionResult onUse(BlockState state, World world, 
         BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (!world.isClient) {
-            NamedScreenHandlerFactory screenHandlerFactory = ((TransmutationTableBlockEntity) world.getBlockEntity(pos));
-
-            if (screenHandlerFactory != null) {
+            TransmutationTableScreenHandlerFactory screenHandlerFactory = new TransmutationTableScreenHandlerFactory();
+            if (screenHandlerFactory != null) 
                 player.openHandledScreen(screenHandlerFactory);
-            }
         }
 
         return ActionResult.SUCCESS;
     }
 
 
-    @Nullable
-    @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new TransmutationTableBlockEntity(pos, state);
-    }
+ 
+    
 
 
 }

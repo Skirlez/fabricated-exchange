@@ -2,12 +2,14 @@ package com.skirlez.fabricatedexchange.item;
 
 import java.util.Random;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
+import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandlerFactory;
 import com.skirlez.fabricatedexchange.sound.ModSounds;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -57,12 +59,10 @@ public class PhilosophersStone extends Item {
                 }
             }
             else {
-                
                 switchBlock(world, blockPos, context.getStack(), context.getSide());
-                
+
             }
         }
-
         return ActionResult.success(valid);
     }
 

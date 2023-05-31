@@ -15,6 +15,8 @@ public class ModItems {
     
     public static final Item PHILOSOPHERS_STONE = registerItem("philosophers_stone", 
         new PhilosophersStone(new FabricItemSettings().maxCount(1)));
+    public static final Item TRANSMUTATION_TABLET = registerItem("transmutation_tablet", 
+        new TransmutationTablet(new FabricItemSettings().maxCount(1)));
 
     private static Item registerItem(String name, Item item) {
         return Registry.register(Registries.ITEM, new Identifier(FabricatedExchange.MOD_ID, name), item);
@@ -22,6 +24,7 @@ public class ModItems {
 
     public static void addItemsToItemGroup() {
         addToItemGroup(ModItemGroups.FABRICATED_EXCHANGE, PHILOSOPHERS_STONE);
+        addToItemGroup(ModItemGroups.FABRICATED_EXCHANGE, TRANSMUTATION_TABLET);
     }
 
     private static void addToItemGroup(ItemGroup group, Item item) {

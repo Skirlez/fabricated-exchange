@@ -1,7 +1,8 @@
 {
     "item.fabricated-exchange.philosophers_stone": "Philosopher's Stone",
+    "item.fabricated-exchange.transmutation_tablet": "Transmutation Tablet",
     "block.fabricated-exchange.transmutation_table": "Transmutation Table",
-    "block.fabricated-exchange.transmutation_table_title": "Transmutation",
+    "screen.fabricated-exchange.transmutation": "Transmutation",
     "itemgroup.fabricated-exchange": "Fabricated Exchange", 
 
     "sounds.fabricated-exchange.philosophers_stone_use": "Block transmuted",
