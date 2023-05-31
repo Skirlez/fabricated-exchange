@@ -2,7 +2,6 @@ package com.skirlez.fabricatedexchange.event;
 
 import org.lwjgl.glfw.GLFW;
 
-import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;

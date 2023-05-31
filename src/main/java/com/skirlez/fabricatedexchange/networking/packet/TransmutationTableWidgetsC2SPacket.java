@@ -1,7 +1,5 @@
 package com.skirlez.fabricatedexchange.networking.packet;
 
-
-import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandler;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.network.PacketByteBuf;

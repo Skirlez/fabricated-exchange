@@ -1,7 +1,10 @@
 package com.skirlez.fabricatedexchange.screen;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+
+import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.screen.slot.ConsumeSlot;
@@ -22,6 +25,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.collection.DefaultedList;
@@ -72,8 +76,6 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 
         addSlot(new MidSlot(inventory, 17, 131, 18, this, player.world.isClient));
 
-
-
         addPlayerInventory(playerInventory);
         addPlayerHotbar(playerInventory);
 
@@ -96,40 +98,55 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         this.searchText = searchText;
     }
     public void changeOfferingPage(int value) {
-        this.offeringPageNum += value;
-        if (this.offeringPageNum * 8 > knowledge.size())
-            offeringPageNum--;
-        else if (this.offeringPageNum < 0)
-            offeringPageNum = 0;
+        offeringPageNum += value;
         refreshOffering();
     }
 
     public void refreshOffering() {
+        FabricatedExchange.LOGGER.info(String.valueOf(knowledge.size()));
         SuperNumber emc = ServerState.getPlayerState(this.player).emc;
         SuperNumber midItemEmc = EmcData.getItemStackEmc(this.slots.get(17).getStack());
         if (!midItemEmc.equalsZero())
             emc = SuperNumber.min(emc, midItemEmc);
+        LinkedList<Pair<Item, SuperNumber>> newKnowledge = new LinkedList<Pair<Item, SuperNumber>>(knowledge);
+        int len = newKnowledge.size();
+        for (int i = 0; i < len; i++) {
+            SuperNumber itemEmc = newKnowledge.get(i).getRight();
+            if (emc.compareTo(itemEmc) == -1) {
+                newKnowledge.remove(i);
+                i--;
+                len--;
+            }
+                
+        }
+
+        // make sure offering page is within bounds
+        if (offeringPageNum != 0) {
+            if (offeringPageNum * 12 >= newKnowledge.size())
+                offeringPageNum--;
+            else if (offeringPageNum < 0)
+                offeringPageNum = 0;
+        }
+
+        // clear all the transmutation slots
         int num = 0;
         for (int i = 0; i < transmutationSlots.size(); i++) {
             transmutationSlots.get(i).setStack(ItemStack.EMPTY);
         }
-        int len = Math.min(knowledge.size(), 12);
-        for (int i = offeringPageNum * 8; i < len; i++) {
-            Item item = knowledge.get(i).getLeft();
 
-            String name = Registries.ITEM.getId(item).getPath().toString();
-            if (!searchText.isEmpty() && !name.toLowerCase().contains(searchText.toLowerCase())) 
+        boolean isSearching = !searchText.isEmpty();
+        for (int i = (isSearching) ? 0 : offeringPageNum * 12; i < newKnowledge.size(); i++) {
+            Item item = newKnowledge.get(i).getLeft();
+
+            String name = item.getName().getString();
+            if (isSearching && !name.toLowerCase().contains(searchText.toLowerCase())) 
                 continue; // search filter - items who don't have the search text as a substring shouldn't be displayed.
                 // TODO: does this work for other languages?
-            
-            SuperNumber itemEmc = knowledge.get(i).getRight();
-            if (emc.compareTo(itemEmc) == -1)
-                continue; // emc filter - items who's emc value is bigger than the player's shouldn't be displayed
             
             ItemStack stack = new ItemStack(item);
             transmutationSlots.get(num).setStack(stack);
             num++;
-            if (num >= transmutationSlots.size())
+            if (num >= 12)
                 return;
         }
     }

@@ -93,17 +93,17 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         searchBar.setChangedListener(updater);
         
         addDrawableChild(searchBar);
-
+        
         addDrawableChild(ButtonWidget.builder(
             Text.of("<"),
             button -> updatePage(1)
-        ).dimensions(x + 99, y + 67, 15, 15)
+        ).dimensions(x + 99, y + 69, 13, 13)
         .build());
 
         addDrawableChild(ButtonWidget.builder(
             Text.of(">"),
             button -> updatePage(2)
-        ).dimensions(x + 164, y + 67, 15, 15)
+        ).dimensions(x + 164, y + 69, 13, 13)
         .build());
 
     }
@@ -138,8 +138,8 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
     protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
         this.textRenderer.draw(matrices, this.title, (float)this.titleX, (float)this.titleY, 0x404040);
         String emc = FabricatedExchangeClient.clientEmc.toString();
-        this.textRenderer.draw(matrices, Text.literal("EMC:"), -20, 60, 0x404040);
-        this.textRenderer.draw(matrices, Text.literal(emc), -20, 70, 0x404040);
+        this.textRenderer.draw(matrices, Text.literal("EMC:"), -21, 64, 0x404040);
+        this.textRenderer.draw(matrices, Text.literal(emc), -21, 74, 0x404040);
     }
 
     @Override
