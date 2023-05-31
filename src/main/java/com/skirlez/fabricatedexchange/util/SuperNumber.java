@@ -4,9 +4,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 /*
-    SuperNumber:
+    SuperNumber: TODO I want cool ASCII art here of the name
 -has two bigintegers: numerator and denominator
--can represent any real number if you have enough memory
+-can represent any real number if you have enough memory 
+- (well, except for irrational numbers, but technically if you had INFINITE memory...)
 -used for emc values
 -really cool name
 -"super" for "super slow"
