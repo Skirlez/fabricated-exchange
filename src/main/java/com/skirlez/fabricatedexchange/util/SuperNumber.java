@@ -83,6 +83,8 @@ public class SuperNumber {
 
     /** Rounds the SuperNumber to the nearest whole number smaller than itself */
     public void floor() {
+        if (numerator.equals(BigInteger.ZERO))
+            return;
         BigInteger mod = numerator.mod(denominator);
         numerator.subtract(mod);
         simplify();
@@ -90,6 +92,8 @@ public class SuperNumber {
 
     /** Rounds the SuperNumber to the nearest whole number greater than itself */
     public void ceil() {
+        if (numerator.equals(BigInteger.ZERO))
+            return;
         BigInteger mod = numerator.mod(denominator);
         numerator.add(denominator.subtract(mod));
         simplify();

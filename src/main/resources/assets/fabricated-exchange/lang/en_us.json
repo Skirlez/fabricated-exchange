@@ -4,11 +4,13 @@
     "block.fabricated-exchange.transmutation_table": "Transmutation Table",
     "screen.fabricated-exchange.transmutation": "Transmutation",
     "itemgroup.fabricated-exchange": "Fabricated Exchange", 
-
     "sounds.fabricated-exchange.philosophers_stone_use": "Block transmuted",
     "sounds.fabricated-exchange.item_charge": "Item charged",
     "sounds.fabricated-exchange.item_discharge": "Item discharged",
-    
+    "commands.fabricated-exchange.setemc.no_item": "Can't assign EMC to air!",
+    "commands.fabricated-exchange.setemc.no_number": " isn't a number!",
+    "commands.fabricated-exchange.setemc.custom_success": "Item EMC updated!",
+    "commands.fabricated-exchange.setemc.seed_success": "Item EMC updated! Run /reloademc to regenerate the EMC values.",
     "key.category.fabricated-exchange": "Fabricated Exchange bindings",
     "key.fabricated-exchange.charge": "Charge/Discharge Item"
 }

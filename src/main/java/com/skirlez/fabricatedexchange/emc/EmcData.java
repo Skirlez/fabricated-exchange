@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.skirlez.fabricatedexchange.networking.ModMessages;
+import com.skirlez.fabricatedexchange.util.DataFile;
+import com.skirlez.fabricatedexchange.util.ModConfig;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
@@ -50,6 +52,22 @@ public class EmcData {
         PlayerState playerState = ServerState.getPlayerState(player);
         return playerState.emc;
     } 
+    public static void setItemEmc(Item item, SuperNumber emc, DataFile<HashMap<String, SuperNumber>> file, boolean merge) {
+        if (item == null)
+            return;
+        String id = Registries.ITEM.getId(item).toString();
+        HashMap<String, SuperNumber> newEmcMap = file.fetchAndGetValue();
+        if (newEmcMap == null)
+            newEmcMap = new HashMap<String, SuperNumber>();
+        newEmcMap.put(id, emc);
+        file.save();
+        if (merge) {
+            EmcMapper mapper = new EmcMapper(emcMap);
+            mapper.mergeMap(newEmcMap);
+        }
+    }
+
+
 
     public static void setEmc(LivingEntity player, SuperNumber amount) {
         PlayerState playerState = ServerState.getPlayerState(player);

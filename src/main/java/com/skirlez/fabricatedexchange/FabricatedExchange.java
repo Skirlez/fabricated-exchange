@@ -1,6 +1,7 @@
 package com.skirlez.fabricatedexchange;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -21,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import com.skirlez.fabricatedexchange.block.ModBlockEntities;
 import com.skirlez.fabricatedexchange.block.ModBlocks;
+import com.skirlez.fabricatedexchange.command.SetEmcCommand;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.emc.EmcMapper;
 import com.skirlez.fabricatedexchange.item.ModItemGroups;
@@ -49,6 +51,9 @@ public class FabricatedExchange implements ModInitializer {
         ModBlockEntities.registerBlockEntities();
         ModScreenHandlers.registerAllScreenHandlers();
         ModMessages.registerC2SPackets();
+
+
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> SetEmcCommand.register(dispatcher));
         fetchBlockRotationMap();
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> { 
