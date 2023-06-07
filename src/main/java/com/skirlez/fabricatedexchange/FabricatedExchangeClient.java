@@ -19,12 +19,6 @@ public class FabricatedExchangeClient implements ClientModInitializer {
         ModMessages.registerS2CPackets();
         
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-            /*
-            if (client.player == null || client.isInSingleplayer())  
-                return;
-            EmcMapper mapper = new EmcMapper(EmcData.emcMap);
-            mapper.fillEmcMap(client.world, client.getNetworkHandler().getRecipeManager());
-            */
         });
         KeyInputHandler.register();
     }

@@ -1,0 +1,14 @@
+{
+    "replace": "false",
+    "values": [
+        "minecraft:gunpowder",
+        "minecraft:coal",
+        "minecraft:charcoal",
+        "minecraft:redstone",
+        "minecraft:glowstone_dust",
+        "minecraft:redstone_block",
+        "minecraft:blaze_powder",
+        "minecraft:coal_block",
+        "minecraft:glowstone"
+    ]
+}

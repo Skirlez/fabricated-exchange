@@ -1,18 +1,19 @@
 package com.skirlez.fabricatedexchange.emc;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
-import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.mixin.LegacySmithingRecipeAccessor;
+import com.skirlez.fabricatedexchange.util.ModConfig;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.LegacySmithingRecipe;
@@ -27,8 +28,8 @@ import net.minecraft.util.Pair;
 import net.minecraft.world.World;
 
 public class EmcMapper {
-    private Map<String, SuperNumber> emcMap;
-    public EmcMapper(Map<String, SuperNumber> emcMap) {
+    private HashMap<String, SuperNumber> emcMap;
+    public EmcMapper(HashMap<String, SuperNumber> emcMap) {
         this.emcMap = emcMap;
     }
 
@@ -40,26 +41,10 @@ public class EmcMapper {
         TODO: Save the result to make this less terrible.
         */
         emcMap.clear();
-
-
-        // the seed values
-        // TODO: read from json
-        putEmcMap(Items.COBBLESTONE, 1);
-        putEmcMap(Items.DIRT, 1);
-        putEmcMap(Items.GRASS_BLOCK, 1);
-        putEmcMap(Items.OAK_PLANKS,8);
-        putEmcMap(Items.WHITE_WOOL, 48);
-        putEmcMap(Items.BONE, 96);
-        putEmcMap(Items.REDSTONE, 64);
-        putEmcMap(Items.GLOWSTONE_DUST, 384);
-        putEmcMap(Items.EMERALD, 16384);
-        putEmcMap(Items.ENDER_PEARL, 1024);
-        putEmcMap(Items.COAL, 32);
-        putEmcMap(Items.IRON_INGOT, 256);
-        putEmcMap(Items.GOLD_INGOT, 2048);
-        putEmcMap(Items.NETHERITE_SCRAP, 12288);
-        putEmcMap(Items.DIAMOND, 8192);
-        putEmcMap(Items.NETHER_STAR, 139264);
+        
+        HashMap<String, SuperNumber> seedEmcMap = ModConfig.SEED_EMC_MAP_FILE.fetchAndGetValue();
+        if (seedEmcMap != null)
+            mergeMap(seedEmcMap);
         
         // blacklisted recipes
         String[] smeltingRecipesBlacklist = {"minecraft:iron_nugget_from_smelting", "minecraft:gold_nugget_from_smelting"};
@@ -92,8 +77,10 @@ public class EmcMapper {
             }
         }
 
-        
+
+        FabricatedExchange.LOGGER.info("stop");
     }
+
 
     private boolean iterateCraftingRecipes(RecipeManager recipeManager, DynamicRegistryManager dynamicRegistryManager, LinkedList<CraftingRecipe> recipesList) { 
         boolean newInfo = false;
@@ -139,7 +126,7 @@ public class EmcMapper {
                         Item remainder = item.getRecipeRemainder();
                         itemEmc.subtract(getItemEmc(remainder));
                         if (itemEmc.compareTo(SuperNumber.ZERO) == -1) {
-                            FabricatedExchange.LOGGER.error("ERROR: Negative EMC value upon subtracting recipe remainder! Recipe: " + recipe.getId().toString());
+                            FabricatedExchange.LOGGER.error("Negative EMC value upon subtracting recipe remainder! Recipe: " + recipe.getId().toString());
                             giveUp = true;
                             break;
                         }
@@ -188,11 +175,11 @@ public class EmcMapper {
                 SuperNumber rightValue = equation.getRight();
                 rightValue.subtract(leftValue);
                 if (rightValue.compareTo(SuperNumber.ZERO) == -1) {
-                    FabricatedExchange.LOGGER.error("ERROR: Negative EMC value! Recipe: " + recipe.getId().toString());
+                    FabricatedExchange.LOGGER.error("Negative EMC value! Recipe: " + recipe.getId().toString());
                 } 
                 for (Item item : unknownItems) {
                     if (rightValue.equalsZero()) {
-                        FabricatedExchange.LOGGER.warn("WARNING: EMC Mapper thinks " + item.getTranslationKey() + " should have 0 EMC. Recipe: " + recipe.getId().toString());
+                        FabricatedExchange.LOGGER.warn("EMC Mapper thinks " + item.getTranslationKey() + " should have 0 EMC. Recipe: " + recipe.getId().toString());
                         continue;
                     }
                     if (!emcMapHasEntry(item)) {
@@ -238,7 +225,7 @@ public class EmcMapper {
                 }
                 int comparison = itemEmc.compareTo(inEmc);
                 if (comparison != 0) {
-                    FabricatedExchange.LOGGER.warn("WARNING: EMC conflict detected! for recipe " + recipe.getId().toString() + ", for items "  
+                    FabricatedExchange.LOGGER.warn("EMC conflict detected! for recipe " + recipe.getId().toString() + ", for items "  
                     + itemStacks[foundIndex].getName() + " with value " + inEmc.toString() + ", "
                     + itemStacks[j].getName() + " with value " + itemEmc.toString() + ". choosing the lower value."); 
                     inEmc = SuperNumber.min(inEmc, itemEmc);
@@ -333,8 +320,13 @@ public class EmcMapper {
         return newInfo;
     }
 
-    private void putEmcMap(Item item, int value) {
-        emcMap.put(Registries.ITEM.getId(item).toString(), new SuperNumber(value));
+    public void mergeMap(HashMap<String, SuperNumber> newEmcMap) {
+        int iterations = newEmcMap.keySet().size();
+        Iterator<String> iterator = newEmcMap.keySet().iterator();
+        for (int i = 0; i < iterations; i++) {
+            String s = iterator.next();
+            emcMap.put(s, newEmcMap.get(s));
+        }
     }
 
     private void putEmcMap(Item item, SuperNumber value) {

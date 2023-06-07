@@ -20,7 +20,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 public class EmcData {
 
     // both the server and the client can use these
-    public static Map<String, SuperNumber> emcMap = new HashMap<>();
+    public static HashMap<String, SuperNumber> emcMap = new HashMap<>();
 
     public static SuperNumber getItemEmc(Item item) {
         if (item == null)
@@ -74,4 +74,6 @@ public class EmcData {
         buffer.writeString(emc.divisionString());
         ServerPlayNetworking.send(player, ModMessages.EMC_SYNC_IDENTIFIER, buffer);
     }
+
+
 }

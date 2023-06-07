@@ -24,8 +24,10 @@ import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.ModScreenHandlers;
 import com.skirlez.fabricatedexchange.sound.ModSounds;
+import com.skirlez.fabricatedexchange.util.ModConfig;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
+import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 public class FabricatedExchange implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("fabricated-exchange");
@@ -36,13 +38,13 @@ public class FabricatedExchange implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        
         ModItemGroups.registerItemGroups();
         ModItems.registerModItems();
         ModSounds.registerSoundEvents();
         ModBlocks.registerModBlocks();
         ModBlockEntities.registerBlockEntities();
         ModScreenHandlers.registerAllScreenHandlers();
-        
         ModMessages.registerC2SPackets();
         fillBlockRotationMap();
 
@@ -68,11 +70,13 @@ public class FabricatedExchange implements ModInitializer {
         ServerLifecycleEvents.SERVER_STARTED.register((server) -> {
             EmcMapper mapper = new EmcMapper(EmcData.emcMap);
             mapper.fillEmcMap(server.getOverworld(), server.getOverworld().getRecipeManager());
+            
+            HashMap<String, SuperNumber> customEmcMap = ModConfig.CUSTOM_EMC_MAP_FILE.fetchAndGetValue();
+            if (customEmcMap != null)
+                mapper.mergeMap(new HashMap<String, SuperNumber>(customEmcMap));
 
         });
-   
     }
-
 
 
     private void fillBlockRotationMap() {

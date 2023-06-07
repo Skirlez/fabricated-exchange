@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.screen.slot.ConsumeSlot;
 import com.skirlez.fabricatedexchange.screen.slot.MidSlot;
 import com.skirlez.fabricatedexchange.screen.slot.TransmutationSlot;
+import com.skirlez.fabricatedexchange.util.ModTags;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
@@ -24,13 +24,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.collection.DefaultedList;
 
 public class TransmutationTableScreenHandler extends ScreenHandler {
-    private final Inventory inventory;
+    private final Inventory inventory; // the transmutation slots
+    private final Inventory minorInventory; // the middle slot and the slots on the left
     private final LivingEntity player;
     private ConsumeSlot emcSlot;
     private String searchText = "";
@@ -45,6 +45,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
     public TransmutationTableScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory) {
         super(ModScreenHandlers.TRANSMUTATION_TABLE_SCREEN_HANDLER, syncId);
         checkSize(inventory, 18);
+        minorInventory = new SimpleInventory(1);
         this.inventory = inventory;
         this.player = playerInventory.player;
         inventory.onOpen(playerInventory.player);
@@ -73,7 +74,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
             angle += 360.0 / 4.0;
         }
 
-        addSlot(new MidSlot(inventory, 17, 131, 18, this, player.world.isClient));
+        addSlot(new MidSlot(minorInventory, 0, 131, 18, this, player.world.isClient));
         addPlayerInventory(playerInventory);
         addPlayerHotbar(playerInventory);
 
@@ -100,19 +101,27 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
     }
 
     public void refreshOffering() {
-        FabricatedExchange.LOGGER.info(String.valueOf(knowledge.size()));
         SuperNumber emc = ServerState.getPlayerState(this.player).emc;
         SuperNumber midItemEmc = EmcData.getItemStackEmc(this.slots.get(17).getStack());
         if (!midItemEmc.equalsZero())
             emc = SuperNumber.min(emc, midItemEmc);
         LinkedList<Pair<Item, SuperNumber>> newKnowledge = new LinkedList<Pair<Item, SuperNumber>>(knowledge);
+        LinkedList<Pair<Item, SuperNumber>> fuelKnowledge = new LinkedList<Pair<Item, SuperNumber>>();
         int len = newKnowledge.size();
         for (int i = 0; i < len; i++) {
             SuperNumber itemEmc = newKnowledge.get(i).getRight();
             if (emc.compareTo(itemEmc) == -1) {
-                newKnowledge.remove(i);
+                newKnowledge.remove(i); // emc filter - items who's emc value is greater than the players' emc shouldn't be displayed
                 i--;
                 len--;
+                continue;
+            }
+            Item item = newKnowledge.get(i).getLeft();
+            if (Registries.ITEM.getEntry(item).streamTags().anyMatch(tag -> tag == ModTags.FUEL)) {
+                newKnowledge.remove(i); // "fuel" items go in the inner ring, so we put them in this list
+                i--;
+                len--;
+                fuelKnowledge.add(new Pair<Item, SuperNumber>(item, itemEmc));
             }
         }
 
@@ -125,12 +134,12 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         }
 
         // clear all the transmutation slots
-        int num = 0;
         for (int i = 0; i < transmutationSlots.size(); i++) {
             transmutationSlots.get(i).setStack(ItemStack.EMPTY);
         }
 
         boolean isSearching = !searchText.isEmpty();
+        int num = 0;
         for (int i = (isSearching) ? 0 : offeringPageNum * 12; i < newKnowledge.size(); i++) {
             Item item = newKnowledge.get(i).getLeft();
 
@@ -143,14 +152,30 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
             transmutationSlots.get(num).setStack(stack);
             num++;
             if (num >= 12)
+                break;
+        }
+        num = 0;
+        for (int i = 0; i < fuelKnowledge.size(); i++) {
+            Item item = fuelKnowledge.get(i).getLeft();
+
+            String name = item.getName().getString();
+            if (isSearching && !name.toLowerCase().contains(searchText.toLowerCase())) 
+                continue; 
+            
+            ItemStack stack = new ItemStack(item);
+            transmutationSlots.get(num + 12).setStack(stack);
+            num++;
+            if (num >= 4)
                 return;
         }
     }
 
     @Override
-    public void onSlotClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player) {
-        super.onSlotClick(slotIndex, button, actionType, player);
+    public void onClosed(PlayerEntity player) {
+        super.onClosed(player);
+        dropInventory(player, minorInventory);
     }
+
 
     @Override
     public ItemStack quickMove(PlayerEntity player, int invSlot) {

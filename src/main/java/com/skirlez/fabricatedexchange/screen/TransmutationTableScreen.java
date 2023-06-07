@@ -153,7 +153,6 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         if (searchText.equals(oldSearchText))
             return;
         oldSearchText = searchText;
-        FabricatedExchange.LOGGER.info(searchText);
         PacketByteBuf buffer = PacketByteBufs.create();
         buffer.writeInt(0);
         buffer.writeString(searchText);
