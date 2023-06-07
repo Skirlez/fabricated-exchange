@@ -48,7 +48,7 @@ public class PhilosophersStone extends Item {
         BlockPos blockPos = context.getBlockPos();
         World world = context.getWorld();
         Block block = world.getBlockState(blockPos).getBlock();
-        boolean valid = FabricatedExchange.blockRotationMap.containsKey(block);
+        boolean valid = FabricatedExchange.blockTransmutationMap.containsKey(block);
         if (valid) {
             if (world.isClient()) {
                 context.getPlayer().playSound(ModSounds.PS_USE, 1F, 1F);
@@ -71,7 +71,7 @@ public class PhilosophersStone extends Item {
         int charge = stack.getOrCreateNbt().getInt("Charge");
         Block block = world.getBlockState(pos).getBlock();
         if (charge == 0) {
-            world.setBlockState(pos, FabricatedExchange.blockRotationMap.get(block).getDefaultState());
+            world.setBlockState(pos, FabricatedExchange.blockTransmutationMap.get(block).getDefaultState());
             return;
         }
         int xOff = -charge, yOff = -charge, zOff = -charge;
@@ -107,7 +107,7 @@ public class PhilosophersStone extends Item {
                     Block newBlock = world.getBlockState(newPos).getBlock();
                     if (!newBlock.equals(block))
                         continue;
-                    world.setBlockState(newPos, FabricatedExchange.blockRotationMap.get(block).getDefaultState());
+                    world.setBlockState(newPos, FabricatedExchange.blockTransmutationMap.get(block).getDefaultState());
                 }
             }
         }

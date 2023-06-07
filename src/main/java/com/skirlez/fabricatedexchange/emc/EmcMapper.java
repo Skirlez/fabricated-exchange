@@ -46,8 +46,7 @@ public class EmcMapper {
         if (seedEmcMap != null)
             mergeMap(seedEmcMap);
         
-        // blacklisted recipes
-        String[] smeltingRecipesBlacklist = {"minecraft:iron_nugget_from_smelting", "minecraft:gold_nugget_from_smelting"};
+
         
         // i don't know what this thing is, but you need it for some functions
         DynamicRegistryManager dynamicRegistryManager = world.getRegistryManager();
@@ -55,9 +54,16 @@ public class EmcMapper {
         LinkedList<SmithingRecipe> smithingRecipes = new LinkedList<SmithingRecipe>(recipeManager.listAllOfType(RecipeType.SMITHING));
 
         LinkedList<SmeltingRecipe> smeltingRecipes = new LinkedList<SmeltingRecipe>(recipeManager.listAllOfType(RecipeType.SMELTING));
-        removeArrayFromRecipeList(smeltingRecipesBlacklist, smeltingRecipes);
+            
         LinkedList<CraftingRecipe> craftingRecipes = new LinkedList<CraftingRecipe>(recipeManager.listAllOfType(RecipeType.CRAFTING));
 
+
+        // blacklisted recipes
+        HashMap<String, String[]> blacklistedRecipes = ModConfig.BLACKLISTED_MAPPER_RECIPES_FILE.fetchAndGetValue();
+        if (blacklistedRecipes != null) {
+            String[] smeltingRecipesBlacklist = blacklistedRecipes.getOrDefault("smelting", new String[] {});
+            removeArrayFromRecipeList(smeltingRecipesBlacklist, smeltingRecipes);
+        }
 
         for (int i = 0; i < 4; i++) {
             // Smelting recipes
@@ -76,9 +82,6 @@ public class EmcMapper {
                     break;
             }
         }
-
-
-        FabricatedExchange.LOGGER.info("stop");
     }
 
 
@@ -109,8 +112,6 @@ public class EmcMapper {
             else {
                 equation.getRight().add(outputEmc);
             }
-            
-
             for (Ingredient ingredient : ingredients) {
                 ItemStack[] itemStackArr = ingredient.getMatchingStacks();
                 if (itemStackArr.length == 0)

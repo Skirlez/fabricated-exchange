@@ -13,10 +13,10 @@ public class DataFile<T> {
     private final Path path;
     private final String name;
     private T value;
-    public DataFile(Type type, Path path, String name) {
+    public DataFile(Type type, String name) {
         this.type = type;
-        this.path = path;
         this.name = name;
+        this.path = ModConfig.CONFIG_DIR.resolve(name);
     }
 
     public void fetch() {

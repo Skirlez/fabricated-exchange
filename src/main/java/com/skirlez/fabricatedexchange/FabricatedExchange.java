@@ -8,9 +8,13 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
+
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,12 +37,11 @@ public class FabricatedExchange implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("fabricated-exchange");
     public static final String MOD_ID = "fabricated-exchange";
     // this map tells the philosopher's stone what block to transform when right clicked
-    public static Map<Block, Block> blockRotationMap = new HashMap<>();
+    public static Map<Block, Block> blockTransmutationMap = new HashMap<>();
     
 
     @Override
     public void onInitialize() {
-        
         ModItemGroups.registerItemGroups();
         ModItems.registerModItems();
         ModSounds.registerSoundEvents();
@@ -46,13 +49,12 @@ public class FabricatedExchange implements ModInitializer {
         ModBlockEntities.registerBlockEntities();
         ModScreenHandlers.registerAllScreenHandlers();
         ModMessages.registerC2SPackets();
-        fillBlockRotationMap();
+        fetchBlockRotationMap();
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> { 
             // send the player's own emc value
             PlayerState playerState = ServerState.getPlayerState(handler.player);
             EmcData.syncEmc((ServerPlayerEntity)handler.player, playerState.emc);
-
 
             // send the entire emc map
             PacketByteBuf buffer = PacketByteBufs.create();
@@ -74,34 +76,49 @@ public class FabricatedExchange implements ModInitializer {
             HashMap<String, SuperNumber> customEmcMap = ModConfig.CUSTOM_EMC_MAP_FILE.fetchAndGetValue();
             if (customEmcMap != null)
                 mapper.mergeMap(new HashMap<String, SuperNumber>(customEmcMap));
-
         });
     }
 
 
-    private void fillBlockRotationMap() {
-        addTwoWayRelation(Blocks.GRASS_BLOCK, Blocks.SAND);
-        addOneWayRelation(Blocks.DIRT, Blocks.SAND);
-        addTwoWayRelation(Blocks.GRASS, Blocks.DEAD_BUSH);
-        addChainRelation(new Block[] {Blocks.OAK_WOOD, Blocks.BIRCH_WOOD, Blocks.SPRUCE_WOOD});
-        addChainRelation(new Block[] {Blocks.OAK_LOG, Blocks.BIRCH_LOG, Blocks.SPRUCE_LOG}); 
+    private void fetchBlockRotationMap() {
+        blockTransmutationMap.clear();
+        String[][] blockTransmutationData = ModConfig.BLOCK_TRANSMUTATION_MAP_FILE.fetchAndGetValue();
+        if (blockTransmutationData == null)
+            return;
+        for (int i = 0; i < blockTransmutationData.length; i++) {
+            int j = 0;
+            // GSON just packages the string[][] with a FREE (100% off) NULL™ for no reason so i guess we have to check for it
+            if (blockTransmutationData[i] == null) 
+                continue;
+            int len = blockTransmutationData[i].length;
+            if (len == 0)
+                continue;
+            if (len == 3 && blockTransmutationData[i][j].equals("O")) {
+                addBlockRelation(blockTransmutationData[i][j + 1], blockTransmutationData[i][j + 2]); 
+                continue;
+            }
+            while (j < len - 1) {
+                addBlockRelation(blockTransmutationData[i][j], blockTransmutationData[i][j + 1]); 
+                j++;
+            }
+            addBlockRelation(blockTransmutationData[i][j], blockTransmutationData[i][0]); 
+        }
     }
 
-    private void addTwoWayRelation(Block b1, Block b2) {
-        blockRotationMap.put(b1, b2);
-        blockRotationMap.put(b2, b1);
-    };
-    private void addOneWayRelation(Block b1, Block b2) {
-        blockRotationMap.put(b1, b2);
-    };
-    private void addChainRelation(Block[] arr) {
-        int i;
-        for (i = 0; i < arr.length - 1; i++) {
-            blockRotationMap.put(arr[i], arr[i + 1]);
+    private void addBlockRelation(String str1, String str2) {
+        Block b1 = Registries.BLOCK.get(new Identifier(str1));
+        Block b2 = Registries.BLOCK.get(new Identifier(str2));
+        if (b1 == null || b2 == null) {
+            FabricatedExchange.LOGGER.error("Invalid block(s) found in block_transmutation_map.json! Block 1: " + str1 + " -> Block 2: " + str2);
+            return;
         }
-        blockRotationMap.put(arr[i], arr[0]);
+        if (blockTransmutationMap.containsKey(b1)) {
+            FabricatedExchange.LOGGER.error("Duplicate block transmutation in block_transmutation_map.json! Block 1: " + str1 + " -> Block 2: " + str2);
+            return;
+        }
+        blockTransmutationMap.put(b1, b2);
     };
-
+     
 
 
 }

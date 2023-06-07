@@ -55,7 +55,7 @@ public abstract class ModWorldRendererOutline {
         Block block = world.getBlockState(pos).getBlock();
         if (charge != 0 
                 && hit.getType().equals(HitResult.Type.BLOCK)
-                && FabricatedExchange.blockRotationMap.containsKey(block)) {
+                && FabricatedExchange.blockTransmutationMap.containsKey(block)) {
             int xOff = -charge, yOff = -charge, zOff = -charge;
             switch (hit.getSide()) {
                 case DOWN:
