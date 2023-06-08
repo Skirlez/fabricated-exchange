@@ -18,8 +18,7 @@ public class FabricatedExchangeClient implements ClientModInitializer {
         HandledScreens.register(ModScreenHandlers.TRANSMUTATION_TABLE_SCREEN_HANDLER, TransmutationTableScreen::new);
         ModMessages.registerS2CPackets();
         
-        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-        });
+
         KeyInputHandler.register();
     }
 }

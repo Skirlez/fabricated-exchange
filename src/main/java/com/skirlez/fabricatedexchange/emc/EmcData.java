@@ -1,10 +1,15 @@
 package com.skirlez.fabricatedexchange.emc;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.Collections;
 
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.util.DataFile;
+import com.skirlez.fabricatedexchange.util.MapUtil;
 import com.skirlez.fabricatedexchange.util.ModConfig;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
@@ -12,6 +17,7 @@ import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.loader.impl.game.minecraft.McVersion;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -22,8 +28,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 public class EmcData {
 
     // both the server and the client can use these
-    public static HashMap<String, SuperNumber> emcMap = new HashMap<>();
-
+    public static ConcurrentMap<String, SuperNumber> emcMap = new ConcurrentHashMap<String, SuperNumber>();
+    
     public static SuperNumber getItemEmc(Item item) {
         if (item == null)
             return SuperNumber.Zero(); 
@@ -52,20 +58,19 @@ public class EmcData {
         PlayerState playerState = ServerState.getPlayerState(player);
         return playerState.emc;
     } 
-    public static void setItemEmc(Item item, SuperNumber emc, DataFile<HashMap<String, SuperNumber>> file, boolean merge) {
+    public static void setItemEmc(Item item, SuperNumber emc, boolean seed) {
+        DataFile<Map<String, SuperNumber>> file = seed ? ModConfig.SEED_EMC_MAP_FILE : ModConfig.CUSTOM_EMC_MAP_FILE;
         if (item == null)
             return;
         String id = Registries.ITEM.getId(item).toString();
-        HashMap<String, SuperNumber> newEmcMap = file.fetchAndGetValue();
+        Map<String, SuperNumber> newEmcMap = file.getValue();
         if (newEmcMap == null)
             newEmcMap = new HashMap<String, SuperNumber>();
         newEmcMap.put(id, emc);
-        file.save();
-        if (merge) {
-            EmcMapper mapper = new EmcMapper(emcMap);
-            mapper.mergeMap(newEmcMap);
-        }
+        file.setValueAndSave(newEmcMap);
+        MapUtil.mergeMap(emcMap, newEmcMap);
     }
+
 
 
 
@@ -93,5 +98,18 @@ public class EmcData {
         ServerPlayNetworking.send(player, ModMessages.EMC_SYNC_IDENTIFIER, buffer);
     }
 
+    public static void syncMap(ServerPlayerEntity player) {
+        // send the entire emc map
+        PacketByteBuf buffer = PacketByteBufs.create();
+        int iterations = EmcData.emcMap.keySet().size();
+        buffer.writeInt(iterations);
+        Iterator<String> iterator = EmcData.emcMap.keySet().iterator();
+        for (int i = 0; i < iterations; i++) {
+            String s = (String)iterator.next();
+            buffer.writeString(s);
+            buffer.writeString(EmcData.emcMap.get(s).divisionString());
+        }
+        ServerPlayNetworking.send(player, ModMessages.EMC_MAP_SYNC_IDENTIFIER, buffer);
+    }
 
 }

@@ -3,7 +3,7 @@ package com.skirlez.fabricatedexchange.util;
 import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -11,7 +11,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
-import com.google.gson.internal.LinkedTreeMap;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 
 import net.fabricmc.loader.api.FabricLoader;
@@ -37,20 +36,20 @@ public class ModConfig {
     private static Type recipeBlacklistType = new TypeToken<HashMap<String, String[]>>() {}.getType();
     private static Type blockTransmutationMapType = new TypeToken<String[][]>() {}.getType();
 
-    public static final DataFile<HashMap<String, Object>> CONFIG_FILE 
-        = new DataFile<HashMap<String, Object>>(jsonType, 
+    public static final DataFile<Map<String, Object>> CONFIG_FILE 
+        = new DataFile<Map<String, Object>>(jsonType, 
         "config.json");
 
-    public static final DataFile<HashMap<String, SuperNumber>> SEED_EMC_MAP_FILE 
-        = new DataFile<HashMap<String, SuperNumber>>(emcMapType, 
+    public static final DataFile<Map<String, SuperNumber>> SEED_EMC_MAP_FILE 
+        = new DataFile<Map<String, SuperNumber>>(emcMapType, 
         "seed_emc_map.json");
 
-    public static final DataFile<HashMap<String, SuperNumber>> CUSTOM_EMC_MAP_FILE
-        = new DataFile<HashMap<String, SuperNumber>>(emcMapType, 
+    public static final DataFile<Map<String, SuperNumber>> CUSTOM_EMC_MAP_FILE
+        = new DataFile<Map<String, SuperNumber>>(emcMapType, 
         "custom_emc_map.json");
 
-    public static final DataFile<HashMap<String, String[]>> BLACKLISTED_MAPPER_RECIPES_FILE
-        = new DataFile<HashMap<String, String[]>>(recipeBlacklistType,
+    public static final DataFile<Map<String, String[]>> BLACKLISTED_MAPPER_RECIPES_FILE
+        = new DataFile<Map<String, String[]>>(recipeBlacklistType,
         "blacklisted_mapper_recipes.json");
 
     public static final DataFile<String[][]> BLOCK_TRANSMUTATION_MAP_FILE
@@ -58,5 +57,11 @@ public class ModConfig {
         "block_transmutation_map.json");
 
 
-
+    public static void fetchAll() {
+        CONFIG_FILE.fetch();
+        SEED_EMC_MAP_FILE.fetch();
+        CUSTOM_EMC_MAP_FILE.fetch();
+        BLACKLISTED_MAPPER_RECIPES_FILE.fetch();
+        BLOCK_TRANSMUTATION_MAP_FILE.fetch();
+    }
 }

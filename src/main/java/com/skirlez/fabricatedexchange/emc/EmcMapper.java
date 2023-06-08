@@ -1,14 +1,15 @@
 package com.skirlez.fabricatedexchange.emc;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.mixin.LegacySmithingRecipeAccessor;
+import com.skirlez.fabricatedexchange.util.MapUtil;
 import com.skirlez.fabricatedexchange.util.ModConfig;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
@@ -28,9 +29,18 @@ import net.minecraft.util.Pair;
 import net.minecraft.world.World;
 
 public class EmcMapper {
-    private HashMap<String, SuperNumber> emcMap;
-    public EmcMapper(HashMap<String, SuperNumber> emcMap) {
-        this.emcMap = emcMap;
+    private ConcurrentMap<String, SuperNumber> emcMap;
+    private String log;
+    public EmcMapper() {
+        emcMap = new ConcurrentHashMap<String, SuperNumber>();
+        log = "";
+    }
+
+    public ConcurrentMap<String, SuperNumber> getMap() {
+        return emcMap;
+    }
+    public String getLog() {
+        return log;
     }
 
     public void fillEmcMap(World world, RecipeManager recipeManager) {
@@ -38,13 +48,10 @@ public class EmcMapper {
         This function will fill the emc map - the thing that sets the relation between items and their emc values.
         this implementation is dumb, because I am not experienced enough to implement a better solution.
         it loops over all the recipes in the game a LOT to generate the mappings.
-        TODO: Save the result to make this less terrible.
-        */
-        emcMap.clear();
-        
-        HashMap<String, SuperNumber> seedEmcMap = ModConfig.SEED_EMC_MAP_FILE.fetchAndGetValue();
+        */        
+        Map<String, SuperNumber> seedEmcMap = ModConfig.SEED_EMC_MAP_FILE.getValue();
         if (seedEmcMap != null)
-            mergeMap(seedEmcMap);
+            MapUtil.mergeMap(emcMap, seedEmcMap);
         
 
         
@@ -59,10 +66,13 @@ public class EmcMapper {
 
 
         // blacklisted recipes
-        HashMap<String, String[]> blacklistedRecipes = ModConfig.BLACKLISTED_MAPPER_RECIPES_FILE.fetchAndGetValue();
+        Map<String, String[]> blacklistedRecipes = ModConfig.BLACKLISTED_MAPPER_RECIPES_FILE.getValue();
         if (blacklistedRecipes != null) {
             String[] smeltingRecipesBlacklist = blacklistedRecipes.getOrDefault("smelting", new String[] {});
             removeArrayFromRecipeList(smeltingRecipesBlacklist, smeltingRecipes);
+
+            String[] craftingRecipesBlacklist = blacklistedRecipes.getOrDefault("crafting", new String[] {});
+            removeArrayFromRecipeList(craftingRecipesBlacklist, craftingRecipes);
         }
 
         for (int i = 0; i < 4; i++) {
@@ -127,7 +137,7 @@ public class EmcMapper {
                         Item remainder = item.getRecipeRemainder();
                         itemEmc.subtract(getItemEmc(remainder));
                         if (itemEmc.compareTo(SuperNumber.ZERO) == -1) {
-                            FabricatedExchange.LOGGER.error("Negative EMC value upon subtracting recipe remainder! Recipe: " + recipe.getId().toString());
+                            error("Negative EMC value upon subtracting recipe remainder! Recipe: " + recipe.getId().toString());
                             giveUp = true;
                             break;
                         }
@@ -176,11 +186,11 @@ public class EmcMapper {
                 SuperNumber rightValue = equation.getRight();
                 rightValue.subtract(leftValue);
                 if (rightValue.compareTo(SuperNumber.ZERO) == -1) {
-                    FabricatedExchange.LOGGER.error("Negative EMC value! Recipe: " + recipe.getId().toString());
+                    error("Negative EMC value! Recipe: " + recipe.getId().toString());
                 } 
                 for (Item item : unknownItems) {
                     if (rightValue.equalsZero()) {
-                        FabricatedExchange.LOGGER.warn("EMC Mapper thinks " + item.getTranslationKey() + " should have 0 EMC. Recipe: " + recipe.getId().toString());
+                        warn("EMC Mapper thinks " + item.getTranslationKey() + " should have 0 EMC. Recipe: " + recipe.getId().toString());
                         continue;
                     }
                     if (!emcMapHasEntry(item)) {
@@ -200,7 +210,6 @@ public class EmcMapper {
         }
         return newInfo;
     }
-
 
     private boolean iterateSmeltingRecipes(RecipeManager recipeManager, DynamicRegistryManager dynamicRegistryManager, LinkedList<SmeltingRecipe> recipesList) {
         boolean newInfo = false;
@@ -226,7 +235,7 @@ public class EmcMapper {
                 }
                 int comparison = itemEmc.compareTo(inEmc);
                 if (comparison != 0) {
-                    FabricatedExchange.LOGGER.warn("EMC conflict detected! for recipe " + recipe.getId().toString() + ", for items "  
+                    warn("EMC conflict detected! for recipe " + recipe.getId().toString() + ", for items "  
                     + itemStacks[foundIndex].getName() + " with value " + inEmc.toString() + ", "
                     + itemStacks[j].getName() + " with value " + itemEmc.toString() + ". choosing the lower value."); 
                     inEmc = SuperNumber.min(inEmc, itemEmc);
@@ -321,15 +330,6 @@ public class EmcMapper {
         return newInfo;
     }
 
-    public void mergeMap(HashMap<String, SuperNumber> newEmcMap) {
-        int iterations = newEmcMap.keySet().size();
-        Iterator<String> iterator = newEmcMap.keySet().iterator();
-        for (int i = 0; i < iterations; i++) {
-            String s = iterator.next();
-            emcMap.put(s, newEmcMap.get(s));
-        }
-    }
-
     private void putEmcMap(Item item, SuperNumber value) {
         emcMap.put(Registries.ITEM.getId(item).toString(), value);
     }
@@ -359,6 +359,16 @@ public class EmcMapper {
             }
         }
     }
+
+    private void warn(String input) {
+        FabricatedExchange.LOGGER.warn(input);
+        log += "WARNING: " + input + "\n";
+    }
+    private void error(String input) {
+        FabricatedExchange.LOGGER.warn(input);
+        log += "ERROR: " + input + "\n";
+    }
+
 
 }
 

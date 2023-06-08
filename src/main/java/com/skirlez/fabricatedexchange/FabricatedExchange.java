@@ -4,24 +4,27 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.skirlez.fabricatedexchange.block.ModBlockEntities;
 import com.skirlez.fabricatedexchange.block.ModBlocks;
+import com.skirlez.fabricatedexchange.command.ReloadEmcCommand;
+import com.skirlez.fabricatedexchange.command.RemoveEmcCommand;
 import com.skirlez.fabricatedexchange.command.SetEmcCommand;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.emc.EmcMapper;
@@ -30,6 +33,7 @@ import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.ModScreenHandlers;
 import com.skirlez.fabricatedexchange.sound.ModSounds;
+import com.skirlez.fabricatedexchange.util.MapUtil;
 import com.skirlez.fabricatedexchange.util.ModConfig;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
@@ -51,48 +55,54 @@ public class FabricatedExchange implements ModInitializer {
         ModBlockEntities.registerBlockEntities();
         ModScreenHandlers.registerAllScreenHandlers();
         ModMessages.registerC2SPackets();
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+            SetEmcCommand.register(dispatcher);
+            RemoveEmcCommand.register(dispatcher);
+            ReloadEmcCommand.register(dispatcher);
+        });
 
-
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> SetEmcCommand.register(dispatcher));
-        fetchBlockRotationMap();
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> { 
             // send the player's own emc value
             PlayerState playerState = ServerState.getPlayerState(handler.player);
-            EmcData.syncEmc((ServerPlayerEntity)handler.player, playerState.emc);
-
-            // send the entire emc map
-            PacketByteBuf buffer = PacketByteBufs.create();
-            int iterations = EmcData.emcMap.keySet().size();
-            buffer.writeInt(iterations);
-            Iterator<String> iterator = EmcData.emcMap.keySet().iterator();
-            for (int i = 0; i < iterations; i++) {
-                String s = (String)iterator.next();
-                buffer.writeString(s);
-                buffer.writeString(EmcData.emcMap.get(s).divisionString());
-            }
-            ServerPlayNetworking.send(handler.player, ModMessages.EMC_MAP_SYNC_IDENTIFIER, buffer);
+            EmcData.syncEmc(handler.player, playerState.emc);
+            EmcData.syncMap(handler.player);
         });
 
         ServerLifecycleEvents.SERVER_STARTED.register((server) -> {
-            EmcMapper mapper = new EmcMapper(EmcData.emcMap);
-            mapper.fillEmcMap(server.getOverworld(), server.getOverworld().getRecipeManager());
-            
-            HashMap<String, SuperNumber> customEmcMap = ModConfig.CUSTOM_EMC_MAP_FILE.fetchAndGetValue();
-            if (customEmcMap != null)
-                mapper.mergeMap(new HashMap<String, SuperNumber>(customEmcMap));
+            ModConfig.fetchAll();
+            fetchBlockRotationMap();
+            reloadEmcMap(server);
         });
     }
 
 
-    private void fetchBlockRotationMap() {
+
+    public static String reloadEmcMap(MinecraftServer server) {
+        EmcMapper mapper = new EmcMapper();
+        mapper.fillEmcMap(server.getOverworld(), server.getOverworld().getRecipeManager());
+        EmcData.emcMap = mapper.getMap();
+        Map<String, SuperNumber> customEmcMap = ModConfig.CUSTOM_EMC_MAP_FILE.getValue();
+        if (customEmcMap != null)
+            MapUtil.mergeMap(EmcData.emcMap, customEmcMap);
+        
+        return mapper.getLog();
+    }
+
+    public static void syncMaps(MinecraftServer server) {
+        for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+            EmcData.syncMap(player);
+        }
+    }
+
+    private static void fetchBlockRotationMap() {
         blockTransmutationMap.clear();
-        String[][] blockTransmutationData = ModConfig.BLOCK_TRANSMUTATION_MAP_FILE.fetchAndGetValue();
+        String[][] blockTransmutationData = ModConfig.BLOCK_TRANSMUTATION_MAP_FILE.getValue();
         if (blockTransmutationData == null)
             return;
         for (int i = 0; i < blockTransmutationData.length; i++) {
             int j = 0;
-            // GSON just packages the string[][] with a FREE (100% off) NULL™ for no reason so i guess we have to check for it
+            // GSON just packages the String[][] with a FREE (100% off) NULL™ for no reason so i guess we have to check for it
             if (blockTransmutationData[i] == null) 
                 continue;
             int len = blockTransmutationData[i].length;
@@ -110,7 +120,7 @@ public class FabricatedExchange implements ModInitializer {
         }
     }
 
-    private void addBlockRelation(String str1, String str2) {
+    private static void addBlockRelation(String str1, String str2) {
         Block b1 = Registries.BLOCK.get(new Identifier(str1));
         Block b2 = Registries.BLOCK.get(new Identifier(str2));
         if (b1 == null || b2 == null) {

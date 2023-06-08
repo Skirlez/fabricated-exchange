@@ -1,5 +1,6 @@
 package com.skirlez.fabricatedexchange.util;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
@@ -15,7 +16,7 @@ import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
 
 public class ServerState extends PersistentState {
-    public HashMap<UUID, PlayerState> players = new HashMap<>();
+    public Map<UUID, PlayerState> players = new HashMap<UUID, PlayerState>();
 
     @Override
     public NbtCompound writeNbt(NbtCompound nbt) {

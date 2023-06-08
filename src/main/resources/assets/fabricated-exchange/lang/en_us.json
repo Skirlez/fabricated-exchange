@@ -7,10 +7,20 @@
     "sounds.fabricated-exchange.philosophers_stone_use": "Block transmuted",
     "sounds.fabricated-exchange.item_charge": "Item charged",
     "sounds.fabricated-exchange.item_discharge": "Item discharged",
-    "commands.fabricated-exchange.setemc.no_item": "Can't assign EMC to air!",
-    "commands.fabricated-exchange.setemc.no_number": " isn't a number!",
+
+    "commands.fabricated-exchange.reload_notice": "Run /reloademc to regenerate the EMC values.",
+    "commands.fabricated-exchange.zero_notice": "If you want the item to not have EMC, run \"/setemc custom 0\".",
+    "commands.fabricated-exchange.no_item": "Air cannot have EMC! Hold an item and then run the command.",
+    "commands.fabricated-exchange.setemc.not_valid_number": " isn't a valid number!",
     "commands.fabricated-exchange.setemc.custom_success": "Item EMC updated!",
-    "commands.fabricated-exchange.setemc.seed_success": "Item EMC updated! Run /reloademc to regenerate the EMC values.",
+    "commands.fabricated-exchange.setemc.seed_success": "Item EMC added to seed values!",
+    "commands.fabricated-exchange.removeemc.seed_success": "Item EMC removed from seed values!",
+    "commands.fabricated-exchange.removeemc.seed_confused": "This item does not have a seed value.",
+    "commands.fabricated-exchange.removeemc.custom_success": "Custom Item EMC removed!",
+    "commands.fabricated-exchange.removeemc.custom_confused": "This item does not have a custom EMC value.",
+    "commands.fabricated-exchange.reloademc.success": "Done! (%sms) EMC mapper output:",
+
+
     "key.category.fabricated-exchange": "Fabricated Exchange bindings",
     "key.fabricated-exchange.charge": "Charge/Discharge Item"
 }
