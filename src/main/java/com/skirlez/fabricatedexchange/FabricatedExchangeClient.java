@@ -6,7 +6,6 @@ import com.skirlez.fabricatedexchange.screen.TransmutationTableScreen;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 public class FabricatedExchangeClient implements ClientModInitializer {
     public static SuperNumber clientEmc = SuperNumber.Zero();

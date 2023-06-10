@@ -2,14 +2,15 @@ package com.skirlez.fabricatedexchange.screen.slot;
 
 import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.emc.EmcData;
-import com.skirlez.fabricatedexchange.interfaces.ModItemStackInterface;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandler;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.screen.slot.Slot;
 
 public class TransmutationSlot extends Slot {
@@ -26,8 +27,6 @@ public class TransmutationSlot extends Slot {
 
     @Override
     public void setStack(ItemStack stack) {
-        ModItemStackInterface moddedStack = (ModItemStackInterface)(Object)stack;
-        moddedStack.setDisplayMaxStack(3);
         this.setStackNoCallbacks(stack);
     }
 
@@ -44,7 +43,6 @@ public class TransmutationSlot extends Slot {
 
     @Override
     public ItemStack takeStack(int amount) {
-
         ItemStack stack = this.getStack().copy();
         stack.setCount(amount);
         SuperNumber itemCost = EmcData.getItemStackEmc(stack);
@@ -70,7 +68,7 @@ public class TransmutationSlot extends Slot {
         return false;
     }
 
-    // you're not supposed to be able to grab the item by double clicking on a stack of the same that isn't full
+    // you're not supposed to be able to grab the item by double clicking on a stack of the same item that isn't full
     @Override
     public ItemStack takeStackRange(int min, int max, PlayerEntity player) {
         return ItemStack.EMPTY;

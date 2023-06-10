@@ -6,11 +6,20 @@
         },
         {
             "tag": "c:gold_ingots"
+        },
+        {
+            "tag": "c:gold_ingots"
+        },
+        {
+            "tag": "c:gold_ingots"
+        },
+        {
+            "tag": "c:gold_ingots"
         }
     ],
     "result": {
-        "item": "minecraft:iron_ingot",
-        "count": 8
+        "item": "minecraft:diamond",
+        "count": 1
     }
 }
 

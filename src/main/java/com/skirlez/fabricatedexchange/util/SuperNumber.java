@@ -1,8 +1,6 @@
 package com.skirlez.fabricatedexchange.util;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 /*
     SuperNumber: TODO I want cool ASCII art here of the name
 -has two bigintegers: numerator and denominator
@@ -13,7 +11,8 @@ import java.math.RoundingMode;
 -"super" for "super slow"
 
 */
-import java.text.DecimalFormat;
+
+import com.skirlez.fabricatedexchange.FabricatedExchange;
 
 public class SuperNumber {
     private BigInteger numerator;
@@ -22,6 +21,8 @@ public class SuperNumber {
     public static final SuperNumber ZERO = new SuperNumber(BigInteger.ZERO);
     public static final SuperNumber ONE = new SuperNumber(BigInteger.ONE);
     public static final SuperNumber INTEGER_LIMIT = new SuperNumber(Integer.MAX_VALUE);
+
+    private char[] metricPrefixes = {'k', 'M', 'G', 'T', 'P'}; 
 
     // constructor heaven
     public SuperNumber(int numerator) {
@@ -214,7 +215,7 @@ public class SuperNumber {
     }
 
     /** A comparison between this and another SuperNumber. 
-     * Returns -1 for if this is smaller than other, 
+     * @return -1 for if this is smaller than other, 
      * 0 for if this equals to other, 
      * and 1 for if this is bigger than other. */
     public int compareTo(SuperNumber other) {
@@ -228,48 +229,88 @@ public class SuperNumber {
         return thisCopy.numerator.compareTo(otherCopy.numerator);
     }
 
-    /** Returns the smaller of the two SuperNumbers. */
+    /** @return the smaller of the two SuperNumbers. */
     public static SuperNumber min(SuperNumber a, SuperNumber b) {
         return (a.compareTo(b) == -1) ? a : b;
     }
 
 
-    // TODO i don't like the next 3 functions improve them
-    /** Returns a representation of the number as a String, formatted with commas,
-    * and will also return scientific notation if the value is greater than 1,000,000,000. */
+
+    /** @return a representation of the number as a String, formatted with commas and a point */
     public String toString() {
         if (this.equalsZero())
             return "0";
-        BigDecimal a = new BigDecimal(numerator);
-        a = a.divide(new BigDecimal(denominator), 10, RoundingMode.HALF_EVEN);
-        if (a.compareTo(new BigDecimal("1000000000")) == 1)
-            return scientificNotation(a);
-        return normalNotation(a);
-    }
-    private String scientificNotation(BigDecimal a) {
-        DecimalFormat format = new DecimalFormat("0.#####E0");
-        return format.format(a);
-    }
-    private String normalNotation(BigDecimal a) {
-        DecimalFormat formatter = new DecimalFormat("#,###.000");
-        String s = formatter.format(a);
-        while (s.endsWith("0")) 
-            s = s.substring(0, s.length() - 1);
-        if (s.endsWith("."))
-            s = s.substring(0, s.length() - 1);
-        if (s.startsWith("."))
-            s = "0" + s;
-        return s;
+        BigInteger temp = numerator.multiply(BigInteger.valueOf(1000)).divide(denominator);
+        String str = temp.toString();
+        int i;
+        for (i = 0; i < 3; i++) {
+            if (!str.endsWith("0"))
+                break;
+            str = str.substring(0, str.length() - 1);
+        }
+        StringBuilder newStr = new StringBuilder();
+        int commaCount = (3 - ((str.length() + i) % 3)) % 3;
+        for (int j = 0; j < str.length(); j++) {
+            int o = str.length() - (4 - i);
+            newStr.append(str.charAt(j));
+            if (j == o && o != str.length() - 1)
+                newStr.append('.');
+            if (j < o) {
+                commaCount++;
+                if (commaCount >= 3) {
+                    commaCount = 0;
+                    newStr.append(',');
+                }
+            }
+        }
+        return newStr.toString();
     }
 
-    /** Returns the SuperNumber as a string, formatted as %numerator%/%denominator%. If the denominator is 1, it will simply return the numerator as a String. Useful for serialization.
+    /** @return a representation of the number as a String, either formatted with commas and a point,
+     * with SI (metric) prefixes, or in scientific notation, depending on the max amount of characters.
+     * <p> Note: the string may return one above max in the case of metric prefixes, as the prefix is not considered.
+     * @param max - the maximum number of characters the string is given to represent the number
+     */
+    public String shortString(int max) {
+        String str = toString();
+        if (str.length() <= max)
+            return str; // string with fraction
+        int diff = str.length() - max;
+        while (str.contains(".")) {
+            str = str.substring(0, str.length() - 1);
+            diff--;
+        }
+        if (str.length() <= max)
+            return str; // string without fraction
+        if (diff > 17) {
+            // TODO scientific notation
+            return "";
+        }
+       
+        
+        // metric prefixes
+        
+        diff /= 3;
+        
+        if (diff == 0)
+            diff = 1;
+        char c = metricPrefixes[diff - 1];
+        str = str.substring(0, str.length() - diff * 4);
+        
+        str += c;
+        
+        return str;
+    }
+
+
+    /** @return the SuperNumber as a string, formatted as %numerator%/%denominator%. If the denominator is 1, it will simply return the numerator as a String. Useful for serialization.
      * @see SuperNumber#SuperNumber(String)
      */
     public String divisionString() {
         return numerator.toString() + ((denominator.toString().equals("1")) ? "" : "/" + denominator.toString());
     }
 
-    /** divides the fraction it's most simplified form. (3/6) -> (1/2) */
+    /** divides the fraction it's most simplified form. Example: (3/6) -> (1/2) */
     private void simplify() {
         if (denominator.equals(BigInteger.ONE) || numerator.equals(BigInteger.ONE))
             return;

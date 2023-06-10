@@ -136,10 +136,11 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 
     @Override
     protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
-        this.textRenderer.draw(matrices, this.title, (float)this.titleX, (float)this.titleY, 0x404040);
-        String emc = FabricatedExchangeClient.clientEmc.toString();
-        this.textRenderer.draw(matrices, Text.literal("EMC:"), -21, 64, 0x404040);
-        this.textRenderer.draw(matrices, Text.literal(emc), -21, 74, 0x404040);
+        textRenderer.draw(matrices, this.title, (float)this.titleX, (float)this.titleY, 0x404040);
+        String emc = FabricatedExchangeClient.clientEmc.shortString(15);
+
+        textRenderer.draw(matrices, Text.literal("EMC:"), -23, 64, 0x404040);
+        textRenderer.draw(matrices, Text.literal(emc), -23, 74, 0x404040);
     }
 
     @Override
@@ -163,5 +164,10 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         PacketByteBuf buffer = PacketByteBufs.create();
         buffer.writeInt(num);
         ClientPlayNetworking.send(ModMessages.TRANSMUTATION_TABLE_WIDGETS, buffer);
+    }
+
+
+    public Slot getFocusedSlot() {
+        return focusedSlot;
     }
 }

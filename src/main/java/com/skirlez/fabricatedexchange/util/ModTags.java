@@ -7,4 +7,5 @@ import net.minecraft.util.Identifier;
 
 public class ModTags {
     public static final TagKey<Item> FUEL = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "transmutation_fuel"));
+
 }

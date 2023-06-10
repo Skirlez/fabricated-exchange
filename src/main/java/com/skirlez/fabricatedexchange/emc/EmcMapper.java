@@ -1,6 +1,7 @@
 package com.skirlez.fabricatedexchange.emc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -31,9 +32,11 @@ import net.minecraft.world.World;
 public class EmcMapper {
     private ConcurrentMap<String, SuperNumber> emcMap;
     private String log;
+    private String[] ignoredItems;
     public EmcMapper() {
         emcMap = new ConcurrentHashMap<String, SuperNumber>();
         log = "";
+        ignoredItems = new String[0];
     }
 
     public ConcurrentMap<String, SuperNumber> getMap() {
@@ -42,6 +45,7 @@ public class EmcMapper {
     public String getLog() {
         return log;
     }
+
 
     public void fillEmcMap(World world, RecipeManager recipeManager) {
         /*
@@ -65,7 +69,7 @@ public class EmcMapper {
         LinkedList<CraftingRecipe> craftingRecipes = new LinkedList<CraftingRecipe>(recipeManager.listAllOfType(RecipeType.CRAFTING));
 
 
-        // blacklisted recipes
+        // blacklisted recipes and items
         Map<String, String[]> blacklistedRecipes = ModConfig.BLACKLISTED_MAPPER_RECIPES_FILE.getValue();
         if (blacklistedRecipes != null) {
             String[] smeltingRecipesBlacklist = blacklistedRecipes.getOrDefault("smelting", new String[] {});
@@ -73,6 +77,8 @@ public class EmcMapper {
 
             String[] craftingRecipesBlacklist = blacklistedRecipes.getOrDefault("crafting", new String[] {});
             removeArrayFromRecipeList(craftingRecipesBlacklist, craftingRecipes);
+
+            ignoredItems = blacklistedRecipes.getOrDefault("items", new String[] {});
         }
 
         for (int i = 0; i < 4; i++) {
@@ -173,8 +179,6 @@ public class EmcMapper {
             if (giveUp)
                 continue;
 
-            
-
             if (unknownSide == 0) { // if we know the emc value of everything,  move on
                 recipesList.remove(i);
                 i--;
@@ -190,7 +194,8 @@ public class EmcMapper {
                 } 
                 for (Item item : unknownItems) {
                     if (rightValue.equalsZero()) {
-                        warn("EMC Mapper thinks " + item.getTranslationKey() + " should have 0 EMC. Recipe: " + recipe.getId().toString());
+                        if (isIgnoredItem(item))
+                            warn("EMC Mapper thinks " + item.getTranslationKey() + " should have 0 EMC. Recipe: " + recipe.getId().toString());
                         continue;
                     }
                     if (!emcMapHasEntry(item)) {
@@ -270,10 +275,6 @@ public class EmcMapper {
                 i--;
                 len--;
             }
-
-            
-
-
         }
         return newInfo;
     }
@@ -328,6 +329,10 @@ public class EmcMapper {
             
         }
         return newInfo;
+    }
+
+    private boolean isIgnoredItem(Item item) {
+        return !Arrays.stream(ignoredItems).anyMatch(s -> s.equals(Registries.ITEM.getId(item).toString()));
     }
 
     private void putEmcMap(Item item, SuperNumber value) {

@@ -5,12 +5,12 @@
             "item": "fabricated-exchange:philosophers_stone"
         },
         {
-            "tag": "c:gold_ingots"
+            "tag": "c:diamonds"
         }
     ],
     "result": {
-        "item": "minecraft:iron_ingot",
-        "count": 8
+        "item": "minecraft:gold_ingot",
+        "count": 4
     }
 }
 

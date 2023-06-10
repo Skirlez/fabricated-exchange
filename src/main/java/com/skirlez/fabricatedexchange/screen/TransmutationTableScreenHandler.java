@@ -1,6 +1,5 @@
 package com.skirlez.fabricatedexchange.screen;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -106,13 +105,12 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         SuperNumber midItemEmc = EmcData.getItemStackEmc(this.slots.get(17).getStack());
         if (!midItemEmc.equalsZero())
             emc = SuperNumber.min(emc, midItemEmc);
-        // TODO: Make knowledge just a linkedlist of item, since emc is not constant anymore
         LinkedList<Pair<Item, SuperNumber>> newKnowledge = new LinkedList<Pair<Item, SuperNumber>>(knowledge);
         LinkedList<Pair<Item, SuperNumber>> fuelKnowledge = new LinkedList<Pair<Item, SuperNumber>>();
         int len = newKnowledge.size();
         for (int i = 0; i < len; i++) {
             SuperNumber itemEmc = newKnowledge.get(i).getRight();
-            if (emc.compareTo(itemEmc) == -1 || itemEmc.equals(BigInteger.ZERO)) {
+            if (emc.compareTo(itemEmc) == -1 || itemEmc.equalsZero()) {
                 // emc filter - items who's emc value is greater than the players' emc shouldn't be displayed
                 // (or if the item has 0 EMC which can happen if you learn it and then set the emc to 0)
                 newKnowledge.remove(i); 

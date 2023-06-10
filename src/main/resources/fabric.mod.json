@@ -30,6 +30,10 @@
 		{
 			"config": "fabricated-exchange.client.mixins.json",
 			"environment": "client"
+		},
+		{
+			"config": "fabricated-exchange.server.mixins.json",
+			"environment": "server"
 		}
 	],
 	"depends": {

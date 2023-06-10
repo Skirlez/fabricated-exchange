@@ -1,0 +1,37 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "ingredients": [
+        {
+            "item": "fabricated-exchange:philosophers_stone"
+        },
+        {
+            "tag": "c:iron_ingots"
+        },
+        {
+            "tag": "c:iron_ingots"
+        },
+        {
+            "tag": "c:iron_ingots"
+        },
+        {
+            "tag": "c:iron_ingots"
+        },
+        {
+            "tag": "c:iron_ingots"
+        },
+        {
+            "tag": "c:iron_ingots"
+        },
+        {
+            "tag": "c:iron_ingots"
+        },
+        {
+            "tag": "c:iron_ingots"
+        }
+    ],
+    "result": {
+        "item": "minecraft:gold_ingot",
+        "count": 1
+    }
+}
+
