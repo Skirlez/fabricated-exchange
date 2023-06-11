@@ -83,7 +83,7 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         
         titleX = -20;     
         titleY = -26; 
-        this.backgroundWidth = 228;
+        this.backgroundWidth = 232;
         this.backgroundHeight = 196;
         
         Consumer<String> updater = searchText -> updateSearchText(searchText);
@@ -137,7 +137,7 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
     @Override
     protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
         textRenderer.draw(matrices, this.title, (float)this.titleX, (float)this.titleY, 0x404040);
-        String emc = FabricatedExchangeClient.clientEmc.shortString(15);
+        String emc = FabricatedExchangeClient.clientEmc.shortString();
 
         textRenderer.draw(matrices, Text.literal("EMC:"), -23, 64, 0x404040);
         textRenderer.draw(matrices, Text.literal(emc), -23, 74, 0x404040);

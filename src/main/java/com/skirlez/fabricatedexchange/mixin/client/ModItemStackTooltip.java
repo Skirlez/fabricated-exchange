@@ -43,12 +43,12 @@ public class ModItemStackTooltip {
 			itemCount.divide(emc);
 			itemCount.floor();
 
-			int intItemCount = itemCount.toInt();
-			if (intItemCount != 0)
-				maxCount = Math.min(maxCount, intItemCount);
 
-			emc.multiply(maxCount);
-			list.add(Text.literal("§eEMC for " + maxCount + ": §r" + emc.toString()));
+			SuperNumber sMaxCount = new SuperNumber(maxCount);
+			sMaxCount = SuperNumber.min(sMaxCount, itemCount);
+		
+			emc.multiply(sMaxCount);
+			list.add(Text.literal("§eEMC for " + sMaxCount + ": §r" + emc.toString()));
 		}
 		else {
 			list.add(Text.literal("§eEMC§r: " + emc.toString()));

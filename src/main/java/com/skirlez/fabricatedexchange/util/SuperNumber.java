@@ -22,7 +22,7 @@ public class SuperNumber {
     public static final SuperNumber ONE = new SuperNumber(BigInteger.ONE);
     public static final SuperNumber INTEGER_LIMIT = new SuperNumber(Integer.MAX_VALUE);
 
-    private char[] metricPrefixes = {'k', 'M', 'G', 'T', 'P'}; 
+    private static char[] metricPrefixes = {'k', 'M', 'G', 'T', 'P'}; 
 
     // constructor heaven
     public SuperNumber(int numerator) {
@@ -219,7 +219,7 @@ public class SuperNumber {
      * 0 for if this equals to other, 
      * and 1 for if this is bigger than other. */
     public int compareTo(SuperNumber other) {
-        if (denominator.equals(BigInteger.ONE) && other.denominator.equals(BigInteger.ONE))
+        if (denominator.equals(other.denominator))
             return numerator.compareTo(other.numerator);
 
         SuperNumber thisCopy = new SuperNumber(this);
@@ -266,40 +266,34 @@ public class SuperNumber {
         return newStr.toString();
     }
 
-    /** @return a representation of the number as a String, either formatted with commas and a point,
-     * with SI (metric) prefixes, or in scientific notation, depending on the max amount of characters.
-     * <p> Note: the string may return one above max in the case of metric prefixes, as the prefix is not considered.
-     * @param max - the maximum number of characters the string is given to represent the number
+    /** @return a representation of the number as a String, guaranteed to be <=16 in length. either formatted with commas and a point,
+     * with SI (metric) prefixes, or in scientific notation, depending on the size of the number.
      */
-    public String shortString(int max) {
+    public String shortString() {
         String str = toString();
-        if (str.length() <= max)
+        if (str.length() <= 15)
             return str; // string with fraction
-        int diff = str.length() - max;
+
+        int diff = str.length() - 15;
         while (str.contains(".")) {
             str = str.substring(0, str.length() - 1);
             diff--;
         }
-        if (str.length() <= max)
+        if (str.length() <= 15)
             return str; // string without fraction
-        if (diff > 17) {
-            // TODO scientific notation
-            return "";
+        if (diff > 17) { 
+            str = str.replaceAll(",", "");
+            int offset = str.length() - 7;
+            str = str.charAt(0) + "." + str.substring(1, str.length());
+            str = str.substring(0, str.length() - offset);
+            return str + "e" + (offset + str.length() - 2); // string with scientific notation
         }
-       
-        
-        // metric prefixes
-        
         diff /= 3;
-        
         if (diff == 0)
             diff = 1;
         char c = metricPrefixes[diff - 1];
-        str = str.substring(0, str.length() - diff * 4);
-        
-        str += c;
-        
-        return str;
+        str = str.substring(0, str.length() - diff * 4) + c;
+        return str; // string with metric prefix
     }
 
 

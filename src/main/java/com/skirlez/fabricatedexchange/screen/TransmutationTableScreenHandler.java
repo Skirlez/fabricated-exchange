@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.screen.slot.ConsumeSlot;
@@ -181,7 +182,6 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 
     @Override
     public ItemStack quickMove(PlayerEntity player, int invSlot) {
-
         if (invSlot >= 1 && invSlot < 17) {
             ItemStack stack = ItemStack.EMPTY;
             TransmutationSlot slot = (TransmutationSlot)this.slots.get(invSlot);
@@ -195,26 +195,23 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
                 else
                     emc = EmcData.getEmc(player);
                 
-
-                
                 SuperNumber itemCount = new SuperNumber(emc);
                 itemCount.divide(EmcData.getItemEmc(stack.getItem()));
                 itemCount.floor();
 
-                int intItemCount = itemCount.toInt();
-                if (intItemCount == 0)
-                    stack.setCount(stack.getMaxCount());
-                else
-                    stack.setCount(Math.min(stack.getMaxCount(), intItemCount));
+                FabricatedExchange.LOGGER.info(itemCount.divisionString());
+                
+                SuperNumber sMaxCount = new SuperNumber(stack.getMaxCount());
+                sMaxCount = SuperNumber.min(sMaxCount, itemCount);
+                int a = sMaxCount.toInt();
+                stack.setCount(a);
 
                 SuperNumber itemCost = EmcData.getItemStackEmc(stack);
 
-
                 if (emc.compareTo(itemCost) != -1) {
                     if (invSlot < this.inventory.size()) {
-                        if (!this.insertItem(stack, this.inventory.size(), this.slots.size(), true)) {
+                        if (!this.insertItem(stack, this.inventory.size(), this.slots.size(), true)) 
                             return ItemStack.EMPTY;
-                        }
                     } 
                     else if (!this.insertItem(stack, 0, this.inventory.size(), false))
                         return ItemStack.EMPTY;
@@ -227,13 +224,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
                 }
                 else
                     return ItemStack.EMPTY;
-            
-
-
-
             }
-            
-        
             return stack;
         }
         // if it is not one of those slots it must mean we're shift clicking the inventory, meaning transmute this item
