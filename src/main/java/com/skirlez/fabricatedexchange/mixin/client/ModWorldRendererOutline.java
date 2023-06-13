@@ -40,7 +40,6 @@ public abstract class ModWorldRendererOutline {
         
     }
 
-    
     @Inject(method = "drawBlockOutline", at = @At("HEAD"), cancellable = true)
     private void injectDrawBlockOutline(MatrixStack matrices, VertexConsumer vertexConsumer, Entity entity, double cameraX, double cameraY, double cameraZ, BlockPos pos, BlockState state, CallbackInfo cir) {
         ClientPlayerEntity p = client.player;

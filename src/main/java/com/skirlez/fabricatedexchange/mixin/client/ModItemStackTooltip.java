@@ -8,7 +8,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreen;
@@ -17,8 +16,6 @@ import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 
@@ -42,24 +39,19 @@ public class ModItemStackTooltip {
 			SuperNumber itemCount = new SuperNumber(FabricatedExchangeClient.clientEmc);
 			itemCount.divide(emc);
 			itemCount.floor();
-
-
+			
 			SuperNumber sMaxCount = new SuperNumber(maxCount);
 			sMaxCount = SuperNumber.min(sMaxCount, itemCount);
 		
 			emc.multiply(sMaxCount);
-			list.add(Text.literal("§eEMC for " + sMaxCount + ": §r" + emc.toString()));
+			list.add(Text.literal("§eEMC for " + sMaxCount + ": §r" + emc));
 		}
 		else {
-			list.add(Text.literal("§eEMC§r: " + emc.toString()));
+			list.add(Text.literal("§eEMC§r: " + emc));
 			if (count > 1) {
 				emc.multiply(count);
-				list.add(Text.literal("§eStack EMC: §r" + emc.toString()));
+				list.add(Text.literal("§eStack EMC: §r" + emc));
 			}
 		}
-			
-		
 	}
-
-
 }

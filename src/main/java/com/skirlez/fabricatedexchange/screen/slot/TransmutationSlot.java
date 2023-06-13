@@ -5,12 +5,10 @@ import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandler;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.screen.slot.Slot;
 
 public class TransmutationSlot extends Slot {
@@ -44,8 +42,12 @@ public class TransmutationSlot extends Slot {
     @Override
     public ItemStack takeStack(int amount) {
         ItemStack stack = this.getStack().copy();
-        stack.setCount(amount);
         SuperNumber itemCost = EmcData.getItemStackEmc(stack);
+        if (itemCost.equalsZero())
+            return ItemStack.EMPTY;
+
+        stack.setCount(amount);
+
         if (!player.world.isClient()) {
             SuperNumber emc = EmcData.getEmc(player);
             if (emc.compareTo(itemCost) != -1) {

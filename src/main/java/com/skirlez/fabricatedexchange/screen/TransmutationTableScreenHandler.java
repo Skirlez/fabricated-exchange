@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.screen.slot.ConsumeSlot;
@@ -183,11 +182,16 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
     @Override
     public ItemStack quickMove(PlayerEntity player, int invSlot) {
         if (invSlot >= 1 && invSlot < 17) {
+            
             ItemStack stack = ItemStack.EMPTY;
             TransmutationSlot slot = (TransmutationSlot)this.slots.get(invSlot);
             if (slot != null && slot.hasStack()) {
                 stack = slot.getStack().copy();
                 
+                SuperNumber itemEmc = EmcData.getItemEmc(stack.getItem());
+                if (itemEmc.equalsZero())
+                    return ItemStack.EMPTY;
+
                 SuperNumber emc;
                 boolean client = player.getWorld().isClient();
                 if (client)
@@ -196,10 +200,8 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
                     emc = EmcData.getEmc(player);
                 
                 SuperNumber itemCount = new SuperNumber(emc);
-                itemCount.divide(EmcData.getItemEmc(stack.getItem()));
+                itemCount.divide(itemEmc);
                 itemCount.floor();
-
-                FabricatedExchange.LOGGER.info(itemCount.divisionString());
                 
                 SuperNumber sMaxCount = new SuperNumber(stack.getMaxCount());
                 sMaxCount = SuperNumber.min(sMaxCount, itemCount);

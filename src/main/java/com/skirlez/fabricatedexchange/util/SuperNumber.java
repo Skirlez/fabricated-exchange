@@ -45,7 +45,7 @@ public class SuperNumber {
         simplify();
     }
 
-    /** Takes in a String formatted like "%numerator%/%denominator%". If there is no slash, it will set the denominator to 1.
+    /** Takes in a String formatted like "{numerator}/{denominator}". If there is no slash, it will set the denominator to 1.
      *  @see SuperNumber#divisionString() */
     public SuperNumber(String divisionString) {
         String[] parts = divisionString.split("/");
@@ -87,7 +87,7 @@ public class SuperNumber {
         if (numerator.equals(BigInteger.ZERO))
             return;
         BigInteger mod = numerator.mod(denominator);
-        numerator.subtract(mod);
+        numerator = numerator.subtract(mod);
         simplify();
     }
 
@@ -96,7 +96,7 @@ public class SuperNumber {
         if (numerator.equals(BigInteger.ZERO))
             return;
         BigInteger mod = numerator.mod(denominator);
-        numerator.add(denominator.subtract(mod));
+        numerator = numerator.add(denominator.subtract(mod));
         simplify();
     }
     
@@ -191,6 +191,9 @@ public class SuperNumber {
     }
 
     public void divide(SuperNumber other) {
+        if (other.equalsZero())
+            throw new ArithmeticException("SuperNumber: division by zero");
+        
         if (denominator.equals(BigInteger.ONE)) {
             if (other.denominator.equals(BigInteger.ONE)) {
                 denominator = other.numerator;
@@ -238,17 +241,37 @@ public class SuperNumber {
 
     /** @return a representation of the number as a String, formatted with commas and a point */
     public String toString() {
-        if (this.equalsZero())
+        if (equalsZero())
             return "0";
+        StringBuilder newStr = new StringBuilder();
+        
+        if (numerator.compareTo(denominator) == -1) {
+            newStr.append("0.");
+            int len = denominator.subtract(BigInteger.ONE).toString().length() - 1;
+            for (int i = 0; i < len; i++)
+                newStr.append("0");
+
+            String str = numerator.multiply(BigInteger.TEN.pow(Math.max(len + 1, 3))).divide(denominator).toString();
+            newStr.append(str);
+
+            len = newStr.length();
+            while (newStr.charAt(len - 1) == '0') {
+                newStr.deleteCharAt(len - 1);
+                len--;
+            }
+            return newStr.toString();
+        }
+
+
         BigInteger temp = numerator.multiply(BigInteger.valueOf(1000)).divide(denominator);
         String str = temp.toString();
         int i;
+        
         for (i = 0; i < 3; i++) {
             if (!str.endsWith("0"))
                 break;
             str = str.substring(0, str.length() - 1);
         }
-        StringBuilder newStr = new StringBuilder();
         int commaCount = (3 - ((str.length() + i) % 3)) % 3;
         for (int j = 0; j < str.length(); j++) {
             int o = str.length() - (4 - i);
@@ -274,6 +297,17 @@ public class SuperNumber {
         if (str.length() <= 15)
             return str; // string with fraction
 
+        if (str.startsWith("0")) {
+            int ind = 2;
+            while (ind < str.length()) {
+                if (str.charAt(ind) != '0')
+                    break;
+                ind++; 
+            }
+            str = str.substring(ind, str.length());
+            return str + "e-" + (ind - 1); // string with scientific notation (negative exponent)
+        }
+
         int diff = str.length() - 15;
         while (str.contains(".")) {
             str = str.substring(0, str.length() - 1);
@@ -297,16 +331,16 @@ public class SuperNumber {
     }
 
 
-    /** @return the SuperNumber as a string, formatted as %numerator%/%denominator%. If the denominator is 1, it will simply return the numerator as a String. Useful for serialization.
+    /** @return the SuperNumber as a string, formatted as {numerator}/{denominator}. If the denominator is 1, it will simply return the numerator as a String. Useful for serialization.
      * @see SuperNumber#SuperNumber(String)
      */
     public String divisionString() {
-        return numerator.toString() + ((denominator.toString().equals("1")) ? "" : "/" + denominator.toString());
+        return numerator.toString() + ((denominator.equals(BigInteger.ONE)) ? "" : "/" + denominator.toString());
     }
 
     /** divides the fraction it's most simplified form. Example: (3/6) -> (1/2) */
     private void simplify() {
-        if (denominator.equals(BigInteger.ONE) || numerator.equals(BigInteger.ONE))
+        if (denominator.equals(BigInteger.ONE) || numerator.equals(BigInteger.ONE) || equalsZero())
             return;
         BigInteger gcd = numerator.gcd(denominator);
         if (!gcd.equals(BigInteger.ONE)) {

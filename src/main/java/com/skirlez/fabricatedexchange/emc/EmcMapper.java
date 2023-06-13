@@ -82,7 +82,7 @@ public class EmcMapper {
         }
 
         for (int i = 0; i < 4; i++) {
-            // Smelting recipes
+            // Smithing recipes
             for (int j = 0; j < 100; j++) { 
                 if (!iterateSmithingRecipes(recipeManager, dynamicRegistryManager, smithingRecipes))
                     break;

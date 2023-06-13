@@ -3,6 +3,7 @@ package com.skirlez.fabricatedexchange.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
@@ -49,7 +50,7 @@ public class SetEmcCommand {
             context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.setemc.seed_success")
             .append(" ").append(Text.translatable("commands.fabricated-exchange.reload_notice")), false);
         else {
-            EmcData.syncMap(context.getSource().getPlayer());
+            FabricatedExchange.syncMaps(context.getSource().getServer());
             context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.setemc.custom_success"), false);
         }
 
