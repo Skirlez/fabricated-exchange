@@ -11,7 +11,9 @@ import java.math.BigInteger;
 -"super" for "super slow"
 
 */
+import java.math.RoundingMode;
 
+import com.google.common.math.BigIntegerMath;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 
 public class SuperNumber {
@@ -247,18 +249,35 @@ public class SuperNumber {
         
         if (numerator.compareTo(denominator) == -1) {
             newStr.append("0.");
-            int len = denominator.subtract(BigInteger.ONE).toString().length() - 1;
-            for (int i = 0; i < len; i++)
+            BigInteger division = denominator.divide(numerator);
+            int zeroLen = BigIntegerMath.log10(denominator.divide(numerator), RoundingMode.FLOOR);
+            String divisionString = division.toString();
+            String numeratorString = numerator.toString();
+            if (divisionString.startsWith(numeratorString)) { 
+                boolean found = false;
+                for (int i = numeratorString.length(); i < divisionString.length(); i++) {
+                    if (divisionString.charAt(i) != '0') {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                    zeroLen--;
+            }
+                
+            for (int i = 0; i < zeroLen; i++)
                 newStr.append("0");
-
-            String str = numerator.multiply(BigInteger.TEN.pow(Math.max(len + 1, 3))).divide(denominator).toString();
+            
+            String str = numerator.multiply(BigInteger.TEN.pow(Math.max(zeroLen + 1, 3))).divide(denominator).toString();
+            
             newStr.append(str);
 
-            len = newStr.length();
+            int len = newStr.length();
             while (newStr.charAt(len - 1) == '0') {
                 newStr.deleteCharAt(len - 1);
                 len--;
             }
+            
             return newStr.toString();
         }
 
@@ -304,8 +323,19 @@ public class SuperNumber {
                     break;
                 ind++; 
             }
-            str = str.substring(ind, str.length());
-            return str + "e-" + (ind - 1); // string with scientific notation (negative exponent)
+            int length = 0;
+            for (int i = ind; i < str.length(); i++) {
+                if (str.charAt(i) == '0')
+                    break;
+                length++; 
+            }
+
+            int offset = 0;
+            if (str.length() - ind > 6)
+                offset = str.length() - ind - 6;
+            str = str.substring(ind, str.length() - offset);
+            
+            return str + "e-" + (ind + length - 2); // string with scientific notation (negative exponent)
         }
 
         int diff = str.length() - 15;
