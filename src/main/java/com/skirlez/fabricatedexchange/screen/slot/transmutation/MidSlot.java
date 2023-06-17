@@ -1,4 +1,4 @@
-package com.skirlez.fabricatedexchange.screen.slot;
+package com.skirlez.fabricatedexchange.screen.slot.transmutation;
 
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandler;
 

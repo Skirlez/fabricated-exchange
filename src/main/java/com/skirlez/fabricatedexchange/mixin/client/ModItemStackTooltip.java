@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreen;
-import com.skirlez.fabricatedexchange.screen.slot.TransmutationSlot;
+import com.skirlez.fabricatedexchange.screen.slot.transmutation.TransmutationSlot;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.minecraft.client.MinecraftClient;

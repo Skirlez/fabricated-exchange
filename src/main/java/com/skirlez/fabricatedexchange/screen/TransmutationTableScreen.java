@@ -8,7 +8,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
-import com.skirlez.fabricatedexchange.screen.slot.TransmutationSlot;
+import com.skirlez.fabricatedexchange.screen.slot.transmutation.TransmutationSlot;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -83,12 +83,12 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         
         titleX = -20;     
         titleY = -26; 
-        this.backgroundWidth = 232;
-        this.backgroundHeight = 196;
+        this.backgroundWidth = 231;
+        this.backgroundHeight = 197;
         
         Consumer<String> updater = searchText -> updateSearchText(searchText);
 
-        searchBar = new TextFieldWidget(this.textRenderer, x + 38,  y - 45, 100, 10, Text.empty());
+        searchBar = new TextFieldWidget(this.textRenderer, x + 38,  y - 47, 100, 10, Text.empty());
         searchBar.setMaxLength(30);
         searchBar.setChangedListener(updater);
         
@@ -97,13 +97,13 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         addDrawableChild(ButtonWidget.builder(
             Text.of("<"),
             button -> updatePage(1)
-        ).dimensions(x + 99, y + 69, 13, 13)
+        ).dimensions(x + 99, y + 67, 13, 13)
         .build());
 
         addDrawableChild(ButtonWidget.builder(
             Text.of(">"),
             button -> updatePage(2)
-        ).dimensions(x + 164, y + 69, 13, 13)
+        ).dimensions(x + 164, y + 67, 13, 13)
         .build());
 
     }
@@ -114,7 +114,7 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);
         int x = (width - backgroundWidth) / 2 - 1;
-        int y = (height - backgroundHeight) / 2 - 16;
+        int y = (height - backgroundHeight) / 2 - 17;
         drawTexture(matrices, x, y, 0, 0, backgroundWidth, backgroundHeight);
     }
 

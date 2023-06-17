@@ -3,6 +3,7 @@ package com.skirlez.fabricatedexchange.block;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockWithEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
@@ -10,10 +11,10 @@ import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.Direction;
 
-public abstract class BlockWithRotation extends Block {
+public abstract class BlockWithEntityAndRotation extends BlockWithEntity {
     public static final DirectionProperty FACING = DirectionProperty.of("facing");
 
-    protected BlockWithRotation(AbstractBlock.Settings settings) {
+    protected BlockWithEntityAndRotation(AbstractBlock.Settings settings) {
         super(settings);
         this.setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH));
     }

@@ -6,9 +6,9 @@ import java.util.List;
 
 import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.emc.EmcData;
-import com.skirlez.fabricatedexchange.screen.slot.ConsumeSlot;
-import com.skirlez.fabricatedexchange.screen.slot.MidSlot;
-import com.skirlez.fabricatedexchange.screen.slot.TransmutationSlot;
+import com.skirlez.fabricatedexchange.screen.slot.transmutation.ConsumeSlot;
+import com.skirlez.fabricatedexchange.screen.slot.transmutation.MidSlot;
+import com.skirlez.fabricatedexchange.screen.slot.transmutation.TransmutationSlot;
 import com.skirlez.fabricatedexchange.util.ModTags;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
@@ -41,7 +41,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         this(syncId, inventory, new SimpleInventory(18));
         
     }
-
+    
     public TransmutationTableScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory) {
         super(ModScreenHandlers.TRANSMUTATION_TABLE_SCREEN_HANDLER, syncId);
         checkSize(inventory, 18);
@@ -49,7 +49,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         this.inventory = inventory;
         this.player = playerInventory.player;
         inventory.onOpen(playerInventory.player);
-        emcSlot = new ConsumeSlot(inventory, 0, 80, 66, player, this);
+        emcSlot = new ConsumeSlot(inventory, 0, 80, 64, player, this);
         this.addSlot(emcSlot);
         
         // use trigonometry to create the transmutation slots
@@ -60,7 +60,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
             double radianAngle = Math.toRadians(angle);
             int yOffset = (int)(Math.sin(radianAngle) * 41);
             int xOffset = (int)(Math.cos(radianAngle) * 41);
-            addTransmutationSlot(new TransmutationSlot(inventory, i + 1, 131 + xOffset, 18 + yOffset, player, this));
+            addTransmutationSlot(new TransmutationSlot(inventory, i + 1, 131 + xOffset, 16 + yOffset, player, this));
             angle += 360.0 / 12.0;
         }
 
@@ -70,11 +70,11 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
             double radianAngle = Math.toRadians(angle);
             int yOffset = (int)(Math.sin(radianAngle) * 19);
             int xOffset = (int)(Math.cos(radianAngle) * 19);
-            addTransmutationSlot(new TransmutationSlot(inventory, i + 13, 131 + xOffset, 18 + yOffset, player, this));
+            addTransmutationSlot(new TransmutationSlot(inventory, i + 13, 131 + xOffset, 16 + yOffset, player, this));
             angle += 360.0 / 4.0;
         }
 
-        addSlot(new MidSlot(minorInventory, 0, 131, 18, this, player.world.isClient));
+        addSlot(new MidSlot(minorInventory, 0, 131, 16, this, player.world.isClient));
         addPlayerInventory(playerInventory);
         addPlayerHotbar(playerInventory);
 
@@ -280,14 +280,14 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
     private void addPlayerInventory(PlayerInventory playerInventory) {
         for (int i = 0; i < 3; ++i) {
             for (int l = 0; l < 9; ++l) {
-                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 8 + l * 18, 86 + i * 18));
+                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 8 + l * 18, 84 + i * 18));
             }
         }
     }
 
     private void addPlayerHotbar(PlayerInventory playerInventory) {
         for (int i = 0; i < 9; ++i) {
-            this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 144));
+            this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142));
         }
     }
 
