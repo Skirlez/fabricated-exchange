@@ -19,13 +19,15 @@ public class ModBlocks {
 
     
     public static final Block TRANSMUTATION_TABLE = registerBlock("transmutation_table", 
-        new TransmutationTable(FabricBlockSettings.of(Material.STONE)),  ModItemGroups.FABRICATED_EXCHANGE);
+        new TransmutationTable(FabricBlockSettings.of(Material.STONE)), ModItemGroups.FABRICATED_EXCHANGE);
+
+    public static final Block ENERGY_COLLECTOR_MK1 = registerBlock("energy_collector_mk1", 
+        new EnergyCollectorMK1(FabricBlockSettings.of(Material.STONE)), ModItemGroups.FABRICATED_EXCHANGE);
 
     private static Block registerBlock(String name, Block block, ItemGroup group) {
         registerBlockItem(name, block, group);
         return Registry.register(Registries.BLOCK, new Identifier(FabricatedExchange.MOD_ID, name), block);
     }
-
 
     private static Item registerBlockItem(String name, Block block, ItemGroup group) {
         Item item = Registry.register(Registries.ITEM, new Identifier(FabricatedExchange.MOD_ID, name),

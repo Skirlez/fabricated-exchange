@@ -14,7 +14,6 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 
 import com.google.common.math.BigIntegerMath;
-import com.skirlez.fabricatedexchange.FabricatedExchange;
 
 public class SuperNumber {
     private BigInteger numerator;
@@ -212,7 +211,10 @@ public class SuperNumber {
         simplify();
     }
 
-    /** Swaps the numerator and denominator. This instance will become the inverse of the original number. */
+    /** Swaps the numerator and denominator. This instance will become the inverse of the original number. 
+     * <p> (0.5 = 1/2) -> (2 = 2/1)
+     * <p> (0.4 = 2/5) -> (2.5 = 5/2)
+    */
     public void inversify() {
         BigInteger temp = numerator;
         numerator = denominator;
@@ -220,9 +222,9 @@ public class SuperNumber {
     }
 
     /** A comparison between this and another SuperNumber. 
-     * @return -1 for if this is smaller than other, 
-     * 0 for if this equals to other, 
-     * and 1 for if this is bigger than other. */
+     * @return -1 for if this is smaller than other
+     * <p> 0 for if this equals to other
+     * <p> 1 for if this is bigger than other */
     public int compareTo(SuperNumber other) {
         if (denominator.equals(other.denominator))
             return numerator.compareTo(other.numerator);
@@ -247,28 +249,32 @@ public class SuperNumber {
             return "0";
         StringBuilder newStr = new StringBuilder();
         
-        if (numerator.compareTo(denominator) == -1) {
+        if (numerator.compareTo(denominator) == -1) { // This will fail for numbers who's decimal representation is longer than the 32 bit integer limit due to zeroLen. Too bad!
             newStr.append("0.");
             BigInteger division = denominator.divide(numerator);
-            int zeroLen = BigIntegerMath.log10(denominator.divide(numerator), RoundingMode.FLOOR);
             String divisionString = division.toString();
             String numeratorString = numerator.toString();
+            int zeroLen;
+            boolean isPower;
             if (divisionString.startsWith(numeratorString)) { 
-                boolean found = false;
+                isPower = true;
                 for (int i = numeratorString.length(); i < divisionString.length(); i++) {
                     if (divisionString.charAt(i) != '0') {
-                        found = true;
+                        isPower = false;
                         break;
                     }
                 }
-                if (!found)
-                    zeroLen--;
             }
-                
+            else
+                isPower = false;
+            if (!isPower)
+                zeroLen = BigIntegerMath.log10(division, RoundingMode.FLOOR);
+            else
+                zeroLen = divisionString.length() - 2;
             for (int i = 0; i < zeroLen; i++)
                 newStr.append("0");
             
-            String str = numerator.multiply(BigInteger.TEN.pow(Math.max(zeroLen + 1, 3))).divide(denominator).toString();
+            String str = numerator.multiply(BigInteger.TEN.pow(Math.max(zeroLen + 3, 3))).divide(denominator).toString();
             
             newStr.append(str);
 
