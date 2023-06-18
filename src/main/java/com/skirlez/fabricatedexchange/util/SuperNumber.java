@@ -82,6 +82,9 @@ public class SuperNumber {
     public boolean equalsZero() {
         return numerator.equals(BigInteger.ZERO);
     }
+    public boolean equalsOne() {
+        return numerator.equals(BigInteger.ONE) && denominator.equals(BigInteger.ONE);
+    }
 
     /** Rounds the SuperNumber to the nearest whole number smaller than itself */
     public void floor() {

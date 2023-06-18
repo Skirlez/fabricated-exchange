@@ -1,12 +1,7 @@
 package com.skirlez.fabricatedexchange.block;
 
-import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.block.AbstractFurnaceBlock;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;

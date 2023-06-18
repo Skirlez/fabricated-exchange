@@ -1,12 +1,17 @@
 package com.skirlez.fabricatedexchange.screen;
 
+import java.lang.reflect.Field;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
+import com.skirlez.fabricatedexchange.screen.slot.collection.FuelSlot;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -14,8 +19,15 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
     private static final Identifier TEXTURE =
             new Identifier(FabricatedExchange.MOD_ID, "textures/gui/collector1.png");
 
+    public Field fieldDoubleClicked;
     public EnergyCollectorScreen(EnergyCollectorScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
+        try {
+            fieldDoubleClicked = this.getClass().getSuperclass().getDeclaredField("doubleClicking");
+            fieldDoubleClicked.setAccessible(true);
+        } catch (NoSuchFieldException | SecurityException e) {
+            FabricatedExchange.LOGGER.error("", e);
+        }
     }
 
     @Override
@@ -25,6 +37,18 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
         titleY = 0; 
         this.backgroundWidth = 176;
         this.backgroundHeight = 166;
+    }
+
+    @Override
+    protected void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType) {
+        if (actionType == SlotActionType.QUICK_MOVE && slot instanceof FuelSlot) {
+            try {
+                fieldDoubleClicked.set(this, Boolean.FALSE);
+            } catch (SecurityException | IllegalAccessException e) {
+                FabricatedExchange.LOGGER.error("", e);
+            }
+        }
+        super.onMouseClick(slot, slotId, button, actionType);
     }
 
     @Override
