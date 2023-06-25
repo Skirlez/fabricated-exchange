@@ -6,6 +6,7 @@ import com.skirlez.fabricatedexchange.screen.slot.collection.FuelSlot;
 import com.skirlez.fabricatedexchange.screen.slot.collection.InputSlot;
 import com.skirlez.fabricatedexchange.screen.slot.collection.OutputSlot;
 import com.skirlez.fabricatedexchange.util.ModTags;
+import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -24,28 +25,46 @@ public class EnergyCollectorScreenHandler extends ScreenHandler {
     private final EnergyCollectorBlockEntity blockEntity;
     private final DefaultedList<InputSlot> inputSlots = DefaultedList.of();
     private final int outputIndex;
-
-
+    private final int level;
     public EnergyCollectorScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
-        this(syncId, inventory, inventory.player.getWorld().getBlockEntity(buf.readBlockPos()));
+        this(syncId, inventory, inventory.player.getWorld().getBlockEntity(buf.readBlockPos()), buf.readInt());
     }
-    public EnergyCollectorScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity) {
+    public EnergyCollectorScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity, int level) {
         super(ModScreenHandlers.ENERGY_COLLECTOR_SCREEN_HANDLER, syncId);
         this.inventory = (Inventory)blockEntity;
-        checkSize(inventory, 11);
-        this.blockEntity = (EnergyCollectorBlockEntity)blockEntity;
-        inventory.onOpen(playerInventory.player);
-        FuelSlot fuelSlot = new FuelSlot(inventory, 0, 124, 58, this);
-        addSlot(fuelSlot);
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 2; j++)
-                addInputSlot(new InputSlot(inventory, i * 2 + j + 1, 20 + j * 18, 8 + i * 18, fuelSlot));
+        this.level = level;
+        checkSize(inventory, 11 + this.level * 4);
+
+        int inputOffset;
+        int otherOffset;
+        if (this.level == 0) {
+            inputOffset = 0;
+            otherOffset = 0;
+        }
+        else if (this.level == 1) {
+            inputOffset = -14;
+            otherOffset = 4;
+        }
+        else {
+            inputOffset = -24;
+            otherOffset = 12;
         }
 
-        outputIndex = slots.size();
-        addSlot(new OutputSlot(inventory, outputIndex, 124, 13, inputSlots));
+        this.blockEntity = (EnergyCollectorBlockEntity)blockEntity;
+        inventory.onOpen(playerInventory.player);
+        FuelSlot fuelSlot = new FuelSlot(inventory, 0, otherOffset + 124, 58, this);
+        addSlot(fuelSlot);
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 2 + level; j++)
+                addInputSlot(new InputSlot(inventory, i * 2 + j + 1, inputOffset + 20 + j * 18, 8 + i * 18, fuelSlot));
+        }
 
-        addSlot(new FakeSlot(inventory, outputIndex + 1, 153, 36));
+
+
+        outputIndex = slots.size();
+        addSlot(new OutputSlot(inventory, outputIndex, otherOffset + 124, 13, inputSlots));
+
+        addSlot(new FakeSlot(inventory, outputIndex + 1, otherOffset + 153, 36));
 
         addPlayerInventory(playerInventory);
         addPlayerHotbar(playerInventory);
@@ -163,5 +182,8 @@ public class EnergyCollectorScreenHandler extends ScreenHandler {
         return blockEntity;
     }
 
+    public int getLevel() {
+        return level;
+    }
 
 }

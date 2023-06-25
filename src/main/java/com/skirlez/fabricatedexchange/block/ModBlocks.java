@@ -22,7 +22,13 @@ public class ModBlocks {
         new TransmutationTable(FabricBlockSettings.of(Material.STONE)), ModItemGroups.FABRICATED_EXCHANGE);
 
     public static final Block ENERGY_COLLECTOR_MK1 = registerBlock("energy_collector_mk1", 
-        new EnergyCollector(FabricBlockSettings.of(Material.STONE)), ModItemGroups.FABRICATED_EXCHANGE);
+        new EnergyCollector(FabricBlockSettings.of(Material.STONE), 0), ModItemGroups.FABRICATED_EXCHANGE);
+
+    public static final Block ENERGY_COLLECTOR_MK2 = registerBlock("energy_collector_mk2", 
+        new EnergyCollector(FabricBlockSettings.of(Material.STONE), 1), ModItemGroups.FABRICATED_EXCHANGE);
+
+    public static final Block ENERGY_COLLECTOR_MK3 = registerBlock("energy_collector_mk3", 
+        new EnergyCollector(FabricBlockSettings.of(Material.STONE), 2), ModItemGroups.FABRICATED_EXCHANGE);
 
     private static Block registerBlock(String name, Block block, ItemGroup group) {
         registerBlockItem(name, block, group);

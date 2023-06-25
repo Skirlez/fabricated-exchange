@@ -16,9 +16,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class EnergyCollector extends BlockWithEntityAndRotation {
-
-    public EnergyCollector(Settings settings) {
+    private final int level;
+    public EnergyCollector(Settings settings, int level) {
         super(settings);
+        this.level = level;
     }
     @Override   
     public BlockRenderType getRenderType(BlockState state) {
@@ -61,5 +62,9 @@ public class EnergyCollector extends BlockWithEntityAndRotation {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
         return checkType(type, ModBlockEntities.ENERGY_COLLECTOR, EnergyCollectorBlockEntity::tick);
+    }
+
+    public int getLevel() {
+        return level;
     }
 }

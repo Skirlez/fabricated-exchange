@@ -3,6 +3,8 @@
     "item.fabricated-exchange.transmutation_tablet": "Transmutation Tablet",
     "block.fabricated-exchange.transmutation_table": "Transmutation Table",
     "block.fabricated-exchange.energy_collector_mk1": "Energy Collector MK1",
+    "block.fabricated-exchange.energy_collector_mk2": "Energy Collector MK2",
+    "block.fabricated-exchange.energy_collector_mk3": "Energy Collector MK3",
     "screen.fabricated-exchange.transmutation": "Transmutation",
     "screen.fabricated-exchange.emc_collection": "EMC Collection",
     "itemgroup.fabricated-exchange": "Fabricated Exchange", 

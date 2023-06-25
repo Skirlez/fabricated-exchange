@@ -20,13 +20,14 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHandler> {
-    private static final Identifier TEXTURE =
-            new Identifier(FabricatedExchange.MOD_ID, "textures/gui/collector1.png");
+    private final Identifier texture;
     private double progress;
     private final EnergyCollectorScreenHandler handler;
     private int light;
     private SuperNumber emc;
-
+    private final int level;
+    private final SuperNumber maximumEmc;
+    private final SuperNumber emcMultiplier;
     public Field fieldDoubleClicked;
     public EnergyCollectorScreen(EnergyCollectorScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -39,6 +40,20 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
         emc = SuperNumber.Zero();
         progress = 0d;
         this.handler = handler;
+        this.level = handler.getLevel();
+        if (this.level == 0) {
+            maximumEmc = new SuperNumber(10000);
+            emcMultiplier = new SuperNumber(1, 5);
+        }
+        else if (this.level == 1) {
+            maximumEmc = new SuperNumber(30000);
+            emcMultiplier = new SuperNumber(3, 5);
+        }
+        else {
+            maximumEmc = new SuperNumber(60000);
+            emcMultiplier = new SuperNumber(2);
+        }
+        texture = new Identifier(FabricatedExchange.MOD_ID, "textures/gui/collector" + String.valueOf(level + 1) + ".png");
     }
 
     @Override
@@ -46,13 +61,23 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
         super.init();
         titleX = 0; 
         titleY = 0; 
-        this.backgroundWidth = 176;
+        
+        int xOffset = 0;
+        if (level == 1)
+            xOffset = 24;
+        else if (level == 2)
+            xOffset = 43;
+        this.backgroundWidth = 176 + xOffset;
         this.backgroundHeight = 166;
     }
 
     @Override
     protected void handledScreenTick() {
-        emc.add(SuperNumber.ONE);
+        SuperNumber addition = new SuperNumber(light, 15);
+        addition.multiply(emcMultiplier);
+        emc.add(addition);
+        if (emc.compareTo(maximumEmc) == 1)
+            emc.copyValueOf(maximumEmc);
         progress = 0d;
         FuelSlot fuelSlot = (FuelSlot)handler.getSlot(0);
         ItemStack stack = fuelSlot.getStack();
@@ -61,14 +86,14 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
         Item item = stack.getItem();
         if (!FabricatedExchange.fuelProgressionMap.containsKey(item))
             return;
-        SuperNumber itemEmc = EmcData.getItemEmc(item);
         Item nextItem = FabricatedExchange.fuelProgressionMap.get(item);
-        SuperNumber nextEmc = EmcData.getItemEmc(nextItem);
         OutputSlot outputSlot = (OutputSlot)handler.getSlot(handler.getOutputSlotIndex());
         if ((!nextItem.equals(outputSlot.getStack().getItem())
                 || outputSlot.getStack().getMaxCount() <= outputSlot.getStack().getCount()
                 ) && outputSlot.hasStack())
             return; // return if there's an item in the output slot that we cannot merge with the next item in the progression
+        SuperNumber nextEmc = EmcData.getItemEmc(nextItem);
+        SuperNumber itemEmc = EmcData.getItemEmc(item);
         nextEmc.subtract(itemEmc);
         SuperNumber emcCopy = new SuperNumber(emc);
         emcCopy.divide(nextEmc);
@@ -93,22 +118,44 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
     protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
         RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, TEXTURE);
+        RenderSystem.setShaderTexture(0, texture);
         int x = (width - backgroundWidth) / 2;
         int y = (height - backgroundHeight) / 2;
         drawTexture(matrices, x, y, 0, 0, backgroundWidth, backgroundHeight);
 
-        final int maxProgress = 26;
-        int offset = maxProgress - (int)(progress * maxProgress);
-        drawTexture(matrices, x + 138, y + 30 + offset, 176, 13 + offset, 12, 24);
 
-        int height = (int)(((float)light) / 15 * 12);
-        drawTexture(matrices, x + 126, y + 49 - height, 177, 12 - height, 12, height);
+        int xOffset = 0; 
+        int uOffset = 0;
+        if (this.level == 1) {
+            xOffset = 16;
+            uOffset = 25;
+        }
+        else if (this.level == 2) {
+            xOffset = 34;
+            uOffset = 43;
+        }
+
+        // arrowOffset and sunOffset are for drawing the sun and the arrow sliced, 
+        // xOffset and uOffset are for offsetting the elements it draws correctly on all sizes.
+         
+        final int maxProgress = 26;
+        int arrowOffset = maxProgress - (int)(progress * maxProgress);
+        drawTexture(matrices, x + 138 + xOffset, y + 30 + arrowOffset, 176 + uOffset, 13 + arrowOffset, 12, 24); // draw arrow
+
+        int sunOffset = (int)(((float)light) / 15 * 12);
+        drawTexture(matrices, x + 126 + xOffset, y + 49 - sunOffset, 177 + uOffset, 12 - sunOffset, 12, sunOffset); // draw sun
     }
 
     @Override
     protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
-        textRenderer.draw(matrices, emc.toString(), 63, 32, 0x404040);
+        int xOffset = 0; 
+        if (this.level == 1)
+            xOffset = 3;
+        else if (this.level == 2)
+            xOffset = 11;
+        SuperNumber emcCopy = new SuperNumber(emc);
+        emcCopy.floor();
+        textRenderer.draw(matrices, emcCopy.toString(), 63 + xOffset, 32, 0x404040);
     }
 
     @Override

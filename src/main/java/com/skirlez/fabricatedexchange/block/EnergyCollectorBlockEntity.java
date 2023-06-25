@@ -15,6 +15,7 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -22,7 +23,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
@@ -35,16 +35,39 @@ import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 
 public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory {
-    private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(11, ItemStack.EMPTY);
+    private final DefaultedList<ItemStack> inventory;
     private SuperNumber emc;
     private int tick;
     private int light;
+    private final int level;
     private EnergyCollectorScreenHandler handler;
+    private final SuperNumber maximumEmc;
+    private final SuperNumber emcMultiplier;
     public EnergyCollectorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.ENERGY_COLLECTOR, pos, state);
         emc = SuperNumber.Zero();
-        tick = 0;   
+        tick = 0;
+        Block block = state.getBlock();
+        if (block instanceof EnergyCollector)
+            this.level = ((EnergyCollector)block).getLevel();
+        else
+            this.level = 0;
+
+        if (this.level == 0) {
+            maximumEmc = new SuperNumber(10000);
+            emcMultiplier = new SuperNumber(1, 5);
+        }
+        else if (this.level == 1) {
+            maximumEmc = new SuperNumber(30000);
+            emcMultiplier = new SuperNumber(3, 5);
+        }
+        else {
+            maximumEmc = new SuperNumber(60000);
+            emcMultiplier = new SuperNumber(2);
+        }
+        inventory = DefaultedList.ofSize(11 + level * 4, ItemStack.EMPTY);
     }
+
 
     @Override
     public Text getDisplayName() {
@@ -75,9 +98,14 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
             entity.light = world.getLightLevel(LightType.SKY, entity.getPos().add(0, 1, 0)) - world.getAmbientDarkness();
             entity.sendSyncPacket();
         }
-        entity.emc.add(SuperNumber.ONE);
-
+        
+        SuperNumber addition = new SuperNumber(entity.light, 15);
+        addition.multiply(entity.emcMultiplier);
+        entity.emc.add(addition);
+        if (entity.emc.compareTo(entity.maximumEmc) == 1)
+            entity.emc.copyValueOf(entity.maximumEmc);
         entity.tick++;
+        
         if (entity.tick % 60 == 0) {
             entity.light = world.getLightLevel(LightType.SKY, entity.getPos().add(0, 1, 0)) - world.getAmbientDarkness();
             entity.sendSyncPacket();
@@ -109,6 +137,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
                 outputSlot.setStack(new ItemStack(nextItem));
             outputSlot.moveToInputSlots();
             fuelSlot.getStack().decrement(1);
+            entity.handler.moveAllInputsToFuel();
             entity.emc.subtract(nextEmc);
             entity.sendSyncPacket();
         }
@@ -119,7 +148,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
         tick = 0;
-        handler = new EnergyCollectorScreenHandler(syncId, inv, this);
+        handler = new EnergyCollectorScreenHandler(syncId, inv, this, level);
         return handler;
     }
 
@@ -145,6 +174,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
     @Override
     public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
         buf.writeBlockPos(pos);
+        buf.writeInt(level);
     }
 
 }

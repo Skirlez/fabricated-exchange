@@ -172,7 +172,7 @@ public class SuperNumber {
                 numerator = numerator.multiply(other.numerator); // no need to simplify here
                 return;
             }
-            numerator = numerator.multiply(other.denominator);
+            numerator = numerator.multiply(other.numerator);
             denominator = other.denominator;
             simplify();
             return;
@@ -215,8 +215,6 @@ public class SuperNumber {
     }
 
 
-
-
     /** Swaps the numerator and denominator. This instance will become the inverse of the original number. 
      * <p> (0.5 = 1/2) -> (2 = 2/1)
      * <p> (0.4 = 2/5) -> (2.5 = 5/2)
@@ -252,7 +250,11 @@ public class SuperNumber {
         return (a.compareTo(b) == -1) ? a : b;
     }
 
-
+    /** Copies the value of another SuperNumber to this SuperNumber. */
+    public void copyValueOf(SuperNumber other) {
+        this.denominator = other.denominator;
+        this.numerator = other. numerator;
+    }
 
     /** @return a representation of the number as a String, formatted with commas and a point */
     public String toString() {
