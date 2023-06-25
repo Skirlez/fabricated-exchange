@@ -2,6 +2,7 @@ package com.skirlez.fabricatedexchange.screen;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.resource.featuretoggle.FeatureSet;
@@ -14,7 +15,7 @@ public class ModScreenHandlers {
         new ScreenHandlerType<>(TransmutationTableScreenHandler::new, FeatureSet.empty());
 
     public static ScreenHandlerType<EnergyCollectorScreenHandler> ENERGY_COLLECTOR_SCREEN_HANDLER = 
-        new ScreenHandlerType<>(EnergyCollectorScreenHandler::new, FeatureSet.empty());
+        new ExtendedScreenHandlerType<>(EnergyCollectorScreenHandler::new);
 
     public static void registerAllScreenHandlers() {
         // TODO figure out what the strings are for

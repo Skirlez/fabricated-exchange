@@ -5,12 +5,17 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.block.Block;
+import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +32,9 @@ import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.ModScreenHandlers;
 import com.skirlez.fabricatedexchange.sound.ModSounds;
-import com.skirlez.fabricatedexchange.util.MapUtil;
+import com.skirlez.fabricatedexchange.util.CollectionUtil;
 import com.skirlez.fabricatedexchange.util.ModConfig;
+import com.skirlez.fabricatedexchange.util.ModTags;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
@@ -37,9 +43,12 @@ public class FabricatedExchange implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("fabricated-exchange");
     public static final String MOD_ID = "fabricated-exchange";
     // this map tells the philosopher's stone what block to transform when right clicked
-    public static Map<Block, Block> blockTransmutationMap = new HashMap<>();
-    
+    public static Map<Block, Block> blockTransmutationMap = new HashMap<Block, Block>();
+    // this map will be filled with all the items that have the transmutation_fuel tag, and each key value pair will represent a jump in progression between the fuel items
+    // (e.g. in vanilla, coal (32 emc) will have a key value pair with redstone (64 emc), the next item with the fuel tag that has more emc than it.)
+    public static Map<Item, Item> fuelProgressionMap = new HashMap<Item, Item>();
 
+    
     @Override
     public void onInitialize() {
         ModItemGroups.registerItemGroups();
@@ -56,6 +65,7 @@ public class FabricatedExchange implements ModInitializer {
         });
 
 
+
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> { 
             // send the player's own emc value
             PlayerState playerState = ServerState.getPlayerState(handler.player);
@@ -67,6 +77,8 @@ public class FabricatedExchange implements ModInitializer {
             ModConfig.fetchAll();
             fetchBlockRotationMap();
             reloadEmcMap(server);
+
+
         });
     }
 
@@ -78,8 +90,30 @@ public class FabricatedExchange implements ModInitializer {
         EmcData.emcMap = mapper.getMap();
         Map<String, SuperNumber> customEmcMap = ModConfig.CUSTOM_EMC_MAP_FILE.getValue();
         if (customEmcMap != null)
-            MapUtil.mergeMap(EmcData.emcMap, customEmcMap);
+            CollectionUtil.mergeMap(EmcData.emcMap, customEmcMap);
         
+        List<Item> fuelItemList = new ArrayList<Item>();
+        Iterator<RegistryEntry<Item>> iterator = Registries.ITEM.getEntryList(ModTags.FUEL).get().iterator();
+        while (iterator.hasNext()) {
+            Item item = iterator.next().value();
+            CollectionUtil.addSortedEmcList(fuelItemList, item);
+        }
+        Map<Item, Item> newFuelProgressionMap = new HashMap<Item, Item>();
+        for (int i = 0; i < fuelItemList.size(); i++) {
+            Item item = fuelItemList.get(i);
+            SuperNumber itemEmc = EmcData.getItemEmc(item);
+            for (int j = i; j < fuelItemList.size(); j++) {
+                Item nextItem = fuelItemList.get(j);
+                SuperNumber nextEmc = EmcData.getItemEmc(nextItem);
+                if (itemEmc.compareTo(nextEmc) == -1) { // if this item's emc is smaller than the next one
+                    newFuelProgressionMap.put(item, nextItem);
+                    break;
+                }
+            }
+        }
+        fuelProgressionMap = newFuelProgressionMap;
+
+
         return mapper.getLog();
     }
 

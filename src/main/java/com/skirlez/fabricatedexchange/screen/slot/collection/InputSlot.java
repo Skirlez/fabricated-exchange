@@ -1,14 +1,13 @@
 package com.skirlez.fabricatedexchange.screen.slot.collection;
 
-import com.skirlez.fabricatedexchange.util.ModTags;
-
+import com.skirlez.fabricatedexchange.FabricatedExchange;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.Slot;
 
-public class InputSlot extends Slot {
 
+// Input slots should attempt to move their contents to the fuel slot when they can.
+public class InputSlot extends Slot {
     private final FuelSlot fuelSlot;
     public InputSlot(Inventory inventory, int index, int x, int y, 
             FuelSlot fuelSlot) {
@@ -18,7 +17,7 @@ public class InputSlot extends Slot {
 
     @Override
     public boolean canInsert(ItemStack stack) {
-        return Registries.ITEM.getEntry(stack.getItem()).streamTags().anyMatch(tag -> tag == ModTags.FUEL);
+        return FabricatedExchange.fuelProgressionMap.containsKey(stack.getItem());
     }
 
     @Override

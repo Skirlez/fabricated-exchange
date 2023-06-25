@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.util.DataFile;
-import com.skirlez.fabricatedexchange.util.MapUtil;
+import com.skirlez.fabricatedexchange.util.CollectionUtil;
 import com.skirlez.fabricatedexchange.util.ModConfig;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
@@ -65,7 +65,7 @@ public class EmcData {
             newEmcMap = new HashMap<String, SuperNumber>();
         newEmcMap.put(id, emc);
         file.setValueAndSave(newEmcMap);
-        MapUtil.mergeMap(emcMap, newEmcMap);
+        CollectionUtil.mergeMap(emcMap, newEmcMap);
     }
 
 
@@ -94,7 +94,6 @@ public class EmcData {
         buffer.writeString(emc.divisionString());
         ServerPlayNetworking.send(player, ModMessages.EMC_SYNC_IDENTIFIER, buffer);
     }
-
     public static void syncMap(ServerPlayerEntity player) {
         // send the entire emc map
         PacketByteBuf buffer = PacketByteBufs.create();

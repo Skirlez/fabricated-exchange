@@ -1,15 +1,18 @@
 package com.skirlez.fabricatedexchange.screen;
 
+import com.skirlez.fabricatedexchange.block.EnergyCollectorBlockEntity;
 import com.skirlez.fabricatedexchange.screen.slot.FakeSlot;
 import com.skirlez.fabricatedexchange.screen.slot.collection.FuelSlot;
 import com.skirlez.fabricatedexchange.screen.slot.collection.InputSlot;
+import com.skirlez.fabricatedexchange.screen.slot.collection.OutputSlot;
 import com.skirlez.fabricatedexchange.util.ModTags;
 
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -18,26 +21,31 @@ import net.minecraft.util.collection.DefaultedList;
 
 public class EnergyCollectorScreenHandler extends ScreenHandler {
     private final Inventory inventory;
-
+    private final EnergyCollectorBlockEntity blockEntity;
     private final DefaultedList<InputSlot> inputSlots = DefaultedList.of();
-    
-    public EnergyCollectorScreenHandler(int syncId, PlayerInventory inventory) {
-        this(syncId, inventory, new SimpleInventory(18));
+    private final int outputIndex;
+
+
+    public EnergyCollectorScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
+        this(syncId, inventory, inventory.player.getWorld().getBlockEntity(buf.readBlockPos()));
     }
-    public EnergyCollectorScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory) {
+    public EnergyCollectorScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity) {
         super(ModScreenHandlers.ENERGY_COLLECTOR_SCREEN_HANDLER, syncId);
-        this.inventory = inventory;
+        this.inventory = (Inventory)blockEntity;
+        checkSize(inventory, 11);
+        this.blockEntity = (EnergyCollectorBlockEntity)blockEntity;
         inventory.onOpen(playerInventory.player);
-        
         FuelSlot fuelSlot = new FuelSlot(inventory, 0, 124, 58, this);
-        addInputSlot(new InputSlot(inventory, 1, 124, 13, fuelSlot));
         addSlot(fuelSlot);
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 2; j++)
-                addInputSlot(new InputSlot(inventory, i * 2 + j + 2, 20 + j * 18, 8 + i * 18, fuelSlot));
+                addInputSlot(new InputSlot(inventory, i * 2 + j + 1, 20 + j * 18, 8 + i * 18, fuelSlot));
         }
-        
-        addSlot(new FakeSlot(inventory, 10, 153, 36));
+
+        outputIndex = slots.size();
+        addSlot(new OutputSlot(inventory, outputIndex, 124, 13, inputSlots));
+
+        addSlot(new FakeSlot(inventory, outputIndex + 1, 153, 36));
 
         addPlayerInventory(playerInventory);
         addPlayerHotbar(playerInventory);
@@ -73,8 +81,8 @@ public class EnergyCollectorScreenHandler extends ScreenHandler {
     @Override
     public void onSlotClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player) {
         super.onSlotClick(slotIndex, button, actionType, player);
-        if (slotIndex == 10) {
-            FakeSlot slot = (FakeSlot)slots.get(10);
+        if (slotIndex == outputIndex + 1) {
+            FakeSlot slot = (FakeSlot)slots.get(outputIndex + 1);
             ItemStack cursorStack = getCursorStack();
             if (slot.hasStack() && !cursorStack.isEmpty()
                     && ItemStack.areItemsEqual(slot.getStack(), cursorStack)) {
@@ -142,6 +150,17 @@ public class EnergyCollectorScreenHandler extends ScreenHandler {
     public void moveAllInputsToFuel() {
         for (int i = inputSlots.size() - 1; i >= 0; i--)
             inputSlots.get(i).moveToFuelSlot();
+        ((OutputSlot)slots.get(outputIndex)).moveToInputSlots();
+    }
+
+    // accessing the slots list at this index should always give you the output slot,
+    // and accessing the slots list at this index + 1 should always give you the target slot
+    public int getOutputSlotIndex() {
+        return outputIndex;
+    }
+
+    public EnergyCollectorBlockEntity getBlockEntity() {
+        return blockEntity;
     }
 
 

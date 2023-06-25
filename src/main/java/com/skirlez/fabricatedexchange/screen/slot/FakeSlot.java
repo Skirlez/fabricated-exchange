@@ -19,7 +19,7 @@ public class FakeSlot extends Slot {
         return false;
     }
     @Override
-    public void setStack(ItemStack stack) {
+    public void setStack(ItemStack stack) { // TODO is this necessary
         return;
     }
 }

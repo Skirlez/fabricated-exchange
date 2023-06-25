@@ -9,20 +9,6 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
 
 public class EmcMapSyncS2CPacket {
-    /*
-     * 
-*             PacketByteBuf buffer = PacketByteBufs.create();
-            int iterations = EmcData.emcMap.keySet().size();
-            buffer.writeInt(iterations);
-            Iterator<String> iterator = EmcData.emcMap.keySet().iterator();
-            for (int i = 0; i < iterations; i++) {
-                String s = (String)iterator.next();
-                buffer.writeString(s);
-                buffer.writeString(EmcData.emcMap.get(s).divisionString());
-            }
-            ServerPlayNetworking.send(handler.player, ModMessages.EMC_MAP_SYNC_IDENTIFIER, buffer);
-        });
-     */
     public static void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
         EmcData.emcMap.clear();
         int iterations = buf.readInt();

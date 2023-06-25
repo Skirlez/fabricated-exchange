@@ -1,11 +1,9 @@
 package com.skirlez.fabricatedexchange.screen.slot.collection;
 
+import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreenHandler;
-import com.skirlez.fabricatedexchange.util.ModTags;
-
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.Slot;
 
 public class FuelSlot extends Slot {
@@ -18,7 +16,7 @@ public class FuelSlot extends Slot {
 
     @Override
     public boolean canInsert(ItemStack stack) {
-        return Registries.ITEM.getEntry(stack.getItem()).streamTags().anyMatch(tag -> tag == ModTags.FUEL);
+        return FabricatedExchange.fuelProgressionMap.containsKey(stack.getItem());
     }
 
     @Override
@@ -57,5 +55,6 @@ public class FuelSlot extends Slot {
     public void setQuickMoved(boolean quickMoved) {
         this.quickMoved = quickMoved;
     }
+    
 
 }

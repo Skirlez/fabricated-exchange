@@ -16,6 +16,9 @@ public class ModBlockEntities {
         registerBlockEntity("energy_collector_entity",
         FabricBlockEntityTypeBuilder.create(EnergyCollectorBlockEntity::new, ModBlocks.ENERGY_COLLECTOR_MK1).build());
 
+
+
+
     private static <T extends BlockEntity> BlockEntityType<T> registerBlockEntity(String name, BlockEntityType<T> blockEntityType) {
         return Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier(FabricatedExchange.MOD_ID, name), blockEntityType);
     }

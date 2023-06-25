@@ -17,7 +17,6 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
 public class TransmutationTable extends Block {
-
     public TransmutationTable(Settings settings) {
         super(settings);
     }
@@ -30,7 +29,7 @@ public class TransmutationTable extends Block {
     }
 
     @Override   
-    public BlockRenderType getRenderType(BlockState state) {
+    public BlockRenderType getRenderType(BlockState state) {    
         return BlockRenderType.MODEL;
     }
 
@@ -45,10 +44,4 @@ public class TransmutationTable extends Block {
 
         return ActionResult.SUCCESS;
     }
-
-
- 
-    
-
-
 }

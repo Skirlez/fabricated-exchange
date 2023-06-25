@@ -214,6 +214,9 @@ public class SuperNumber {
         simplify();
     }
 
+
+
+
     /** Swaps the numerator and denominator. This instance will become the inverse of the original number. 
      * <p> (0.5 = 1/2) -> (2 = 2/1)
      * <p> (0.4 = 2/5) -> (2.5 = 5/2)
@@ -222,6 +225,11 @@ public class SuperNumber {
         BigInteger temp = numerator;
         numerator = denominator;
         denominator = temp;
+    }
+
+    /** @return Whether the value of the SuperNumbers is equal. */
+    public boolean equalTo(SuperNumber other) {
+        return numerator.equals(other.numerator) && denominator.equals(other.denominator);
     }
 
     /** A comparison between this and another SuperNumber. 
@@ -376,6 +384,17 @@ public class SuperNumber {
     public String divisionString() {
         return numerator.toString() + ((denominator.equals(BigInteger.ONE)) ? "" : "/" + denominator.toString());
     }
+
+
+    /** @return the SuperNumber as a double. 
+     * Will return 0 if the value of the SuperNumber is not representable with a double. */
+    public double toDouble() {        
+        double result = (numerator.doubleValue() / denominator.doubleValue());
+        if (Double.isNaN(result))
+            return 0;
+        return result;
+    }
+
 
     /** divides the fraction it's most simplified form. Example: (3/6) -> (1/2) */
     private void simplify() {

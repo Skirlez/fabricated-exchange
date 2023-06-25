@@ -21,6 +21,7 @@ public class ReloadEmcCommand {
         MinecraftServer server = context.getSource().getServer();
         ModConfig.CUSTOM_EMC_MAP_FILE.fetch();
         ModConfig.SEED_EMC_MAP_FILE.fetch();
+        ModConfig.BLACKLISTED_MAPPER_RECIPES_FILE.fetch();
         String log = FabricatedExchange.reloadEmcMap(server);
         FabricatedExchange.syncMaps(server);
 
