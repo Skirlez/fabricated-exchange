@@ -34,6 +34,6 @@ new features, or old features from previous equivalence mods.
 - As much EMC as your RAM can store
 - Infinitely precise EMC fractions (No more slabs without EMC values!)
 - Distinction between "seed" and "custom" EMC values:
- * Seed: The EMC values the EMC mapper uses to infer the EMC values of other items
- * Custom: EMC values that get applied at the end of the mapping process and override any value the mapper might have assigned.
+  * Seed: The EMC values the EMC mapper uses to infer the EMC values of other items
+  * Custom: EMC values that get applied at the end of the mapping process and override any value the mapper might have assigned.
  
