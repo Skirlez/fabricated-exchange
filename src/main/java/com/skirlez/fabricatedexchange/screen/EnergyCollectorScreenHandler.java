@@ -6,7 +6,6 @@ import com.skirlez.fabricatedexchange.screen.slot.collection.FuelSlot;
 import com.skirlez.fabricatedexchange.screen.slot.collection.InputSlot;
 import com.skirlez.fabricatedexchange.screen.slot.collection.OutputSlot;
 import com.skirlez.fabricatedexchange.util.ModTags;
-import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -56,14 +55,12 @@ public class EnergyCollectorScreenHandler extends ScreenHandler {
         addSlot(fuelSlot);
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 2 + level; j++)
-                addInputSlot(new InputSlot(inventory, i * 2 + j + 1, inputOffset + 20 + j * 18, 8 + i * 18, fuelSlot));
+                addInputSlot(new InputSlot(inventory, i * (2 + level) + j + 1, inputOffset + 20 + j * 18, 8 + i * 18, fuelSlot));
         }
-
-
-
+        
         outputIndex = slots.size();
-        addSlot(new OutputSlot(inventory, outputIndex, otherOffset + 124, 13, inputSlots));
 
+        addSlot(new OutputSlot(inventory, outputIndex, otherOffset + 124, 13, inputSlots));
         addSlot(new FakeSlot(inventory, outputIndex + 1, otherOffset + 153, 36));
 
         addPlayerInventory(playerInventory);

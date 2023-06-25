@@ -1,19 +1,22 @@
 package com.skirlez.fabricatedexchange.util;
 
 import java.math.BigInteger;
-/*
-    SuperNumber: TODO I want cool ASCII art here of the name
--has two bigintegers: numerator and denominator
--can represent any real number if you have enough memory 
-- (well, except for irrational numbers, but technically if you had infinite memory...)
--used for emc values
--really cool name
--"super" for "super slow"
-
-*/
 import java.math.RoundingMode;
-
 import com.google.common.math.BigIntegerMath;
+
+/** SuperNumber
+*<p> TODO I want cool ASCII art here of the name
+*<p> SuperNumber has two BigIntegers: a numerator and denominator.
+* It can represent any real number if you have enough memory!
+* (well, except for irrational numbers, but technically if you had infinite memory...)
+*<p> It is/was:
+*<p>-Used for emc values
+*<p>-Really cool name
+*<p>-"Super" for "super slow"
+*<p>-Given to me by God
+*@author Jesus H. Christ
+*@see BigInteger
+**/
 
 public class SuperNumber {
     private BigInteger numerator;
@@ -263,6 +266,16 @@ public class SuperNumber {
         StringBuilder newStr = new StringBuilder();
         
         if (numerator.compareTo(denominator) == -1) { // This will fail for numbers who's decimal representation is longer than the 32 bit integer limit due to zeroLen. Too bad!
+            
+            /* Our desired output for numbers smaller than zero is as follows:
+                1. if there are any zeros before the first real digit, get ALL of them
+                2. afterwards get a maximum of 3 digits
+                We can actually get the number of zeros after the point by using Log10! Except it's off by one
+                for any number that's a power of 10 multiplied by the numerator. It's easy to see why 
+                if you graph it in software like Desmos. So we explicitly check for that case.
+                after that, we can get the next 3 digits by multiplying the numerator by 
+                10^(number of zeros + 3) and dividing it by the denominator.
+            */
             newStr.append("0.");
             BigInteger division = denominator.divide(numerator);
             String divisionString = division.toString();

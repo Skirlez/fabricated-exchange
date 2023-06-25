@@ -7,6 +7,7 @@ import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.interfaces.ImplementedInventory;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreenHandler;
+import com.skirlez.fabricatedexchange.screen.slot.FakeSlot;
 import com.skirlez.fabricatedexchange.screen.slot.collection.FuelSlot;
 import com.skirlez.fabricatedexchange.screen.slot.collection.OutputSlot;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
@@ -114,6 +115,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
         if (entity.handler == null)
             return;
         FuelSlot fuelSlot = (FuelSlot)entity.handler.getSlot(0);
+        FakeSlot targetSlot = (FakeSlot)entity.handler.getSlot(entity.handler.getOutputSlotIndex() + 1);
         ItemStack stack = fuelSlot.getStack();
         if (stack.isEmpty())
             return;
@@ -121,6 +123,12 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
         if (!FabricatedExchange.fuelProgressionMap.containsKey(item))
             return;
         SuperNumber itemEmc = EmcData.getItemEmc(item);
+        if (targetSlot.hasStack()) {
+            SuperNumber targetItemEmc = EmcData.getItemEmc(targetSlot.getStack().getItem());
+            if (itemEmc.compareTo(targetItemEmc) >= 0)
+                return;
+        }
+
         Item nextItem = FabricatedExchange.fuelProgressionMap.get(item);
         SuperNumber nextEmc = EmcData.getItemEmc(nextItem);
         OutputSlot outputSlot = (OutputSlot)entity.handler.getSlot(entity.handler.getOutputSlotIndex());

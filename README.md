@@ -1,8 +1,8 @@
 # fabricated-exchange
 
-A Fabric remake of Project E/Equivalent Exchange 2.
-Each item has its own "EMC" value attached to it. Some are worth more, some less.
-Transmute items and blocks into EMC, and EMC to different items you've obtained in the past.
+A Fabric remake of the Minecraft mod Project E/Equivalent Exchange 2.
+The mod attaches an "EMC" number value to every item. Some are worth more, some less.
+Transmute items and blocks into EMC, and EMC to different items you've obtained before.
 
 The mod is targetting 1.19.4. Once the mod is in a stable, feature complete state, I will port it to 1.19.2, 1.18.2, 
 and then 1.16.5. Afterwards it will be upgraded to whatever versions after 1.19.4 that have the most mods.
@@ -25,9 +25,14 @@ efficiently, please open an issue/pull request a change.
 Additionally, as of now the mod is under development. So you could also suggest or implement
 new features, or old features from previous equivalence mods.
 
+# Project Goals
+- Finish the project
+- Oh and also do not use any external libraries other than the Fabric API because I, personally, greatly dislike having to download additional jar files
+
 # Implemented Features
 - Philosopher's Stone
 - Transmutation Table
+- Energy Collectors Mk1-Mk3
 - EMC Mapper
 
 # NEW Features

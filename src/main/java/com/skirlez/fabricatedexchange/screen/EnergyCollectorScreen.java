@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
+import com.skirlez.fabricatedexchange.screen.slot.FakeSlot;
 import com.skirlez.fabricatedexchange.screen.slot.collection.FuelSlot;
 import com.skirlez.fabricatedexchange.screen.slot.collection.OutputSlot;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
@@ -21,7 +22,8 @@ import net.minecraft.util.Identifier;
 
 public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHandler> {
     private final Identifier texture;
-    private double progress;
+    private double fuelProgress; // 0 - 1 how much of the arrow should be displayed
+    private double emcProgress; // 0 - 1 how much of the emc bar should be filled
     private final EnergyCollectorScreenHandler handler;
     private int light;
     private SuperNumber emc;
@@ -38,7 +40,7 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
             FabricatedExchange.LOGGER.error("", e);
         }
         emc = SuperNumber.Zero();
-        progress = 0d;
+        fuelProgress = 0d;
         this.handler = handler;
         this.level = handler.getLevel();
         if (this.level == 0) {
@@ -78,28 +80,42 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
         emc.add(addition);
         if (emc.compareTo(maximumEmc) == 1)
             emc.copyValueOf(maximumEmc);
-        progress = 0d;
+
+        SuperNumber emcCopy = new SuperNumber(emc);
+        emcCopy.divide(maximumEmc);
+        emcProgress = emcCopy.toDouble();
+
+        fuelProgress = 0d;
         FuelSlot fuelSlot = (FuelSlot)handler.getSlot(0);
+        FakeSlot targetSlot = (FakeSlot)handler.getSlot(handler.getOutputSlotIndex() + 1);
         ItemStack stack = fuelSlot.getStack();
         if (stack.isEmpty())
             return;
         Item item = stack.getItem();
         if (!FabricatedExchange.fuelProgressionMap.containsKey(item))
             return;
+        SuperNumber itemEmc = EmcData.getItemEmc(item);
+        if (targetSlot.hasStack()) {
+            SuperNumber targetItemEmc = EmcData.getItemEmc(targetSlot.getStack().getItem());
+            if (itemEmc.compareTo(targetItemEmc) >= 0)
+                return;
+        }
+
         Item nextItem = FabricatedExchange.fuelProgressionMap.get(item);
         OutputSlot outputSlot = (OutputSlot)handler.getSlot(handler.getOutputSlotIndex());
         if ((!nextItem.equals(outputSlot.getStack().getItem())
                 || outputSlot.getStack().getMaxCount() <= outputSlot.getStack().getCount()
                 ) && outputSlot.hasStack())
-            return; // return if there's an item in the output slot that we cannot merge with the next item in the progression
+            return; // return if there's an item in the output slot that we cannot merge with the next item in the fuelProgression
         SuperNumber nextEmc = EmcData.getItemEmc(nextItem);
-        SuperNumber itemEmc = EmcData.getItemEmc(item);
+        
         nextEmc.subtract(itemEmc);
-        SuperNumber emcCopy = new SuperNumber(emc);
+
+        emcCopy.copyValueOf(emc);
         emcCopy.divide(nextEmc);
-        progress = emcCopy.toDouble();
-        if (progress > 1d)
-            progress = 1d;
+        fuelProgress = emcCopy.toDouble();
+        if (fuelProgress > 1d)
+            fuelProgress = 1d;
     }
 
     @Override
@@ -137,13 +153,15 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
 
         // arrowOffset and sunOffset are for drawing the sun and the arrow sliced, 
         // xOffset and uOffset are for offsetting the elements it draws correctly on all sizes.
-         
-        final int maxProgress = 26;
-        int arrowOffset = maxProgress - (int)(progress * maxProgress);
-        drawTexture(matrices, x + 138 + xOffset, y + 30 + arrowOffset, 176 + uOffset, 13 + arrowOffset, 12, 24); // draw arrow
+
+        final int maxfuelProgress = 24;
+        int arrowOffset = maxfuelProgress - (int)(fuelProgress * maxfuelProgress);
+        drawTexture(matrices, x + 138 + xOffset, y + 31 + arrowOffset, 176 + uOffset, 14 + arrowOffset, 12, 25); // draw arrow
 
         int sunOffset = (int)(((float)light) / 15 * 12);
         drawTexture(matrices, x + 126 + xOffset, y + 49 - sunOffset, 177 + uOffset, 12 - sunOffset, 12, sunOffset); // draw sun
+
+        drawTexture(matrices, x + 64 + xOffset, y + 18, 0, 166, (int)(48 * emcProgress), 10); // draw energy bar thing
     }
 
     @Override
