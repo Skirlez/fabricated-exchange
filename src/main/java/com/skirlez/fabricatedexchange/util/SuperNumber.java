@@ -265,8 +265,7 @@ public class SuperNumber {
             return "0";
         StringBuilder newStr = new StringBuilder();
         
-        if (numerator.compareTo(denominator) == -1) { // This will fail for numbers who's decimal representation is longer than the 32 bit integer limit due to zeroLen. Too bad!
-            
+        if (numerator.abs().compareTo(denominator) == -1) { // This will fail for numbers who's decimal representation is longer than the 32 bit integer limit due to zeroLen. Too bad!
             /* Our desired output for numbers smaller than zero is as follows:
                 1. if there are any zeros before the first real digit, get ALL of them
                 2. afterwards get a maximum of 3 digits
@@ -276,6 +275,8 @@ public class SuperNumber {
                 after that, we can get the next 3 digits by multiplying the numerator by 
                 10^(number of zeros + 3) and dividing it by the denominator.
             */
+            if (numerator.compareTo(BigInteger.ZERO) == -1)
+                newStr.append("-");
             newStr.append("0.");
             BigInteger division = denominator.divide(numerator);
             String divisionString = division.toString();
@@ -294,7 +295,7 @@ public class SuperNumber {
             else
                 isPower = false;
             if (!isPower)
-                zeroLen = BigIntegerMath.log10(division, RoundingMode.FLOOR);
+                zeroLen = BigIntegerMath.log10(division.abs(), RoundingMode.FLOOR);
             else
                 zeroLen = divisionString.length() - 2;
             for (int i = 0; i < zeroLen; i++)

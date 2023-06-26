@@ -54,6 +54,7 @@ public class EmcMapper {
         this implementation is dumb, because I am not experienced enough to implement a better solution.
         it loops over all the recipes in the game a LOT to generate the mappings.
         */        
+        FabricatedExchange.LOGGER.info("Start EMC mapper");
         Map<String, SuperNumber> seedEmcMap = ModConfig.SEED_EMC_MAP_FILE.getValue();
         if (seedEmcMap != null)
             CollectionUtil.mergeMap(emcMap, seedEmcMap);
@@ -82,23 +83,36 @@ public class EmcMapper {
             ignoredItems = blacklistedRecipes.getOrDefault("items", new String[] {});
         }
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 100; i++) {
             // Smithing recipes
+            int count = 0;
             for (int j = 0; j < 100; j++) { 
-                if (!iterateSmithingRecipes(recipeManager, dynamicRegistryManager, smithingRecipes))
+               if (!iterateSmithingRecipes(recipeManager, dynamicRegistryManager, smithingRecipes)) {
+                    if (j == 0)
+                        count++;
                     break;
+                }
             }
             // Smelting recipes
             for (int j = 0; j < 100; j++) { 
-                if (!iterateSmeltingRecipes(recipeManager, dynamicRegistryManager, smeltingRecipes))
+                if (!iterateSmeltingRecipes(recipeManager, dynamicRegistryManager, smeltingRecipes)) {
+                    if (j == 0)
+                        count++;
                     break;
+                }
             }
             // Crafting recipes
             for (int j = 0; j < 100; j++) {
-                if (!iterateCraftingRecipes(recipeManager, dynamicRegistryManager, craftingRecipes))
+                if (!iterateCraftingRecipes(recipeManager, dynamicRegistryManager, craftingRecipes)) {
+                    if (j == 0)
+                        count++;
                     break;
+                }
             }
+            if (count == 3)
+                break;
         }
+        FabricatedExchange.LOGGER.info("End EMC mapper");
     }
 
 
@@ -165,7 +179,7 @@ public class EmcMapper {
                         Item item = stack.getItem();
                         SuperNumber itemEmc = getItemEmc(item);
                         if (itemEmc.equalsZero()) {
-                            newInfo = putEmcMap(item, emcWorth, recipe);
+                            newInfo = putEmcMap(item, emcWorth, recipe) || newInfo;
                             break;
                         }
                     }
@@ -193,13 +207,13 @@ public class EmcMapper {
                             warn("EMC Mapper thinks " + item.getTranslationKey() + " should have 0 EMC. Recipe: " + recipe.getId().toString());
                         continue;
                     }
-                    newInfo = putEmcMap(item, rightValue, recipe);
+                    newInfo = putEmcMap(item, rightValue, recipe) || newInfo;
                 }
             }
             else {
                 SuperNumber result = equation.getLeft();
                 result.divide(outputStack.getCount());
-                newInfo = putEmcMap(outputItem, result, recipe);
+                newInfo = putEmcMap(outputItem, result, recipe) || newInfo;
             }
         }
         return newInfo;
@@ -243,13 +257,13 @@ public class EmcMapper {
                     continue; // not enough info
 
                 // if in emc is defined but out emc is not
-                newInfo = putEmcMap(outputItem, inEmc, recipe);
+                newInfo = putEmcMap(outputItem, inEmc, recipe) || newInfo;
             }
             else if (inEmc.equalsZero()) {
                  // if out emc is defined but in emc is not
                 for (int j = 0; j < itemStacks.length; j++) {
                     Item inputItem = itemStacks[j].getItem();
-                    newInfo = putEmcMap(inputItem, outEmc, recipe);
+                    newInfo = putEmcMap(inputItem, outEmc, recipe) || newInfo;
                 }
             }
             else if (!inEmc.equalTo(outEmc)) { // we already know both inemc and outemc, run an inequality check
@@ -289,16 +303,16 @@ public class EmcMapper {
 
             if (outEmc.equalsZero()) {
                 aEmc.add(bEmc);
-                newInfo = putEmcMap(output, aEmc, recipe);
+                newInfo = putEmcMap(output, aEmc, recipe) || newInfo;
                 continue;
             }
             if (aEmc.equalsZero()) {
                 bEmc.add(outEmc);
-                newInfo = putEmcMap(a, bEmc, recipe);
+                newInfo = putEmcMap(a, bEmc, recipe) || newInfo;
                 continue;
             }
             outEmc.subtract(aEmc);
-            newInfo = putEmcMap(b, outEmc, recipe);      
+            newInfo = putEmcMap(b, outEmc, recipe) || newInfo;      
         }
         return newInfo;
     }
@@ -308,9 +322,9 @@ public class EmcMapper {
     }
 
     private boolean putEmcMap(Item item, SuperNumber value, Recipe<?> recipe) {
-        if (value.equalsZero()) {
+        if (value.compareTo(SuperNumber.ZERO) <= 0) {
             warn("Conflict: EMC Mapper tried assigning item " + Registries.ITEM.getId(item).toString() 
-            + " a value of 0. Current recipe: " + recipe.getId().toString());
+            + " a value lower or equal to 0. Current recipe: " + recipe.getId().toString());
             return false;
         }
         if (!emcMapHasEntry(item)) {

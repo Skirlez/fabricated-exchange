@@ -185,4 +185,8 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
         buf.writeInt(level);
     }
 
+    public EnergyCollectorScreenHandler getScreenHandler() {
+        return handler;
+    }
+
 }

@@ -1,5 +1,7 @@
 package com.skirlez.fabricatedexchange.block;
 
+import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreenHandler;
+
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -45,7 +47,7 @@ public class EnergyCollector extends BlockWithEntityAndRotation {
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity instanceof EnergyCollectorBlockEntity) {
                 Inventory inv = (Inventory)blockEntity;
-                inv.removeStack(10); // remove the target item slot
+                inv.removeStack(10 + level * 4); // remove the target item slot
                 ItemScatterer.spawn(world, pos, inv);
                 world.updateComparators(pos, this);
             }
