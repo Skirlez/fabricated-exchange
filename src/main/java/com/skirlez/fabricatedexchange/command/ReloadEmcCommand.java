@@ -26,7 +26,8 @@ public class ReloadEmcCommand {
         FabricatedExchange.syncMaps(server);
 
         String add = (log.isEmpty()) ? "\nNo errors or warnings." : "\n" + log;
-        context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.reloademc.success", String.valueOf((System.nanoTime() - startTime) / 1000000)).append(add), false);
+        context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.reloademc.success",
+        String.valueOf((System.nanoTime() - startTime) / 1000000)).append(add), false);
         return 1;
     }
 }

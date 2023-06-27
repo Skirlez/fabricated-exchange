@@ -75,11 +75,6 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
         return Text.translatable("screen.fabricated-exchange.emc_collection");
     }
 
-    public void update(SuperNumber emc, int light) {
-        this.emc = emc;
-        this.light = light;
-    }
-
     private void sendSyncPacket() {
         PacketByteBuf data = PacketByteBufs.create();
         data.writeString(emc.divisionString());
@@ -95,11 +90,6 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
     public static void tick(World world, BlockPos blockPos, BlockState blockState, EnergyCollectorBlockEntity entity) {
         if (world.isClient())
             return;
-        if (entity.tick < 2) {
-            entity.light = world.getLightLevel(LightType.SKY, entity.getPos().add(0, 1, 0)) - world.getAmbientDarkness();
-            entity.sendSyncPacket();
-        }
-        
         SuperNumber addition = new SuperNumber(entity.light, 15);
         addition.multiply(entity.emcMultiplier);
         entity.emc.add(addition);
@@ -181,8 +171,15 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 
     @Override
     public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
+        // these will be read by the screen handler
         buf.writeBlockPos(pos);
         buf.writeInt(level);
+        
+        if (world != null)
+            light = world.getLightLevel(LightType.SKY, getPos().add(0, 1, 0)) - world.getAmbientDarkness();
+        // these will only be read on the screen
+        buf.writeString(emc.divisionString());
+        buf.writeInt(light);
     }
 
     public EnergyCollectorScreenHandler getScreenHandler() {

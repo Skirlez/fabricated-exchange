@@ -1,7 +1,5 @@
 package com.skirlez.fabricatedexchange.block;
 
-import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreenHandler;
-
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -40,7 +38,6 @@ public class EnergyCollector extends BlockWithEntityAndRotation {
         return ActionResult.SUCCESS;
     }
 
-
     @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         if (state.getBlock() != newState.getBlock()) {
@@ -54,7 +51,6 @@ public class EnergyCollector extends BlockWithEntityAndRotation {
         }
         super.onStateReplaced(state, world, pos, newState, moved);
     }
-
 
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {

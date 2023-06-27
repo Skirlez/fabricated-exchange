@@ -1,0 +1,5 @@
+{
+    "variants": {
+        "": { "model": "fabricated-exchange:block/alchemical_coal_block" }
+    }
+}

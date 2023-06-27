@@ -1,0 +1,13 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "ingredients": [
+        {
+            "item": "fabricated-exchange:mobius_fuel_block"
+        }
+    ],
+    "result": {
+        "item": "fabricated-exchange:mobius_fuel",
+        "count": 9
+    }
+}
+

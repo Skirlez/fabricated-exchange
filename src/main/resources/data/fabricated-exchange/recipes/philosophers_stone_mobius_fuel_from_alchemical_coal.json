@@ -1,0 +1,36 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "ingredients": [
+        {
+            "item": "fabricated-exchange:philosophers_stone"
+        },
+        {
+            "item": "fabricated-exchange:alchemical_coal"
+        },
+        {
+            "item": "fabricated-exchange:alchemical_coal"
+        },
+        {
+            "item": "fabricated-exchange:alchemical_coal"
+        },
+        {
+            "item": "fabricated-exchange:alchemical_coal"
+        },
+        {
+            "item": "fabricated-exchange:alchemical_coal"
+        },
+        {
+            "item": "fabricated-exchange:alchemical_coal"
+        },
+        {
+            "item": "fabricated-exchange:alchemical_coal"
+        },
+        {
+            "item": "fabricated-exchange:alchemical_coal"
+        }
+    ],
+    "result": {
+        "item": "fabricated-exchange:mobius_fuel"
+    }
+}
+

@@ -1,0 +1,23 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"GRG",
+		"GEG",
+		"GGG"
+	],
+	"key": {
+		"G": {
+			"item": "minecraft:glowstone"
+		},
+		"E": {
+			"item": "fabricated-exchange:energy_collector_mk2"
+		},
+        "R": {
+			"item": "fabricated-exchange:red_matter"
+		}
+	},
+	"result": {
+		"item": "fabricated-exchange:energy_collector_mk3"
+	}
+}
+

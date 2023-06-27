@@ -1,0 +1,36 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "ingredients": [
+        {
+            "item": "fabricated-exchange:philosophers_stone"
+        },
+        {
+            "tag": "c:coal"
+        },
+        {
+            "tag": "c:coal"
+        },
+        {
+            "tag": "c:coal"
+        },
+        {
+            "tag": "c:coal"
+        },
+        {
+            "tag": "c:coal"
+        },
+        {
+            "tag": "c:coal"
+        },
+        {
+            "tag": "c:coal"
+        },
+        {
+            "tag": "c:coal"
+        }
+    ],
+    "result": {
+        "item": "fabricated-exchange:alchemical_coal"
+    }
+}
+

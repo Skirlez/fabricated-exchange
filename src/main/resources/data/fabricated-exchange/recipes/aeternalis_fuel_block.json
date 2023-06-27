@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "key": {
+        "#": {
+            "item": "fabricated-exchange:aeternalis_fuel"
+        }
+    },
+    "pattern": [
+        "###",
+        "###",
+        "###"
+    ],
+    "result": {
+        "item": "fabricated-exchange:aeternalis_fuel_block"
+    }
+}

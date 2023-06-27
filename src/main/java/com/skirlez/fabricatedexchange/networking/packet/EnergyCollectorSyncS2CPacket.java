@@ -16,15 +16,10 @@ public class EnergyCollectorSyncS2CPacket {
         SuperNumber emc = new SuperNumber(buf.readString());
         int light = buf.readInt();
         BlockPos pos = buf.readBlockPos();
-
-        if(client.world.getBlockEntity(pos) instanceof EnergyCollectorBlockEntity blockEntity) {
-            blockEntity.update(emc, light);
-            if (client.player.currentScreenHandler instanceof EnergyCollectorScreenHandler screenHandler
-                    && screenHandler.getBlockEntity().getPos().equals(pos)) {
-
-                ((EnergyCollectorScreen)client.currentScreen).update(emc, light);
-
-            }
+        if (client.player.currentScreenHandler instanceof EnergyCollectorScreenHandler screenHandler
+                && screenHandler.getBlockEntity().getPos().equals(pos)) {
+            ((EnergyCollectorScreen)client.currentScreen).update(emc, light);
         }
+
     }
 }

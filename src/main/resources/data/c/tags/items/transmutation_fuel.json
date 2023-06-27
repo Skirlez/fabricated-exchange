@@ -5,10 +5,16 @@
         "minecraft:coal",
         "minecraft:charcoal",
         "minecraft:redstone",
+        "fabricated-exchange:alchemical_coal",
         "minecraft:glowstone_dust",
         "minecraft:redstone_block",
         "minecraft:blaze_powder",
         "minecraft:coal_block",
-        "minecraft:glowstone"
+        "minecraft:glowstone",
+        "fabricated-exchange:mobius_fuel",
+        "fabricated-exchange:alchemical_coal_block",
+        "fabricated-exchange:aeternalis_fuel",
+        "fabricated-exchange:mobius_fuel_block",
+        "fabricated-exchange:aeternalis_fuel_block"
     ]
 }

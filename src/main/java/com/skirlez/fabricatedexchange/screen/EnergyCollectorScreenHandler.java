@@ -25,11 +25,15 @@ public class EnergyCollectorScreenHandler extends ScreenHandler {
     private final DefaultedList<InputSlot> inputSlots = DefaultedList.of();
     private final int outputIndex;
     private final int level;
+    public PacketByteBuf buf;
     public EnergyCollectorScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
         this(syncId, inventory, inventory.player.getWorld().getBlockEntity(buf.readBlockPos()), buf.readInt());
+        this.buf = buf;
     }
     public EnergyCollectorScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity, int level) {
         super(ModScreenHandlers.ENERGY_COLLECTOR_SCREEN_HANDLER, syncId);
+        this.buf = null;
+        
         this.inventory = (Inventory)blockEntity;
         this.level = level;
         checkSize(inventory, 11 + this.level * 4);

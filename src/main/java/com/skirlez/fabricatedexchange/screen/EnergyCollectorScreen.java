@@ -39,9 +39,7 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
         } catch (NoSuchFieldException | SecurityException e) {
             FabricatedExchange.LOGGER.error("", e);
         }
-        emc = SuperNumber.Zero();
-        fuelProgress = 0d;
-        this.handler = handler;
+        
         this.level = handler.getLevel();
         if (this.level == 0) {
             maximumEmc = new SuperNumber(10000);
@@ -55,6 +53,24 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
             maximumEmc = new SuperNumber(60000);
             emcMultiplier = new SuperNumber(2);
         }
+
+        this.handler = handler;
+        if (handler.buf != null) {
+            emc = new SuperNumber(handler.buf.readString());
+            light = handler.buf.readInt();
+            calculateFuelProgress();
+            SuperNumber emcCopy = new SuperNumber(emc);
+            emcCopy.divide(maximumEmc);
+            emcProgress = emcCopy.toDouble();
+            handler.buf = null;
+        }  
+        else {
+            emc = SuperNumber.Zero();
+            light = 0;
+            fuelProgress = 0d;
+            emcProgress = 0d;
+        }
+
         texture = new Identifier(FabricatedExchange.MOD_ID, "textures/gui/collector" + String.valueOf(level + 1) + ".png");
     }
 
@@ -85,37 +101,7 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
         emcCopy.divide(maximumEmc);
         emcProgress = emcCopy.toDouble();
 
-        fuelProgress = 0d;
-        FuelSlot fuelSlot = (FuelSlot)handler.getSlot(0);
-        FakeSlot targetSlot = (FakeSlot)handler.getSlot(handler.getOutputSlotIndex() + 1);
-        ItemStack stack = fuelSlot.getStack();
-        if (stack.isEmpty())
-            return;
-        Item item = stack.getItem();
-        if (!FabricatedExchange.fuelProgressionMap.containsKey(item))
-            return;
-        SuperNumber itemEmc = EmcData.getItemEmc(item);
-        if (targetSlot.hasStack()) {
-            SuperNumber targetItemEmc = EmcData.getItemEmc(targetSlot.getStack().getItem());
-            if (itemEmc.compareTo(targetItemEmc) >= 0)
-                return;
-        }
-
-        Item nextItem = FabricatedExchange.fuelProgressionMap.get(item);
-        OutputSlot outputSlot = (OutputSlot)handler.getSlot(handler.getOutputSlotIndex());
-        if ((!nextItem.equals(outputSlot.getStack().getItem())
-                || outputSlot.getStack().getMaxCount() <= outputSlot.getStack().getCount()
-                ) && outputSlot.hasStack())
-            return; // return if there's an item in the output slot that we cannot merge with the next item in the fuelProgression
-        SuperNumber nextEmc = EmcData.getItemEmc(nextItem);
-        
-        nextEmc.subtract(itemEmc);
-
-        emcCopy.copyValueOf(emc);
-        emcCopy.divide(nextEmc);
-        fuelProgress = emcCopy.toDouble();
-        if (fuelProgress > 1d)
-            fuelProgress = 1d;
+        calculateFuelProgress();
     }
 
     @Override
@@ -187,5 +173,39 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
     public void update(SuperNumber emc, int light) {
         this.emc = emc;
         this.light = light;
+    }
+
+    public void calculateFuelProgress() {
+        fuelProgress = 0d;
+        FuelSlot fuelSlot = (FuelSlot)handler.getSlot(0);
+        FakeSlot targetSlot = (FakeSlot)handler.getSlot(handler.getOutputSlotIndex() + 1);
+        ItemStack stack = fuelSlot.getStack();
+        if (stack.isEmpty())
+            return;
+        Item item = stack.getItem();
+        if (!FabricatedExchange.fuelProgressionMap.containsKey(item))
+            return;
+        SuperNumber itemEmc = EmcData.getItemEmc(item);
+        if (targetSlot.hasStack()) {
+            SuperNumber targetItemEmc = EmcData.getItemEmc(targetSlot.getStack().getItem());
+            if (itemEmc.compareTo(targetItemEmc) >= 0)
+                return;
+        }
+
+        Item nextItem = FabricatedExchange.fuelProgressionMap.get(item);
+        OutputSlot outputSlot = (OutputSlot)handler.getSlot(handler.getOutputSlotIndex());
+        if ((!nextItem.equals(outputSlot.getStack().getItem())
+                || outputSlot.getStack().getMaxCount() <= outputSlot.getStack().getCount()
+                ) && outputSlot.hasStack())
+            return; // return if there's an item in the output slot that we cannot merge with the next item in the fuel progression
+        SuperNumber nextEmc = EmcData.getItemEmc(nextItem);
+        
+        nextEmc.subtract(itemEmc);
+
+        SuperNumber emcCopy = new SuperNumber(emc);
+        emcCopy.divide(nextEmc);
+        fuelProgress = emcCopy.toDouble();
+        if (fuelProgress > 1d)
+            fuelProgress = 1d;
     }
 }

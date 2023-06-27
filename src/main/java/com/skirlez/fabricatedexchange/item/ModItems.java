@@ -5,7 +5,6 @@ import com.skirlez.fabricatedexchange.FabricatedExchange;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
@@ -16,22 +15,24 @@ public class ModItems {
         new PhilosophersStone(new FabricItemSettings().maxCount(1)));
     public static final Item TRANSMUTATION_TABLET = registerItem("transmutation_tablet", 
         new TransmutationTablet(new FabricItemSettings().maxCount(1)));
-
+    public static final Item ALCHEMICAL_COAL = registerItem("alchemical_coal", 
+        new Item(new FabricItemSettings()));
+    public static final Item MOBIUS_FUEL = registerItem("mobius_fuel", 
+        new Item(new FabricItemSettings()));
+    public static final Item AETERNALIS_FUEL = registerItem("aeternalis_fuel", 
+        new Item(new FabricItemSettings()));
+    public static final Item DARK_MATTER = registerItem("dark_matter", 
+        new Item(new FabricItemSettings()));
+    public static final Item RED_MATTER = registerItem("red_matter", 
+        new Item(new FabricItemSettings()));    
+    
     private static Item registerItem(String name, Item item) {
-        return Registry.register(Registries.ITEM, new Identifier(FabricatedExchange.MOD_ID, name), item);
-    }
-
-    public static void addItemsToItemGroup() {
-        addToItemGroup(ModItemGroups.FABRICATED_EXCHANGE, PHILOSOPHERS_STONE);
-        addToItemGroup(ModItemGroups.FABRICATED_EXCHANGE, TRANSMUTATION_TABLET);
-    }
-
-    private static void addToItemGroup(ItemGroup group, Item item) {
-        ItemGroupEvents.modifyEntriesEvent(group).register(entries->entries.add(item));
+        Registry.register(Registries.ITEM, new Identifier(FabricatedExchange.MOD_ID, name), item);
+        ItemGroupEvents.modifyEntriesEvent(ModItemGroups.FABRICATED_EXCHANGE).register(entries->entries.add(item));
+        return item;
     }
 
     public static void registerModItems() { 
-        addItemsToItemGroup();
         
     }   
 }

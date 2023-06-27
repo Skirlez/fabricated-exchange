@@ -1,0 +1,19 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "key": {
+        "A": {
+            "item": "fabricated-exchange:aeternalis_fuel"
+        },
+        "D": {
+            "item": "fabricated-exchange:dark_matter"
+        }
+    },
+    "pattern": [
+        "AAA",
+        "DDD",
+        "AAA"
+    ],
+    "result": {
+        "item": "fabricated-exchange:red_matter"
+    }
+}

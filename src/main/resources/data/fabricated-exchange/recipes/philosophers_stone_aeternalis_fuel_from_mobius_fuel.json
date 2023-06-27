@@ -1,0 +1,24 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "ingredients": [
+        {
+            "item": "fabricated-exchange:philosophers_stone"
+        },
+        {
+            "item": "fabricated-exchange:mobius_fuel"
+        },
+        {
+            "item": "fabricated-exchange:mobius_fuel"
+        },
+        {
+            "item": "fabricated-exchange:mobius_fuel"
+        },
+        {
+            "item": "fabricated-exchange:mobius_fuel"
+        }
+    ],
+    "result": {
+        "item": "fabricated-exchange:aeternalis_fuel"
+    }
+}
+

@@ -1,0 +1,26 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"GSG",
+		"GDG",
+		"GFG"
+	],
+	"key": {
+		"G": {
+			"item": "minecraft:glowstone"
+		},
+		"D": {
+			"item": "minecraft:diamond_block"
+		},
+		"S": {
+			"item": "minecraft:glass"
+		},
+		"F": {
+			"item": "minecraft:furnace"
+		}
+	},
+	"result": {
+		"item": "fabricated-exchange:energy_collector_mk1"
+	}
+}
+

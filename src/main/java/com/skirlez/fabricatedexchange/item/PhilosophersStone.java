@@ -58,10 +58,8 @@ public class PhilosophersStone extends Item {
                         (double)blockPos.getZ() + 0.5, r.nextDouble(0.2) - 0.1, 0.06, r.nextDouble(0.2) - 0.1);
                 }
             }
-            else {
+            else
                 switchBlock(world, blockPos, context.getStack(), context.getSide());
-
-            }
         }
         return ActionResult.success(valid);
     }
