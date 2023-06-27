@@ -9,7 +9,15 @@ and then 1.16.5. Afterwards it will be upgraded to whatever versions after 1.19.
 
 All of the assets were taken from https://github.com/sinkillerj/ProjectE.
 If the author(s) of the assets do not want this project using them, I will take the project 
-down until I can replace the assets myself.
+down until I can replace the assets myself. 
+
+According to the Project E description, the following people deserve credit for the assets:
+
+Magic Banana: https://twitter.com/Magic_Banana
+
+x3n0ph0b3: (No existing social media page I could find)
+
+MidnightLightning: https://github.com/MidnightLightning
 
 # Something isn't working
 
@@ -22,7 +30,7 @@ This is my very first Minecraft mod, and so I am unfamiliar with good Fabric mod
 If you spot anything that is done incorrectly, unsafely, or that could be done more 
 efficiently, please open an issue/pull request a change.
 
-Additionally, as of now the mod is under development. So you could also suggest or implement
+Additionally, as of now, the mod is still under development. So you could also suggest or implement
 new features, or old features from previous equivalence mods.
 
 # Project Goals
