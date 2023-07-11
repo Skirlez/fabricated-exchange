@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.util.DataFile;
-import com.skirlez.fabricatedexchange.util.CollectionUtil;
+import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.ModConfig;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
@@ -65,7 +65,7 @@ public class EmcData {
             newEmcMap = new HashMap<String, SuperNumber>();
         newEmcMap.put(id, emc);
         file.setValueAndSave(newEmcMap);
-        CollectionUtil.mergeMap(emcMap, newEmcMap);
+        GeneralUtil.mergeMap(emcMap, newEmcMap);
     }
 
 

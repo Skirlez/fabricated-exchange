@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.mixin.LegacySmithingRecipeAccessor;
-import com.skirlez.fabricatedexchange.util.CollectionUtil;
+import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.ModConfig;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
@@ -64,7 +64,7 @@ public class EmcMapper {
         FabricatedExchange.LOGGER.info("Start EMC mapper");
         Map<String, SuperNumber> seedEmcMap = ModConfig.SEED_EMC_MAP_FILE.getValue();
         if (seedEmcMap != null)
-            CollectionUtil.mergeMap(emcMap, seedEmcMap);
+            GeneralUtil.mergeMap(emcMap, seedEmcMap);
         
         // i don't know what this thing is, but you need it for some functions
         DynamicRegistryManager dynamicRegistryManager = world.getRegistryManager();

@@ -15,6 +15,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
@@ -29,7 +30,6 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
     private SuperNumber emc;
     private final int level;
     private final SuperNumber maximumEmc;
-    private final SuperNumber emcMultiplier;
     public Field fieldDoubleClicked;
     public EnergyCollectorScreen(EnergyCollectorScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -41,28 +41,23 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
         }
         
         this.level = handler.getLevel();
-        if (this.level == 0) {
+        if (this.level == 0)
             maximumEmc = new SuperNumber(10000);
-            emcMultiplier = new SuperNumber(1, 5);
-        }
-        else if (this.level == 1) {
+        else if (this.level == 1)
             maximumEmc = new SuperNumber(30000);
-            emcMultiplier = new SuperNumber(3, 5);
-        }
-        else {
+
+        else 
             maximumEmc = new SuperNumber(60000);
-            emcMultiplier = new SuperNumber(2);
-        }
 
         this.handler = handler;
-        if (handler.buf != null) {
-            emc = new SuperNumber(handler.buf.readString());
-            light = handler.buf.readInt();
+        PacketByteBuf buf = handler.getAndConsumeCreationBuffer();
+        if (buf != null) {
+            emc = new SuperNumber(buf.readString());
+            light = buf.readInt();
             calculateFuelProgress();
             SuperNumber emcCopy = new SuperNumber(emc);
             emcCopy.divide(maximumEmc);
             emcProgress = emcCopy.toDouble();
-            handler.buf = null;
         }  
         else {
             emc = SuperNumber.Zero();
@@ -91,12 +86,6 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
 
     @Override
     protected void handledScreenTick() {
-        SuperNumber addition = new SuperNumber(light, 15);
-        addition.multiply(emcMultiplier);
-        emc.add(addition);
-        if (emc.compareTo(maximumEmc) == 1)
-            emc.copyValueOf(maximumEmc);
-
         SuperNumber emcCopy = new SuperNumber(emc);
         emcCopy.divide(maximumEmc);
         emcProgress = emcCopy.toDouble();

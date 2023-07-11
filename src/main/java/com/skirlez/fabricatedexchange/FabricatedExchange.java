@@ -32,7 +32,7 @@ import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.ModScreenHandlers;
 import com.skirlez.fabricatedexchange.sound.ModSounds;
-import com.skirlez.fabricatedexchange.util.CollectionUtil;
+import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.ModConfig;
 import com.skirlez.fabricatedexchange.util.ModTags;
 import com.skirlez.fabricatedexchange.util.PlayerState;
@@ -90,13 +90,13 @@ public class FabricatedExchange implements ModInitializer {
         EmcData.emcMap = mapper.getMap();
         Map<String, SuperNumber> customEmcMap = ModConfig.CUSTOM_EMC_MAP_FILE.getValue();
         if (customEmcMap != null)
-            CollectionUtil.mergeMap(EmcData.emcMap, customEmcMap);
+            GeneralUtil.mergeMap(EmcData.emcMap, customEmcMap);
         
         List<Item> fuelItemList = new ArrayList<Item>();
         Iterator<RegistryEntry<Item>> iterator = Registries.ITEM.getEntryList(ModTags.FUEL).get().iterator();
         while (iterator.hasNext()) {
             Item item = iterator.next().value();
-            CollectionUtil.addSortedEmcList(fuelItemList, item);
+            GeneralUtil.addSortedEmcList(fuelItemList, item);
         }
         Map<Item, Item> newFuelProgressionMap = new HashMap<Item, Item>();
         for (int i = 0; i < fuelItemList.size(); i++) {

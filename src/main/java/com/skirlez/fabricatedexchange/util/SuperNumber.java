@@ -162,6 +162,18 @@ public class SuperNumber {
         simplify();
     }
 
+    /** This method will "steal" an amount from the other SuperNumber and add it's value to this.
+     * If other has less than amount, then this SuperNumber will steal all of other. */
+    public void steal(SuperNumber other, SuperNumber amount) {
+        if (other.compareTo(amount) >= 0) {
+            other.subtract(amount);
+            this.add(amount);
+            return;
+        }
+        this.add(other);
+        other.copyValueOf(SuperNumber.ZERO);
+    }
+
     // multiplication methods
 
     public void multiply(int other) {
@@ -398,6 +410,7 @@ public class SuperNumber {
      * @see SuperNumber#SuperNumber(String)
      */
     public String divisionString() {
+
         return numerator.toString() + ((denominator.equals(BigInteger.ONE)) ? "" : "/" + denominator.toString());
     }
 
@@ -414,8 +427,10 @@ public class SuperNumber {
 
     /** divides the fraction it's most simplified form. Example: (3/6) -> (1/2) */
     private void simplify() {
-        if (denominator.equals(BigInteger.ONE) || numerator.equals(BigInteger.ONE) || equalsZero())
+        if (denominator.equals(BigInteger.ONE) || numerator.equals(BigInteger.ONE))
             return;
+        if (equalsZero())
+            denominator = BigInteger.ONE;
         BigInteger gcd = numerator.gcd(denominator);
         if (!gcd.equals(BigInteger.ONE)) {
             numerator = numerator.divide(gcd);

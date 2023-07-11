@@ -17,6 +17,7 @@ import net.minecraft.world.World;
 
 public class EnergyCollector extends BlockWithEntityAndRotation {
     private final int level;
+    private EnergyCollectorBlockEntity entity;
     public EnergyCollector(Settings settings, int level) {
         super(settings);
         this.level = level;
@@ -25,6 +26,7 @@ public class EnergyCollector extends BlockWithEntityAndRotation {
     public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
     }
+    
 
     @Override
     public ActionResult onUse(BlockState state, World world, 
@@ -54,7 +56,8 @@ public class EnergyCollector extends BlockWithEntityAndRotation {
 
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new EnergyCollectorBlockEntity(pos, state);
+        entity = new EnergyCollectorBlockEntity(pos, state);
+        return entity;
     }
 
     @Override

@@ -1,8 +1,6 @@
 package com.skirlez.fabricatedexchange.networking.packet;
 
 import com.skirlez.fabricatedexchange.block.EnergyCollectorBlockEntity;
-import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreen;
-import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreenHandler;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -15,11 +13,13 @@ public class EnergyCollectorSyncS2CPacket {
     public static void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
         SuperNumber emc = new SuperNumber(buf.readString());
         int light = buf.readInt();
+        boolean consuming = buf.readBoolean();
         BlockPos pos = buf.readBlockPos();
-        if (client.player.currentScreenHandler instanceof EnergyCollectorScreenHandler screenHandler
-                && screenHandler.getBlockEntity().getPos().equals(pos)) {
-            ((EnergyCollectorScreen)client.currentScreen).update(emc, light);
+        
+        if(client.world.getBlockEntity(pos) instanceof EnergyCollectorBlockEntity blockEntity) {
+            blockEntity.update(emc, light, consuming);
         }
+        
 
     }
 }

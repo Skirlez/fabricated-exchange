@@ -1,5 +1,7 @@
 package com.skirlez.fabricatedexchange.screen;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.skirlez.fabricatedexchange.block.EnergyCollectorBlockEntity;
 import com.skirlez.fabricatedexchange.screen.slot.FakeSlot;
 import com.skirlez.fabricatedexchange.screen.slot.collection.FuelSlot;
@@ -25,7 +27,7 @@ public class EnergyCollectorScreenHandler extends ScreenHandler {
     private final DefaultedList<InputSlot> inputSlots = DefaultedList.of();
     private final int outputIndex;
     private final int level;
-    public PacketByteBuf buf;
+    private PacketByteBuf buf;
     public EnergyCollectorScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
         this(syncId, inventory, inventory.player.getWorld().getBlockEntity(buf.readBlockPos()), buf.readInt());
         this.buf = buf;
@@ -185,6 +187,16 @@ public class EnergyCollectorScreenHandler extends ScreenHandler {
 
     public int getLevel() {
         return level;
+    }
+
+    // intended to be called by the screen instance
+    @Nullable
+    public PacketByteBuf getAndConsumeCreationBuffer() {
+        if (buf == null)
+            return null;
+        PacketByteBuf copy = new PacketByteBuf(buf.copy());
+        buf = null;
+        return copy;
     }
 
 }
