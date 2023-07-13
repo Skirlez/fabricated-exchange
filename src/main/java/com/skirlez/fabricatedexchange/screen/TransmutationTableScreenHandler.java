@@ -49,7 +49,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         this.inventory = inventory;
         this.player = playerInventory.player;
         inventory.onOpen(playerInventory.player);
-        emcSlot = new ConsumeSlot(inventory, 0, 80, 64, player, this);
+        emcSlot = new ConsumeSlot(inventory, 0, 108, 80, player, this);
         this.addSlot(emcSlot);
         
         // use trigonometry to create the transmutation slots
@@ -60,7 +60,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
             double radianAngle = Math.toRadians(angle);
             int yOffset = (int)(Math.sin(radianAngle) * 41);
             int xOffset = (int)(Math.cos(radianAngle) * 41);
-            addTransmutationSlot(new TransmutationSlot(inventory, i + 1, 131 + xOffset, 16 + yOffset, player, this));
+            addTransmutationSlot(new TransmutationSlot(inventory, i + 1, 158 + xOffset, 32 + yOffset, player, this));
             angle += 360.0 / 12.0;
         }
 
@@ -70,11 +70,11 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
             double radianAngle = Math.toRadians(angle);
             int yOffset = (int)(Math.sin(radianAngle) * 19);
             int xOffset = (int)(Math.cos(radianAngle) * 19);
-            addTransmutationSlot(new TransmutationSlot(inventory, i + 13, 131 + xOffset, 16 + yOffset, player, this));
+            addTransmutationSlot(new TransmutationSlot(inventory, i + 13, 158 + xOffset, 32 + yOffset, player, this));
             angle += 360.0 / 4.0;
         }
 
-        addSlot(new MidSlot(minorInventory, 0, 131, 16, this, player.world.isClient));
+        addSlot(new MidSlot(minorInventory, 0, 158, 32, this, player.world.isClient));
         addPlayerInventory(playerInventory);
         addPlayerHotbar(playerInventory);
 
@@ -280,14 +280,14 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
     private void addPlayerInventory(PlayerInventory playerInventory) {
         for (int i = 0; i < 3; ++i) {
             for (int l = 0; l < 9; ++l) {
-                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 8 + l * 18, 84 + i * 18));
+                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 36 + l * 18, 100 + i * 18));
             }
         }
     }
 
     private void addPlayerHotbar(PlayerInventory playerInventory) {
         for (int i = 0; i < 9; ++i) {
-            this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142));
+            this.addSlot(new Slot(playerInventory, i, 36 + i * 18, 158));
         }
     }
 

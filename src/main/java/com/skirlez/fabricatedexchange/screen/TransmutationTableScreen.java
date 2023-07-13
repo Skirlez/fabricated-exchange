@@ -1,12 +1,11 @@
 package com.skirlez.fabricatedexchange.screen;
 
-
-import java.lang.reflect.Field;
 import java.util.function.Consumer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
+import com.skirlez.fabricatedexchange.mixin.HandledScreenAccessor;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.slot.transmutation.TransmutationSlot;
 
@@ -32,15 +31,8 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
             new Identifier(FabricatedExchange.MOD_ID, "textures/gui/transmute.png");
 
     private String oldSearchText = "";
-    public Field fieldDoubleClicked;
     public TransmutationTableScreen(TransmutationTableScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
-        try {
-            fieldDoubleClicked = this.getClass().getSuperclass().getDeclaredField("doubleClicking");
-            fieldDoubleClicked.setAccessible(true);
-        } catch (NoSuchFieldException | SecurityException e) {
-            FabricatedExchange.LOGGER.error("", e);
-        }
     }
 
     @Override
@@ -57,13 +49,9 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         boolean result = super.mouseClicked(mouseX, mouseY, button);
         Slot slot = getSlotAt(mouseX, mouseY);
 
-        // this double clicking variable creates a lot of trouble for transmutation slots, so we attempt to make it false here
+        // this double clicking variable creates a lot of trouble for transmutation slots, so we make it false here
         if (slot instanceof TransmutationSlot) {
-            try {
-                fieldDoubleClicked.set(this, Boolean.FALSE);
-            } catch (SecurityException | IllegalAccessException e) {
-                FabricatedExchange.LOGGER.error("", e);
-            }
+            ((HandledScreenAccessor)this).setDoubleClicking(false);
         }
         return result;
     }
@@ -79,16 +67,16 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 
     @Override
     protected void init() {
-        super.init();
-        
-        titleX = -20;     
-        titleY = -26; 
         this.backgroundWidth = 231;
         this.backgroundHeight = 197;
-        
+        super.init();
+
+        titleX = 4;     
+        titleY = -10; 
+
         Consumer<String> updater = searchText -> updateSearchText(searchText);
 
-        searchBar = new TextFieldWidget(this.textRenderer, x + 38,  y - 47, 100, 10, Text.empty());
+        searchBar = new TextFieldWidget(this.textRenderer, x + 64, y - 31, 100, 10, Text.empty());
         searchBar.setMaxLength(30);
         searchBar.setChangedListener(updater);
         
@@ -97,13 +85,13 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         addDrawableChild(ButtonWidget.builder(
             Text.of("<"),
             button -> updatePage(1)
-        ).dimensions(x + 99, y + 67, 13, 13)
+        ).dimensions(x + 126, y + 83, 13, 13)
         .build());
 
         addDrawableChild(ButtonWidget.builder(
             Text.of(">"),
             button -> updatePage(2)
-        ).dimensions(x + 164, y + 67, 13, 13)
+        ).dimensions(x + 191, y + 83, 13, 13)
         .build());
 
     }
@@ -115,6 +103,7 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         RenderSystem.setShaderTexture(0, TEXTURE);
         int x = (width - backgroundWidth) / 2 - 1;
         int y = (height - backgroundHeight) / 2 - 17;
+        
         drawTexture(matrices, x, y, 0, 0, backgroundWidth, backgroundHeight);
     }
 
@@ -139,8 +128,8 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         textRenderer.draw(matrices, this.title, (float)this.titleX, (float)this.titleY, 0x404040);
         String emc = FabricatedExchangeClient.clientEmc.shortString();
 
-        textRenderer.draw(matrices, Text.literal("EMC:"), -23, 64, 0x404040);
-        textRenderer.draw(matrices, Text.literal(emc), -23, 74, 0x404040);
+        textRenderer.draw(matrices, Text.literal("EMC:"), 4, 79, 0x404040);
+        textRenderer.draw(matrices, Text.literal(emc), 4, 89, 0x404040);
     }
 
     @Override

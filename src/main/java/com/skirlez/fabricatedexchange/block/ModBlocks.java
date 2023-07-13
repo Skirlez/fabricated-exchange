@@ -23,6 +23,8 @@ public class ModBlocks {
     public static final Block AETERNALIS_FUEL_BLOCK = registerBlock("aeternalis_fuel_block", 
         new Block(FabricBlockSettings.of(Material.STONE, MapColor.WHITE).requiresTool().strength(5.0f, 6.0f)));
 
+    
+
     public static final Block TRANSMUTATION_TABLE = registerBlock("transmutation_table", 
         new TransmutationTable(FabricBlockSettings.of(Material.STONE, MapColor.WHITE)));
 
@@ -34,6 +36,9 @@ public class ModBlocks {
 
     public static final Block ENERGY_COLLECTOR_MK3 = registerBlock("energy_collector_mk3", 
         new EnergyCollector(FabricBlockSettings.of(Material.GLASS, MapColor.PALE_YELLOW).requiresTool().strength(3.5f), 2));
+
+    public static final Block ANTIMATTER_RELAY_MK1 = registerBlock("antimatter_relay_mk1", 
+        new AntiMatterRelay(FabricBlockSettings.of(Material.GLASS, MapColor.BLACK).requiresTool().strength(3.5f), 2));
 
     private static Block registerBlock(String name, Block block) {
         registerBlockItem(name, block);

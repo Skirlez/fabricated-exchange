@@ -9,11 +9,11 @@ import com.google.common.math.BigIntegerMath;
 *<p> SuperNumber has two BigIntegers: a numerator and denominator.
 * It can represent any real number if you have enough memory!
 * (well, except for irrational numbers, but technically if you had infinite memory...)
-*<p> It is/was:
-*<p>-Used for emc values
-*<p>-Really cool name
-*<p>-"Super" for "super slow"
-*<p>-Given to me by God
+*<p> It:
+*<p>-is used for emc values
+*<p>-has a really cool name
+*<p>-is "super" for "super slow"
+*<p>-was given to me by God
 *@author Jesus H. Christ
 *@see BigInteger
 **/
@@ -48,7 +48,19 @@ public class SuperNumber {
         this.denominator = BigInteger.valueOf(denominator);
         simplify();
     }
-
+    public SuperNumber(SuperNumber other) {
+        this.numerator = other.numerator;
+        this.denominator = other.denominator;
+        // don't need to simplify since we know for sure other was simplified
+    }
+    /** Takes in two byte representations of the numerator and denominator
+     * @see SuperNumber#toByteArrays()
+     */
+    public SuperNumber(byte[] numeratorBytes, byte[] denominatorBytes) {
+        numerator = new BigInteger(numeratorBytes);
+        denominator = new BigInteger(denominatorBytes);
+        simplify();
+    }
     /** Takes in a String formatted like "{numerator}/{denominator}". If there is no slash, it will set the denominator to 1.
      *  @see SuperNumber#divisionString() */
     public SuperNumber(String divisionString) {
@@ -62,11 +74,7 @@ public class SuperNumber {
         }
         this.denominator = BigInteger.ONE;
     }
-    public SuperNumber(SuperNumber other) {
-        this.numerator = other.numerator;
-        this.denominator = other.denominator;
-        // don't need to simplify since we know for sure other was simplified
-    }
+
 
     public int toInt() { // TODO: this is dumb
         if (this.compareTo(INTEGER_LIMIT) == 1 || numerator.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) == 1) {
@@ -410,7 +418,6 @@ public class SuperNumber {
      * @see SuperNumber#SuperNumber(String)
      */
     public String divisionString() {
-
         return numerator.toString() + ((denominator.equals(BigInteger.ONE)) ? "" : "/" + denominator.toString());
     }
 
@@ -423,7 +430,16 @@ public class SuperNumber {
             return 0;
         return result;
     }
-
+    
+    public byte[][] toByteArrays() {
+        byte[] numeratorBytes = numerator.toByteArray();
+        byte[] denominatorBytes = denominator.toByteArray();
+        
+        byte[][] bytes = new byte[2][];
+        bytes[0] = numeratorBytes;
+        bytes[1] = denominatorBytes;
+        return bytes;
+    }
 
     /** divides the fraction it's most simplified form. Example: (3/6) -> (1/2) */
     private void simplify() {

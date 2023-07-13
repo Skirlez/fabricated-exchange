@@ -40,7 +40,7 @@ import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 
 public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory,
-        ConsumerBlockEntityInterface {
+        ConsumerBlockEntity {
     private final DefaultedList<ItemStack> inventory;
     private SuperNumber emc;
     private int tick;
@@ -127,18 +127,19 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
             // TODO: you could probably do this in a way that doesn't require you to get the neighbors on every tick. I couldn't find a way that worked both clientside and serverside
             entity.distributeEmc(GeneralUtil.getNeighboringBlockEntities(world, blockPos));
         }
-
-
-        entity.tick++;
+        
         if (client)
             entity.clientSync();
-        else if (entity.tick % 60 == 0) {
-            entity.serverSync();
-            entity.markDirty();
+        else {
+            entity.tick++; 
+            if (entity.tick % 60 == 0) {
+                entity.serverSync();
+                entity.markDirty();
+            }
         }
     }
 
-
+    // returns true if the collector is "consuming" (will use it's emc when it reaches a target)
     private boolean tickInventoryLogic() {
         if (handler == null)
             return false;
@@ -200,6 +201,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
         super.writeNbt(nbt);
         Inventories.writeNbt(nbt, inventory);
         nbt.putString("energy_collector.emc", emc.divisionString());
+    
     }
 
     @Override

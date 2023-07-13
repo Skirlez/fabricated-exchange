@@ -42,17 +42,21 @@ public class EnergyCollectorScreenHandler extends ScreenHandler {
 
         int inputOffset;
         int otherOffset;
+        int invOffset;
         if (this.level == 0) {
             inputOffset = 0;
             otherOffset = 0;
+            invOffset = 8;
         }
         else if (this.level == 1) {
-            inputOffset = -14;
-            otherOffset = 4;
+            inputOffset = -2;
+            otherOffset = 16;
+            invOffset = 20;
         }
         else {
-            inputOffset = -24;
-            otherOffset = 12;
+            inputOffset = -2;
+            otherOffset = 34;
+            invOffset = 30;
         }
 
         this.blockEntity = (EnergyCollectorBlockEntity)blockEntity;
@@ -69,8 +73,8 @@ public class EnergyCollectorScreenHandler extends ScreenHandler {
         addSlot(new OutputSlot(inventory, outputIndex, otherOffset + 124, 13, inputSlots));
         addSlot(new FakeSlot(inventory, outputIndex + 1, otherOffset + 153, 36));
 
-        addPlayerInventory(playerInventory);
-        addPlayerHotbar(playerInventory);
+        addPlayerInventory(playerInventory, invOffset, 84);
+        addPlayerHotbar(playerInventory, invOffset, 142);
     }
 
     @Override
@@ -150,17 +154,17 @@ public class EnergyCollectorScreenHandler extends ScreenHandler {
     }
 
 
-    private void addPlayerInventory(PlayerInventory playerInventory) {
+    private void addPlayerInventory(PlayerInventory playerInventory, int x, int y) {
         for (int i = 0; i < 3; ++i) {
             for (int l = 0; l < 9; ++l) {
-                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 8 + l * 18, 84 + i * 18));
+                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, x + l * 18, y + i * 18));
             }
         }
     }
 
-    private void addPlayerHotbar(PlayerInventory playerInventory) {
+    private void addPlayerHotbar(PlayerInventory playerInventory, int x, int y) {
         for (int i = 0; i < 9; ++i) {
-            this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142));
+            this.addSlot(new Slot(playerInventory, i, x + i * 18, y));
         }
     }
 

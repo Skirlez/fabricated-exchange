@@ -1,9 +1,10 @@
 package com.skirlez.fabricatedexchange.screen;
 
-import java.lang.reflect.Field;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
+import com.skirlez.fabricatedexchange.mixin.HandledScreenAccessor;
 import com.skirlez.fabricatedexchange.screen.slot.FakeSlot;
 import com.skirlez.fabricatedexchange.screen.slot.collection.FuelSlot;
 import com.skirlez.fabricatedexchange.screen.slot.collection.OutputSlot;
@@ -30,16 +31,8 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
     private SuperNumber emc;
     private final int level;
     private final SuperNumber maximumEmc;
-    public Field fieldDoubleClicked;
     public EnergyCollectorScreen(EnergyCollectorScreenHandler handler, PlayerInventory inventory, Text title) {
-        super(handler, inventory, title);
-        try {
-            fieldDoubleClicked = this.getClass().getSuperclass().getDeclaredField("doubleClicking");
-            fieldDoubleClicked.setAccessible(true);
-        } catch (NoSuchFieldException | SecurityException e) {
-            FabricatedExchange.LOGGER.error("", e);
-        }
-        
+        super(handler, inventory, title);        
         this.level = handler.getLevel();
         if (this.level == 0)
             maximumEmc = new SuperNumber(10000);
@@ -71,17 +64,18 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
 
     @Override
     protected void init() {
-        super.init();
-        titleX = 0; 
-        titleY = 0; 
-        
         int xOffset = 0;
         if (level == 1)
-            xOffset = 24;
+            xOffset = 25;
         else if (level == 2)
             xOffset = 43;
         this.backgroundWidth = 176 + xOffset;
         this.backgroundHeight = 166;
+        super.init();
+        titleX = 0; 
+        titleY = 0; 
+        
+
     }
 
     @Override
@@ -96,12 +90,9 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
     @Override
     protected void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType) {
         if (actionType == SlotActionType.QUICK_MOVE && slot instanceof FuelSlot) {
-            try {
-                fieldDoubleClicked.set(this, Boolean.FALSE);
-            } catch (SecurityException | IllegalAccessException e) {
-                FabricatedExchange.LOGGER.error("", e);
-            }
+            ((HandledScreenAccessor)this).setDoubleClicking(false);
         }
+        
         super.onMouseClick(slot, slotId, button, actionType);
     }
 
@@ -143,12 +134,12 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
     protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
         int xOffset = 0; 
         if (this.level == 1)
-            xOffset = 3;
+            xOffset = 16;
         else if (this.level == 2)
-            xOffset = 11;
+            xOffset = 34;
         SuperNumber emcCopy = new SuperNumber(emc);
         emcCopy.floor();
-        textRenderer.draw(matrices, emcCopy.toString(), 63 + xOffset, 32, 0x404040);
+        textRenderer.draw(matrices, emcCopy.toString(), 62 + xOffset, 32, 0x404040);
     }
 
     @Override

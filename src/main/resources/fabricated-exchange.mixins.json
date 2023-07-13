@@ -5,6 +5,7 @@
 	"mixins": [
 		"LegacySmithingRecipeAccessor",
 		"ItemAccessor",
+		"HandledScreenAccessor",
 		"ModFurnaceFuels"
 	],
 	"injectors": {

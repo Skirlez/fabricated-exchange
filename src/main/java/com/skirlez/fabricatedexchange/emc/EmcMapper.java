@@ -1,7 +1,6 @@
 package com.skirlez.fabricatedexchange.emc;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -18,7 +17,6 @@ import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.LegacySmithingRecipe;
