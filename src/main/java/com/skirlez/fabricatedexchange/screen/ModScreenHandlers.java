@@ -17,12 +17,19 @@ public class ModScreenHandlers {
     public static ScreenHandlerType<EnergyCollectorScreenHandler> ENERGY_COLLECTOR_SCREEN_HANDLER = 
         new ExtendedScreenHandlerType<>(EnergyCollectorScreenHandler::new);
 
+    public static ScreenHandlerType<AntiMatterRelayScreenHandler> ANTIMATTER_RELAY_SCREEN_HANDLER = 
+        new ExtendedScreenHandlerType<>(AntiMatterRelayScreenHandler::new);
+
+
     public static void registerAllScreenHandlers() {
         // TODO figure out what the strings are for
-        Registry.register(Registries.SCREEN_HANDLER, new Identifier(FabricatedExchange.MOD_ID, "transmutation"),
+        Registry.register(Registries.SCREEN_HANDLER, new Identifier(FabricatedExchange.MOD_ID, "transmutation_table"),
             TRANSMUTATION_TABLE_SCREEN_HANDLER);
             
-        Registry.register(Registries.SCREEN_HANDLER, new Identifier(FabricatedExchange.MOD_ID, "emc_collection"),
+        Registry.register(Registries.SCREEN_HANDLER, new Identifier(FabricatedExchange.MOD_ID, "energy_collector"),
             ENERGY_COLLECTOR_SCREEN_HANDLER);
+
+        Registry.register(Registries.SCREEN_HANDLER, new Identifier(FabricatedExchange.MOD_ID, "antimatter_relay"),
+            ANTIMATTER_RELAY_SCREEN_HANDLER);
     }
 }

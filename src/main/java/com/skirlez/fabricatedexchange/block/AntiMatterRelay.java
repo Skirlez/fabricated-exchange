@@ -17,7 +17,7 @@ import net.minecraft.world.World;
 
 public class AntiMatterRelay extends BlockWithEntityAndRotation {
     private final int level;
-    private EnergyCollectorBlockEntity entity;
+
     public AntiMatterRelay(Settings settings, int level) {
         super(settings);
         this.level = level;
@@ -31,7 +31,7 @@ public class AntiMatterRelay extends BlockWithEntityAndRotation {
     public ActionResult onUse(BlockState state, World world, 
         BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (!world.isClient) {
-            NamedScreenHandlerFactory screenHandlerFactory = ((EnergyCollectorBlockEntity) world.getBlockEntity(pos));
+            NamedScreenHandlerFactory screenHandlerFactory = ((AntiMatterRelayBlockEntity)world.getBlockEntity(pos));
             if (screenHandlerFactory != null) 
                 player.openHandledScreen(screenHandlerFactory);
         }
@@ -53,13 +53,12 @@ public class AntiMatterRelay extends BlockWithEntityAndRotation {
 
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        entity = new EnergyCollectorBlockEntity(pos, state);
-        return entity;
+        return new AntiMatterRelayBlockEntity(pos, state);
     }
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return checkType(type, ModBlockEntities.ENERGY_COLLECTOR, AntiMatterRelayBlockEntity::tick);
+        return checkType(type, ModBlockEntities.ANTIMATTER_RELAY, AntiMatterRelayBlockEntity::tick);
     }
 
     public int getLevel() {

@@ -15,6 +15,7 @@ by the block entities to determine if they should spread their EMC to the surrou
 public interface ConsumerBlockEntity {
     SuperNumber getEmc();
     SuperNumber getOutputRate();
+    SuperNumber getMaximumEmc();
     boolean isConsuming();
 
     default void distributeEmc(List<BlockEntity> neighbors) {
@@ -31,7 +32,7 @@ public interface ConsumerBlockEntity {
             SuperNumber output = new SuperNumber(SuperNumber.min(getOutputRate(), emc));
             output.divide(goodNeighbors.size());
             for (ConsumerBlockEntity neighbor : goodNeighbors) {
-                neighbor.getEmc().steal(emc, output);
+                neighbor.getEmc().stealFrom(emc, output);
             }
         }
     }

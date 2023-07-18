@@ -16,7 +16,6 @@ public class ClientWorldAmbientDarkness {
 
     @Inject(method = "tick", at = @At("HEAD"))
     public void addCalculationToTick(BooleanSupplier shouldKeepTicking, CallbackInfo info) {
-        World world = (World)(Object)this;
-        world.calculateAmbientDarkness();
+        ((World)(Object)this).calculateAmbientDarkness();
     }
 }

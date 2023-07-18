@@ -1,22 +1,25 @@
-package com.skirlez.fabricatedexchange.screen.slot.collection;
+package com.skirlez.fabricatedexchange.screen.slot;
 
-import com.skirlez.fabricatedexchange.FabricatedExchange;
-import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreenHandler;
+import com.skirlez.fabricatedexchange.screen.FuelScreenHandler;
+
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 
+
 public class FuelSlot extends Slot {
     private boolean quickMoved;
-    private final EnergyCollectorScreenHandler screenHandler;
-    public FuelSlot(Inventory inventory, int index, int x, int y, EnergyCollectorScreenHandler screenHandler) {
+    private final FuelScreenHandler screenHandler;
+    private final SlotCondition slotCondition;
+    public FuelSlot(Inventory inventory, int index, int x, int y, FuelScreenHandler screenHandler, SlotCondition slotCondition) {
         super(inventory, index, x, y);
         this.screenHandler = screenHandler;
+        this.slotCondition = slotCondition;
     }
 
     @Override
     public boolean canInsert(ItemStack stack) {
-        return FabricatedExchange.fuelProgressionMap.containsKey(stack.getItem());
+        return slotCondition.condition(stack);
     }
 
     @Override
@@ -55,6 +58,4 @@ public class FuelSlot extends Slot {
     public void setQuickMoved(boolean quickMoved) {
         this.quickMoved = quickMoved;
     }
-    
-
 }

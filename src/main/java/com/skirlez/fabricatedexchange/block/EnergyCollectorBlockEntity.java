@@ -10,7 +10,7 @@ import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreen;
 import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreenHandler;
 import com.skirlez.fabricatedexchange.screen.slot.FakeSlot;
-import com.skirlez.fabricatedexchange.screen.slot.collection.FuelSlot;
+import com.skirlez.fabricatedexchange.screen.slot.FuelSlot;
 import com.skirlez.fabricatedexchange.screen.slot.collection.OutputSlot;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
@@ -179,7 +179,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
             emc.subtract(nextEmc);
             serverSync();
         }
-        return true;
+        return emc.compareTo(maximumEmc) == -1;
     }
 
 
@@ -206,11 +206,10 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 
     @Override
     public void readNbt(NbtCompound nbt) {
-        Inventories.readNbt(nbt, inventory);
         super.readNbt(nbt);
+        Inventories.readNbt(nbt, inventory);
         emc = new SuperNumber(nbt.getString("energy_collector.emc"));
     }
-
 
     @Override
     public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
@@ -222,33 +221,28 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
         buf.writeString(emc.divisionString());
         buf.writeInt(light);
     }
-
-    @Override
-    public boolean isConsuming() {
-        return consuming;
-    }
-
-
+    
     public EnergyCollectorScreenHandler getScreenHandler() {
         return handler;
     }
-
-
-    @Override
-    public SuperNumber getEmc() {
-        return emc;
-    }
-
     public void update(SuperNumber emc, int light, boolean consuming) {
         this.emc = emc;
         this.light = light;
         this.consuming = consuming;
     }
 
-
-    @Override
+    public boolean isConsuming() {
+        return consuming;
+    }
+    public SuperNumber getEmc() {
+        return emc;
+    }
     public SuperNumber getOutputRate() {
         return outputRate;
     }
+    public SuperNumber getMaximumEmc() {
+        return maximumEmc;
+    }
+ 
 
 }

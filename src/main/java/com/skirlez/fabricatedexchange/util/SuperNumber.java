@@ -32,17 +32,17 @@ public class SuperNumber {
     public SuperNumber(int numerator) {
         this.numerator = BigInteger.valueOf(numerator);
         this.denominator = BigInteger.ONE;
-    }   
-    public SuperNumber(int numerator, int denominator) {
-        this.numerator = BigInteger.valueOf(numerator);
-        this.denominator = BigInteger.valueOf(denominator);
-        simplify();
-    }   
+    }
     public SuperNumber(BigInteger numerator) {
         this.numerator = numerator;
         this.denominator = BigInteger.ONE;
         simplify();
     }
+    public SuperNumber(int numerator, int denominator) {
+        this.numerator = BigInteger.valueOf(numerator);
+        this.denominator = BigInteger.valueOf(denominator);
+        simplify();
+    }   
     public SuperNumber(BigInteger numerator, int denominator) {
         this.numerator = numerator;
         this.denominator = BigInteger.valueOf(denominator);
@@ -172,7 +172,7 @@ public class SuperNumber {
 
     /** This method will "steal" an amount from the other SuperNumber and add it's value to this.
      * If other has less than amount, then this SuperNumber will steal all of other. */
-    public void steal(SuperNumber other, SuperNumber amount) {
+    public void stealFrom(SuperNumber other, SuperNumber amount) {
         if (other.compareTo(amount) >= 0) {
             other.subtract(amount);
             this.add(amount);
@@ -248,6 +248,12 @@ public class SuperNumber {
         denominator = temp;
     }
 
+    /** Copies the value of another SuperNumber to this SuperNumber. */
+    public void copyValueOf(SuperNumber other) {
+        this.denominator = other.denominator;
+        this.numerator = other. numerator;
+    }
+
     /** @return Whether the value of the SuperNumbers is equal. */
     public boolean equalTo(SuperNumber other) {
         return numerator.equals(other.numerator) && denominator.equals(other.denominator);
@@ -266,17 +272,6 @@ public class SuperNumber {
         thisCopy.numerator = thisCopy.numerator.multiply(other.denominator);
         otherCopy.numerator = otherCopy.numerator.multiply(denominator);
         return thisCopy.numerator.compareTo(otherCopy.numerator);
-    }
-
-    /** @return the smaller of the two SuperNumbers. */
-    public static SuperNumber min(SuperNumber a, SuperNumber b) {
-        return (a.compareTo(b) == -1) ? a : b;
-    }
-
-    /** Copies the value of another SuperNumber to this SuperNumber. */
-    public void copyValueOf(SuperNumber other) {
-        this.denominator = other.denominator;
-        this.numerator = other. numerator;
     }
 
     /** @return a representation of the number as a String, formatted with commas and a point */
@@ -431,6 +426,10 @@ public class SuperNumber {
         return result;
     }
     
+    /** Returns a two-dimensional byte array representing the SuperNumber. The array at index 0 represents the numerator,
+     * and the array at index 1 represents the denominator.
+     * @see SuperNumber#SuperNumber(byte[], byte[])
+     */
     public byte[][] toByteArrays() {
         byte[] numeratorBytes = numerator.toByteArray();
         byte[] denominatorBytes = denominator.toByteArray();
@@ -440,6 +439,7 @@ public class SuperNumber {
         bytes[1] = denominatorBytes;
         return bytes;
     }
+
 
     /** divides the fraction it's most simplified form. Example: (3/6) -> (1/2) */
     private void simplify() {
@@ -453,4 +453,15 @@ public class SuperNumber {
             denominator = denominator.divide(gcd);
         }
     }
+
+    protected void stupid() {
+        throw new UnsupportedOperationException("Cannot mutate ConstSuperNumber");
+    }
+
+    /** @return the smaller of the two SuperNumbers. */
+    public static SuperNumber min(SuperNumber a, SuperNumber b) {
+        return (a.compareTo(b) == -1) ? a : b;
+    }
 }
+
+

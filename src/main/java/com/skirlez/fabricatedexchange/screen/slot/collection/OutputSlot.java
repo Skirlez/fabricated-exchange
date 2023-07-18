@@ -1,5 +1,7 @@
 package com.skirlez.fabricatedexchange.screen.slot.collection;
 
+import com.skirlez.fabricatedexchange.screen.slot.InputSlot;
+
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;

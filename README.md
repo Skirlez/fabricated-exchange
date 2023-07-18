@@ -34,9 +34,9 @@ Additionally, as of now, the mod is still under development. So you could also s
 new features, or old features from previous equivalence mods.
 
 # Project Goals
-- Finish the project
-- Oh and also do not use any external libraries other than the Fabric API because I, personally, greatly dislike having to download additional jar files
-- And also make sure it works on Quilt
+- Support Quilt (Even over Fabric, if it ever comes to that choice)
+- Don't use any external libraries other than the Fabric API
+
 
 # Implemented Features
 - Philosopher's Stone

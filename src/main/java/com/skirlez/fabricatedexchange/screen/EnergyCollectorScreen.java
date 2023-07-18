@@ -6,7 +6,7 @@ import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.mixin.HandledScreenAccessor;
 import com.skirlez.fabricatedexchange.screen.slot.FakeSlot;
-import com.skirlez.fabricatedexchange.screen.slot.collection.FuelSlot;
+import com.skirlez.fabricatedexchange.screen.slot.FuelSlot;
 import com.skirlez.fabricatedexchange.screen.slot.collection.OutputSlot;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
@@ -38,7 +38,6 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
             maximumEmc = new SuperNumber(10000);
         else if (this.level == 1)
             maximumEmc = new SuperNumber(30000);
-
         else 
             maximumEmc = new SuperNumber(60000);
 
@@ -74,8 +73,6 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
         super.init();
         titleX = 0; 
         titleY = 0; 
-        
-
     }
 
     @Override

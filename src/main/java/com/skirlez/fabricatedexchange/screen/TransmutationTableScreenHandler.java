@@ -9,6 +9,7 @@ import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.screen.slot.transmutation.ConsumeSlot;
 import com.skirlez.fabricatedexchange.screen.slot.transmutation.MidSlot;
 import com.skirlez.fabricatedexchange.screen.slot.transmutation.TransmutationSlot;
+import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.ModTags;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
@@ -75,8 +76,9 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         }
 
         addSlot(new MidSlot(minorInventory, 0, 158, 32, this, player.world.isClient));
-        addPlayerInventory(playerInventory);
-        addPlayerHotbar(playerInventory);
+        GeneralUtil.addPlayerInventory(this, playerInventory, 36, 100);
+        GeneralUtil.addPlayerHotbar(this, playerInventory, 36, 158);
+
 
         if (!player.getWorld().isClient()) {
             PlayerState playerState = ServerState.getPlayerState(player);
@@ -277,19 +279,6 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
     }
 
 
-    private void addPlayerInventory(PlayerInventory playerInventory) {
-        for (int i = 0; i < 3; ++i) {
-            for (int l = 0; l < 9; ++l) {
-                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, 36 + l * 18, 100 + i * 18));
-            }
-        }
-    }
-
-    private void addPlayerHotbar(PlayerInventory playerInventory) {
-        for (int i = 0; i < 9; ++i) {
-            this.addSlot(new Slot(playerInventory, i, 36 + i * 18, 158));
-        }
-    }
 
     private void addTransmutationSlot(TransmutationSlot slot) {
         this.addSlot(slot);

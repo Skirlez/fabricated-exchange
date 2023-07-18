@@ -4,9 +4,11 @@ import org.jetbrains.annotations.Nullable;
 
 import com.skirlez.fabricatedexchange.block.EnergyCollectorBlockEntity;
 import com.skirlez.fabricatedexchange.screen.slot.FakeSlot;
-import com.skirlez.fabricatedexchange.screen.slot.collection.FuelSlot;
-import com.skirlez.fabricatedexchange.screen.slot.collection.InputSlot;
+import com.skirlez.fabricatedexchange.screen.slot.FuelSlot;
+import com.skirlez.fabricatedexchange.screen.slot.InputSlot;
+import com.skirlez.fabricatedexchange.screen.slot.SlotCondition;
 import com.skirlez.fabricatedexchange.screen.slot.collection.OutputSlot;
+import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.ModTags;
 
 import net.minecraft.block.entity.BlockEntity;
@@ -21,7 +23,7 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.collection.DefaultedList;
 
-public class EnergyCollectorScreenHandler extends ScreenHandler {
+public class EnergyCollectorScreenHandler extends ScreenHandler implements FuelScreenHandler {
     private final Inventory inventory;
     private final EnergyCollectorBlockEntity blockEntity;
     private final DefaultedList<InputSlot> inputSlots = DefaultedList.of();
@@ -38,7 +40,7 @@ public class EnergyCollectorScreenHandler extends ScreenHandler {
         
         this.inventory = (Inventory)blockEntity;
         this.level = level;
-        checkSize(inventory, 11 + this.level * 4);
+
 
         int inputOffset;
         int otherOffset;
@@ -61,11 +63,12 @@ public class EnergyCollectorScreenHandler extends ScreenHandler {
 
         this.blockEntity = (EnergyCollectorBlockEntity)blockEntity;
         inventory.onOpen(playerInventory.player);
-        FuelSlot fuelSlot = new FuelSlot(inventory, 0, otherOffset + 124, 58, this);
+        FuelSlot fuelSlot = new FuelSlot(inventory, 0, otherOffset + 124, 58, (FuelScreenHandler)this, SlotCondition.isFuel);
+
         addSlot(fuelSlot);
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 2 + level; j++)
-                addInputSlot(new InputSlot(inventory, i * (2 + level) + j + 1, inputOffset + 20 + j * 18, 8 + i * 18, fuelSlot));
+                addInputSlot(new InputSlot(inventory, i * (2 + level) + j + 1, inputOffset + 20 + j * 18, 8 + i * 18, fuelSlot, SlotCondition.isFuel));
         }
         
         outputIndex = slots.size();
@@ -73,8 +76,8 @@ public class EnergyCollectorScreenHandler extends ScreenHandler {
         addSlot(new OutputSlot(inventory, outputIndex, otherOffset + 124, 13, inputSlots));
         addSlot(new FakeSlot(inventory, outputIndex + 1, otherOffset + 153, 36));
 
-        addPlayerInventory(playerInventory, invOffset, 84);
-        addPlayerHotbar(playerInventory, invOffset, 142);
+        GeneralUtil.addPlayerInventory(this, playerInventory, invOffset, 84);
+        GeneralUtil.addPlayerHotbar(this, playerInventory, invOffset, 142);
     }
 
     @Override
@@ -153,20 +156,6 @@ public class EnergyCollectorScreenHandler extends ScreenHandler {
         return this.inventory.canPlayerUse(player);
     }
 
-
-    private void addPlayerInventory(PlayerInventory playerInventory, int x, int y) {
-        for (int i = 0; i < 3; ++i) {
-            for (int l = 0; l < 9; ++l) {
-                this.addSlot(new Slot(playerInventory, l + i * 9 + 9, x + l * 18, y + i * 18));
-            }
-        }
-    }
-
-    private void addPlayerHotbar(PlayerInventory playerInventory, int x, int y) {
-        for (int i = 0; i < 9; ++i) {
-            this.addSlot(new Slot(playerInventory, i, x + i * 18, y));
-        }
-    }
 
     private void addInputSlot(InputSlot slot) {
         this.addSlot(slot);

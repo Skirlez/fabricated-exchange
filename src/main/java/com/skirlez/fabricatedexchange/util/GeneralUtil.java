@@ -6,9 +6,13 @@ import java.util.List;
 import java.util.Map;
 
 import com.skirlez.fabricatedexchange.emc.EmcData;
+import com.skirlez.fabricatedexchange.mixin.ScreenHandlerInvoker;
 
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -80,4 +84,18 @@ public class GeneralUtil {
         list.trimToSize();
         return list;
     }
+
+
+    public static void addPlayerInventory(ScreenHandler self, PlayerInventory playerInventory, int x, int y) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 9; j++)
+                ((ScreenHandlerInvoker)self).invokeAddSlot(new Slot(playerInventory, j + i * 9 + 9, x + j * 18, y + i * 18));
+        }
+    }
+
+    public static void addPlayerHotbar(ScreenHandler self, PlayerInventory playerInventory, int x, int y) {
+        for (int i = 0; i < 9; i++)
+            ((ScreenHandlerInvoker)self).invokeAddSlot(new Slot(playerInventory, i, x + i * 18, y));
+    }
+
 }

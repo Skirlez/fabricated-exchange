@@ -6,6 +6,7 @@
 		"LegacySmithingRecipeAccessor",
 		"ItemAccessor",
 		"HandledScreenAccessor",
+		"ScreenHandlerInvoker",
 		"ModFurnaceFuels"
 	],
 	"injectors": {

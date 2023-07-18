@@ -25,7 +25,6 @@ public class ServerState extends PersistentState {
             NbtCompound playerStateNbt = new NbtCompound();
  
             playerStateNbt.putString("emc", playerState.emc.divisionString());
-
             NbtList knowledgeList = new NbtList();
             for (int i = 0; i < playerState.knowledge.size(); i++) {
                 knowledgeList.add(NbtString.of(playerState.knowledge.get(i)));
