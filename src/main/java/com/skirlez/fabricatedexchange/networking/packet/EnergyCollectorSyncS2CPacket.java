@@ -17,7 +17,6 @@ public class EnergyCollectorSyncS2CPacket {
         if(client.world.getBlockEntity(pos) instanceof EnergyCollectorBlockEntity blockEntity) {
             blockEntity.update(emc);
         }
-        
 
     }
 }

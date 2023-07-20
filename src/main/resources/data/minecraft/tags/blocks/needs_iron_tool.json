@@ -1,0 +1,11 @@
+{
+    "replace": "false",
+    "values": [
+        "fabricated-exchange:energy_collector_mk1",
+        "fabricated-exchange:energy_collector_mk2",
+        "fabricated-exchange:energy_collector_mk3",
+        "fabricated-exchange:antimatter_relay_mk1",
+        "fabricated-exchange:antimatter_relay_mk2",
+        "fabricated-exchange:antimatter_relay_mk3"
+    ]
+}

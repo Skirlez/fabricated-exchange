@@ -4,6 +4,7 @@ import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
@@ -12,7 +13,7 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.Direction;
 
 public abstract class BlockWithEntityAndRotation extends BlockWithEntity {
-    public static final DirectionProperty FACING = DirectionProperty.of("facing");
+    public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
 
     protected BlockWithEntityAndRotation(AbstractBlock.Settings settings) {
         super(settings);

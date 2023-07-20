@@ -2,7 +2,7 @@ package com.skirlez.fabricatedexchange.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
-import com.skirlez.fabricatedexchange.mixin.HandledScreenAccessor;
+import com.skirlez.fabricatedexchange.mixin.client.HandledScreenAccessor;
 import com.skirlez.fabricatedexchange.screen.slot.FuelSlot;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
@@ -25,16 +25,21 @@ public class AntiMatterRelayScreen extends HandledScreen<AntiMatterRelayScreenHa
     private final AntiMatterRelayScreenHandler handler;
     public AntiMatterRelayScreen(AntiMatterRelayScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
-
+        this.handler = handler;
+        this.level = handler.getLevel();
         PacketByteBuf buf = handler.getAndConsumeCreationBuffer();
         if (buf == null) 
             this.emc = SuperNumber.Zero();
         else
             this.emc = new SuperNumber(buf.readString());
-        this.handler = handler;
-        this.level = handler.getLevel();
+
+        if (level == 0) 
+            maximumEmc = new SuperNumber(100000);
+        else if (level == 1) 
+            maximumEmc = new SuperNumber(1000000);
+        else 
+            maximumEmc = new SuperNumber(10000000);
         
-        maximumEmc = new SuperNumber(100000);
         texture = new Identifier(FabricatedExchange.MOD_ID, 
             "textures/gui/antimatter_relay" + String.valueOf(level + 1) + ".png");
 
@@ -43,11 +48,25 @@ public class AntiMatterRelayScreen extends HandledScreen<AntiMatterRelayScreenHa
 
     @Override
     protected void init() {
-        this.backgroundWidth = 176;
-        this.backgroundHeight = 177;
+        int xOffset, yOffset;
+        if (level == 0) {
+            xOffset = 0;
+            yOffset = 0;
+        }
+        else if (level == 1) {
+            xOffset = 18;
+            yOffset = 6;
+        }
+        else {
+            xOffset = 37;
+            yOffset = 18;
+        }
+        this.backgroundWidth = 176 + xOffset;
+        this.backgroundHeight = 177 + yOffset;
         super.init();
         titleX = 0; 
         titleY = 0; 
+        
     }
 
     @Override
@@ -59,12 +78,30 @@ public class AntiMatterRelayScreen extends HandledScreen<AntiMatterRelayScreenHa
         int y = (height - backgroundHeight) / 2 - 5;
         drawTexture(matrices, x, y, 0, 0, backgroundWidth, backgroundHeight);
 
-        double percent;
+        
 
+        int xFuel, yFuel, xBar;
+        if (level == 0) {
+            xBar = 0;
+            xFuel = 0;
+            yFuel = 0;
+        }
+        else if (level == 1) {
+            xBar = 22;
+            xFuel = 17;
+            yFuel = 1;
+        }
+        else {
+            xBar = 41;
+            xFuel = 37;
+            yFuel = 15;
+        }
+
+        double percent;
         // draw fuel energy bar 
         ItemStack fuelStack = handler.getFuelSlot().getStack();
         percent = (double)fuelStack.getCount() / fuelStack.getMaxCount();
-        drawTexture(matrices, x + 64, y + 67, 0, 177, (int)(30 * percent), 10); 
+        drawTexture(matrices, x + 64 + xFuel, y + 67 + yFuel, 0, backgroundHeight, (int)(30 * percent), 10); 
 
         // draw emc bar
         SuperNumber emcCopy = new SuperNumber(emc);
@@ -72,7 +109,7 @@ public class AntiMatterRelayScreen extends HandledScreen<AntiMatterRelayScreenHa
         percent = emcCopy.toDouble();
         if (percent > 1)
             percent = 1;
-        drawTexture(matrices, x + 64, y + 6, 30, 177, (int)(102 * percent), 10); 
+        drawTexture(matrices, x + 64 + xBar, y + 6, 30, backgroundHeight, (int)(102 * percent), 10); 
 
     }
     
@@ -94,7 +131,16 @@ public class AntiMatterRelayScreen extends HandledScreen<AntiMatterRelayScreenHa
     protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
         SuperNumber emcCopy = new SuperNumber(emc);
         emcCopy.floor();
-        textRenderer.draw(matrices, emcCopy.toString(), 88, 16, 0x404040);
+        int xOffset;
+        if (level == 0) 
+            xOffset = 0;
+        else if (level == 1) 
+            xOffset = 17;
+        else 
+            xOffset = 37;
+        
+
+        textRenderer.draw(matrices, emcCopy.toString(), 88 + xOffset, 16, 0x404040);
     }
 
     public void update(SuperNumber emc) {

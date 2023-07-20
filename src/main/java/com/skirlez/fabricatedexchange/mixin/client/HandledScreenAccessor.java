@@ -1,4 +1,4 @@
-package com.skirlez.fabricatedexchange.mixin;
+package com.skirlez.fabricatedexchange.mixin.client;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;

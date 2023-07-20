@@ -7,6 +7,7 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -17,7 +18,6 @@ import net.minecraft.world.World;
 
 public class EnergyCollector extends BlockWithEntityAndRotation {
     private final int level;
-    private EnergyCollectorBlockEntity entity;
     public EnergyCollector(Settings settings, int level) {
         super(settings);
         this.level = level;
@@ -27,7 +27,6 @@ public class EnergyCollector extends BlockWithEntityAndRotation {
         return BlockRenderType.MODEL;
     }
     
-
     @Override
     public ActionResult onUse(BlockState state, World world, 
         BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
@@ -36,7 +35,6 @@ public class EnergyCollector extends BlockWithEntityAndRotation {
             if (screenHandlerFactory != null) 
                 player.openHandledScreen(screenHandlerFactory);
         }
-
         return ActionResult.SUCCESS;
     }
 
@@ -45,9 +43,9 @@ public class EnergyCollector extends BlockWithEntityAndRotation {
         if (state.getBlock() != newState.getBlock()) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity instanceof EnergyCollectorBlockEntity) {
-                Inventory inv = (Inventory)blockEntity;
-                inv.removeStack(10 + level * 4); // remove the target item slot
-                ItemScatterer.spawn(world, pos, inv);
+                // clear the target slot, as the item in it isn't real
+                ((EnergyCollectorBlockEntity)blockEntity).getTargetSlot().setStack(ItemStack.EMPTY);
+                ItemScatterer.spawn(world, pos, (Inventory)blockEntity);
                 world.updateComparators(pos, this);
             }
         }
@@ -56,8 +54,7 @@ public class EnergyCollector extends BlockWithEntityAndRotation {
 
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        entity = new EnergyCollectorBlockEntity(pos, state);
-        return entity;
+        return new EnergyCollectorBlockEntity(pos, state);
     }
 
     @Override

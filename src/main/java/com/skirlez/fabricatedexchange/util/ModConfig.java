@@ -19,6 +19,7 @@ import net.fabricmc.loader.api.FabricLoader;
 public class ModConfig {
 
     private ModConfig() {
+    
     }
 
     public static final Gson GSON = new GsonBuilder()

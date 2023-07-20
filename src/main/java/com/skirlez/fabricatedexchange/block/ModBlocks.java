@@ -23,22 +23,22 @@ public class ModBlocks {
     public static final Block AETERNALIS_FUEL_BLOCK = registerBlock("aeternalis_fuel_block", 
         new Block(FabricBlockSettings.of(Material.STONE, MapColor.WHITE).requiresTool().strength(5.0f, 6.0f)));
 
-    
-
     public static final Block TRANSMUTATION_TABLE = registerBlock("transmutation_table", 
         new TransmutationTable(FabricBlockSettings.of(Material.STONE, MapColor.WHITE)));
 
     public static final Block ENERGY_COLLECTOR_MK1 = registerBlock("energy_collector_mk1", 
-        new EnergyCollector(FabricBlockSettings.of(Material.GLASS, MapColor.PALE_YELLOW).requiresTool().strength(3.5f), 0));
-
+        new EnergyCollector(FabricBlockSettings.of(Material.GLASS, MapColor.PALE_YELLOW).requiresTool().strength(5.0f, 6.0f).luminance(state -> 5), 0));
     public static final Block ENERGY_COLLECTOR_MK2 = registerBlock("energy_collector_mk2", 
-        new EnergyCollector(FabricBlockSettings.of(Material.GLASS, MapColor.PALE_YELLOW).requiresTool().strength(3.5f), 1));
-
+        new EnergyCollector(FabricBlockSettings.of(Material.GLASS, MapColor.PALE_YELLOW).requiresTool().strength(5.0f, 6.0f).luminance(state -> 10), 1));
     public static final Block ENERGY_COLLECTOR_MK3 = registerBlock("energy_collector_mk3", 
-        new EnergyCollector(FabricBlockSettings.of(Material.GLASS, MapColor.PALE_YELLOW).requiresTool().strength(3.5f), 2));
+        new EnergyCollector(FabricBlockSettings.of(Material.GLASS, MapColor.PALE_YELLOW).requiresTool().strength(5.0f, 6.0f).luminance(state -> 15), 2));
 
     public static final Block ANTIMATTER_RELAY_MK1 = registerBlock("antimatter_relay_mk1", 
         new AntiMatterRelay(FabricBlockSettings.of(Material.GLASS, MapColor.BLACK).requiresTool().strength(3.5f), 0));
+    public static final Block ANTIMATTER_RELAY_MK2 = registerBlock("antimatter_relay_mk2", 
+        new AntiMatterRelay(FabricBlockSettings.of(Material.GLASS, MapColor.BLACK).requiresTool().strength(3.5f), 1));
+    public static final Block ANTIMATTER_RELAY_MK3 = registerBlock("antimatter_relay_mk3", 
+        new AntiMatterRelay(FabricBlockSettings.of(Material.GLASS, MapColor.BLACK).requiresTool().strength(3.5f), 2));
 
     private static Block registerBlock(String name, Block block) {
         registerBlockItem(name, block);

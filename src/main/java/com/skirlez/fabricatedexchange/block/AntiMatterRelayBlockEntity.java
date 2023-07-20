@@ -55,31 +55,57 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 
     public AntiMatterRelayBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.ANTIMATTER_RELAY, pos, state);
-        inventory = DefaultedList.ofSize(11, ItemStack.EMPTY);
+        
 
         Block block = state.getBlock();
         if (block instanceof AntiMatterRelay)
             this.level = ((AntiMatterRelay)block).getLevel();
         else
             this.level = 0;
+        
+        int addition = (level == 0) ? 0 : (level == 1) ? 6 : 14;
+        inventory = DefaultedList.ofSize(11 + addition, ItemStack.EMPTY);
 
-        Inventory inv = (Inventory)this;
-        fuelSlot = new FuelSlot(inv, 0, 67, 38, inputSlots, SlotCondition.alwaysTrue);
-        chargeSlot = new Slot(inv, 1, 127, 38);
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 2; j++)
-                inputSlots.add(new InputSlot(inv, i * 2 + j + 2, 27 + j * 18, 12 + i * 18, fuelSlot, SlotCondition.alwaysTrue));
+        int xInput, yInput, xFuel, yFuel;
+        if (level == 0) {
+            outputRate = new SuperNumber(64);
+            maximumEmc = new SuperNumber(100000);
+            xInput = 0; yInput = 0; xFuel = 0; yFuel = 0;
+        }
+        else if (level == 1) {
+            outputRate = new SuperNumber(192);
+            maximumEmc = new SuperNumber(1000000);
+            xInput = -1; yInput = 1; xFuel = 17; yFuel = 1;
+        }
+        else {
+            outputRate = new SuperNumber(640);
+            maximumEmc = new SuperNumber(10000000);
+            xInput = 1; yInput = 1; xFuel = 37; yFuel = 15;
         }
 
-        outputRate = new SuperNumber(64);
-        maximumEmc = new SuperNumber(100000);
+        Inventory inv = (Inventory)this;
+        fuelSlot = new FuelSlot(inv, 0, 67 + xFuel, 38 + yFuel, inputSlots, SlotCondition.alwaysTrue);
+        chargeSlot = new Slot(inv, 1, 127 + xFuel, 38 + yFuel);
+        for (int i = 0; i < 3 + level; i++) {
+            for (int j = 0; j < 2 + level; j++)
+                inputSlots.add(new InputSlot(inv, i * (2 + level) + j + 2, xInput + 27 + j * 18, yInput + 12 + i * 18, fuelSlot, SlotCondition.alwaysTrue));
+        }
+
+
         emc = SuperNumber.Zero();
         tick = 0;
     }
 
     public static void tick(World world, BlockPos blockPos, BlockState blockState, AntiMatterRelayBlockEntity entity) {
+        if (world.isClient()) {
+            MinecraftClient client = MinecraftClient.getInstance();
+            if (client.player.currentScreenHandler instanceof AntiMatterRelayScreenHandler screenHandler 
+                    && screenHandler.getBlockEntity().getPos().equals(entity.pos))
+                ((AntiMatterRelayScreen)client.currentScreen).update(entity.emc);
+            return;
+        }
+        
         if (entity.fuelSlot.hasStack()) {
-
             SuperNumber value = EmcData.getItemEmc(entity.fuelSlot.getStack().getItem());                
             SuperNumber emcCopy = new SuperNumber(entity.emc);
             emcCopy.add(value);
@@ -105,21 +131,10 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
             entity.distributeEmc(neighbors);
         }
 
-        if (world.isClient()) {
-            MinecraftClient client = MinecraftClient.getInstance();
-            if (client.player.currentScreenHandler instanceof AntiMatterRelayScreenHandler screenHandler
-                    && screenHandler.getBlockEntity().getPos().equals(entity.pos)) {
-                ((AntiMatterRelayScreen)client.currentScreen).update(entity.emc);
-            }
-        }
-        else { 
-            if (entity.tick % 60 == 0) {
-                entity.serverSync();
-                entity.markDirty();
-            }
-            entity.tick++;
-        }
-
+        entity.serverSync();
+        if (entity.tick % 120 == 0) 
+            entity.markDirty();
+        entity.tick++;
     }
 
 
@@ -187,20 +202,21 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
         data.writeBlockPos(getPos());
         
         for(ServerPlayerEntity player : PlayerLookup.tracking((ServerWorld) world, getPos())) {
-            ServerPlayNetworking.send(player, ModMessages.ANTIMATTER_RELAY_SYNC, data);
+            if (player.currentScreenHandler instanceof AntiMatterRelayScreenHandler screenHandler && screenHandler.getBlockEntity().getPos().equals(pos)) 
+                ServerPlayNetworking.send(player, ModMessages.ANTIMATTER_RELAY_SYNC, data);
         }
     }
     private void serverSyncPlayer(ServerPlayerEntity player) {
         PacketByteBuf data = PacketByteBufs.create();
-        data.writeBlockPos(getPos());
         data.writeString(emc.divisionString());
-        ServerPlayNetworking.send(player, ModMessages.ENERGY_COLLECTOR_SYNC, data);
+        data.writeBlockPos(getPos());
+        
+        ServerPlayNetworking.send(player, ModMessages.ANTIMATTER_RELAY_SYNC, data);
     }
 
     public void update(SuperNumber emc) {
         this.emc = emc;
     }
-
 
 
     public DefaultedList<InputSlot> getInputSlots() {

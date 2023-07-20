@@ -4,7 +4,7 @@ package com.skirlez.fabricatedexchange.screen;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
-import com.skirlez.fabricatedexchange.mixin.HandledScreenAccessor;
+import com.skirlez.fabricatedexchange.mixin.client.HandledScreenAccessor;
 import com.skirlez.fabricatedexchange.screen.slot.FakeSlot;
 import com.skirlez.fabricatedexchange.screen.slot.FuelSlot;
 import com.skirlez.fabricatedexchange.screen.slot.collection.OutputSlot;
@@ -63,10 +63,12 @@ public class EnergyCollectorScreen extends HandledScreen<FuelScreenHandler> {
 
     @Override
     protected void init() {
-        int xOffset = 0;
-        if (level == 1)
+        int xOffset;
+        if (level == 0)
+            xOffset = 0;
+        else if (level == 1)
             xOffset = 25;
-        else if (level == 2)
+        else
             xOffset = 43;
         this.backgroundWidth = 176 + xOffset;
         this.backgroundHeight = 166;

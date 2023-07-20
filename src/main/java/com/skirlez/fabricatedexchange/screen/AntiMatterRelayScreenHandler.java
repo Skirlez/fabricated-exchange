@@ -25,9 +25,21 @@ public class AntiMatterRelayScreenHandler extends FuelScreenHandler {
         for (int i = 0; i < inputSlots.size(); i++) {
             addSlot(inputSlots.get(i));
         }
-
-        GeneralUtil.addPlayerInventory(this, playerInventory, 8, 90);
-        GeneralUtil.addPlayerHotbar(this, playerInventory, 8, 148);
+        int xInv, yInv;
+        if (level == 0) {
+            xInv = 0; 
+            yInv = 0;
+        }
+        else if (level == 1) {
+            xInv = 8; 
+            yInv = 6;
+        }
+        else {
+            xInv = 18; 
+            yInv = 18;
+        }
+        GeneralUtil.addPlayerInventory(this, playerInventory, 8 + xInv, 90 + yInv);
+        GeneralUtil.addPlayerHotbar(this, playerInventory, 8 + xInv, 148 + yInv);
     }
 
 

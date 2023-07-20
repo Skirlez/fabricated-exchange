@@ -17,7 +17,5 @@ public class AntiMatterRelaySyncS2CPacket {
         if (client.world.getBlockEntity(pos) instanceof AntiMatterRelayBlockEntity blockEntity) {
             blockEntity.update(emc);
         }
-        
-
     }
 }

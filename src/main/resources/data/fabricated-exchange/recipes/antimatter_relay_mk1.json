@@ -1,0 +1,23 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"OGO",
+		"ODO",
+		"OOO"
+	],
+	"key": {
+		"G": {
+			"item": "minecraft:glass"
+		},
+		"D": {
+			"item": "minecraft:diamond_block"
+		},
+		"O": {
+			"item": "minecraft:obsidian"
+		}
+	},
+	"result": {
+		"item": "fabricated-exchange:antimatter_relay_mk1"
+	}
+}
+

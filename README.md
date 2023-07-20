@@ -37,11 +37,11 @@ new features, or old features from previous equivalence mods.
 - Support Quilt (Even over Fabric, if it ever comes to that choice)
 - Don't use any external libraries other than the Fabric API
 
-
 # Implemented Features
 - Philosopher's Stone
 - Transmutation Table
 - Energy Collectors Mk1-Mk3
+- Antimatter Relays Mk1-Mk3
 - EMC Mapper
 
 # NEW Features

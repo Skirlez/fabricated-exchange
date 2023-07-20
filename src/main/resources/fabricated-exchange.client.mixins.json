@@ -5,6 +5,7 @@
 	"client": [
 		"ModWorldRendererOutline",
 		"ModItemStackTooltip",
+		"HandledScreenAccessor",
 		"ClientWorldAmbientDarkness"
 	],
 	"injectors": {
