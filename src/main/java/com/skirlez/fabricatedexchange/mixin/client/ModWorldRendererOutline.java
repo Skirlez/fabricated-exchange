@@ -41,7 +41,7 @@ public abstract class ModWorldRendererOutline {
     }
 
     @Inject(method = "drawBlockOutline", at = @At("HEAD"), cancellable = true)
-    private void injectDrawBlockOutline(MatrixStack matrices, VertexConsumer vertexConsumer, Entity entity, double cameraX, double cameraY, double cameraZ, BlockPos pos, BlockState state, CallbackInfo cir) {
+    private void drawEvenMoreDrawBlockOutlines(MatrixStack matrices, VertexConsumer vertexConsumer, Entity entity, double cameraX, double cameraY, double cameraZ, BlockPos pos, BlockState state, CallbackInfo cir) {
         ClientPlayerEntity p = client.player;
         ItemStack stack = p.getStackInHand(Hand.MAIN_HAND);
         if (!stack.getItem().equals(ModItems.PHILOSOPHERS_STONE)) {

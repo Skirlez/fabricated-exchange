@@ -8,6 +8,7 @@ import java.nio.file.Path;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 
+// This class represents a JSON file.
 public class DataFile<T> {
     private final Type type;
     private final Path path;
@@ -19,6 +20,7 @@ public class DataFile<T> {
         this.path = ModConfig.CONFIG_DIR.resolve(name);
     }
 
+    // Read the file from disk to update the instance
     public void fetch() {
         if (Files.exists(path)) {
             try (BufferedReader reader = Files.newBufferedReader(path)) {
@@ -38,8 +40,8 @@ public class DataFile<T> {
         fetch();
         return value;
     }
-
-
+    
+    // Write the instance's current data to disk
     public void save() {
         if (!Files.exists(ModConfig.CONFIG_DIR)) {
             try {

@@ -2,6 +2,8 @@ package com.skirlez.fabricatedexchange.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
+import com.skirlez.fabricatedexchange.mixin.HandledScreenAccessor;
+import com.skirlez.fabricatedexchange.screen.slot.FuelSlot;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -10,6 +12,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -71,6 +75,13 @@ public class AntiMatterRelayScreen extends HandledScreen<AntiMatterRelayScreenHa
         drawTexture(matrices, x + 64, y + 6, 30, 177, (int)(102 * percent), 10); 
 
     }
+    
+    @Override
+    protected void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType) {
+        if (actionType == SlotActionType.QUICK_MOVE && slot instanceof FuelSlot)
+            ((HandledScreenAccessor)this).setDoubleClicking(false);
+        super.onMouseClick(slot, slotId, button, actionType);
+    }
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
@@ -81,7 +92,9 @@ public class AntiMatterRelayScreen extends HandledScreen<AntiMatterRelayScreenHa
 
     @Override
     protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
-        
+        SuperNumber emcCopy = new SuperNumber(emc);
+        emcCopy.floor();
+        textRenderer.draw(matrices, emcCopy.toString(), 88, 16, 0x404040);
     }
 
     public void update(SuperNumber emc) {

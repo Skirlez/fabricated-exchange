@@ -9,9 +9,9 @@ import com.skirlez.fabricatedexchange.interfaces.ImplementedInventory;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.AntiMatterRelayScreen;
 import com.skirlez.fabricatedexchange.screen.AntiMatterRelayScreenHandler;
-import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreen;
-import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreenHandler;
 import com.skirlez.fabricatedexchange.screen.slot.FuelSlot;
+import com.skirlez.fabricatedexchange.screen.slot.InputSlot;
+import com.skirlez.fabricatedexchange.screen.slot.SlotCondition;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
@@ -26,10 +26,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
@@ -43,10 +45,14 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
     private SuperNumber emc;
     private final SuperNumber outputRate;
     private final SuperNumber maximumEmc;
-    private AntiMatterRelayScreenHandler handler;
     private final int level;
     private final DefaultedList<ItemStack> inventory;
     private int tick;
+
+    private final DefaultedList<InputSlot> inputSlots = DefaultedList.of();
+    private final FuelSlot fuelSlot;
+    private final Slot chargeSlot;
+
     public AntiMatterRelayBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.ANTIMATTER_RELAY, pos, state);
         inventory = DefaultedList.ofSize(11, ItemStack.EMPTY);
@@ -57,6 +63,14 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
         else
             this.level = 0;
 
+        Inventory inv = (Inventory)this;
+        fuelSlot = new FuelSlot(inv, 0, 67, 38, inputSlots, SlotCondition.alwaysTrue);
+        chargeSlot = new Slot(inv, 1, 127, 38);
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 2; j++)
+                inputSlots.add(new InputSlot(inv, i * 2 + j + 2, 27 + j * 18, 12 + i * 18, fuelSlot, SlotCondition.alwaysTrue));
+        }
+
         outputRate = new SuperNumber(64);
         maximumEmc = new SuperNumber(100000);
         emc = SuperNumber.Zero();
@@ -64,11 +78,19 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
     }
 
     public static void tick(World world, BlockPos blockPos, BlockState blockState, AntiMatterRelayBlockEntity entity) {
-        boolean isClient = world.isClient();
+        if (entity.fuelSlot.hasStack()) {
+
+            SuperNumber value = EmcData.getItemEmc(entity.fuelSlot.getStack().getItem());                
+            SuperNumber emcCopy = new SuperNumber(entity.emc);
+            emcCopy.add(value);
+            if (emcCopy.compareTo(entity.maximumEmc) != 1) {
+                entity.emc.add(value);
+                entity.fuelSlot.takeStack(1);
+            }
+        }   
+    
 
         List<BlockEntity> neighbors = GeneralUtil.getNeighboringBlockEntities(world, blockPos);
-
-        // the antimatter relay will only be consuming if no other surrounding blockentity is
         boolean hasConsumingNeighbors = false;
         for (BlockEntity blockEntity : neighbors) {
             if (!(blockEntity instanceof ConsumerBlockEntity))
@@ -78,60 +100,28 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
                 break;
             }
         }
-
-        if (hasConsumingNeighbors)
-            entity.distributeEmc(neighbors);
         
-        if (isClient) {
-            boolean success = entity.clientSync();
-            if (!success)
-                return;
+        if (hasConsumingNeighbors) {
+            entity.distributeEmc(neighbors);
+        }
+
+        if (world.isClient()) {
             MinecraftClient client = MinecraftClient.getInstance();
-            entity.handler = 
-                (AntiMatterRelayScreenHandler)client.player.currentScreenHandler;
+            if (client.player.currentScreenHandler instanceof AntiMatterRelayScreenHandler screenHandler
+                    && screenHandler.getBlockEntity().getPos().equals(entity.pos)) {
+                ((AntiMatterRelayScreen)client.currentScreen).update(entity.emc);
+            }
         }
         else { 
-            if (entity.tick % 60 == 0)
+            if (entity.tick % 60 == 0) {
                 entity.serverSync();
+                entity.markDirty();
+            }
             entity.tick++;
         }
 
-        if (entity.handler == null)
-            return;
-
-        FuelSlot fuelSlot = entity.handler.getFuelSlot();
-        if (!fuelSlot.hasStack())
-            return;
-        SuperNumber value = EmcData.getItemEmc(fuelSlot.getStack().getItem());
-        if (!isClient)
-            fuelSlot.takeStack(1);
-        entity.emc.add(value);
     }
 
-
-    private void serverSync() {
-        PacketByteBuf data = PacketByteBufs.create();
-        data.writeString(emc.divisionString());
-        data.writeBlockPos(getPos());
-        
-        for(ServerPlayerEntity player : PlayerLookup.tracking((ServerWorld) world, getPos())) {
-            ServerPlayNetworking.send(player, ModMessages.ANTIMATTER_RELAY_SYNC, data);
-        }
-    }
-    private boolean clientSync() {
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player.currentScreenHandler instanceof AntiMatterRelayScreenHandler screenHandler
-                && screenHandler.getBlockEntity().getPos().equals(pos)) {
-            ((AntiMatterRelayScreen)client.currentScreen).update(emc);
-            return true;
-        }
-        return false;
-        
-    }
-
-    public void update(SuperNumber emc) {
-        this.emc = emc;
-    }
 
     @Override
     public Text getDisplayName() {
@@ -141,8 +131,8 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-        handler = new AntiMatterRelayScreenHandler(syncId, inv, this, level);
-        return handler;
+        serverSyncPlayer((ServerPlayerEntity)player);
+        return new AntiMatterRelayScreenHandler(syncId, inv, this, level, null);
     }
 
     @Override
@@ -173,7 +163,6 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
         emc = new SuperNumber(nbt.getString("antimatter_relay.emc"));
     }
 
-
     @Override
     public SuperNumber getEmc() {
         return emc;
@@ -192,4 +181,35 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
     }
 
 
+    private void serverSync() {
+        PacketByteBuf data = PacketByteBufs.create();
+        data.writeString(emc.divisionString());
+        data.writeBlockPos(getPos());
+        
+        for(ServerPlayerEntity player : PlayerLookup.tracking((ServerWorld) world, getPos())) {
+            ServerPlayNetworking.send(player, ModMessages.ANTIMATTER_RELAY_SYNC, data);
+        }
+    }
+    private void serverSyncPlayer(ServerPlayerEntity player) {
+        PacketByteBuf data = PacketByteBufs.create();
+        data.writeBlockPos(getPos());
+        data.writeString(emc.divisionString());
+        ServerPlayNetworking.send(player, ModMessages.ENERGY_COLLECTOR_SYNC, data);
+    }
+
+    public void update(SuperNumber emc) {
+        this.emc = emc;
+    }
+
+
+
+    public DefaultedList<InputSlot> getInputSlots() {
+        return this.inputSlots;
+    }
+    public FuelSlot getFuelSlot() {
+        return this.fuelSlot;
+    }
+    public Slot getChargeSlot() {
+        return this.chargeSlot;
+    }
 }

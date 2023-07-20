@@ -26,7 +26,7 @@ public class ModConfig {
         -> new JsonPrimitive(superNumber.divisionString()))
         .registerTypeAdapter(SuperNumber.class, (JsonDeserializer<SuperNumber>) (jsonElement, type, jsonDeserializationContext) 
         -> new SuperNumber(jsonElement.getAsString()))
-        .setPrettyPrinting()
+        .setPrettyPrinting() // we do want these to be editable by users
         .create();
 
     public static final Path CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve(FabricatedExchange.MOD_ID);

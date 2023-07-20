@@ -24,15 +24,23 @@ public interface ConsumerBlockEntity {
         for (int i = 0; i < neighbors.size(); i++) {
             BlockEntity neighbor = neighbors.get(i);
             if (neighbor instanceof ConsumerBlockEntity
-                    && ((ConsumerBlockEntity)neighbor).isConsuming())
-                goodNeighbors.add((ConsumerBlockEntity)neighbor);
+                    && ((ConsumerBlockEntity)neighbor).isConsuming()) {
+
+                ConsumerBlockEntity consumerNeighbor = (ConsumerBlockEntity)neighbor;
+                if (consumerNeighbor.getEmc().compareTo(consumerNeighbor.getMaximumEmc()) == -1)
+                    goodNeighbors.add(consumerNeighbor);
+            }
         }
         if (goodNeighbors.size() > 0) {
             SuperNumber emc = getEmc();
             SuperNumber output = new SuperNumber(SuperNumber.min(getOutputRate(), emc));
             output.divide(goodNeighbors.size());
             for (ConsumerBlockEntity neighbor : goodNeighbors) {
-                neighbor.getEmc().stealFrom(emc, output);
+                SuperNumber neighborEmc = neighbor.getEmc();
+                SuperNumber neighborMaximumEmc = neighbor.getMaximumEmc();
+                neighborEmc.stealFrom(emc, output);
+                if (neighborEmc.compareTo(neighborMaximumEmc) == 1)
+                    neighborEmc.copyValueOf(neighborMaximumEmc);
             }
         }
     }

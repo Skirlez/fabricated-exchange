@@ -1,6 +1,6 @@
 package com.skirlez.fabricatedexchange.screen.slot;
 
-import com.skirlez.fabricatedexchange.screen.FuelScreenHandler;
+import java.util.List;
 
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -9,12 +9,12 @@ import net.minecraft.screen.slot.Slot;
 
 public class FuelSlot extends Slot {
     private boolean quickMoved;
-    private final FuelScreenHandler screenHandler;
     private final SlotCondition slotCondition;
-    public FuelSlot(Inventory inventory, int index, int x, int y, FuelScreenHandler screenHandler, SlotCondition slotCondition) {
+    private final List<InputSlot> inputSlots;
+    public FuelSlot(Inventory inventory, int index, int x, int y, List<InputSlot> inputSlots, SlotCondition slotCondition) {
         super(inventory, index, x, y);
-        this.screenHandler = screenHandler;
         this.slotCondition = slotCondition;
+        this.inputSlots = inputSlots;
     }
 
     @Override
@@ -25,13 +25,19 @@ public class FuelSlot extends Slot {
     @Override
     public void setStack(ItemStack stack) {
         super.setStack(stack);
-        screenHandler.moveAllInputsToFuel();
+        moveAllInputsToFuel();
+        
+    }
+
+    private void moveAllInputsToFuel() {
+        for (int i = inputSlots.size() - 1; i >= 0; i--)
+            inputSlots.get(i).moveToFuelSlot();
     }
 
     @Override
     public ItemStack takeStack(int amount) {
         ItemStack result = super.takeStack(amount);
-        screenHandler.moveAllInputsToFuel();
+        moveAllInputsToFuel();
         return result;
     }
 

@@ -1,117 +1,51 @@
 package com.skirlez.fabricatedexchange.screen;
 
-import org.jetbrains.annotations.Nullable;
-
 import com.skirlez.fabricatedexchange.block.EnergyCollectorBlockEntity;
 import com.skirlez.fabricatedexchange.screen.slot.FakeSlot;
-import com.skirlez.fabricatedexchange.screen.slot.FuelSlot;
-import com.skirlez.fabricatedexchange.screen.slot.InputSlot;
-import com.skirlez.fabricatedexchange.screen.slot.SlotCondition;
-import com.skirlez.fabricatedexchange.screen.slot.collection.OutputSlot;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.ModTags;
 
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.util.collection.DefaultedList;
 
-public class EnergyCollectorScreenHandler extends ScreenHandler implements FuelScreenHandler {
-    private final Inventory inventory;
-    private final EnergyCollectorBlockEntity blockEntity;
-    private final DefaultedList<InputSlot> inputSlots = DefaultedList.of();
-    private final int outputIndex;
-    private final int level;
-    private PacketByteBuf buf;
+public class EnergyCollectorScreenHandler extends FuelScreenHandler {
     public EnergyCollectorScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
-        this(syncId, inventory, inventory.player.getWorld().getBlockEntity(buf.readBlockPos()), buf.readInt());
-        this.buf = buf;
+        this(syncId, inventory, (EnergyCollectorBlockEntity)inventory.player.getWorld().getBlockEntity(buf.readBlockPos()), buf.readInt(), buf);
     }
-    public EnergyCollectorScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity, int level) {
-        super(ModScreenHandlers.ENERGY_COLLECTOR_SCREEN_HANDLER, syncId);
-        this.buf = null;
-        
-        this.inventory = (Inventory)blockEntity;
-        this.level = level;
-
-
-        int inputOffset;
-        int otherOffset;
-        int invOffset;
-        if (this.level == 0) {
-            inputOffset = 0;
-            otherOffset = 0;
-            invOffset = 8;
-        }
-        else if (this.level == 1) {
-            inputOffset = -2;
-            otherOffset = 16;
-            invOffset = 20;
-        }
-        else {
-            inputOffset = -2;
-            otherOffset = 34;
-            invOffset = 30;
-        }
-
-        this.blockEntity = (EnergyCollectorBlockEntity)blockEntity;
+    public EnergyCollectorScreenHandler(int syncId, PlayerInventory playerInventory, EnergyCollectorBlockEntity blockEntity, int level, PacketByteBuf buf) {
+        super(ModScreenHandlers.ENERGY_COLLECTOR_SCREEN_HANDLER, syncId, blockEntity, level, buf);
         inventory.onOpen(playerInventory.player);
-        FuelSlot fuelSlot = new FuelSlot(inventory, 0, otherOffset + 124, 58, (FuelScreenHandler)this, SlotCondition.isFuel);
 
-        addSlot(fuelSlot);
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 2 + level; j++)
-                addInputSlot(new InputSlot(inventory, i * (2 + level) + j + 1, inputOffset + 20 + j * 18, 8 + i * 18, fuelSlot, SlotCondition.isFuel));
+        addSlot(blockEntity.getFuelSlot());
+        addSlot(blockEntity.getOutputSlot());
+        addSlot(blockEntity.getTargetSlot());
+
+        inputSlots = blockEntity.getInputSlots();
+        for (int i = 0; i < inputSlots.size(); i++) {
+            addSlot(inputSlots.get(i));
         }
+        int invOffset;
+        if (this.level == 0) 
+            invOffset = 8;
+        else if (this.level == 1) 
+            invOffset = 20;
+        else 
+            invOffset = 30;
         
-        outputIndex = slots.size();
-
-        addSlot(new OutputSlot(inventory, outputIndex, otherOffset + 124, 13, inputSlots));
-        addSlot(new FakeSlot(inventory, outputIndex + 1, otherOffset + 153, 36));
 
         GeneralUtil.addPlayerInventory(this, playerInventory, invOffset, 84);
         GeneralUtil.addPlayerHotbar(this, playerInventory, invOffset, 142);
     }
 
     @Override
-    public ItemStack quickMove(PlayerEntity player, int invSlot) {
-        // if we don't do this, shift-clicking the fuel slot will not only transfer anything in it
-        // to the player inventory, but also any item of the same type in all of the input slots
-        // this is because the act of moving it to the inventory immediately updates the input slots which
-        // causes them to move to the fuel slot, and the code responsible for shift-clicking runs in a while loop until
-        // the slot is empty. so we try to check for this case and forcefully return empty to get out of the while loop
-        Slot slot = this.slots.get(invSlot);
-        ItemStack startStack = slot.getStack().copy();
-        if (slot instanceof FuelSlot) {
-            FuelSlot fuelSlot = (FuelSlot)slot;
-            if (fuelSlot.hasQuickMoved()) { // The Case has been detected, return empty
-                fuelSlot.setQuickMoved(false);
-                return ItemStack.EMPTY;
-            }
-        }
-        ItemStack result = quickMoveInternal(player, invSlot);
-        if (slot instanceof FuelSlot) {
-            FuelSlot fuelSlot = (FuelSlot)slot;
-            if (result.isEmpty())
-                return ItemStack.EMPTY;
-            if (fuelSlot.hasStack() && ItemStack.areItemsEqual(startStack, fuelSlot.getStack()))
-                fuelSlot.setQuickMoved(true);
-        }
-        return result;
-    }
-
-    @Override
     public void onSlotClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player) {
         super.onSlotClick(slotIndex, button, actionType, player);
-        if (slotIndex == outputIndex + 1) {
-            FakeSlot slot = (FakeSlot)slots.get(outputIndex + 1);
+        if (slotIndex == 2) {
+            FakeSlot slot = (FakeSlot)slots.get(2);
             ItemStack cursorStack = getCursorStack();
             if (slot.hasStack() && !cursorStack.isEmpty()
                     && ItemStack.areItemsEqual(slot.getStack(), cursorStack)) {
@@ -125,71 +59,4 @@ public class EnergyCollectorScreenHandler extends ScreenHandler implements FuelS
             }
         }
     }
-
-
-    private ItemStack quickMoveInternal(PlayerEntity player, int invSlot) {
-        ItemStack newStack = ItemStack.EMPTY;
-        Slot slot = this.slots.get(invSlot);
-        if (slot != null && slot.hasStack()) {
-            ItemStack originalStack = slot.getStack();
-            newStack = originalStack.copy();
-            if (invSlot < this.inventory.size()) {
-                if (!this.insertItem(originalStack, this.inventory.size(), this.slots.size(), true)) {
-                    return ItemStack.EMPTY;
-                }
-            } else if (!this.insertItem(originalStack, 0, this.inventory.size(), false)) {
-                return ItemStack.EMPTY;
-            }
-
-            if (originalStack.isEmpty())
-                slot.setStack(ItemStack.EMPTY);
-            else {
-                slot.markDirty();
-            }
-        }
-
-        return newStack;
-    }
-
-    @Override
-    public boolean canUse(PlayerEntity player) {
-        return this.inventory.canPlayerUse(player);
-    }
-
-
-    private void addInputSlot(InputSlot slot) {
-        this.addSlot(slot);
-        inputSlots.add(slot);
-    }
-    
-    public void moveAllInputsToFuel() {
-        for (int i = inputSlots.size() - 1; i >= 0; i--)
-            inputSlots.get(i).moveToFuelSlot();
-        ((OutputSlot)slots.get(outputIndex)).moveToInputSlots();
-    }
-
-    // accessing the slots list at this index should always give you the output slot,
-    // and accessing the slots list at this index + 1 should always give you the target slot
-    public int getOutputSlotIndex() {
-        return outputIndex;
-    }
-
-    public EnergyCollectorBlockEntity getBlockEntity() {
-        return blockEntity;
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    // intended to be called by the screen instance
-    @Nullable
-    public PacketByteBuf getAndConsumeCreationBuffer() {
-        if (buf == null)
-            return null;
-        PacketByteBuf copy = new PacketByteBuf(buf.copy());
-        buf = null;
-        return copy;
-    }
-
 }

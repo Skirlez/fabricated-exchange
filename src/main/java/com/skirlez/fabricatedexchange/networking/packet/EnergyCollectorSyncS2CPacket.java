@@ -11,13 +11,11 @@ import net.minecraft.util.math.BlockPos;
 
 public class EnergyCollectorSyncS2CPacket {
     public static void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-        SuperNumber emc = new SuperNumber(buf.readString());
-        int light = buf.readInt();
-        boolean consuming = buf.readBoolean();
         BlockPos pos = buf.readBlockPos();
-        
+        SuperNumber emc = new SuperNumber(buf.readString());
+ 
         if(client.world.getBlockEntity(pos) instanceof EnergyCollectorBlockEntity blockEntity) {
-            blockEntity.update(emc, light, consuming);
+            blockEntity.update(emc);
         }
         
 

@@ -1,16 +1,19 @@
 package com.skirlez.fabricatedexchange.block;
 
-
 import org.jetbrains.annotations.Nullable;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.interfaces.ImplementedInventory;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
+import com.skirlez.fabricatedexchange.screen.AntiMatterRelayScreen;
+import com.skirlez.fabricatedexchange.screen.AntiMatterRelayScreenHandler;
 import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreen;
 import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreenHandler;
 import com.skirlez.fabricatedexchange.screen.slot.FakeSlot;
 import com.skirlez.fabricatedexchange.screen.slot.FuelSlot;
+import com.skirlez.fabricatedexchange.screen.slot.InputSlot;
+import com.skirlez.fabricatedexchange.screen.slot.SlotCondition;
 import com.skirlez.fabricatedexchange.screen.slot.collection.OutputSlot;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
@@ -26,6 +29,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -47,10 +51,14 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
     private int light;
     private boolean consuming;
     private final int level;
-    private EnergyCollectorScreenHandler handler;
     private final SuperNumber maximumEmc;
     private final SuperNumber emcMultiplier;
     private final SuperNumber outputRate;
+
+    private final DefaultedList<InputSlot> inputSlots = DefaultedList.of();
+    private final FuelSlot fuelSlot;
+    private final OutputSlot outputSlot;
+    private final FakeSlot targetSlot;
     public EnergyCollectorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.ENERGY_COLLECTOR, pos, state);
         emc = SuperNumber.Zero();
@@ -61,22 +69,40 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
         else
             this.level = 0;
 
+        int inputOffset;
+        int otherOffset;
         if (this.level == 0) {
             maximumEmc = new SuperNumber(10000);
             emcMultiplier = new SuperNumber(1, 5);
             outputRate = new SuperNumber(10);
+            inputOffset = 0;
+            otherOffset = 0;
         }
         else if (this.level == 1) {
             maximumEmc = new SuperNumber(30000);
             emcMultiplier = new SuperNumber(3, 5);
             outputRate = new SuperNumber(20);
+            inputOffset = -2;
+            otherOffset = 16;
         }
         else {
             maximumEmc = new SuperNumber(60000);
             emcMultiplier = new SuperNumber(2);
             outputRate = new SuperNumber(50);
+            inputOffset = -2;
+            otherOffset = 34;
         }
         inventory = DefaultedList.ofSize(11 + level * 4, ItemStack.EMPTY);
+
+        Inventory inv = (Inventory)this;
+        fuelSlot = new FuelSlot(inv, 0, otherOffset + 124, 58, inputSlots, SlotCondition.isFuel);
+        outputSlot = new OutputSlot(inv, 1, otherOffset + 124, 13, inputSlots);
+        targetSlot = new FakeSlot(inv, 2, otherOffset + 153, 36);
+
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 2 + level; j++)
+                inputSlots.add(new InputSlot(inv, i * (2 + level) + j + 3, inputOffset + 20 + j * 18, 8 + i * 18, fuelSlot, SlotCondition.isFuel));
+        }
     }
 
 
@@ -84,67 +110,40 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
     public Text getDisplayName() {
         return Text.translatable("screen.fabricated-exchange.emc_collection");
     }
-
-    private void serverSync() {
-        PacketByteBuf data = PacketByteBufs.create();
-
-        data.writeString(emc.divisionString());
-        data.writeInt(light);
-        data.writeBoolean(consuming);
-        data.writeBlockPos(getPos());
-        
-        for(ServerPlayerEntity player : PlayerLookup.tracking((ServerWorld) world, getPos())) {
-            ServerPlayNetworking.send(player, ModMessages.ENERGY_COLLECTOR_SYNC, data);
-        }
-    }
-    private void clientSync() {
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player.currentScreenHandler instanceof EnergyCollectorScreenHandler screenHandler
-                && screenHandler.getBlockEntity().getPos().equals(pos))
-            ((EnergyCollectorScreen)client.currentScreen).update(emc, light);
-    }
-
-
+    
     public static void tick(World world, BlockPos blockPos, BlockState blockState, EnergyCollectorBlockEntity entity) {
-        boolean client = world.isClient();
-        
         entity.light = world.getLightLevel(LightType.SKY, entity.getPos().add(0, 1, 0)) - world.getAmbientDarkness();
-        if (!client) {
-            boolean consuming = entity.tickInventoryLogic();
-            if (consuming != entity.consuming) {
-                entity.consuming = consuming;
-                entity.serverSync(); 
-            }
-        }
+        if (entity.light < 0)
+            entity.light = 0;
+        entity.consuming = entity.tickInventoryLogic();
         
         SuperNumber addition = new SuperNumber(entity.light, 15);
         addition.multiply(entity.emcMultiplier);
         entity.emc.add(addition);
         if (entity.emc.compareTo(entity.maximumEmc) == 1)
             entity.emc.copyValueOf(entity.maximumEmc);
-
         if (entity.consuming == false) {
-            // TODO: you could probably do this in a way that doesn't require you to get the neighbors on every tick. I couldn't find a way that worked both clientside and serverside
             entity.distributeEmc(GeneralUtil.getNeighboringBlockEntities(world, blockPos));
         }
         
-        if (client)
-            entity.clientSync();
-        else {
-            entity.tick++; 
+        if (world.isClient()) {
+            MinecraftClient client = MinecraftClient.getInstance();
+            if (client.player.currentScreenHandler instanceof EnergyCollectorScreenHandler screenHandler
+                    && screenHandler.getBlockEntity().getPos().equals(entity.pos)) {
+                ((EnergyCollectorScreen)client.currentScreen).update(entity.emc, entity.light);
+            }
+        }
+        else { 
             if (entity.tick % 60 == 0) {
                 entity.serverSync();
                 entity.markDirty();
             }
+            entity.tick++;
         }
     }
 
     // returns true if the collector is "consuming" (will use it's emc when it reaches a target)
     private boolean tickInventoryLogic() {
-        if (handler == null)
-            return false;
-        FuelSlot fuelSlot = (FuelSlot)handler.getSlot(0);
-        FakeSlot targetSlot = (FakeSlot)handler.getSlot(handler.getOutputSlotIndex() + 1);
         ItemStack fuelStack = fuelSlot.getStack();
         if (fuelStack.isEmpty())
             return false;
@@ -160,7 +159,6 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
         
         Item nextItem = FabricatedExchange.fuelProgressionMap.get(item);
         SuperNumber nextEmc = EmcData.getItemEmc(nextItem);
-        OutputSlot outputSlot = (OutputSlot)handler.getSlot(handler.getOutputSlotIndex());
 
         if ((!nextItem.equals(outputSlot.getStack().getItem())
                 || outputSlot.getStack().getMaxCount() <= outputSlot.getStack().getCount()
@@ -174,21 +172,18 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
             else
                 outputSlot.setStack(new ItemStack(nextItem));
             outputSlot.moveToInputSlots();
-            fuelSlot.getStack().decrement(1);
-            handler.moveAllInputsToFuel();
+            fuelSlot.takeStack(1);
             emc.subtract(nextEmc);
-            serverSync();
         }
-        return emc.compareTo(maximumEmc) == -1;
+        return true;
     }
 
 
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-        tick = 0;
-        handler = new EnergyCollectorScreenHandler(syncId, inv, this, level);
-        return handler;
+        serverSyncPlayer((ServerPlayerEntity)player);
+        return new EnergyCollectorScreenHandler(syncId, inv, this, level, null);
     }
 
     @Override
@@ -222,27 +217,52 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
         buf.writeInt(light);
     }
     
-    public EnergyCollectorScreenHandler getScreenHandler() {
-        return handler;
-    }
-    public void update(SuperNumber emc, int light, boolean consuming) {
-        this.emc = emc;
-        this.light = light;
-        this.consuming = consuming;
-    }
-
+    @Override
     public boolean isConsuming() {
         return consuming;
     }
+    @Override
     public SuperNumber getEmc() {
         return emc;
     }
+    @Override
     public SuperNumber getOutputRate() {
         return outputRate;
     }
+    @Override
     public SuperNumber getMaximumEmc() {
         return maximumEmc;
     }
  
+    private void serverSync() {
+        PacketByteBuf data = PacketByteBufs.create();
+        data.writeBlockPos(getPos());
+        data.writeString(emc.divisionString());
+    
+        for (ServerPlayerEntity player : PlayerLookup.tracking((ServerWorld) world, getPos())) {
+            ServerPlayNetworking.send(player, ModMessages.ENERGY_COLLECTOR_SYNC, data);
+        }
+    }
+    private void serverSyncPlayer(ServerPlayerEntity player) {
+        PacketByteBuf data = PacketByteBufs.create();
+        data.writeBlockPos(getPos());
+        data.writeString(emc.divisionString());
+        ServerPlayNetworking.send(player, ModMessages.ENERGY_COLLECTOR_SYNC, data);
+    }
+    public void update(SuperNumber emc) {
+        this.emc = emc;
+    }
 
+    public FuelSlot getFuelSlot() {
+        return fuelSlot;
+    }
+    public OutputSlot getOutputSlot() {
+        return outputSlot;
+    }
+    public FakeSlot getTargetSlot() {
+        return targetSlot;
+    }
+    public DefaultedList<InputSlot> getInputSlots() {
+        return inputSlots;
+    }
 }

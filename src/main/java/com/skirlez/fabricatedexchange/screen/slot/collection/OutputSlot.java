@@ -1,17 +1,18 @@
 package com.skirlez.fabricatedexchange.screen.slot.collection;
 
+import java.util.List;
+
 import com.skirlez.fabricatedexchange.screen.slot.InputSlot;
 
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.collection.DefaultedList;
 
 // The output slot should attempt to move its contents to the input slots when possible.
 // If the EMC of the target slot is greater or equal to the current item, don't move the item to the input slots.
 public class OutputSlot extends Slot {
-    private final DefaultedList<InputSlot> inputSlots;
-    public OutputSlot(Inventory inventory, int index, int x, int y, DefaultedList<InputSlot> inputSlots) {
+    private final List<InputSlot> inputSlots;
+    public OutputSlot(Inventory inventory, int index, int x, int y, List<InputSlot> inputSlots) {
         super(inventory, index, x, y);
         this.inputSlots = inputSlots;
     }

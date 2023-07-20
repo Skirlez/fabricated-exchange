@@ -22,7 +22,7 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHandler> {
+public class EnergyCollectorScreen extends HandledScreen<FuelScreenHandler> {
     private final Identifier texture;
     private double fuelProgress; // 0 - 1 how much of the arrow should be displayed
     private double emcProgress; // 0 - 1 how much of the emc bar should be filled
@@ -31,7 +31,7 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
     private SuperNumber emc;
     private final int level;
     private final SuperNumber maximumEmc;
-    public EnergyCollectorScreen(EnergyCollectorScreenHandler handler, PlayerInventory inventory, Text title) {
+    public EnergyCollectorScreen(FuelScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);        
         this.level = handler.getLevel();
         if (this.level == 0)
@@ -41,7 +41,7 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
         else 
             maximumEmc = new SuperNumber(60000);
 
-        this.handler = handler;
+        this.handler = (EnergyCollectorScreenHandler)handler;
         PacketByteBuf buf = handler.getAndConsumeCreationBuffer();
         if (buf != null) {
             emc = new SuperNumber(buf.readString());
@@ -155,7 +155,7 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
     public void calculateFuelProgress() {
         fuelProgress = 0d;
         FuelSlot fuelSlot = (FuelSlot)handler.getSlot(0);
-        FakeSlot targetSlot = (FakeSlot)handler.getSlot(handler.getOutputSlotIndex() + 1);
+        FakeSlot targetSlot = (FakeSlot)handler.getSlot(2);
         ItemStack stack = fuelSlot.getStack();
         if (stack.isEmpty())
             return;
@@ -170,7 +170,7 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
         }
 
         Item nextItem = FabricatedExchange.fuelProgressionMap.get(item);
-        OutputSlot outputSlot = (OutputSlot)handler.getSlot(handler.getOutputSlotIndex());
+        OutputSlot outputSlot = (OutputSlot)handler.getSlot(1);
         if ((!nextItem.equals(outputSlot.getStack().getItem())
                 || outputSlot.getStack().getMaxCount() <= outputSlot.getStack().getCount()
                 ) && outputSlot.hasStack())
