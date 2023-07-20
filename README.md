@@ -51,3 +51,5 @@ new features, or old features from previous equivalence mods.
   * Seed: The EMC values the EMC mapper uses to infer the EMC values of other items
   * Custom: EMC values that get applied at the end of the mapping process and override any value the mapper might have assigned.
  
+# Screenshot
+![progress](https://github.com/Skirlez/fabricated-exchange/assets/17904548/394f5610-1be4-4534-9279-b97052963706)
