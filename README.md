@@ -33,13 +33,19 @@ efficiently, please open an issue/pull request a change.
 Additionally, as of now, the mod is still under development. So you could also suggest or implement
 new features, or old features from previous equivalence mods.
 
+# Licensing
+
+All of the code in this repository is licensed under the terms of the LGPLv3. I really don't want to include the notice in every source file.
+
 # Project Goals
+
 - Support Quilt (Even over Fabric, if it ever comes to that choice)
 - Don't use any external libraries other than the Fabric API
 
+
 # Implemented Features
 - Philosopher's Stone
-- Transmutation Table
+- Transmutation Table and Tablet
 - Energy Collectors Mk1-Mk3
 - Antimatter Relays Mk1-Mk3
 - EMC Mapper
