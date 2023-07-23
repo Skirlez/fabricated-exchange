@@ -48,7 +48,7 @@ public class RemoveEmcCommand {
                 return 0;
             }
             map.remove(id);
-            ModConfig.SEED_EMC_MAP_FILE.save();
+            ModConfig.SEED_EMC_MAP_FILE.setValueAndSave(map);
             context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.removeemc.seed_success")
                 .append(" ").append(Text.translatable("commands.fabricated-exchange.reload_notice")), false);
         }
@@ -60,7 +60,7 @@ public class RemoveEmcCommand {
                 return 0;
             }
             map.remove(id);
-            ModConfig.CUSTOM_EMC_MAP_FILE.save();
+            ModConfig.CUSTOM_EMC_MAP_FILE.setValueAndSave(map);
             EmcData.syncMap(context.getSource().getPlayer());
             context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.removeemc.custom_success")
                 .append(" ").append(Text.translatable("commands.fabricated-exchange.reload_notice")), false);

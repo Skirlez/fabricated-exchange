@@ -12,6 +12,8 @@ import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreen;
 import com.skirlez.fabricatedexchange.screen.slot.transmutation.TransmutationSlot;
+import com.skirlez.fabricatedexchange.util.ConfigFile;
+import com.skirlez.fabricatedexchange.util.ModConfig;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.minecraft.client.MinecraftClient;
@@ -56,5 +58,12 @@ public class ModItemStackTooltip {
 				list.add(Text.literal("§eStack EMC: §r" + emc));
 			}
 		}
+		if (ModConfig.CONFIG_FILE.getOption(ConfigFile.Bool.SHOW_ITEM_EMC_ORIGIN)) {
+			if (EmcData.isItemInSeedValues(itemStack.getItem()))
+				list.add(Text.literal("§eSeed EMC"));
+			if (EmcData.isItemInCustomValues(itemStack.getItem()))
+				list.add(Text.literal("§eCustom EMC"));
+		}
+		
 	}
 }

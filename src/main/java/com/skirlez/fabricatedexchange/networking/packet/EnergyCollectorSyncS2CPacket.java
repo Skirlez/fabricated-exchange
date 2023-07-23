@@ -14,9 +14,9 @@ public class EnergyCollectorSyncS2CPacket {
         BlockPos pos = buf.readBlockPos();
         SuperNumber emc = new SuperNumber(buf.readString());
  
-        if(client.world.getBlockEntity(pos) instanceof EnergyCollectorBlockEntity blockEntity) {
+        if (client.world.getBlockEntity(pos) instanceof EnergyCollectorBlockEntity blockEntity)
             blockEntity.update(emc);
-        }
+        
 
     }
 }

@@ -3,15 +3,15 @@
 	"id": "fabricated-exchange",
 	"version": "${version}",
 	"name": "Fabricated Exchange",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "A Fabric remake of Project E/Equivalent Exchange 2.",
 	"authors": [
-		"Me!"
+		"Skirlez"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
+		"homepage": "https://twitter.com/skirlez3",
 		"sources": "https://github.com/Skirlez/fabricated-exchange"
 	},
-	"license": "GPL-3.0",
+	"license": "LGPL-3.0",
 	"icon": "assets/fabricated-exchange/icon.png",
 	"environment": "*",
 	"entrypoints": {
@@ -41,8 +41,5 @@
 		"minecraft": "~1.19.4",
 		"java": ">=17",
 		"fabric-api": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
 	}
 }

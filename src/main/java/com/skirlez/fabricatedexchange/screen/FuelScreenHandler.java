@@ -70,10 +70,10 @@ public abstract class FuelScreenHandler extends ScreenHandler {
             ItemStack originalStack = slot.getStack();
             newStack = originalStack.copy();
             if (invSlot < this.inventory.size()) {
-                if (!this.insertItem(originalStack, this.inventory.size(), this.slots.size(), true)) {
+                if (!insertItem(originalStack, this.inventory.size(), this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.insertItem(originalStack, 0, this.inventory.size(), false)) {
+            } else if (!insertItem(originalStack, 0, this.inventory.size(), false)) {
                 return ItemStack.EMPTY;
             }
 
@@ -86,6 +86,8 @@ public abstract class FuelScreenHandler extends ScreenHandler {
 
         return newStack;
     }
+
+
     public FuelSlot getFuelSlot() {
         return (FuelSlot)slots.get(0);
     }

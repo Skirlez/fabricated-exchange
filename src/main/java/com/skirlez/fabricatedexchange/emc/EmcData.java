@@ -26,7 +26,11 @@ public class EmcData {
 
     // both the server and the client can use these
     public static ConcurrentMap<String, SuperNumber> emcMap = new ConcurrentHashMap<String, SuperNumber>();
-    
+
+    // these should only ever be equal to what's in the seed emc json
+    public static Map<String, SuperNumber> seedEmcMap = new HashMap<String, SuperNumber>();
+    public static Map<String, SuperNumber> customEmcMap = new HashMap<String, SuperNumber>();
+
     public static SuperNumber getItemEmc(Item item) {
         if (item == null)
             return SuperNumber.Zero(); 
@@ -48,8 +52,12 @@ public class EmcData {
         }
         return SuperNumber.Zero(); 
     }
-
-    
+    public static boolean isItemInSeedValues(Item item) {
+        return seedEmcMap.containsKey(Registries.ITEM.getId(item).toString());
+    }
+    public static boolean isItemInCustomValues(Item item) {
+        return customEmcMap.containsKey(Registries.ITEM.getId(item).toString());
+    }
     // only the server can use these
     public static SuperNumber getEmc(LivingEntity player) {
         PlayerState playerState = ServerState.getPlayerState(player);
@@ -107,5 +115,7 @@ public class EmcData {
         }
         ServerPlayNetworking.send(player, ModMessages.EMC_MAP_SYNC_IDENTIFIER, buffer);
     }
+
+
 
 }

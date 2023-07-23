@@ -11,11 +11,11 @@ import net.minecraft.util.math.BlockPos;
 
 public class AntiMatterRelaySyncS2CPacket {
     public static void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-        SuperNumber emc = new SuperNumber(buf.readString());
         BlockPos pos = buf.readBlockPos();
-    
-        if (client.world.getBlockEntity(pos) instanceof AntiMatterRelayBlockEntity blockEntity) {
+        SuperNumber emc = new SuperNumber(buf.readString());
+        
+        if (client.world.getBlockEntity(pos) instanceof AntiMatterRelayBlockEntity blockEntity)
             blockEntity.update(emc);
-        }
+        
     }
 }

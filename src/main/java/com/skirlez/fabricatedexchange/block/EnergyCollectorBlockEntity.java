@@ -118,8 +118,9 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
         if (world.isClient()) {
             MinecraftClient client = MinecraftClient.getInstance();
             if (client.player.currentScreenHandler instanceof EnergyCollectorScreenHandler screenHandler 
-                    && screenHandler.getBlockEntity().getPos().equals(entity.pos))
-                ((EnergyCollectorScreen)client.currentScreen).update(entity.emc, entity.light);
+                    && screenHandler.getBlockEntity().getPos().equals(entity.pos) 
+                    && client.currentScreen instanceof EnergyCollectorScreen screen)
+                screen.update(entity.emc, entity.light);
             return;
         }
 

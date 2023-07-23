@@ -1,6 +1,7 @@
 package com.skirlez.fabricatedexchange.emc;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -53,68 +54,87 @@ public class EmcMapper {
     }
 
 
-    public void fillEmcMap(World world, RecipeManager recipeManager) {
+    public void fillEmcMap(World world, Map<String, SuperNumber> seedEmcMap, RecipeManager recipeManager) {
         /*
-        This function will fill the emc map - the thing that sets the relation between items and their emc values.
+        This function will fill the EMC map - the thing that sets the relation between items and their emc values.
         this implementation is dumb, because I am not experienced enough to implement a better solution.
         it loops over all the recipes in the game a LOT to generate the mappings.
         */        
         FabricatedExchange.LOGGER.info("Start EMC mapper");
-        Map<String, SuperNumber> seedEmcMap = ModConfig.SEED_EMC_MAP_FILE.getValue();
         if (seedEmcMap != null)
             GeneralUtil.mergeMap(emcMap, seedEmcMap);
         
         // i don't know what this thing is, but you need it for some functions
         DynamicRegistryManager dynamicRegistryManager = world.getRegistryManager();
 
-        LinkedList<SmithingRecipe> smithingRecipes = new LinkedList<SmithingRecipe>(recipeManager.listAllOfType(RecipeType.SMITHING));
-
-        LinkedList<SmeltingRecipe> smeltingRecipes = new LinkedList<SmeltingRecipe>(recipeManager.listAllOfType(RecipeType.SMELTING));
-        
-        LinkedList<CraftingRecipe> craftingRecipes = new LinkedList<CraftingRecipe>(recipeManager.listAllOfType(RecipeType.CRAFTING));
+        List<SmithingRecipe> allSmithingRecipes = recipeManager.listAllOfType(RecipeType.SMITHING);
+        List<SmeltingRecipe> allSmeltingRecipes = recipeManager.listAllOfType(RecipeType.SMELTING);
+        List<CraftingRecipe> allCraftingRecipes = recipeManager.listAllOfType(RecipeType.CRAFTING);
 
         // blacklisted recipes and items
-        Map<String, String[]> blacklistedRecipes = ModConfig.BLACKLISTED_MAPPER_RECIPES_FILE.getValue();
-        if (blacklistedRecipes != null) {
+        Map<String, HashSet<String>> blacklistedRecipes = ModConfig.BLACKLISTED_MAPPER_RECIPES_FILE.getValue();
+        if (blacklistedRecipes == null)
+            blacklistedRecipes = new HashMap<>();
+        HashSet<String> smithingRecipesBlacklist = blacklistedRecipes.getOrDefault("smithing", new HashSet<String>());
+        HashSet<String> smeltingRecipesBlacklist = blacklistedRecipes.getOrDefault("smelting", new HashSet<String>());
+        HashSet<String> craftingRecipesBlacklist = blacklistedRecipes.getOrDefault("crafting", new HashSet<String>());
+        
+        // we must split the recipes between their origin mod. 
+        // minecraft recipes should evaluate first, and then we don't actually care about the order.
+        HashSet<String> namespaces = new HashSet<String>();
 
-            String[] smithingRecipesBlacklist = blacklistedRecipes.getOrDefault("smithing", new String[] {});
-            removeArrayFromRecipeList(smithingRecipesBlacklist, smeltingRecipes);
+        namespaces.add("minecraft");
+        Map<String, LinkedList<SmithingRecipe>> splitSmithingRecipes = splitRecipesToMods(allSmithingRecipes, namespaces, smithingRecipesBlacklist);
+        Map<String, LinkedList<SmeltingRecipe>> splitSmeltingRecipes = splitRecipesToMods(allSmeltingRecipes, namespaces, smeltingRecipesBlacklist);
+        Map<String, LinkedList<CraftingRecipe>> splitCraftingRecipes = splitRecipesToMods(allCraftingRecipes, namespaces, craftingRecipesBlacklist);
+        namespaces.remove("minecraft");
 
-            String[] smeltingRecipesBlacklist = blacklistedRecipes.getOrDefault("smelting", new String[] {});
-            removeArrayFromRecipeList(smeltingRecipesBlacklist, smeltingRecipes);
+        List<String> mods = new ArrayList<String>(namespaces.size() + 1);
+        mods.add("minecraft");
+        namespaces.addAll(mods);
 
-            String[] craftingRecipesBlacklist = blacklistedRecipes.getOrDefault("crafting", new String[] {});
-            removeArrayFromRecipeList(craftingRecipesBlacklist, craftingRecipes);
-        }
+        for (int m = 0; m < mods.size(); m++) {
+            String namespace = mods.get(m);
+            LinkedList<SmithingRecipe> smithingRecipes = splitSmithingRecipes.getOrDefault(namespace, null);
+            LinkedList<SmeltingRecipe> smeltingRecipes = splitSmeltingRecipes.getOrDefault(namespace, null);
+            LinkedList<CraftingRecipe> craftingRecipes = splitCraftingRecipes.getOrDefault(namespace, null);          
 
-        for (int i = 0; i < 100; i++) {
-            // Smithing recipes
-            int count = 0;
-            for (int j = 0; j < 100; j++) { 
-               if (!iterateSmithingRecipes(recipeManager, dynamicRegistryManager, smithingRecipes)) {
-                    if (j == 0)
-                        count++;
-                    break;
+            for (int i = 0; i < 100; i++) {
+                // Smithing recipes
+                int count = 0;
+
+                if (smithingRecipes == null)
+                    count++;
+                else for (int j = 0; j < 100; j++) { 
+                    if (!iterateSmithingRecipes(recipeManager, dynamicRegistryManager, smithingRecipes)) {
+                        if (j == 0)
+                            count++;
+                        break;
+                    }
                 }
-            }
-            // Smelting recipes
-            for (int j = 0; j < 100; j++) { 
-                if (!iterateSmeltingRecipes(recipeManager, dynamicRegistryManager, smeltingRecipes)) {
-                    if (j == 0)
-                        count++;
-                    break;
+                // Smelting recipes
+                if (smeltingRecipes == null)
+                    count++;
+                else for (int j = 0; j < 100; j++) { 
+                    if (!iterateSmeltingRecipes(recipeManager, dynamicRegistryManager, smeltingRecipes)) {
+                        if (j == 0)
+                            count++;
+                        break;
+                    }
                 }
-            }
-            // Crafting recipes
-            for (int j = 0; j < 100; j++) {
-                if (!iterateCraftingRecipes(recipeManager, dynamicRegistryManager, craftingRecipes)) {
-                    if (j == 0)
-                        count++;
-                    break;
+                // Crafting recipes
+                if (craftingRecipes == null)
+                    count++;
+                else for (int j = 0; j < 100; j++) {
+                    if (!iterateCraftingRecipes(recipeManager, dynamicRegistryManager, craftingRecipes)) {
+                        if (j == 0)
+                            count++;
+                        break;
+                    }
                 }
+                if (count == 3) // if no information was extracted from an iteration
+                    break;
             }
-            if (count == 3) // if no information was extracted from an iteration
-                break;
         }
         FabricatedExchange.LOGGER.info("End EMC mapper");
     }
@@ -134,6 +154,7 @@ public class EmcMapper {
             Item outputItem = outputStack.getItem();
             if (outputStack.getCount() == 0)
                 continue; 
+
             SuperNumber outputEmc = getItemEmc(outputItem);
             outputEmc.multiply(outputStack.getCount());
             Pair<SuperNumber, SuperNumber> equation = new Pair<SuperNumber, SuperNumber>(SuperNumber.Zero(), SuperNumber.Zero());
@@ -142,7 +163,7 @@ public class EmcMapper {
             else
                 equation.getRight().add(outputEmc);
 
-            for (Ingredient ingredient : ingredients) {
+            for (Ingredient ingredient : ingredients)   {
                 ItemStack[] itemStackArr = ingredient.getMatchingStacks();
                 if (itemStackArr.length == 0) // this will be zero for air
                     continue;
@@ -285,8 +306,11 @@ public class EmcMapper {
                     newInfo = putEmcMap(inputItem, outEmc, recipe) || newInfo;
                 }
             }
-            else if (!inEmc.equalTo(outEmc)) { // we already know both inemc and outemc, run an inequality check
-                warn("Inequality in recipe " + recipe.getId().toString());
+            else {
+                if (inEmc.equalTo(outEmc)) // we already know both inemc and outemc, run an inequality check
+                    iterator.remove();
+                else
+                    warn("Inequality in recipe " + recipe.getId().toString());
             }
         }
         return newInfo;
@@ -321,7 +345,12 @@ public class EmcMapper {
                 unknownCount++;
 
             if (unknownCount == 0) {
-                // TODO: Conflict check
+                aEmc.add(bEmc);
+                if (!aEmc.equalTo(outEmc))
+                    warn("Inequality detected in smithing recipe! Recipe: " + recipe.getId().toString());
+                else
+                    iterator.remove();
+                
                 continue;
             }
             if (unknownCount > 1)
@@ -349,10 +378,13 @@ public class EmcMapper {
             + " a value lower or equal to 0. Current recipe: " + recipe.getId().toString());
             return false;
         }
+
+
         if (!emcMapHasEntry(item)) {
             emcMap.put(Registries.ITEM.getId(item).toString(), value);
             return true;
         }
+
         SuperNumber emc = getItemEmc(item);
         if (emc.equalTo(value))
             return false;
@@ -375,24 +407,32 @@ public class EmcMapper {
         return emcMap.containsKey(Registries.ITEM.getId(item).toString());
     }
 
-    private void removeArrayFromRecipeList(String[] arr, LinkedList<?> list) {
-        for (String str : arr) {
-            int len = list.size();
-            for (int i = 0; i < len; i++) {
-                if (((Recipe<?>)list.get(i)).getId().toString().equals(str)) {
-                    list.remove(i);
-                    i--;
-                    len--;
-                }
-            }
-        }
-    }
-
     private void warn(String input) {
         if (!log.contains(input)) {
             FabricatedExchange.LOGGER.warn(input);
             log.add(input);
         }
+    }
+
+
+    private <T extends Recipe<?>> Map<String, LinkedList<T>> splitRecipesToMods(List<T> allRecipes, HashSet<String> namespaces, HashSet<String> blacklist) {
+        Map<String, LinkedList<T>> splitRecipes = new HashMap<String, LinkedList<T>>();
+        for (int i = 0; i < allRecipes.size(); i++) {
+            T recipe = allRecipes.get(i);
+            if (blacklist.contains(recipe.getId().toString()))
+                continue;
+            String namespace = recipe.getId().getNamespace();
+            if (!namespaces.contains(namespace))
+                namespaces.add(namespace);
+            if (!splitRecipes.containsKey(namespace)) {
+                LinkedList<T> newList = new LinkedList<T>();
+                newList.add(recipe);
+                splitRecipes.put(namespace, newList);
+            }
+            else
+                splitRecipes.get(namespace).add(recipe);
+        }
+        return splitRecipes;
     }
 
 }

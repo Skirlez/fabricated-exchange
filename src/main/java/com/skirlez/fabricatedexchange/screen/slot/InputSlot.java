@@ -31,5 +31,4 @@ public class InputSlot extends Slot {
             setStackNoCallbacks(fuelSlot.insertStackNoCallbacks(getStack()));
         }
     }
-    
 }

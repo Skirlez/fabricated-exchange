@@ -10,6 +10,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 
 public class EnergyCollectorScreenHandler extends FuelScreenHandler {
@@ -59,4 +60,68 @@ public class EnergyCollectorScreenHandler extends FuelScreenHandler {
             }
         }
     }
+
+    @Override
+    protected boolean insertItem(ItemStack stack, int startIndex, int endIndex, boolean fromLast) {
+        ItemStack itemStack;
+        Slot slot;
+        boolean bl = false;
+        int i = startIndex;
+        if (fromLast) {
+            i = endIndex - 1;
+        }
+        if (stack.isStackable()) {
+            while (!stack.isEmpty() && (fromLast ? i >= startIndex : i < endIndex)) {
+                slot = this.slots.get(i);
+                itemStack = slot.getStack();
+
+                // the last condition is the only difference between the super method and this, amazing
+                // I added it so you wouldn't be able to shift click to add items to the output slot and target slot
+                // I would use a mixin but I'm afraid of breaking something for other mods
+                if (!itemStack.isEmpty() && ItemStack.canCombine(stack, itemStack) && slot.canInsert(stack)) {
+                    int j = itemStack.getCount() + stack.getCount();
+                    if (j <= stack.getMaxCount()) {
+                        stack.setCount(0);
+                        itemStack.setCount(j);
+                        slot.markDirty();
+                        bl = true;
+                    } else if (itemStack.getCount() < stack.getMaxCount()) {
+                        stack.decrement(stack.getMaxCount() - itemStack.getCount());
+                        itemStack.setCount(stack.getMaxCount());
+                        slot.markDirty();
+                        bl = true;
+                    }
+                }
+                if (fromLast) {
+                    --i;
+                    continue;
+                }
+                ++i;
+            }
+        }
+        if (!stack.isEmpty()) {
+            i = fromLast ? endIndex - 1 : startIndex;
+            while (fromLast ? i >= startIndex : i < endIndex) {
+                slot = this.slots.get(i);
+                itemStack = slot.getStack();
+                if (itemStack.isEmpty() && slot.canInsert(stack)) {
+                    if (stack.getCount() > slot.getMaxItemCount()) {
+                        slot.setStack(stack.split(slot.getMaxItemCount()));
+                    } else {
+                        slot.setStack(stack.split(stack.getCount()));
+                    }
+                    slot.markDirty();
+                    bl = true;
+                    break;
+                }
+                if (fromLast) {
+                    --i;
+                    continue;
+                }
+                ++i;
+            }
+        }
+        return bl;
+    }
+
 }

@@ -18,8 +18,5 @@ public class FakeSlot extends Slot {
     public boolean canTakeItems(PlayerEntity playerEntity) {
         return false;
     }
-    @Override
-    public void setStack(ItemStack stack) { // TODO is this necessary
-        return;
-    }
+
 }

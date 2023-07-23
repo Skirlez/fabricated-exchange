@@ -100,8 +100,9 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
         if (world.isClient()) {
             MinecraftClient client = MinecraftClient.getInstance();
             if (client.player.currentScreenHandler instanceof AntiMatterRelayScreenHandler screenHandler 
-                    && screenHandler.getBlockEntity().getPos().equals(entity.pos))
-                ((AntiMatterRelayScreen)client.currentScreen).update(entity.emc);
+                    && screenHandler.getBlockEntity().getPos().equals(entity.pos)
+                    && client.currentScreen instanceof AntiMatterRelayScreen screen)
+                screen.update(entity.emc);
             return;
         }
         
@@ -198,8 +199,8 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 
     private void serverSync() {
         PacketByteBuf data = PacketByteBufs.create();
-        data.writeString(emc.divisionString());
         data.writeBlockPos(getPos());
+        data.writeString(emc.divisionString());
         
         for(ServerPlayerEntity player : PlayerLookup.tracking((ServerWorld) world, getPos())) {
             if (player.currentScreenHandler instanceof AntiMatterRelayScreenHandler screenHandler && screenHandler.getBlockEntity().getPos().equals(pos)) 
@@ -208,9 +209,8 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
     }
     private void serverSyncPlayer(ServerPlayerEntity player) {
         PacketByteBuf data = PacketByteBufs.create();
-        data.writeString(emc.divisionString());
         data.writeBlockPos(getPos());
-        
+        data.writeString(emc.divisionString());
         ServerPlayNetworking.send(player, ModMessages.ANTIMATTER_RELAY_SYNC, data);
     }
 

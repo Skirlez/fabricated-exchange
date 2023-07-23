@@ -77,8 +77,6 @@ public class FabricatedExchange implements ModInitializer {
             ModConfig.fetchAll();
             fetchBlockRotationMap();
             reloadEmcMap(server);
-
-
         });
     }
 
@@ -86,12 +84,16 @@ public class FabricatedExchange implements ModInitializer {
 
     public static String reloadEmcMap(MinecraftServer server) {
         EmcMapper mapper = new EmcMapper();
-        mapper.fillEmcMap(server.getOverworld(), server.getOverworld().getRecipeManager());
-        EmcData.emcMap = mapper.getMap();
+        Map<String, SuperNumber> seedEmcMap = ModConfig.SEED_EMC_MAP_FILE.getValue();
         Map<String, SuperNumber> customEmcMap = ModConfig.CUSTOM_EMC_MAP_FILE.getValue();
+
+        mapper.fillEmcMap(server.getOverworld(), seedEmcMap, server.getOverworld().getRecipeManager());
+        EmcData.emcMap = mapper.getMap();
         if (customEmcMap != null)
             GeneralUtil.mergeMap(EmcData.emcMap, customEmcMap);
         
+
+
         List<Item> fuelItemList = new ArrayList<Item>();
         Iterator<RegistryEntry<Item>> iterator = Registries.ITEM.getEntryList(ModTags.FUEL).get().iterator();
         while (iterator.hasNext()) {
@@ -136,8 +138,10 @@ public class FabricatedExchange implements ModInitializer {
             int len = blockTransmutationData[i].length;
             if (len == 0)
                 continue;
-            if (len == 3 && blockTransmutationData[i][j].equals("O")) {
-                addBlockRelation(blockTransmutationData[i][j + 1], blockTransmutationData[i][j + 2]); 
+            if (len == 1) {
+                String str = blockTransmutationData[i][j];
+                String[] parts = str.split("->");
+                addBlockRelation(parts[0], parts[1]); 
                 continue;
             }
             while (j < len - 1) {
