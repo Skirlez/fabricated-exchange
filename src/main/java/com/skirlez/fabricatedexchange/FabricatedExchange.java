@@ -22,9 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import com.skirlez.fabricatedexchange.block.ModBlockEntities;
 import com.skirlez.fabricatedexchange.block.ModBlocks;
-import com.skirlez.fabricatedexchange.command.ReloadEmcCommand;
-import com.skirlez.fabricatedexchange.command.RemoveEmcCommand;
-import com.skirlez.fabricatedexchange.command.SetEmcCommand;
+import com.skirlez.fabricatedexchange.command.TheCommand;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.emc.EmcMapper;
 import com.skirlez.fabricatedexchange.item.ModItemGroups;
@@ -58,13 +56,10 @@ public class FabricatedExchange implements ModInitializer {
         ModBlockEntities.registerBlockEntities();
         ModScreenHandlers.registerAllScreenHandlers();
         ModMessages.registerC2SPackets();
+
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-            SetEmcCommand.register(dispatcher);
-            RemoveEmcCommand.register(dispatcher);
-            ReloadEmcCommand.register(dispatcher);
+            TheCommand.register(dispatcher);
         });
-
-
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> { 
             // send the player's own emc value
@@ -92,8 +87,6 @@ public class FabricatedExchange implements ModInitializer {
         if (customEmcMap != null)
             GeneralUtil.mergeMap(EmcData.emcMap, customEmcMap);
         
-
-
         List<Item> fuelItemList = new ArrayList<Item>();
         Iterator<RegistryEntry<Item>> iterator = Registries.ITEM.getEntryList(ModTags.FUEL).get().iterator();
         while (iterator.hasNext()) {

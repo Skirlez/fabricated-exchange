@@ -24,8 +24,8 @@
     "sounds.fabricated-exchange.item_charge": "Item charged",
     "sounds.fabricated-exchange.item_discharge": "Item discharged",
 
-    "commands.fabricated-exchange.reload_notice": "Run /reloademc to regenerate the EMC values.",
-    "commands.fabricated-exchange.zero_notice": "If you want the item to not have EMC, run \"/setemc custom 0\".",
+    "commands.fabricated-exchange.reload_notice": "Run '/fe reload' to regenerate the EMC values.",
+    "commands.fabricated-exchange.zero_notice": "If you want this specific item to not have EMC, run '/fe set custom 0'.",
     "commands.fabricated-exchange.no_item": "Air cannot have EMC! Hold an item and then run the command.",
     "commands.fabricated-exchange.setemc.not_valid_number": " isn't a valid number!",
     "commands.fabricated-exchange.setemc.custom_success": "Item EMC updated!",
@@ -35,8 +35,11 @@
     "commands.fabricated-exchange.removeemc.custom_success": "Custom Item EMC removed!",
     "commands.fabricated-exchange.removeemc.custom_confused": "This item does not have a custom EMC value.",
     "commands.fabricated-exchange.reloademc.success": "Done! (%sms) EMC mapper output:",
-
-
+    "commands.fabricated-exchange.recipe.ban.unsupported_type": "Cannot ban this recipe because its type (%s) is unsupported.",
+    "commands.fabricated-exchange.recipe.ban.success": "Done! The recipe will now be considered by the EMC mapper!",
+    "commands.fabricated-exchange.recipe.pardon.unsupported_type": "Cannot pardon this recipe because its type (%s) is unsupported. You couldn't ban it if you wanted to.",
+    "commands.fabricated-exchange.recipe.pardon.success": "Done! The recipe will now be considered by the EMC mapper!",
+    "commands.fabricated-exchange.nothing": "Nothing has changed.",
     "key.category.fabricated-exchange": "Fabricated Exchange bindings",
     "key.fabricated-exchange.charge": "Charge/Discharge Item"
 }

@@ -88,13 +88,15 @@ public class EmcMapper {
         Map<String, LinkedList<SmeltingRecipe>> splitSmeltingRecipes = splitRecipesToMods(allSmeltingRecipes, namespaces, smeltingRecipesBlacklist);
         Map<String, LinkedList<CraftingRecipe>> splitCraftingRecipes = splitRecipesToMods(allCraftingRecipes, namespaces, craftingRecipesBlacklist);
         namespaces.remove("minecraft");
-
+        
         List<String> mods = new ArrayList<String>(namespaces.size() + 1);
         mods.add("minecraft");
-        namespaces.addAll(mods);
+        mods.addAll(namespaces);
+
 
         for (int m = 0; m < mods.size(); m++) {
             String namespace = mods.get(m);
+           
             LinkedList<SmithingRecipe> smithingRecipes = splitSmithingRecipes.getOrDefault(namespace, null);
             LinkedList<SmeltingRecipe> smeltingRecipes = splitSmeltingRecipes.getOrDefault(namespace, null);
             LinkedList<CraftingRecipe> craftingRecipes = splitCraftingRecipes.getOrDefault(namespace, null);          
@@ -139,7 +141,7 @@ public class EmcMapper {
         FabricatedExchange.LOGGER.info("End EMC mapper");
     }
 
-
+    // TODO: Rewrite this function
     private boolean iterateCraftingRecipes(RecipeManager recipeManager, DynamicRegistryManager dynamicRegistryManager, LinkedList<CraftingRecipe> recipesList) { 
         boolean newInfo = false;
         
@@ -148,6 +150,7 @@ public class EmcMapper {
             CraftingRecipe recipe = iterator.next();
             int unknownSide = 0; // 0 - unset, 1 - left, 2 - right
             List<Item> unknownItems = new ArrayList<Item>();
+            int unknownAmount = 0; // used if unknownSide == 1
             boolean giveUp = false;
             List<Ingredient> ingredients = recipe.getIngredients();
             ItemStack outputStack = recipe.getOutput(dynamicRegistryManager);
@@ -202,6 +205,7 @@ public class EmcMapper {
                             unknownItems.add(stack.getItem());
                         }
                         unknownSide = 1;
+                        unknownAmount = 1;
                     }
                     else { // if this is the second unknown we find, make sure it isn't the same unknown as the first
                         for (ItemStack stack : itemStackArr) {
@@ -210,6 +214,8 @@ public class EmcMapper {
                                 break;
                             }
                         }
+                        if (giveUp == false)
+                            unknownAmount++;
                     }
                 }
                 else {
@@ -239,7 +245,12 @@ public class EmcMapper {
                 if (rightValue.compareTo(SuperNumber.ZERO) == -1) {
                     warn("Negative EMC value! Recipe: " + recipe.getId().toString());
                     continue;
-                } 
+                }
+                if (unknownAmount == 0) {
+                    warn("unknownAmount is 0! Report this to the developer! Recipe: " + recipe.getId().toString());
+                    continue;
+                }
+                rightValue.divide(unknownAmount);
                 for (Item item : unknownItems) {
                     if ((item.hasRecipeRemainder() && item.getRecipeRemainder().equals(item)))
                         break;
@@ -281,7 +292,7 @@ public class EmcMapper {
                 }
                 int comparison = itemEmc.compareTo(inEmc);
                 if (comparison != 0) {
-                    warn("Ingredient found with multiple conflicting EMC values! in recipe " + recipe.getId().toString() + ": for items "  
+                    warn("Ingredient found with multiple conflicting EMC values! In recipe: " + recipe.getId().toString() + " for items: "  
                     + Registries.ITEM.getId(itemStacks[foundIndex].getItem()) + " with value " + inEmc + ", "
                     + Registries.ITEM.getId(itemStacks[j].getItem()) + " with value " + itemEmc
                     + ". choosing the lower value."); 
@@ -378,7 +389,6 @@ public class EmcMapper {
             + " a value lower or equal to 0. Current recipe: " + recipe.getId().toString());
             return false;
         }
-
 
         if (!emcMapHasEntry(item)) {
             emcMap.put(Registries.ITEM.getId(item).toString(), value);
