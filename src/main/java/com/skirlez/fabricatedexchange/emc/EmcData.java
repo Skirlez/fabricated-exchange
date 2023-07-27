@@ -44,6 +44,10 @@ public class EmcData {
         String id = Registries.ITEM.getId(item).toString();
         SuperNumber baseEmc = getItemEmc(id);
         baseEmc.multiply(itemStack.getCount());
+        if (itemStack.getMaxDamage() != 0) {
+            baseEmc.multiply(new SuperNumber(itemStack.getMaxDamage()-itemStack.getDamage(), itemStack.getMaxDamage()));
+            baseEmc.floor();
+        }
         return baseEmc;
     }
     public static SuperNumber getItemEmc(String id) {

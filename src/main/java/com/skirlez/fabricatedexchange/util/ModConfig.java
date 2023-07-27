@@ -2,8 +2,11 @@ package com.skirlez.fabricatedexchange.util;
 
 import java.lang.reflect.Type;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gson.reflect.TypeToken;
@@ -16,6 +19,12 @@ import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.item.Item;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.TagKey;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.Pair;
 
 
 public class ModConfig {
@@ -33,10 +42,11 @@ public class ModConfig {
 
     public static final Path CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve(FabricatedExchange.MOD_ID);
 
-    private static Type jsonType = new TypeToken<HashMap<String, Object>>() {}.getType();
-    private static Type emcMapType = new TypeToken<HashMap<String, SuperNumber>>() {}.getType();
-    private static Type recipeBlacklistType = new TypeToken<HashMap<String, HashSet<String>>>() {}.getType();
-    private static Type blockTransmutationMapType = new TypeToken<String[][]>() {}.getType();
+    private static final Type jsonType = new TypeToken<HashMap<String, Object>>() {}.getType();
+    private static final Type emcMapType = new TypeToken<HashMap<String, SuperNumber>>() {}.getType();
+    private static final Type stringSetType = new TypeToken<HashSet<String>>() {}.getType();
+    private static final Type recipeBlacklistType = new TypeToken<HashMap<String, HashSet<String>>>() {}.getType();
+    private static final Type blockTransmutationMapType = new TypeToken<String[][]>() {}.getType();
 
     public static final ConfigFile CONFIG_FILE = new ConfigFile(jsonType, 
         "config.json");
@@ -48,6 +58,10 @@ public class ModConfig {
     public static final DataFile<Map<String, SuperNumber>> CUSTOM_EMC_MAP_FILE
         = new CustomEmcMap(emcMapType, 
         "custom_emc_map.json");
+
+    public static final DataFile<HashSet<String>> MODIFIERS
+        = new DataFile<HashSet<String>>(stringSetType, 
+        "modifiers.json");
 
     public static final DataFile<Map<String, HashSet<String>>> BLACKLISTED_MAPPER_RECIPES_FILE
         = new DataFile<Map<String, HashSet<String>>>(recipeBlacklistType,
@@ -62,38 +76,76 @@ public class ModConfig {
         CONFIG_FILE.fetch();
         SEED_EMC_MAP_FILE.fetch();
         CUSTOM_EMC_MAP_FILE.fetch();
+        MODIFIERS.fetch();
         BLACKLISTED_MAPPER_RECIPES_FILE.fetch();
         BLOCK_TRANSMUTATION_MAP_FILE.fetch();
     }
 }
 
-class SeedEmcMap extends DataFile<Map<String, SuperNumber>> {
+class EmcMap extends DataFile<Map<String, SuperNumber>> {
+    public EmcMap(Type type, String name) {
+        super(type, name);
+    }
+    @Override
+    public void process() {
+        List<Pair<String, SuperNumber>> pairs = new ArrayList<Pair<String, SuperNumber>>();
+        Iterator<String> iterator = value.keySet().iterator();
+        while (iterator.hasNext()) {
+            String entry = iterator.next();
+            if (!entry.startsWith("#"))
+                continue;
+            
+            SuperNumber emc = value.get(entry);
+
+            entry = entry.substring(1);
+            // tag found
+            iterator.remove();
+
+            String[] parts = entry.split(":");
+            if (parts.length != 2)
+                return;
+            Identifier tagId = new Identifier(parts[0], parts[1]);
+            TagKey<Item> tag = Registries.ITEM.streamTags().filter((key) -> (key.id().equals(tagId))).findFirst().orElse(null);
+            if (tag == null) {
+                FabricatedExchange.LOGGER.error("Invalid tag in " + name + "! Tag: " + tagId.toString());
+                continue;
+            }
+            
+            Iterator<RegistryEntry<Item>> itemIterator = Registries.ITEM.getEntryList(tag).get().iterator();
+            while (itemIterator.hasNext()) {
+                Item item = itemIterator.next().value();
+                pairs.add(new Pair<String, SuperNumber>(Registries.ITEM.getId(item).toString(), emc));
+            }
+        }
+
+        for (int i = 0; i < pairs.size(); i++) {
+            Pair<String, SuperNumber> pair = pairs.get(i);
+            value.put(pair.getLeft(), pair.getRight());
+        }
+
+
+    }
+}
+
+class SeedEmcMap extends EmcMap {
     public SeedEmcMap(Type type, String name) {
         super(type, name);
     }
     @Override
-    public void fetch() {
-        super.fetch();
+    public void process() {
+        super.process();
         EmcData.seedEmcMap = this.value;
     }
-    @Override
-    public void setValue(Map<String, SuperNumber> value) {
-        super.setValue(value);
-        EmcData.seedEmcMap = value;
-    }
 }
-class CustomEmcMap extends DataFile<Map<String, SuperNumber>> {
+class CustomEmcMap extends EmcMap {
     public CustomEmcMap(Type type, String name) {
         super(type, name);
     }
     @Override
-    public void fetch() {
-        super.fetch();
+    public void process() {
+        super.process();
         EmcData.customEmcMap = this.value;
     }
-    @Override
-    public void setValue(Map<String, SuperNumber> value) {
-        super.setValue(value);
-        EmcData.customEmcMap = value;
-    }
 }
+
+

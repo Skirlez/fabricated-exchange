@@ -35,8 +35,8 @@ public class ModItemStackTooltip {
 		ArrayList<Text> list = cir.getReturnValue();
 		int maxCount = itemStack.getMaxCount();
 		MinecraftClient client = MinecraftClient.getInstance();
-		if (client.currentScreen instanceof TransmutationTableScreen 
-				&& (((TransmutationTableScreen)client.currentScreen)).getFocusedSlot() instanceof TransmutationSlot 
+		if (client.currentScreen instanceof TransmutationTableScreen currentScreen
+				&& currentScreen.getFocusedSlot() instanceof TransmutationSlot 
 				&& Screen.hasShiftDown() && maxCount != 1) {
 			SuperNumber itemCount = new SuperNumber(FabricatedExchangeClient.clientEmc);
 			itemCount.divide(emc);
@@ -52,6 +52,12 @@ public class ModItemStackTooltip {
 			}
 		}
 		else {
+			if (itemStack.getMaxDamage() != 0) {
+				emc.multiply(new SuperNumber(itemStack.getMaxDamage()-itemStack.getDamage(), itemStack.getMaxDamage()));
+				emc.floor();
+			}
+			
+			
 			list.add(Text.literal("§eEMC§r: " + emc));
 			if (count > 1) {
 				emc.multiply(count);

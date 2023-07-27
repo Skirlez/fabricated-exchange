@@ -29,9 +29,17 @@ import net.minecraft.util.Hand;
 public class TheCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         LiteralCommandNode<ServerCommandSource> mainNode = CommandManager
-        .literal("fe")
+        // consider "/fabex" if /fe is taken
+        // if it's taken after this mod releases i'm standing my ground (:
+        // (why do commands not have namespaces?)
+        .literal("fe") 
         .build();
 
+        LiteralCommandNode<ServerCommandSource> helpNode = CommandManager
+        .literal("help")
+        .executes(context -> help(context))
+        .build();
+        
         LiteralCommandNode<ServerCommandSource> setNode = CommandManager
         .literal("set")
         .build();
@@ -79,9 +87,11 @@ public class TheCommand {
         .literal("reload")
         .executes(context -> reload(context))
         .build();
-        
+
 
         dispatcher.getRoot().addChild(mainNode);
+
+        mainNode.addChild(helpNode);
 
         mainNode.addChild(setNode);
         setNode.addChild(setSeedNode);
@@ -97,13 +107,18 @@ public class TheCommand {
 
         mainNode.addChild(reloadNode);
     }
+    private static int help(CommandContext<ServerCommandSource> context) {
+        context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.help"));
+        return 1;
+        
+    }
 
     private static int setEmc(CommandContext<ServerCommandSource> context, boolean seed) {
         PlayerEntity p = context.getSource().getPlayer();
         String str = context.getArgument("number", String.class);
 
         if (!str.matches("[\\d/]+")) {
-            context.getSource().sendFeedback(MutableText.of(Text.of(str).getContent()).append(Text.translatable("commands.fabricated-exchange.setemc.not_valid_number")), false);
+            context.getSource().sendMessage(MutableText.of(Text.of(str).getContent()).append(Text.translatable("commands.fabricated-exchange.setemc.not_valid_number")));
             return 0;
         }
         SuperNumber num = new SuperNumber(str);
@@ -111,18 +126,18 @@ public class TheCommand {
         if (stack.isEmpty()) {
             stack = p.getStackInHand(Hand.OFF_HAND);
             if (stack.isEmpty()) {
-                context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.no_item"), false);
+                context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.no_item"));
                 return 0;
             }
         }
         Item item = stack.getItem();
         EmcData.setItemEmc(item, num, seed);
         if (seed) 
-            context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.setemc.seed_success")
-            .append(" ").append(Text.translatable("commands.fabricated-exchange.reload_notice")), false);
+            context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.setemc.seed_success")
+            .append(" ").append(Text.translatable("commands.fabricated-exchange.reload_notice")));
         else {
             FabricatedExchange.syncMaps(context.getSource().getServer());
-            context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.setemc.custom_success"), false);
+            context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.setemc.custom_success"));
         }
 
         return 1;
@@ -135,7 +150,7 @@ public class TheCommand {
         if (stack.isEmpty()) {
             stack = p.getStackInHand(Hand.OFF_HAND);
             if (stack.isEmpty()) {
-                context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.no_item"), false);
+                context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.no_item"));
                 return 0;
             }
         }
@@ -145,27 +160,27 @@ public class TheCommand {
         if (seed) {
             Map<String, SuperNumber> map = ModConfig.SEED_EMC_MAP_FILE.getValue();
             if (!map.containsKey(id)) {
-                context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.removeemc.seed_confused")
-                    .append(" ").append(Text.translatable("commands.fabricated-exchange.zero_notice")), false);
+                context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.removeemc.seed_confused")
+                    .append(" ").append(Text.translatable("commands.fabricated-exchange.zero_notice")));
                 return 0;
             }
             map.remove(id);
             ModConfig.SEED_EMC_MAP_FILE.setValueAndSave(map);
-            context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.removeemc.seed_success")
-                .append(" ").append(Text.translatable("commands.fabricated-exchange.reload_notice")), false);
+            context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.removeemc.seed_success")
+                .append(" ").append(Text.translatable("commands.fabricated-exchange.reload_notice")));
         }
         else {
             Map<String, SuperNumber> map = ModConfig.CUSTOM_EMC_MAP_FILE.getValue();
             if (!map.containsKey(id)) {
-                context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.removeemc.custom_confused")
-                    .append(" ").append(Text.translatable("commands.fabricated-exchange.zero_notice")), false);
+                context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.removeemc.custom_confused")
+                    .append(" ").append(Text.translatable("commands.fabricated-exchange.zero_notice")));
                 return 0;
             }
             map.remove(id);
             ModConfig.CUSTOM_EMC_MAP_FILE.setValueAndSave(map);
             EmcData.syncMap(context.getSource().getPlayer());
-            context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.removeemc.custom_success")
-                .append(" ").append(Text.translatable("commands.fabricated-exchange.reload_notice")), false);
+            context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.removeemc.custom_success")
+                .append(" ").append(Text.translatable("commands.fabricated-exchange.reload_notice")));
         }
 
         return 1;
@@ -174,36 +189,36 @@ public class TheCommand {
     private static int banRecipe(CommandContext<ServerCommandSource> context, Recipe<?> recipe) {
         String type = recipe.getType().toString();
         if (!isRecipeTypeSupported(type)) {
-            context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.recipe.ban.unsupported_type", type), false);
+            context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.recipe.ban.unsupported_type", type));
             return 0;
         }
         Map<String, HashSet<String>> blacklisted = ModConfig.BLACKLISTED_MAPPER_RECIPES_FILE.getValue();
         String name = recipe.getId().toString();
         if (blacklisted.get(type).contains(name)) {
-            context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.nothing"), false);
+            context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.nothing"));
             return 0;
         }
         blacklisted.get(type).add(name);
         ModConfig.BLACKLISTED_MAPPER_RECIPES_FILE.save();
-        context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.recipe.ban.success", type), false);
+        context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.recipe.ban.success", type));
         return 1;
     }
     
     private static int pardonRecipe(CommandContext<ServerCommandSource> context, Recipe<?> recipe) {
         String type = recipe.getType().toString();
         if (!isRecipeTypeSupported(type)) {
-            context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.recipe.pardon.unsupported_type", type), false);
+            context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.recipe.pardon.unsupported_type", type));
             return 0;
         }
         Map<String, HashSet<String>> blacklisted = ModConfig.BLACKLISTED_MAPPER_RECIPES_FILE.getValue();
         String name = recipe.getId().toString();
         if (!blacklisted.get(type).contains(name)) {
-            context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.nothing"), false);
+            context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.nothing"));
             return 0;
         }
         blacklisted.get(type).remove(name);
         ModConfig.BLACKLISTED_MAPPER_RECIPES_FILE.save();
-        context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.recipe.pardon.success", type), false);
+        context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.recipe.pardon.success", type));
         return 1;
     }
 
@@ -215,8 +230,8 @@ public class TheCommand {
         FabricatedExchange.syncMaps(server);
 
         String add = (log.isEmpty()) ? "\nNo errors or warnings." : "\n" + log;
-        context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.reloademc.success",
-        String.valueOf((System.nanoTime() - startTime) / 1000000)).append(add), false);
+        context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.reloademc.success",
+        String.valueOf((System.nanoTime() - startTime) / 1000000)).append(add));
         return 1;
     }
 

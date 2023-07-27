@@ -2,7 +2,6 @@ package com.skirlez.fabricatedexchange.util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -16,7 +15,7 @@ import com.skirlez.fabricatedexchange.FabricatedExchange;
 public class DataFile<T> {
     private final Type type;
     private final Path path;
-    private final String name;
+    protected final String name;
     protected T value;
     public DataFile(Type type, String name) {
         this.type = type;
@@ -30,6 +29,7 @@ public class DataFile<T> {
         if (Files.exists(path)) {
             try (BufferedReader reader = Files.newBufferedReader(path)) {
                 value = ModConfig.GSON.fromJson(reader, type);
+                process();
             } 
             catch (Exception e) {
                 FabricatedExchange.LOGGER.error(name + " exists but could not be read!", e);
@@ -37,7 +37,6 @@ public class DataFile<T> {
             }
         }
     }
-
 
     public T getValue() {
         return value;
@@ -70,6 +69,7 @@ public class DataFile<T> {
 
     public void setValue(T newValue) {
         value = newValue;
+        process();
     }
 
     public void setValueAndSave(T newValue) {
@@ -81,7 +81,8 @@ public class DataFile<T> {
         try (InputStream inputStream = FabricatedExchange.class.getClassLoader().getResourceAsStream("default_configs/" + name);
             Reader reader = new InputStreamReader(inputStream)) {
             value = ModConfig.GSON.fromJson(reader, type);
-        } catch (IOException e) {
+            process();
+        } catch (Exception e) {
             FabricatedExchange.LOGGER.error(name + "'s default configuration could not be read from!", e);
             value = null;
         }
@@ -91,9 +92,15 @@ public class DataFile<T> {
         try (InputStream inputStream = FabricatedExchange.class.getClassLoader().getResourceAsStream("default_configs/" + name);
             Reader reader = new InputStreamReader(inputStream)) {
             return ModConfig.GSON.fromJson(reader, type);
-        } catch (IOException e) {
+        } catch (Exception e) {
             FabricatedExchange.LOGGER.error(name + "'s default configuration could not be read from!", e);
             return null;
         }
     }
+
+    // This method will allow subclasses that override it to perform additional operations on the data that was fetched/set
+    protected void process() {
+
+    }
+
 }

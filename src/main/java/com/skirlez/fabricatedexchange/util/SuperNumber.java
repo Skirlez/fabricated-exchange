@@ -83,6 +83,9 @@ public class SuperNumber {
         return (numerator.intValue()/denominator.intValue());
     }
     
+    public static SuperNumber NegativeOne() {
+        return new SuperNumber(BigInteger.ONE.negate());
+    }
     public static SuperNumber Zero() {
         return new SuperNumber(BigInteger.ZERO);
     }
@@ -97,18 +100,30 @@ public class SuperNumber {
         return numerator.equals(BigInteger.ONE) && denominator.equals(BigInteger.ONE);
     }
 
-    /** Rounds the SuperNumber to the nearest whole number smaller than itself */
+    /** Rounds the SuperNumber to the closest whole number. 
+     * If it's the same distance from two whole numbers, it'll choose the one greater than itself. */
+    public void round() {
+        if (numerator.equals(BigInteger.ZERO) || denominator.equals(BigInteger.ONE))
+            return;
+        if (numerator.multiply(BigInteger.TWO).compareTo(denominator) >= 0) 
+            ceil();
+        else
+            round();
+    }
+
+
+    /** Rounds the SuperNumber to the closest whole number smaller than itself */
     public void floor() {
-        if (numerator.equals(BigInteger.ZERO))
+        if (numerator.equals(BigInteger.ZERO) || denominator.equals(BigInteger.ONE))
             return;
         BigInteger mod = numerator.mod(denominator);
         numerator = numerator.subtract(mod);
         simplify();
     }
 
-    /** Rounds the SuperNumber to the nearest whole number greater than itself */
+    /** Rounds the SuperNumber to the closest whole number greater than itself */
     public void ceil() {
-        if (numerator.equals(BigInteger.ZERO))
+        if (numerator.equals(BigInteger.ZERO) || denominator.equals(BigInteger.ONE))
             return;
         BigInteger mod = numerator.mod(denominator);
         numerator = numerator.add(denominator.subtract(mod));
@@ -248,6 +263,15 @@ public class SuperNumber {
         denominator = temp;
     }
 
+    
+    /** Negates the SuperNumber
+     * <p> 1 -> -1
+     * <p> 3/4 -> -3/4
+    */
+    public void negate() {
+        numerator = numerator.negate();
+    }
+
     /** Copies the value of another SuperNumber to this SuperNumber. */
     public void copyValueOf(SuperNumber other) {
         this.denominator = other.denominator;
@@ -257,6 +281,13 @@ public class SuperNumber {
     /** @return Whether the value of the SuperNumbers is equal. */
     public boolean equalTo(SuperNumber other) {
         return numerator.equals(other.numerator) && denominator.equals(other.denominator);
+    }
+
+    public boolean isPositive() {
+        return numerator.compareTo(BigInteger.ZERO) > 0;
+    }
+    public boolean isNegative() {
+        return numerator.compareTo(BigInteger.ZERO) < 0;
     }
 
     /** A comparison between this and another SuperNumber. 
@@ -452,10 +483,6 @@ public class SuperNumber {
             numerator = numerator.divide(gcd);
             denominator = denominator.divide(gcd);
         }
-    }
-
-    protected void stupid() {
-        throw new UnsupportedOperationException("Cannot mutate ConstSuperNumber");
     }
 
     /** @return the smaller of the two SuperNumbers. */

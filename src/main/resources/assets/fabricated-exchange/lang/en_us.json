@@ -24,10 +24,12 @@
     "sounds.fabricated-exchange.item_charge": "Item charged",
     "sounds.fabricated-exchange.item_discharge": "Item discharged",
 
+    "commands.fabricated-exchange.help": "/fe set (seed/custom) <number> - Set the currently held item's seed or custom EMC value\n/fe remove (seed/custom) - Remove the currently held item's seed or custom EMC value\n/fe recipe (ban/pardon) <recipe> - Ban/Unban a recipe from being considered by the EMC mapper\n/fe reload - Reload all config files and regenerate all EMC values using the the EMC mapper\n/fe help - I don't know what this one does\n",
+    
     "commands.fabricated-exchange.reload_notice": "Run '/fe reload' to regenerate the EMC values.",
     "commands.fabricated-exchange.zero_notice": "If you want this specific item to not have EMC, run '/fe set custom 0'.",
     "commands.fabricated-exchange.no_item": "Air cannot have EMC! Hold an item and then run the command.",
-    "commands.fabricated-exchange.setemc.not_valid_number": " isn't a valid number!",
+    "commands.fabricated-exchange.setemc.not_valid_number": " isn't a valid number string!",
     "commands.fabricated-exchange.setemc.custom_success": "Item EMC updated!",
     "commands.fabricated-exchange.setemc.seed_success": "Item EMC added to seed values!",
     "commands.fabricated-exchange.removeemc.seed_success": "Item EMC removed from seed values!",
@@ -36,9 +38,9 @@
     "commands.fabricated-exchange.removeemc.custom_confused": "This item does not have a custom EMC value.",
     "commands.fabricated-exchange.reloademc.success": "Done! (%sms) EMC mapper output:",
     "commands.fabricated-exchange.recipe.ban.unsupported_type": "Cannot ban this recipe because its type (%s) is unsupported.",
-    "commands.fabricated-exchange.recipe.ban.success": "Done! The recipe will now be considered by the EMC mapper!",
+    "commands.fabricated-exchange.recipe.ban.success": "Done! The recipe will be skipped by the EMC mapper!",
     "commands.fabricated-exchange.recipe.pardon.unsupported_type": "Cannot pardon this recipe because its type (%s) is unsupported. You couldn't ban it if you wanted to.",
-    "commands.fabricated-exchange.recipe.pardon.success": "Done! The recipe will now be considered by the EMC mapper!",
+    "commands.fabricated-exchange.recipe.pardon.success": "Done! The recipe will now be evaluated by the EMC mapper!",
     "commands.fabricated-exchange.nothing": "Nothing has changed.",
     "key.category.fabricated-exchange": "Fabricated Exchange bindings",
     "key.fabricated-exchange.charge": "Charge/Discharge Item"

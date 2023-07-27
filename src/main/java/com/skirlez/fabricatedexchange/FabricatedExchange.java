@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
@@ -79,15 +80,13 @@ public class FabricatedExchange implements ModInitializer {
 
     public static String reloadEmcMap(MinecraftServer server) {
         EmcMapper mapper = new EmcMapper();
-        Map<String, SuperNumber> seedEmcMap = ModConfig.SEED_EMC_MAP_FILE.getValue();
-        Map<String, SuperNumber> customEmcMap = ModConfig.CUSTOM_EMC_MAP_FILE.getValue();
 
-        mapper.fillEmcMap(server.getOverworld(), seedEmcMap, server.getOverworld().getRecipeManager());
+        mapper.fillEmcMap(server.getOverworld(), server.getOverworld().getRecipeManager());
         EmcData.emcMap = mapper.getMap();
-        if (customEmcMap != null)
-            GeneralUtil.mergeMap(EmcData.emcMap, customEmcMap);
+
         
         List<Item> fuelItemList = new ArrayList<Item>();
+ 
         Iterator<RegistryEntry<Item>> iterator = Registries.ITEM.getEntryList(ModTags.FUEL).get().iterator();
         while (iterator.hasNext()) {
             Item item = iterator.next().value();
