@@ -40,6 +40,9 @@ public class ModBlocks {
     public static final Block ANTIMATTER_RELAY_MK3 = registerBlock("antimatter_relay_mk3", 
         new AntiMatterRelay(FabricBlockSettings.of(Material.GLASS, MapColor.BLACK).requiresTool().strength(3.5f), 2));
 
+    public static final Block ALCHEMICAL_CHEST = registerBlock("alchemical_chest", 
+        new AlchemicalChest(FabricBlockSettings.of(Material.GLASS, MapColor.BLACK).requiresTool().strength(3.5f)));
+
     private static Block registerBlock(String name, Block block) {
         registerBlockItem(name, block);
         return Registry.register(Registries.BLOCK, new Identifier(FabricatedExchange.MOD_ID, name), block);

@@ -22,6 +22,12 @@ public class ModBlockEntities {
         ModBlocks.ANTIMATTER_RELAY_MK1, ModBlocks.ANTIMATTER_RELAY_MK2, ModBlocks.ANTIMATTER_RELAY_MK3)
         .build());
 
+    public static BlockEntityType<AlchemicalChestBlockEntity> ALCHEMICAL_CHEST = 
+        registerBlockEntity("alchemical_chest_entity",
+        FabricBlockEntityTypeBuilder.create(AlchemicalChestBlockEntity::new, 
+        ModBlocks.ALCHEMICAL_CHEST)
+        .build());
+
 
     private static <T extends BlockEntity> BlockEntityType<T> registerBlockEntity(String name, BlockEntityType<T> blockEntityType) {
         return Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier(FabricatedExchange.MOD_ID, name), blockEntityType);

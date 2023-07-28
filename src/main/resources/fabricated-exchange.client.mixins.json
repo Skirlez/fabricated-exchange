@@ -6,6 +6,7 @@
 		"ModWorldRendererOutline",
 		"ModItemStackTooltip",
 		"HandledScreenAccessor",
+		"ModTexturedRenderLayers",
 		"ClientWorldAmbientDarkness"
 	],
 	"injectors": {

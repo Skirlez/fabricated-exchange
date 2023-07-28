@@ -17,6 +17,7 @@
     "block.fabricated-exchange.energy_collector_mk1": "Energy Collector MK1",
     "block.fabricated-exchange.energy_collector_mk2": "Energy Collector MK2",
     "block.fabricated-exchange.energy_collector_mk3": "Energy Collector MK3",
+    "block.fabricated-exchange.alchemical_chest": "Alchemical Chest",
     "screen.fabricated-exchange.transmutation": "Transmutation",
     "screen.fabricated-exchange.emc_collection": "EMC Collection",
     "itemgroup.fabricated-exchange": "Fabricated Exchange", 

@@ -46,6 +46,7 @@ All of the code in this repository is licensed under the terms of the LGPLv3. I 
 # Implemented Features
 - Philosopher's Stone
 - Transmutation Table and Tablet
+- Alchemical Chest
 - Energy Collectors Mk1-Mk3
 - Antimatter Relays Mk1-Mk3
 - EMC Mapper
@@ -58,4 +59,4 @@ All of the code in this repository is licensed under the terms of the LGPLv3. I 
   * Custom: EMC values that get applied at the end of the mapping process and override any value the mapper might have assigned.
  
 # Screenshot
-![progress](https://github.com/Skirlez/fabricated-exchange/assets/17904548/394f5610-1be4-4534-9279-b97052963706)
+![image](https://github.com/Skirlez/fabricated-exchange/assets/17904548/cf15c450-3715-4821-a988-de192aa0306a)

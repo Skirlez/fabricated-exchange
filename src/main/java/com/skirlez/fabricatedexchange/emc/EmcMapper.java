@@ -360,8 +360,12 @@ public class EmcMapper {
         unknownWorth.divide(unknownMult);
         for (Item item : unknownItems) {
             if (item.hasRecipeRemainder()) {
-                SuperNumber remainderEmc = getItemEmc(item.getRecipeRemainder());
-                if (remainderEmc.equalsZero())
+                // if the item has a recipe remainder, the EMC value of the remainder 
+                // should be added on top of the value this recipe assigns to the item.
+                // (and if the remainder is equal to the item, we don't need to do this)
+                Item remainder = item.getRecipeRemainder();
+                SuperNumber remainderEmc = getItemEmc(remainder);
+                if (remainderEmc.equalsZero() && !remainder.equals(item)) 
                     continue;
                 remainderEmc.add(unknownWorth);
                 newInfo = putEmcMap(item, remainderEmc, recipe) || newInfo;

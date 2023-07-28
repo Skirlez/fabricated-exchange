@@ -7,7 +7,8 @@ import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.minecraft.block.entity.BlockEntity;
 
-/* This interface is used by block entities which can be in an idle state or consuming state.
+/* This interface is used by block entities that can share and take EMC from other block entities. 
+the block entites can be in one of two states: an idle state and a consuming state.
 For example: When the Energy Collectors have no fuel items in them, They are in the idle state,
 simply generating EMC. When a fuel item is put inside of them, they are in the consuming state,
 consuming their EMC in order to transmute the fuel item to the next one. these states will be used 

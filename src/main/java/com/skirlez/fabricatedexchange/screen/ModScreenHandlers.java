@@ -20,6 +20,8 @@ public class ModScreenHandlers {
     public static ScreenHandlerType<AntiMatterRelayScreenHandler> ANTIMATTER_RELAY_SCREEN_HANDLER = 
         new ExtendedScreenHandlerType<>(AntiMatterRelayScreenHandler::new);
 
+    public static ScreenHandlerType<AlchemicalChestScreenHandler> ALCHEMICAL_CHEST_SCREEN_HANDLER = 
+        new ScreenHandlerType<>(AlchemicalChestScreenHandler::new, FeatureSet.empty());
 
     public static void registerAllScreenHandlers() {
         // TODO figure out what the strings are for
@@ -31,5 +33,8 @@ public class ModScreenHandlers {
 
         Registry.register(Registries.SCREEN_HANDLER, new Identifier(FabricatedExchange.MOD_ID, "antimatter_relay"),
             ANTIMATTER_RELAY_SCREEN_HANDLER);
+        
+        Registry.register(Registries.SCREEN_HANDLER, new Identifier(FabricatedExchange.MOD_ID, "alchemical_chest"),
+            ALCHEMICAL_CHEST_SCREEN_HANDLER);
     }
 }
