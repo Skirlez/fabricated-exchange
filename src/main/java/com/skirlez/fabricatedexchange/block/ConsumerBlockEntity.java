@@ -17,6 +17,9 @@ public interface ConsumerBlockEntity {
     SuperNumber getEmc();
     SuperNumber getOutputRate();
     SuperNumber getMaximumEmc();
+    default SuperNumber getBonusEmc() {
+        return SuperNumber.ZERO;
+    }
     boolean isConsuming();
 
     default void distributeEmc(List<BlockEntity> neighbors) {
@@ -28,7 +31,8 @@ public interface ConsumerBlockEntity {
                     && ((ConsumerBlockEntity)neighbor).isConsuming()) {
 
                 ConsumerBlockEntity consumerNeighbor = (ConsumerBlockEntity)neighbor;
-                if (consumerNeighbor.getEmc().compareTo(consumerNeighbor.getMaximumEmc()) == -1)
+                SuperNumber max = consumerNeighbor.getMaximumEmc();
+                if (max.equalsZero() || consumerNeighbor.getEmc().compareTo(max) == -1)
                     goodNeighbors.add(consumerNeighbor);
             }
         }
@@ -40,11 +44,17 @@ public interface ConsumerBlockEntity {
                 SuperNumber neighborEmc = neighbor.getEmc();
                 SuperNumber neighborMaximumEmc = neighbor.getMaximumEmc();
                 neighborEmc.stealFrom(emc, output);
+                SuperNumber bonusEmc = getBonusEmc();
+                if (!bonusEmc.equalsZero())
+                    neighborEmc.add(bonusEmc);
+                if (neighborMaximumEmc.equalsZero())
+                    continue;
                 if (neighborEmc.compareTo(neighborMaximumEmc) == 1)
                     neighborEmc.copyValueOf(neighborMaximumEmc);
             }
         }
     }
+    void update(SuperNumber emc);
     
 
 }

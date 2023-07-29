@@ -2,7 +2,6 @@ package com.skirlez.fabricatedexchange.screen;
 
 import com.skirlez.fabricatedexchange.block.AntiMatterRelayBlockEntity;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
-
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.PacketByteBuf;
 

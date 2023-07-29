@@ -13,6 +13,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.BlockPos;
 
 
 // This is the parent class of EnergyCollectorScreenHandler and AntiMatterRelayScreenHandler, as they
@@ -33,7 +34,7 @@ public abstract class FuelScreenHandler extends ScreenHandler {
 
     @Override
     public boolean canUse(PlayerEntity player) {
-        return this.inventory.canPlayerUse(player);
+        return Inventory.canPlayerUse(blockEntity, player);
     }
 
     @Override
@@ -106,8 +107,8 @@ public abstract class FuelScreenHandler extends ScreenHandler {
         return copy;
     }
 
-    public BlockEntity getBlockEntity() {
-        return blockEntity;
+    public BlockPos getPos() {
+        return blockEntity.getPos();
     }
     public int getLevel() {
         return level;

@@ -11,17 +11,21 @@ import net.minecraft.util.Identifier;
 
 
 public class ModScreenHandlers {
-    public static ScreenHandlerType<TransmutationTableScreenHandler> TRANSMUTATION_TABLE_SCREEN_HANDLER = 
+    public static final ScreenHandlerType<TransmutationTableScreenHandler> TRANSMUTATION_TABLE_SCREEN_HANDLER = 
         new ScreenHandlerType<>(TransmutationTableScreenHandler::new, FeatureSet.empty());
 
-    public static ScreenHandlerType<EnergyCollectorScreenHandler> ENERGY_COLLECTOR_SCREEN_HANDLER = 
+    public static final ScreenHandlerType<EnergyCollectorScreenHandler> ENERGY_COLLECTOR_SCREEN_HANDLER = 
         new ExtendedScreenHandlerType<>(EnergyCollectorScreenHandler::new);
 
-    public static ScreenHandlerType<AntiMatterRelayScreenHandler> ANTIMATTER_RELAY_SCREEN_HANDLER = 
+    public static final ScreenHandlerType<AntiMatterRelayScreenHandler> ANTIMATTER_RELAY_SCREEN_HANDLER = 
         new ExtendedScreenHandlerType<>(AntiMatterRelayScreenHandler::new);
 
-    public static ScreenHandlerType<AlchemicalChestScreenHandler> ALCHEMICAL_CHEST_SCREEN_HANDLER = 
+    public static final ScreenHandlerType<AlchemicalChestScreenHandler> ALCHEMICAL_CHEST_SCREEN_HANDLER = 
         new ScreenHandlerType<>(AlchemicalChestScreenHandler::new, FeatureSet.empty());
+
+    public static final ScreenHandlerType<EnergyCondenserScreenHandler> ENERGY_CONDENSER_SCREEN_HANDLER = 
+        new ExtendedScreenHandlerType<>(EnergyCondenserScreenHandler::new);
+
 
     public static void registerAllScreenHandlers() {
         // TODO figure out what the strings are for
@@ -36,5 +40,8 @@ public class ModScreenHandlers {
         
         Registry.register(Registries.SCREEN_HANDLER, new Identifier(FabricatedExchange.MOD_ID, "alchemical_chest"),
             ALCHEMICAL_CHEST_SCREEN_HANDLER);
+
+        Registry.register(Registries.SCREEN_HANDLER, new Identifier(FabricatedExchange.MOD_ID, "energy_condenser"),
+            ENERGY_CONDENSER_SCREEN_HANDLER);
     }
 }

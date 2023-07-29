@@ -12,25 +12,38 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
-public class AlchemicalChest extends ChestBlock {
-    public AlchemicalChest(Settings settings) {
+public class EnergyCondenser extends ChestBlock {
+    private final int level;
+    public EnergyCondenser(Settings settings, int level) {
         super(settings, new Supplier<BlockEntityType<? extends ChestBlockEntity>>() {
             @Override
             public BlockEntityType<? extends ChestBlockEntity> get() {
-                return ModBlockEntities.ALCHEMICAL_CHEST;
+                return ModBlockEntities.ENERGY_CONDENSER;
             }
         });
+        this.level = level;
     }
 
 
     @Override
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (state.getBlock() != newState.getBlock()) {
+            BlockEntity blockEntity = world.getBlockEntity(pos);
+            if (blockEntity instanceof EnergyCondenserBlockEntity)
+                ((Inventory)blockEntity).removeStack(0);
+        }
+        super.onStateReplaced(state, world, pos, newState, moved);
+    }
+
+    @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new AlchemicalChestBlockEntity(pos, state);
+        return new EnergyCondenserBlockEntity(pos, state);
     }
 
     @Override
@@ -42,8 +55,13 @@ public class AlchemicalChest extends ChestBlock {
 
     @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return (world.isClient && type == ModBlockEntities.ALCHEMICAL_CHEST) 
-            ? (world2, pos, state1, blockEntity) -> ((AlchemicalChestBlockEntity)blockEntity).progressAnimation() 
-            : null;
+        return (world.isClient && type == ModBlockEntities.ENERGY_CONDENSER) 
+            ? (world2, pos, state2, blockEntity) -> ((EnergyCondenserBlockEntity)blockEntity).clientTick(world2, pos, state2) 
+            : (world2, pos, state2, blockEntity) -> ((EnergyCondenserBlockEntity)blockEntity).serverTick(world2, pos, state2);
+    }
+
+
+    public int getLevel() {
+        return level;
     }
 }

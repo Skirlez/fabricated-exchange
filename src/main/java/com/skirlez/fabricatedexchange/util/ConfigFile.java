@@ -13,6 +13,7 @@ public class ConfigFile extends DataFile<Map<String, Object>> {
 
     public static enum Bool {
         SHOW_ITEM_EMC_ORIGIN,
+        MAPPER_ENABLED
     }
 
     /* Fetch the config and compare to the default config to see if any keys
@@ -49,6 +50,9 @@ public class ConfigFile extends DataFile<Map<String, Object>> {
         switch (option) {
             case SHOW_ITEM_EMC_ORIGIN:
                 str = "showItemEmcOrigin";
+                break;
+            case MAPPER_ENABLED:
+                str = "mapper_enabled";
                 break;
             default:
                 FabricatedExchange.LOGGER.error("Config file has enum without a matching string");

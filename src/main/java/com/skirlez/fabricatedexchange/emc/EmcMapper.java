@@ -69,6 +69,8 @@ public class EmcMapper {
         // i don't know what this thing is, but you need it for some functions
         DynamicRegistryManager dynamicRegistryManager = world.getRegistryManager();
 
+
+
         List<SmithingRecipe> allSmithingRecipes = recipeManager.listAllOfType(RecipeType.SMITHING);
         List<SmeltingRecipe> allSmeltingRecipes = recipeManager.listAllOfType(RecipeType.SMELTING);
         List<CraftingRecipe> allCraftingRecipes = recipeManager.listAllOfType(RecipeType.CRAFTING);
@@ -364,14 +366,16 @@ public class EmcMapper {
                 // should be added on top of the value this recipe assigns to the item.
                 // (and if the remainder is equal to the item, we don't need to do this)
                 Item remainder = item.getRecipeRemainder();
-                SuperNumber remainderEmc = getItemEmc(remainder);
-                if (remainderEmc.equalsZero() && !remainder.equals(item)) 
+                if (!remainder.equals(item)) {
+                    SuperNumber remainderEmc = getItemEmc(remainder);
+                    if (remainderEmc.equalsZero()) 
+                        continue;
+                    remainderEmc.add(unknownWorth);
+                    newInfo = putEmcMap(item, remainderEmc, recipe) || newInfo;
                     continue;
-                remainderEmc.add(unknownWorth);
-                newInfo = putEmcMap(item, remainderEmc, recipe) || newInfo;
+                }
             }
-            else
-                newInfo = putEmcMap(item, unknownWorth, recipe) || newInfo;
+            newInfo = putEmcMap(item, unknownWorth, recipe) || newInfo;
         }
 
         return newInfo;
@@ -441,7 +445,7 @@ public class EmcMapper {
         Iterator<SmithingRecipe> iterator = recipesList.iterator();
         while (iterator.hasNext()) {
             // this is deprecated but at the moment the recipe list function gives us LegacySmithingRecipe,
-            // when they change it we will properly use SmithingTransformRecipe and SmithingTrimRecipe
+            // when the mod is updated we will properly use SmithingTransformRecipe and SmithingTrimRecipe
             LegacySmithingRecipe recipe = (LegacySmithingRecipe)iterator.next();
 
             LegacySmithingRecipeAccessor recipeAccessor = (LegacySmithingRecipeAccessor) recipe;

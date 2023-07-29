@@ -2,7 +2,8 @@ package com.skirlez.fabricatedexchange.block;
 
 import org.jetbrains.annotations.Nullable;
 
-import com.skirlez.fabricatedexchange.screen.AlchemicalChestScreenHandler;
+import com.skirlez.fabricatedexchange.screen.ChestScreenHandler;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
@@ -30,15 +31,11 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
-public class BaseChestBlockEntity extends ChestBlockEntity {
+public abstract class BaseChestBlockEntity extends ChestBlockEntity {
     private int viewers = 0;
     private float angle, last;
     private final ViewerCountManager stateManager;
     private final ChestLidAnimator lidAnimator;
-
-    public BaseChestBlockEntity(BlockPos pos, BlockState state) {
-        this(ModBlockEntities.ALCHEMICAL_CHEST, pos, state);
-    }
 
     public BaseChestBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
         super(blockEntityType, pos, state);
@@ -59,10 +56,10 @@ public class BaseChestBlockEntity extends ChestBlockEntity {
             }
 
             protected boolean isPlayerViewing(PlayerEntity player) {
-                if (!(player.currentScreenHandler instanceof AlchemicalChestScreenHandler)) {
+                if (!(player.currentScreenHandler instanceof ChestScreenHandler handler))
                     return false;
-                } else {
-                    Inventory inventory = ((AlchemicalChestScreenHandler)player.currentScreenHandler).getInventory();
+                else {
+                    Inventory inventory = handler.getInventory();
                     return inventory == BaseChestBlockEntity.this;
                 }
             }
@@ -142,15 +139,16 @@ public class BaseChestBlockEntity extends ChestBlockEntity {
     }
 
     @Environment(EnvType.CLIENT)
-    public void clientTick() {
+    public void progressAnimation() {
         last = angle;
 
         int viewers = countViewers();
         if (viewers == 0 && angle > 0.0F || viewers > 0 && angle < 0.89F) {
             if (viewers > 0) 
                 angle += 0.1F;
-            else angle -= 0.1F;
-                angle = MathHelper.clamp(angle, 0, 1);
+            else 
+                angle -= 0.1F;
+            angle = MathHelper.clamp(angle, 0, 1);
         }
     }
 

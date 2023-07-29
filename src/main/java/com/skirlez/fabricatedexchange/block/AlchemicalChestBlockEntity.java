@@ -1,7 +1,5 @@
 package com.skirlez.fabricatedexchange.block;
 
-import org.jetbrains.annotations.Nullable;
-
 import com.skirlez.fabricatedexchange.screen.AlchemicalChestScreenHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;

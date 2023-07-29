@@ -51,6 +51,7 @@ public class AntiMatterRelay extends BlockWithEntityAndRotation {
         super.onStateReplaced(state, world, pos, newState, moved);
     }
 
+
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new AntiMatterRelayBlockEntity(pos, state);
@@ -58,8 +59,15 @@ public class AntiMatterRelay extends BlockWithEntityAndRotation {
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return checkType(type, ModBlockEntities.ANTIMATTER_RELAY, AntiMatterRelayBlockEntity::tick);
+        return type != ModBlockEntities.ANTIMATTER_RELAY ? null : 
+            (world.isClient()) 
+            ? (world2, pos, state2, blockEntity) 
+                -> AntiMatterRelayBlockEntity.clientTick(world2, pos, state2, (AntiMatterRelayBlockEntity)blockEntity)
+            : (world2, pos, state2, blockEntity) 
+                -> AntiMatterRelayBlockEntity.tick(world2, pos, state2, (AntiMatterRelayBlockEntity)blockEntity);
+
     }
+    // World world, BlockPos blockPos, BlockState blockState, AntiMatterRelayBlockEntity entity
 
     public int getLevel() {
         return level;

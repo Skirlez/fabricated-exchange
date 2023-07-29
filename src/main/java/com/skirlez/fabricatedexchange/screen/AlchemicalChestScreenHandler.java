@@ -7,12 +7,9 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 
-public class AlchemicalChestScreenHandler extends ScreenHandler {
-    private Inventory inventory;
-
+public class AlchemicalChestScreenHandler extends ChestScreenHandler {
     public AlchemicalChestScreenHandler(int syncId, PlayerInventory inventory) {
         this(syncId, inventory, new SimpleInventory(104));
     }
@@ -33,15 +30,9 @@ public class AlchemicalChestScreenHandler extends ScreenHandler {
     }
 
     @Override
-    public void onClosed(PlayerEntity player){
-        super.onClosed(player);
-        this.inventory.onClose(player);
-    }
-
-    @Override
     public ItemStack quickMove(PlayerEntity player, int slot) {
         ItemStack itemStack = ItemStack.EMPTY;
-        Slot slot2 = (Slot)this.slots.get(slot);
+        Slot slot2 = this.slots.get(slot);
         if (slot2 != null && slot2.hasStack()) {
             ItemStack itemStack2 = slot2.getStack();
             itemStack = itemStack2.copy();
@@ -61,14 +52,5 @@ public class AlchemicalChestScreenHandler extends ScreenHandler {
         }
 
         return itemStack;
-    }
-
-    @Override
-    public boolean canUse(PlayerEntity player) {
-        return this.inventory.canPlayerUse(player);
-    }
-
-    public Inventory getInventory() {
-        return this.inventory;
     }
 }

@@ -9,6 +9,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
+import com.skirlez.fabricatedexchange.util.ConfigFile;
 import com.skirlez.fabricatedexchange.util.ModConfig;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
@@ -225,13 +226,16 @@ public class TheCommand {
     private static int reload(CommandContext<ServerCommandSource> context) {
         MinecraftServer server = context.getSource().getServer();
         ModConfig.fetchAll();
-        long startTime = System.nanoTime();
-        String log = FabricatedExchange.reloadEmcMap(server);
-        FabricatedExchange.syncMaps(server);
+        context.getSource().sendMessage(Text.literal("Data files reloaded!"));
+        if (ModConfig.CONFIG_FILE.getOption(ConfigFile.Bool.MAPPER_ENABLED)) {
+            long startTime = System.nanoTime();
+            String log = FabricatedExchange.reloadEmcMap(server);
+            FabricatedExchange.syncMaps(server);
 
-        String add = (log.isEmpty()) ? "\nNo errors or warnings." : "\n" + log;
-        context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.reloademc.success",
-        String.valueOf((System.nanoTime() - startTime) / 1000000)).append(add));
+            String add = (log.isEmpty()) ? "\nNo errors or warnings." : "\n" + log;
+            context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.reloademc.success",
+            String.valueOf((System.nanoTime() - startTime) / 1000000)).append(add));
+        }
         return 1;
     }
 

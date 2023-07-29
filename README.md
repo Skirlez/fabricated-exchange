@@ -26,12 +26,17 @@ In any case, open an issue on this repository.
 
 # Contributing
 
-This is my very first Minecraft mod, and so I am unfamiliar with good Fabric mod practices.
+Contributions are welcome.
+
+This is my very first Fabric mod, and so I am unfamiliar with good Fabric mod practices.
 If you spot anything that is done incorrectly, unsafely, or that could be done more 
 efficiently, please open an issue/pull request a change.
 
 Additionally, as of now, the mod is still under development. So you could also suggest or implement
 new features, or old features from previous equivalence mods.
+
+Also, I'd appreciate an issue being opened before making a pull request 
+to avoid two people working on the same thing.
 
 # Licensing
 
@@ -42,21 +47,20 @@ All of the code in this repository is licensed under the terms of the LGPLv3. I 
 - Support Quilt (Even over Fabric, if it ever comes to that choice)
 - Don't use any external libraries other than the Fabric API
 
-
 # Implemented Features
+
 - Philosopher's Stone
 - Transmutation Table and Tablet
-- Alchemical Chest
 - Energy Collectors Mk1-Mk3
 - Antimatter Relays Mk1-Mk3
-- EMC Mapper
+- Alchemical Chest
+- Energy Condensers Mk1, Mk2
+- Alchemical Fuels + Blocks, Dark/Red Matter, Covalence Dusts
+- Configurable EMC Mapper
 
 # NEW Features
 - As much EMC as your RAM can store
 - Infinitely precise EMC fractions (No more slabs without EMC values!)
-- Distinction between "seed" and "custom" EMC values:
-  * Seed: The EMC values the EMC mapper uses to infer the EMC values of other items
-  * Custom: EMC values that get applied at the end of the mapping process and override any value the mapper might have assigned.
  
 # Screenshot
-![image](https://github.com/Skirlez/fabricated-exchange/assets/17904548/cf15c450-3715-4821-a988-de192aa0306a)
+![image](https://github.com/Skirlez/fabricated-exchange/assets/17904548/c389d2f9-c129-4207-be85-51735b0e682e)

@@ -15,6 +15,8 @@ import com.skirlez.fabricatedexchange.screen.slot.SlotCondition;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -96,16 +98,18 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
         tick = 0;
     }
 
+    @Environment(EnvType.CLIENT)
+    public static void clientTick(World world, BlockPos blockPos, BlockState blockState, AntiMatterRelayBlockEntity entity) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.player.currentScreenHandler instanceof AntiMatterRelayScreenHandler screenHandler 
+                && screenHandler.getPos().equals(blockPos)
+                && client.currentScreen instanceof AntiMatterRelayScreen screen)
+            screen.update(entity.emc);
+        return;
+    }
+
+
     public static void tick(World world, BlockPos blockPos, BlockState blockState, AntiMatterRelayBlockEntity entity) {
-        if (world.isClient()) {
-            MinecraftClient client = MinecraftClient.getInstance();
-            if (client.player.currentScreenHandler instanceof AntiMatterRelayScreenHandler screenHandler 
-                    && screenHandler.getBlockEntity().getPos().equals(entity.pos)
-                    && client.currentScreen instanceof AntiMatterRelayScreen screen)
-                screen.update(entity.emc);
-            return;
-        }
-        
         if (entity.fuelSlot.hasStack()) {
             SuperNumber value = EmcData.getItemEmc(entity.fuelSlot.getStack().getItem());                
             SuperNumber emcCopy = new SuperNumber(entity.emc);
@@ -115,8 +119,7 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
                 entity.fuelSlot.takeStack(1);
             }
         }   
-    
-
+        
         List<BlockEntity> neighbors = GeneralUtil.getNeighboringBlockEntities(world, blockPos);
         boolean hasConsumingNeighbors = false;
         for (BlockEntity blockEntity : neighbors) {
@@ -138,6 +141,14 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
         entity.tick++;
     }
 
+    @Override
+    public boolean isValid(int slot, ItemStack stack) {
+        return (slot > 1);
+    }
+    @Override
+    public boolean canTransferTo(Inventory hopperInventory, int slot, ItemStack stack) {
+        return false;
+    }
 
     @Override
     public Text getDisplayName() {
@@ -203,15 +214,15 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
         data.writeString(emc.divisionString());
         
         for(ServerPlayerEntity player : PlayerLookup.tracking((ServerWorld) world, getPos())) {
-            if (player.currentScreenHandler instanceof AntiMatterRelayScreenHandler screenHandler && screenHandler.getBlockEntity().getPos().equals(pos)) 
-                ServerPlayNetworking.send(player, ModMessages.ANTIMATTER_RELAY_SYNC, data);
+            if (player.currentScreenHandler instanceof AntiMatterRelayScreenHandler screenHandler && screenHandler.getPos().equals(pos)) 
+                ServerPlayNetworking.send(player, ModMessages.CONSUMER_BLOCK_SYNC, data);
         }
     }
     private void serverSyncPlayer(ServerPlayerEntity player) {
         PacketByteBuf data = PacketByteBufs.create();
         data.writeBlockPos(getPos());
         data.writeString(emc.divisionString());
-        ServerPlayNetworking.send(player, ModMessages.ANTIMATTER_RELAY_SYNC, data);
+        ServerPlayNetworking.send(player, ModMessages.CONSUMER_BLOCK_SYNC, data);
     }
 
     public void update(SuperNumber emc) {

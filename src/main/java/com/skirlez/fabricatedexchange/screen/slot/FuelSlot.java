@@ -30,7 +30,7 @@ public class FuelSlot extends Slot {
     }
 
     private void moveAllInputsToFuel() {
-        for (int i = inputSlots.size() - 1; i >= 0; i--)
+        for (int i = 0; i < inputSlots.size(); i++)
             inputSlots.get(i).moveToFuelSlot();
     }
 

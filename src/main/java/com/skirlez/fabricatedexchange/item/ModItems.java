@@ -21,6 +21,12 @@ public class ModItems {
         new Item(new FabricItemSettings()));
     public static final Item AETERNALIS_FUEL = registerItem("aeternalis_fuel", 
         new Item(new FabricItemSettings()));
+    public static final Item LOW_COVALENCE_DUST = registerItem("low_covalence_dust", 
+        new Item(new FabricItemSettings()));
+    public static final Item MEDIUM_COVALENCE_DUST = registerItem("medium_covalence_dust", 
+        new Item(new FabricItemSettings()));
+    public static final Item HIGH_COVALENCE_DUST = registerItem("high_covalence_dust", 
+        new Item(new FabricItemSettings()));
     public static final Item DARK_MATTER = registerItem("dark_matter", 
         new Item(new FabricItemSettings()));
     public static final Item RED_MATTER = registerItem("red_matter", 

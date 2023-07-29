@@ -1,7 +1,5 @@
 package com.skirlez.fabricatedexchange.block;
 
-import org.jetbrains.annotations.Nullable;
-
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.interfaces.ImplementedInventory;
@@ -49,6 +47,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
     private int light;
     private boolean consuming;
     private final int level;
+
     private final SuperNumber maximumEmc;
     private final SuperNumber emcMultiplier;
     private final SuperNumber outputRate;
@@ -67,29 +66,26 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
         else
             this.level = 0;
 
-        int inputOffset;
         int xOffset;
         if (this.level == 0) {
             maximumEmc = new SuperNumber(10000);
             emcMultiplier = new SuperNumber(1, 5);
             outputRate = new SuperNumber(10);
-            inputOffset = 0;
             xOffset = 0;
         }
         else if (this.level == 1) {
             maximumEmc = new SuperNumber(30000);
             emcMultiplier = new SuperNumber(3, 5);
             outputRate = new SuperNumber(20);
-            inputOffset = -2;
             xOffset = 16;
         }
         else {
             maximumEmc = new SuperNumber(60000);
             emcMultiplier = new SuperNumber(2);
             outputRate = new SuperNumber(50);
-            inputOffset = -2;
             xOffset = 34;
         }
+        int inputOffset = 36 + level * 18;
         inventory = DefaultedList.ofSize(11 + level * 4, ItemStack.EMPTY);
 
         Inventory inv = (Inventory)this;
@@ -97,9 +93,11 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
         outputSlot = new OutputSlot(inv, 1, xOffset + 124, 13, inputSlots);
         targetSlot = new FakeSlot(inv, 2, xOffset + 153, 36);
 
+        int ind = 3;
         for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 2 + level; j++)
-                inputSlots.add(new InputSlot(inv, i * (2 + level) + j + 3, inputOffset + 20 + j * 18, 8 + i * 18, fuelSlot, SlotCondition.isFuel));
+            for (int j = 0; j < 2 + level; j++) {
+                inputSlots.add(new InputSlot(inv, ind++, inputOffset - j * 18, 62 - i * 18, fuelSlot, SlotCondition.isFuel));
+            }
         }
     }
 
@@ -110,15 +108,14 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
     }
     
     public static void tick(World world, BlockPos blockPos, BlockState blockState, EnergyCollectorBlockEntity entity) {
-
-        entity.light = world.getLightLevel(LightType.SKY, entity.getPos().add(0, 1, 0)) - world.getAmbientDarkness();
+        entity.light = world.getLightLevel(LightType.BLOCK, entity.getPos().add(0, 1, 0)) - world.getAmbientDarkness();
         if (entity.light < 0)
             entity.light = 0;
 
         if (world.isClient()) {
             MinecraftClient client = MinecraftClient.getInstance();
             if (client.player.currentScreenHandler instanceof EnergyCollectorScreenHandler screenHandler 
-                    && screenHandler.getBlockEntity().getPos().equals(entity.pos) 
+                    && screenHandler.getPos().equals(entity.pos) 
                     && client.currentScreen instanceof EnergyCollectorScreen screen)
                 screen.update(entity.emc, entity.light);
             return;
@@ -126,7 +123,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 
         entity.consuming = entity.tickInventoryLogic();
         
-        SuperNumber addition = new SuperNumber(entity.light, 15);
+        SuperNumber addition = new SuperNumber(entity.light + 1, 16);
         addition.multiply(entity.emcMultiplier);
         entity.emc.add(addition);
         if (entity.emc.compareTo(entity.maximumEmc) == 1)
@@ -182,9 +179,16 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
         return true;
     }
 
+    @Override
+    public boolean isValid(int slot, ItemStack stack) {
+        return (slot > 2) || slot == 0;
+    }
+    @Override
+    public boolean canTransferTo(Inventory hopperInventory, int slot, ItemStack stack) {
+        return (slot == 1);
+    }
 
 
-    @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
         serverSyncPlayer((ServerPlayerEntity)player);
@@ -245,7 +249,8 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
         data.writeString(emc.divisionString());
         
         for (ServerPlayerEntity player : PlayerLookup.tracking((ServerWorld) world, getPos())) {
-            if (player.currentScreenHandler instanceof EnergyCollectorScreenHandler screenHandler && screenHandler.getBlockEntity().getPos().equals(pos)) 
+            if (player.currentScreenHandler instanceof EnergyCollectorScreenHandler screenHandler 
+                    && screenHandler.getPos().equals(pos)) 
                 ServerPlayNetworking.send(player, ModMessages.ENERGY_COLLECTOR_SYNC, data);
         }
     }
@@ -271,5 +276,9 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
     }
     public DefaultedList<InputSlot> getInputSlots() {
         return inputSlots;
+    }
+
+    public int getLevel() {
+        return this.level;
     }
 }

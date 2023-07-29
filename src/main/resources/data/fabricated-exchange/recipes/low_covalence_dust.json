@@ -1,0 +1,37 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "ingredients": [
+        {
+            "item": "minecraft:charcoal"
+        },
+        {
+            "item": "minecraft:cobblestone"
+        },
+        {
+            "item": "minecraft:cobblestone"
+        },
+        {
+            "item": "minecraft:cobblestone"
+        },
+		{
+            "item": "minecraft:cobblestone"
+        },
+		{
+            "item": "minecraft:cobblestone"
+        },
+        {
+            "item": "minecraft:cobblestone"
+        },
+        {
+            "item": "minecraft:cobblestone"
+        },
+		{
+            "item": "minecraft:cobblestone"
+        }
+    ],
+    "result": {
+        "item": "fabricated-exchange:low_covalence_dust",
+		"count": 40
+    }
+}
+

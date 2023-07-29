@@ -6,6 +6,9 @@
     "item.fabricated-exchange.dark_matter": "Dark Matter",
     "item.fabricated-exchange.red_matter": "Red Matter",
     "item.fabricated-exchange.transmutation_tablet": "Transmutation Tablet",
+    "item.fabricated-exchange.low_covalence_dust": "Low Covalence Dust",
+    "item.fabricated-exchange.medium_covalence_dust": "Medium Covalence Dust",
+    "item.fabricated-exchange.high_covalence_dust": "High Covalence Dust",
 
     "block.fabricated-exchange.alchemical_coal_block": "Alchemical Coal Block",
     "block.fabricated-exchange.mobius_fuel_block": "Mobius Fuel Block",
@@ -18,10 +21,12 @@
     "block.fabricated-exchange.energy_collector_mk2": "Energy Collector MK2",
     "block.fabricated-exchange.energy_collector_mk3": "Energy Collector MK3",
     "block.fabricated-exchange.alchemical_chest": "Alchemical Chest",
+    "block.fabricated-exchange.energy_condenser_mk1": "Energy Condenser MK1",
+    "block.fabricated-exchange.energy_condenser_mk2": "Energy Condenser MK2",
     "screen.fabricated-exchange.transmutation": "Transmutation",
     "screen.fabricated-exchange.emc_collection": "EMC Collection",
     "itemgroup.fabricated-exchange": "Fabricated Exchange", 
-    "sounds.fabricated-exchange.philosophers_stone_use": "Block transmuted",
+    "sounds.fabricated-exchange.philosophers_stone_use": "Blocks transmuted",
     "sounds.fabricated-exchange.item_charge": "Item charged",
     "sounds.fabricated-exchange.item_discharge": "Item discharged",
 
