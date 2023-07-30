@@ -1,5 +1,7 @@
 package com.skirlez.fabricatedexchange.block;
 
+import java.util.List;
+
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.interfaces.ImplementedInventory;
@@ -49,7 +51,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
     private final int level;
 
     private final SuperNumber maximumEmc;
-    private final SuperNumber emcMultiplier;
+    private final SuperNumber genPerTick;
     private final SuperNumber outputRate;
 
     private final DefaultedList<InputSlot> inputSlots = DefaultedList.of();
@@ -69,19 +71,19 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
         int xOffset;
         if (this.level == 0) {
             maximumEmc = new SuperNumber(10000);
-            emcMultiplier = new SuperNumber(1, 5);
+            genPerTick = new SuperNumber(1, 5);
             outputRate = new SuperNumber(10);
             xOffset = 0;
         }
         else if (this.level == 1) {
             maximumEmc = new SuperNumber(30000);
-            emcMultiplier = new SuperNumber(3, 5);
+            genPerTick = new SuperNumber(3, 5);
             outputRate = new SuperNumber(20);
             xOffset = 16;
         }
         else {
             maximumEmc = new SuperNumber(60000);
-            emcMultiplier = new SuperNumber(2);
+            genPerTick = new SuperNumber(2);
             outputRate = new SuperNumber(50);
             xOffset = 34;
         }
@@ -108,10 +110,14 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
     }
     
     public static void tick(World world, BlockPos blockPos, BlockState blockState, EnergyCollectorBlockEntity entity) {
-        entity.light = world.getLightLevel(LightType.BLOCK, entity.getPos().add(0, 1, 0)) - world.getAmbientDarkness();
+        entity.light = 
+        Math.max(world.getLightLevel(LightType.BLOCK, blockPos.add(0, 1, 0)),
+            world.getLightLevel(LightType.SKY, blockPos.add(0, 1, 0)) - world.getAmbientDarkness());
         if (entity.light < 0)
             entity.light = 0;
-
+        else if (entity.light > 15)
+            entity.light = 15;
+            
         if (world.isClient()) {
             MinecraftClient client = MinecraftClient.getInstance();
             if (client.player.currentScreenHandler instanceof EnergyCollectorScreenHandler screenHandler 
@@ -122,9 +128,9 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
         }
 
         entity.consuming = entity.tickInventoryLogic();
-        
         SuperNumber addition = new SuperNumber(entity.light + 1, 16);
-        addition.multiply(entity.emcMultiplier);
+
+        addition.multiply(entity.genPerTick);
         entity.emc.add(addition);
         if (entity.emc.compareTo(entity.maximumEmc) == 1)
             entity.emc.copyValueOf(entity.maximumEmc);
@@ -149,30 +155,39 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 
         if (!FabricatedExchange.fuelProgressionMap.containsKey(item))
             return false;
+        
         SuperNumber itemEmc = EmcData.getItemEmc(item);
+        SuperNumber targetItemEmc = EmcData.getItemEmc(targetSlot.getStack().getItem());
         // check if we've gotten to the target item
         if (targetSlot.hasStack()) {
-            SuperNumber targetItemEmc = EmcData.getItemEmc(targetSlot.getStack().getItem());
             if (itemEmc.compareTo(targetItemEmc) >= 0)
                 return false;
         }
-        
-        
         Item nextItem = FabricatedExchange.fuelProgressionMap.get(item);
-        SuperNumber nextEmc = EmcData.getItemEmc(nextItem);
+        
 
         if ((!nextItem.equals(outputSlot.getStack().getItem())
                 || outputSlot.getStack().getMaxCount() <= outputSlot.getStack().getCount()
                 ) && outputSlot.hasStack())
             return false; // return if there's an item in the output slot that we cannot merge with the next item in the progression
         
+
+        SuperNumber nextEmc = EmcData.getItemEmc(nextItem);
         nextEmc.subtract(itemEmc);
         if (emc.compareTo(nextEmc) >= 0) {
             if (outputSlot.hasStack())
                 outputSlot.getStack().increment(1);
             else
                 outputSlot.setStack(new ItemStack(nextItem));
-            outputSlot.moveToInputSlots();
+
+            // consider the target slot on whether we should move the output slot to the inputs
+            if (targetSlot.hasStack()) {
+                SuperNumber newItemEmc = EmcData.getItemEmc(outputSlot.getStack().getItem());
+                if (newItemEmc.compareTo(targetItemEmc) < 0)
+                    outputSlot.moveToInputSlots();
+            }
+            else
+                outputSlot.moveToInputSlots();
             fuelSlot.takeStack(1);
             emc.subtract(nextEmc);
         }

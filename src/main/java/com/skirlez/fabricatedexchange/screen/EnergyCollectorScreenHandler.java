@@ -2,9 +2,9 @@ package com.skirlez.fabricatedexchange.screen;
 
 import com.skirlez.fabricatedexchange.block.EnergyCollectorBlockEntity;
 import com.skirlez.fabricatedexchange.screen.slot.FakeSlot;
+import com.skirlez.fabricatedexchange.screen.slot.collection.OutputSlot;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.ModTags;
-
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -51,12 +51,14 @@ public class EnergyCollectorScreenHandler extends FuelScreenHandler {
             if (slot.hasStack() && !cursorStack.isEmpty()
                     && ItemStack.areItemsEqual(slot.getStack(), cursorStack)) {
                 slot.setStackNoCallbacks(ItemStack.EMPTY);
+                ((OutputSlot)slots.get(1)).moveToInputSlots();
                 return;
             }
             if (cursorStack.isEmpty() || Registries.ITEM.getEntry(cursorStack.getItem()).streamTags().anyMatch(tag -> tag == ModTags.FUEL)) {
                 cursorStack = cursorStack.copy();
                 cursorStack.setCount(1);
                 slot.setStackNoCallbacks(cursorStack);
+                ((OutputSlot)slots.get(1)).moveToInputSlots();
             }
         }
     }

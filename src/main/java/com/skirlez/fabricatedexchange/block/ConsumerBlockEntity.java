@@ -44,9 +44,11 @@ public interface ConsumerBlockEntity {
                 SuperNumber neighborEmc = neighbor.getEmc();
                 SuperNumber neighborMaximumEmc = neighbor.getMaximumEmc();
                 neighborEmc.stealFrom(emc, output);
-                SuperNumber bonusEmc = getBonusEmc();
-                if (!bonusEmc.equalsZero())
+                SuperNumber bonusEmc = neighbor.getBonusEmc();
+                if (!bonusEmc.equalsZero()) {
                     neighborEmc.add(bonusEmc);
+
+                }
                 if (neighborMaximumEmc.equalsZero())
                     continue;
                 if (neighborEmc.compareTo(neighborMaximumEmc) == 1)

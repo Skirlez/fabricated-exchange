@@ -47,6 +47,7 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
     private SuperNumber emc;
     private final SuperNumber outputRate;
     private final SuperNumber maximumEmc;
+    private final SuperNumber bonusEmc;
     private final int level;
     private final DefaultedList<ItemStack> inventory;
     private int tick;
@@ -57,8 +58,6 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 
     public AntiMatterRelayBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.ANTIMATTER_RELAY, pos, state);
-        
-
         Block block = state.getBlock();
         if (block instanceof AntiMatterRelay)
             this.level = ((AntiMatterRelay)block).getLevel();
@@ -72,16 +71,19 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
         if (level == 0) {
             outputRate = new SuperNumber(64);
             maximumEmc = new SuperNumber(100000);
+            bonusEmc = new SuperNumber(1, 20);
             xInput = 0; yInput = 0; xFuel = 0; yFuel = 0;
         }
         else if (level == 1) {
             outputRate = new SuperNumber(192);
             maximumEmc = new SuperNumber(1000000);
+            bonusEmc = new SuperNumber(3, 20);
             xInput = -1; yInput = 1; xFuel = 17; yFuel = 1;
         }
         else {
             outputRate = new SuperNumber(640);
             maximumEmc = new SuperNumber(10000000);
+            bonusEmc = new SuperNumber(1, 2);
             xInput = 1; yInput = 1; xFuel = 37; yFuel = 15;
         }
 
@@ -131,7 +133,8 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
             }
         }
         
-        if (hasConsumingNeighbors) {
+        if (hasConsumingNeighbors && !entity.emc.equalsZero()) {
+
             entity.distributeEmc(neighbors);
         }
 
@@ -205,6 +208,10 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
     @Override
     public SuperNumber getMaximumEmc() {
         return maximumEmc;
+    }
+    @Override
+    public SuperNumber getBonusEmc() {
+        return bonusEmc;
     }
 
 

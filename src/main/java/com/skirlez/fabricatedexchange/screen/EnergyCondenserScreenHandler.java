@@ -4,9 +4,9 @@ import org.jetbrains.annotations.Nullable;
 
 import com.skirlez.fabricatedexchange.block.EnergyCondenserBlockEntity;
 import com.skirlez.fabricatedexchange.emc.EmcData;
+import com.skirlez.fabricatedexchange.screen.slot.ConsiderateSlot;
 import com.skirlez.fabricatedexchange.screen.slot.FakeSlot;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
-
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -38,18 +38,18 @@ public class EnergyCondenserScreenHandler extends ChestScreenHandler {
         if (level == 0) {
             for (int i = 0; i < 7; i++) {
                 for (int j = 0; j < 13; j++) 
-                    this.addSlot(new Slot(inventory, 1 + j + i * 13, 12 + j * 18, 26 + i * 18));
+                    this.addSlot(new ConsiderateSlot(inventory, 1 + j + i * 13, 12 + j * 18, 26 + i * 18));
             }
         }
         else {
             for (int i = 0; i < 7; i++) {
                 for (int j = 0; j < 6; j++) 
-                    this.addSlot(new Slot(inventory, 1 + j + i * 6, 12 + j * 18, 26 + i * 18));
+                    this.addSlot(new ConsiderateSlot(inventory, 1 + j + i * 6, 12 + j * 18, 26 + i * 18));
             }
 
             for (int i = 0; i < 7; i++) {
                 for (int j = 0; j < 6; j++) 
-                    this.addSlot(new Slot(inventory, 43 + j + i * 6, 138 + j * 18, 26 + i * 18));
+                    this.addSlot(new ConsiderateSlot(inventory, 43 + j + i * 6, 138 + j * 18, 26 + i * 18));
             }
         }
 
@@ -98,6 +98,7 @@ public class EnergyCondenserScreenHandler extends ChestScreenHandler {
                 cursorStack.setCount(1);
                 slot.setStackNoCallbacks(cursorStack);
             }
+  
         }
     }
 

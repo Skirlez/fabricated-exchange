@@ -90,7 +90,7 @@ public class SuperNumber {
         return new SuperNumber(BigInteger.ZERO);
     }
     public static SuperNumber One() {
-        return new SuperNumber(BigInteger.ZERO);
+        return new SuperNumber(BigInteger.ONE);
     }
 
     public boolean equalsZero() {
