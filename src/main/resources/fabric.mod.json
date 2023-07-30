@@ -8,10 +8,10 @@
 		"Skirlez"
 	],
 	"contact": {
-		"homepage": "https://twitter.com/skirlez3",
+		"homepage": "https://github.com/Skirlez/fabricated-exchange",
 		"sources": "https://github.com/Skirlez/fabricated-exchange"
 	},
-	"license": "LGPL-3.0",
+	"license": "LGPLv3",
 	"icon": "assets/fabricated-exchange/icon.png",
 	"environment": "*",
 	"entrypoints": {
