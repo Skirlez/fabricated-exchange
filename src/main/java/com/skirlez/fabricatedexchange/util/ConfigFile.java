@@ -24,25 +24,28 @@ public class ConfigFile extends DataFile<Map<String, Object>> {
         super.fetch();
         
         Map<String, Object> defaultValue = getDefaultValue();
-        Iterator<String> iterator = defaultValue.keySet().iterator();
         boolean changed = false;
-        while (iterator.hasNext()) {
-            String key = iterator.next();
-            if (!value.containsKey(key)) {
-                FabricatedExchange.LOGGER.error("Config file is missing key " + key + "! Inserting it into the config with the default value.");
-                value.put(key, defaultValue.get(key));
-                if (!changed)
-                    changed = true;
-            }
-            else if (!value.get(key).getClass().equals(defaultValue.get(key).getClass())) {
-                FabricatedExchange.LOGGER.error("Key " + key + " has different value type than the default type! Reseting it to the default value.");
-                value.put(key, defaultValue.get(key));
-                if (!changed)
-                    changed = true;
+        if (value != null) {
+            Iterator<String> iterator = defaultValue.keySet().iterator();
+            
+            
+            while (iterator.hasNext()) {
+                String key = iterator.next();
+                if (!value.containsKey(key)) {
+                    FabricatedExchange.LOGGER.error("Config file is missing key " + key + "! Inserting it into the config with the default value.");
+                    value.put(key, defaultValue.get(key));
+                    if (!changed)
+                        changed = true;
+                }
+                else if (!value.get(key).getClass().equals(defaultValue.get(key).getClass())) {
+                    FabricatedExchange.LOGGER.error("Key " + key + " has different value type than the default type! Reseting it to the default value.");
+                    value.put(key, defaultValue.get(key));
+                    if (!changed)
+                        changed = true;
+                }
             }
         }
-        if (changed)
-            save();
+        save();
     }
     
     public boolean getOption(Bool option) {

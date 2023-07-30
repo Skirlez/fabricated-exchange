@@ -36,6 +36,11 @@ public class DataFile<T> {
                 setValueToDefault();
             }
         }
+        else {
+            FabricatedExchange.LOGGER.info("Data file " + name + " doesn't exist, creating it...");
+            setValueToDefault();
+            save();
+        }
     }
 
     public T getValue() {

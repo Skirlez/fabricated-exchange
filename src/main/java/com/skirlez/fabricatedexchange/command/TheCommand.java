@@ -227,15 +227,13 @@ public class TheCommand {
         MinecraftServer server = context.getSource().getServer();
         ModConfig.fetchAll();
         context.getSource().sendMessage(Text.literal("Data files reloaded!"));
-        if (ModConfig.CONFIG_FILE.getOption(ConfigFile.Bool.MAPPER_ENABLED)) {
-            long startTime = System.nanoTime();
-            String log = FabricatedExchange.reloadEmcMap(server);
-            FabricatedExchange.syncMaps(server);
+        long startTime = System.nanoTime();
+        String log = FabricatedExchange.reloadEmcMap(server);
+        FabricatedExchange.syncMaps(server);
 
-            String add = (log.isEmpty()) ? "\nNo errors or warnings." : "\n" + log;
-            context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.reloademc.success",
-            String.valueOf((System.nanoTime() - startTime) / 1000000)).append(add));
-        }
+        String add = (log.isEmpty()) ? "\nNo errors or warnings." : "\n" + log;
+        context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.reloademc.success",
+        String.valueOf((System.nanoTime() - startTime) / 1000000)).append(add));
         return 1;
     }
 

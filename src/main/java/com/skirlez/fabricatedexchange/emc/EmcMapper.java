@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.mixin.LegacySmithingRecipeAccessor;
+import com.skirlez.fabricatedexchange.util.ConfigFile;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.ModConfig;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
@@ -66,80 +67,80 @@ public class EmcMapper {
         if (seedEmcMap != null)
             GeneralUtil.mergeMap(emcMap, seedEmcMap);
 
-        // i don't know what this thing is, but you need it for some functions
-        DynamicRegistryManager dynamicRegistryManager = world.getRegistryManager();
+        if (ModConfig.CONFIG_FILE.getOption(ConfigFile.Bool.MAPPER_ENABLED)) {
+            // i don't know what this thing is, but you need it for some functions
+            DynamicRegistryManager dynamicRegistryManager = world.getRegistryManager();
+
+            List<SmithingRecipe> allSmithingRecipes = recipeManager.listAllOfType(RecipeType.SMITHING);
+            List<SmeltingRecipe> allSmeltingRecipes = recipeManager.listAllOfType(RecipeType.SMELTING);
+            List<CraftingRecipe> allCraftingRecipes = recipeManager.listAllOfType(RecipeType.CRAFTING);
+
+            // blacklisted recipes and items
+            Map<String, HashSet<String>> blacklistedRecipes = ModConfig.BLACKLISTED_MAPPER_RECIPES_FILE.getValue();
+            if (blacklistedRecipes == null)
+                blacklistedRecipes = new HashMap<>();
+            HashSet<String> smithingRecipesBlacklist = blacklistedRecipes.getOrDefault("smithing", new HashSet<String>());
+            HashSet<String> smeltingRecipesBlacklist = blacklistedRecipes.getOrDefault("smelting", new HashSet<String>());
+            HashSet<String> craftingRecipesBlacklist = blacklistedRecipes.getOrDefault("crafting", new HashSet<String>());
+            
+            // we must split the recipes between their origin mod. 
+            // minecraft recipes should evaluate first, and then we don't actually care about the order.
+            HashSet<String> namespaces = new HashSet<String>();
+
+            namespaces.add("minecraft");
+            Map<String, LinkedList<SmithingRecipe>> splitSmithingRecipes = splitRecipesToMods(allSmithingRecipes, namespaces, smithingRecipesBlacklist);
+            Map<String, LinkedList<SmeltingRecipe>> splitSmeltingRecipes = splitRecipesToMods(allSmeltingRecipes, namespaces, smeltingRecipesBlacklist);
+            Map<String, LinkedList<CraftingRecipe>> splitCraftingRecipes = splitRecipesToMods(allCraftingRecipes, namespaces, craftingRecipesBlacklist);
+            namespaces.remove("minecraft");
+            
+            List<String> mods = new ArrayList<String>(namespaces.size() + 1);
+            mods.add("minecraft");
+            mods.addAll(namespaces);
 
 
+            for (int m = 0; m < mods.size(); m++) {
+                String mod = mods.get(m);
+            
+                LinkedList<SmithingRecipe> smithingRecipes = splitSmithingRecipes.getOrDefault(mod, null);
+                LinkedList<SmeltingRecipe> smeltingRecipes = splitSmeltingRecipes.getOrDefault(mod, null);
+                LinkedList<CraftingRecipe> craftingRecipes = splitCraftingRecipes.getOrDefault(mod, null);          
 
-        List<SmithingRecipe> allSmithingRecipes = recipeManager.listAllOfType(RecipeType.SMITHING);
-        List<SmeltingRecipe> allSmeltingRecipes = recipeManager.listAllOfType(RecipeType.SMELTING);
-        List<CraftingRecipe> allCraftingRecipes = recipeManager.listAllOfType(RecipeType.CRAFTING);
+                for (int i = 0; i < 100; i++) {
+                    // Smithing recipes
+                    int count = 0;
 
-        // blacklisted recipes and items
-        Map<String, HashSet<String>> blacklistedRecipes = ModConfig.BLACKLISTED_MAPPER_RECIPES_FILE.getValue();
-        if (blacklistedRecipes == null)
-            blacklistedRecipes = new HashMap<>();
-        HashSet<String> smithingRecipesBlacklist = blacklistedRecipes.getOrDefault("smithing", new HashSet<String>());
-        HashSet<String> smeltingRecipesBlacklist = blacklistedRecipes.getOrDefault("smelting", new HashSet<String>());
-        HashSet<String> craftingRecipesBlacklist = blacklistedRecipes.getOrDefault("crafting", new HashSet<String>());
-        
-        // we must split the recipes between their origin mod. 
-        // minecraft recipes should evaluate first, and then we don't actually care about the order.
-        HashSet<String> namespaces = new HashSet<String>();
-
-        namespaces.add("minecraft");
-        Map<String, LinkedList<SmithingRecipe>> splitSmithingRecipes = splitRecipesToMods(allSmithingRecipes, namespaces, smithingRecipesBlacklist);
-        Map<String, LinkedList<SmeltingRecipe>> splitSmeltingRecipes = splitRecipesToMods(allSmeltingRecipes, namespaces, smeltingRecipesBlacklist);
-        Map<String, LinkedList<CraftingRecipe>> splitCraftingRecipes = splitRecipesToMods(allCraftingRecipes, namespaces, craftingRecipesBlacklist);
-        namespaces.remove("minecraft");
-        
-        List<String> mods = new ArrayList<String>(namespaces.size() + 1);
-        mods.add("minecraft");
-        mods.addAll(namespaces);
-
-
-        for (int m = 0; m < mods.size(); m++) {
-            String mod = mods.get(m);
-           
-            LinkedList<SmithingRecipe> smithingRecipes = splitSmithingRecipes.getOrDefault(mod, null);
-            LinkedList<SmeltingRecipe> smeltingRecipes = splitSmeltingRecipes.getOrDefault(mod, null);
-            LinkedList<CraftingRecipe> craftingRecipes = splitCraftingRecipes.getOrDefault(mod, null);          
-
-            for (int i = 0; i < 100; i++) {
-                // Smithing recipes
-                int count = 0;
-
-                if (smithingRecipes == null)
-                    count++;
-                else for (int j = 0; j < 100; j++) { 
-                    if (!iterateSmithingRecipes(recipeManager, dynamicRegistryManager, smithingRecipes)) {
-                        if (j == 0)
-                            count++;
-                        break;
+                    if (smithingRecipes == null)
+                        count++;
+                    else for (int j = 0; j < 100; j++) { 
+                        if (!iterateSmithingRecipes(recipeManager, dynamicRegistryManager, smithingRecipes)) {
+                            if (j == 0)
+                                count++;
+                            break;
+                        }
                     }
-                }
-                // Smelting recipes
-                if (smeltingRecipes == null)
-                    count++;
-                else for (int j = 0; j < 100; j++) { 
-                    if (!iterateSmeltingRecipes(recipeManager, dynamicRegistryManager, smeltingRecipes)) {
-                        if (j == 0)
-                            count++;
-                        break;
+                    // Smelting recipes
+                    if (smeltingRecipes == null)
+                        count++;
+                    else for (int j = 0; j < 100; j++) { 
+                        if (!iterateSmeltingRecipes(recipeManager, dynamicRegistryManager, smeltingRecipes)) {
+                            if (j == 0)
+                                count++;
+                            break;
+                        }
                     }
-                }
-                // Crafting recipes
-                if (craftingRecipes == null)
-                    count++;
-                else for (int j = 0; j < 100; j++) {
-                    if (!iterateCraftingRecipes(recipeManager, dynamicRegistryManager, craftingRecipes)) {
-                        if (j == 0)
-                            count++;
-                        break;
+                    // Crafting recipes
+                    if (craftingRecipes == null)
+                        count++;
+                    else for (int j = 0; j < 100; j++) {
+                        if (!iterateCraftingRecipes(recipeManager, dynamicRegistryManager, craftingRecipes)) {
+                            if (j == 0)
+                                count++;
+                            break;
+                        }
                     }
+                    if (count == 3) // if no information was extracted from an iteration
+                        break;
                 }
-                if (count == 3) // if no information was extracted from an iteration
-                    break;
             }
         }
         Map<String, SuperNumber> customEmcMap = ModConfig.CUSTOM_EMC_MAP_FILE.getValue();

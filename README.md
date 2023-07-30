@@ -4,8 +4,8 @@ A Fabric remake of the Minecraft mod Project E/Equivalent Exchange 2.
 The mod attaches an "EMC" number value to every item. Some are worth more, some less.
 Transmute items and blocks into EMC, and EMC to different items you've obtained before.
 
-The mod is targetting 1.19.4. Once the mod is in a stable, feature complete state, I will port it to 1.19.2, 1.18.2, 
-and then 1.16.5. Afterwards it will be upgraded to whatever versions after 1.19.4 that have the most mods.
+The mod is currently in beta. It is targetting 1.19.4. Once it is in a stable, feature complete state, I will port it to 1.19.2, 1.18.2, 
+and then 1.16.5. Afterwards it will be upgraded to whatever versions after 1.19.4 that are most popular for mods.
 
 All of the assets were taken from https://github.com/sinkillerj/ProjectE.
 If the author(s) of the assets do not want this project using them, I will take the project 
@@ -35,8 +35,8 @@ efficiently, please open an issue/pull request a change.
 Additionally, as of now, the mod is still under development. So you could also suggest or implement
 new features, or old features from previous equivalence mods.
 
-Also, I'd appreciate an issue being opened before making a pull request 
-to avoid two people working on the same thing.
+If you do want to contribute, please open an issue regarding the potential pull request
+to avoid the situation where two people work on the same thing (unless it's a minor change).
 
 # Licensing
 
@@ -59,6 +59,7 @@ All of the code in this repository is licensed under the terms of the LGPLv3. I 
 - Configurable EMC Mapper
 
 # NEW Features
+
 - As much EMC as your RAM can store
 - Infinitely precise EMC fractions (No more slabs without EMC values!)
  
