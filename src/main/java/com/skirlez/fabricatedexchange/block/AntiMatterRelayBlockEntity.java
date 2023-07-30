@@ -122,20 +122,21 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
             }
         }   
         
-        List<BlockEntity> neighbors = GeneralUtil.getNeighboringBlockEntities(world, blockPos);
-        boolean hasConsumingNeighbors = false;
-        for (BlockEntity blockEntity : neighbors) {
-            if (!(blockEntity instanceof ConsumerBlockEntity))
-                continue;
-            if (((ConsumerBlockEntity)blockEntity).isConsuming()) {
-                hasConsumingNeighbors = true;
-                break;
+        if (!entity.emc.equalsZero()) {
+            List<BlockEntity> neighbors = GeneralUtil.getNeighboringBlockEntities(world, blockPos);
+            boolean hasConsumingNeighbors = false;
+            for (BlockEntity blockEntity : neighbors) {
+                if (!(blockEntity instanceof ConsumerBlockEntity) || blockEntity instanceof AntiMatterRelayBlockEntity)
+                    continue;
+                if (((ConsumerBlockEntity)blockEntity).isConsuming()) {
+                    hasConsumingNeighbors = true;
+                    break;
+                }
             }
-        }
-        
-        if (hasConsumingNeighbors && !entity.emc.equalsZero()) {
-
-            entity.distributeEmc(neighbors);
+            
+            if (hasConsumingNeighbors) {
+                entity.distributeEmc(neighbors);
+            }
         }
 
         entity.serverSync();

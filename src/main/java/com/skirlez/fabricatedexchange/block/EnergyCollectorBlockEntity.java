@@ -1,7 +1,5 @@
 package com.skirlez.fabricatedexchange.block;
 
-import java.util.List;
-
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.interfaces.ImplementedInventory;

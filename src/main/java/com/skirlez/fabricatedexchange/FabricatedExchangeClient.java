@@ -28,7 +28,6 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 
     private static final BlockEntity renderAlchemicalChest = 
         new AlchemicalChestBlockEntity(BlockPos.ORIGIN, ModBlocks.ALCHEMICAL_CHEST.getDefaultState());
-
     private static final BlockEntity renderEnergyCollectorMk1 = 
         new EnergyCondenserBlockEntity(BlockPos.ORIGIN, ModBlocks.ENERGY_CONDENSER_MK1.getDefaultState());
     private static final BlockEntity renderEnergyCollectorMk2 = 

@@ -130,7 +130,7 @@ public class FabricatedExchange implements ModInitializer {
                 continue;
             if (len == 1) {
                 String str = blockTransmutationData[i][j];
-                String[] parts = str.split("->");
+                String[] parts = str.split("#");
                 addBlockRelation(parts[0], parts[1]); 
                 continue;
             }
