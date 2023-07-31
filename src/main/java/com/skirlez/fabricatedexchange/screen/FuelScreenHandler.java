@@ -9,7 +9,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.collection.DefaultedList;
@@ -18,23 +17,19 @@ import net.minecraft.util.math.BlockPos;
 
 // This is the parent class of EnergyCollectorScreenHandler and AntiMatterRelayScreenHandler, as they
 // both share a considerable amount of code
-public abstract class FuelScreenHandler extends ScreenHandler {
-    protected final Inventory inventory;
-    protected final BlockEntity blockEntity;
-    protected final int level;
-    protected PacketByteBuf buf;
+public abstract class FuelScreenHandler extends CoolScreenHandler {
+    protected Inventory inventory;
     protected DefaultedList<InputSlot> inputSlots = DefaultedList.of();
-    protected FuelScreenHandler(ScreenHandlerType<?> type, int syncId, BlockEntity blockEntity, int level, PacketByteBuf buf) {
+    protected FuelScreenHandler(ScreenHandlerType<?> type, int syncId, BlockPos pos, int level, PacketByteBuf buf) {
         super(type, syncId);
-        this.blockEntity = blockEntity;
-        this.inventory = (Inventory)blockEntity;
+        this.pos = pos;
         this.level = level;
         this.buf = buf;
     }
 
     @Override
     public boolean canUse(PlayerEntity player) {
-        return Inventory.canPlayerUse(blockEntity, player);
+        return Inventory.canPlayerUse((BlockEntity)inventory, player);
     }
 
     @Override
@@ -108,7 +103,7 @@ public abstract class FuelScreenHandler extends ScreenHandler {
     }
 
     public BlockPos getPos() {
-        return blockEntity.getPos();
+        return pos;
     }
     public int getLevel() {
         return level;

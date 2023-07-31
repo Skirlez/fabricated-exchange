@@ -2,6 +2,7 @@ package com.skirlez.fabricatedexchange.screen.slot.transmutation;
 
 
 import com.skirlez.fabricatedexchange.emc.EmcData;
+import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandler;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
@@ -33,7 +34,7 @@ public class ConsumeSlot extends Slot {
         ItemStack newStack = stack.copy();
         newStack.setCount(count);
         SuperNumber emc = EmcData.getItemStackEmc(newStack);
-        if (emc.equalsZero())
+        if (emc.equalsZero() && !stack.getItem().equals(ModItems.TOME_OF_KNOWLEDGE))
             return stack;
         if (!player.getWorld().isClient()) {
             EmcData.addEmc(player, emc);
@@ -43,6 +44,17 @@ public class ConsumeSlot extends Slot {
             if (!playerState.knowledge.contains(idName)) {
                 playerState.knowledge.add(idName);
                 screenHandler.addKnowledgePair(new Pair<Item, SuperNumber>(item, EmcData.getItemEmc(item)));
+            }
+            if (item.equals(ModItems.TOME_OF_KNOWLEDGE)) {
+                Registries.ITEM.forEach(
+                currentItem -> {
+                    String currentId = Registries.ITEM.getId(currentItem).toString();
+                    SuperNumber currentEmc = EmcData.getItemEmc(currentId);
+                    if (!currentEmc.equalsZero() && !playerState.knowledge.contains(currentId)) {
+                        playerState.knowledge.add(currentId);
+                        screenHandler.addKnowledgePair(new Pair<Item, SuperNumber>(currentItem, currentEmc));
+                    }
+                });
             }
             playerState.markDirty();
             

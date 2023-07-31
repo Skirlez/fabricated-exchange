@@ -5,20 +5,31 @@ import com.skirlez.fabricatedexchange.screen.slot.FakeSlot;
 import com.skirlez.fabricatedexchange.screen.slot.collection.OutputSlot;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.ModTags;
+
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.math.BlockPos;
 
 public class EnergyCollectorScreenHandler extends FuelScreenHandler {
-    public EnergyCollectorScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
-        this(syncId, inventory, (EnergyCollectorBlockEntity)inventory.player.getWorld().getBlockEntity(buf.readBlockPos()), buf.readInt(), buf);
+    public EnergyCollectorScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
+        this(syncId, playerInventory, buf.readBlockPos(), buf.readInt(), buf);
     }
-    public EnergyCollectorScreenHandler(int syncId, PlayerInventory playerInventory, EnergyCollectorBlockEntity blockEntity, int level, PacketByteBuf buf) {
-        super(ModScreenHandlers.ENERGY_COLLECTOR_SCREEN_HANDLER, syncId, blockEntity, level, buf);
+    public EnergyCollectorScreenHandler(int syncId, PlayerInventory playerInventory, BlockPos pos, int level, PacketByteBuf buf) {
+        super(ModScreenHandlers.ENERGY_COLLECTOR_SCREEN_HANDLER, syncId, pos, level, buf);
+        EnergyCollectorBlockEntity blockEntity = (EnergyCollectorBlockEntity)playerInventory.player.getWorld().getBlockEntity(pos);
+        if (blockEntity == null) {
+            inventory = new SimpleInventory((2 + level) * 4 + 3);
+            return;
+        }
+        else
+            inventory = (Inventory)blockEntity;
         inventory.onOpen(playerInventory.player);
 
         addSlot(blockEntity.getFuelSlot());

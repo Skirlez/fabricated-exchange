@@ -1,16 +1,14 @@
 package com.skirlez.fabricatedexchange.block;
 
+import java.util.LinkedList;
+
 import com.skirlez.fabricatedexchange.emc.EmcData;
-import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.EnergyCondenserScreen;
 import com.skirlez.fabricatedexchange.screen.EnergyCondenserScreenHandler;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -23,7 +21,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -31,6 +28,7 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
     private final int level;
     private SuperNumber emc;
     private int tick;
+    private final LinkedList<ServerPlayerEntity> players = new LinkedList<>();
     public EnergyCondenserBlockEntity(BlockPos pos, BlockState state) {
         this(ModBlockEntities.ENERGY_CONDENSER, pos, state);
     }
@@ -95,7 +93,7 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
             }
         }
 
-        serverSync();
+        serverSync(pos, emc, players);
         if (tick % 120 == 0) 
             markDirty();
         tick++;
@@ -118,8 +116,10 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 
     @Override
     public ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
-        serverSyncPlayer((ServerPlayerEntity)playerInventory.player);
-        return new EnergyCondenserScreenHandler(syncId, playerInventory, this, null);
+        ServerPlayerEntity player = (ServerPlayerEntity)playerInventory.player;
+        serverSyncPlayer(pos, emc, player);
+        players.add(player);
+        return new EnergyCondenserScreenHandler(syncId, playerInventory, pos, level, null);
     }
 
     public int getLevel() {
@@ -150,28 +150,10 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
     public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
         // intended to be read by the screen handler
         buf.writeBlockPos(pos);
+        buf.writeInt(level);
         // intended to be read by the screen
         buf.writeString(emc.divisionString());
     }
-
-    private void serverSync() {
-        PacketByteBuf data = PacketByteBufs.create();
-        data.writeBlockPos(getPos());
-        data.writeString(emc.divisionString());
-        
-        for(ServerPlayerEntity player : PlayerLookup.tracking((ServerWorld) world, getPos())) {
-            if (player.currentScreenHandler instanceof EnergyCondenserScreenHandler screenHandler 
-                    && screenHandler.getPos().equals(pos)) 
-                ServerPlayNetworking.send(player, ModMessages.CONSUMER_BLOCK_SYNC, data);
-        }
-    }
-    private void serverSyncPlayer(ServerPlayerEntity player) {
-        PacketByteBuf data = PacketByteBufs.create();
-        data.writeBlockPos(getPos());
-        data.writeString(emc.divisionString());
-        ServerPlayNetworking.send(player, ModMessages.CONSUMER_BLOCK_SYNC, data);
-    }
-
 
     @Override
     public void update(SuperNumber emc) {

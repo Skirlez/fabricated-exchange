@@ -7,9 +7,11 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 
-public class AlchemicalChestScreenHandler extends ChestScreenHandler {
+public class AlchemicalChestScreenHandler extends ScreenHandler implements ChestScreenHandler {
+    protected Inventory inventory;
     public AlchemicalChestScreenHandler(int syncId, PlayerInventory inventory) {
         this(syncId, inventory, new SimpleInventory(104));
     }
@@ -27,6 +29,22 @@ public class AlchemicalChestScreenHandler extends ChestScreenHandler {
         }
         GeneralUtil.addPlayerInventory(this, playerInventory, 48, 152);
         GeneralUtil.addPlayerHotbar(this, playerInventory, 48, 210);
+    }
+
+    @Override
+    public void onClosed(PlayerEntity player){
+        super.onClosed(player);
+        this.inventory.onClose(player);
+    }
+
+    @Override
+    public boolean canUse(PlayerEntity player) {
+        return this.inventory.canPlayerUse(player);
+    }
+    
+    @Override
+    public Inventory getInventory() {
+        return this.inventory;
     }
 
     @Override
@@ -53,4 +71,6 @@ public class AlchemicalChestScreenHandler extends ChestScreenHandler {
 
         return itemStack;
     }
+
+
 }

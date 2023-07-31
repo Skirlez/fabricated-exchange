@@ -37,10 +37,9 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
     private String searchText = "";
     private int offeringPageNum = 0;
     private List<Pair<Item, SuperNumber>> knowledge = new ArrayList<Pair<Item,SuperNumber>>();
-    private final DefaultedList<Slot> transmutationSlots = DefaultedList.of();
+    private final DefaultedList<TransmutationSlot> transmutationSlots = DefaultedList.of();
     public TransmutationTableScreenHandler(int syncId, PlayerInventory inventory) {
         this(syncId, inventory, new SimpleInventory(18));
-        
     }
     
     public TransmutationTableScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory) {
@@ -58,22 +57,18 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         // outer ring
         double angle = 270.0;
         for (int i = 0; i < 12; i++) {
-            double radianAngle = Math.toRadians(angle);
-            int yOffset = (int)(Math.sin(radianAngle) * 41);
-            int xOffset = (int)(Math.cos(radianAngle) * 41);
-            addTransmutationSlot(new TransmutationSlot(inventory, i + 1, 158 + xOffset, 32 + yOffset, player, this));
+            addTransmutationSlot(new TransmutationSlot(inventory, i + 1, angle, player, this));
             angle += 360.0 / 12.0;
         }
 
         // inner ring
         angle = 270.0;
         for (int i = 0; i < 4; i++) {
-            double radianAngle = Math.toRadians(angle);
-            int yOffset = (int)(Math.sin(radianAngle) * 19);
-            int xOffset = (int)(Math.cos(radianAngle) * 19);
-            addTransmutationSlot(new TransmutationSlot(inventory, i + 13, 158 + xOffset, 32 + yOffset, player, this));
+            addTransmutationSlot(new TransmutationSlot(inventory, i + 13, angle, player, this));
             angle += 360.0 / 4.0;
         }
+
+
 
         addSlot(new MidSlot(minorInventory, 0, 158, 32, this, player.world.isClient));
         GeneralUtil.addPlayerInventory(this, playerInventory, 36, 100);
@@ -137,6 +132,8 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
                 offeringPageNum = 0;
         }
 
+
+
         // clear all the transmutation slots
         for (int i = 0; i < transmutationSlots.size(); i++) {
             transmutationSlots.get(i).setStack(ItemStack.EMPTY);
@@ -170,8 +167,9 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
             transmutationSlots.get(num + 12).setStack(stack);
             num++;
             if (num >= 4)
-                return;
+                break;
         }
+        return;
     }
 
     @Override
@@ -284,6 +282,12 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         this.addSlot(slot);
         transmutationSlots.add(slot);
     }
+
+    public DefaultedList<TransmutationSlot> getTransmutationSlots() {
+        return transmutationSlots;
+    }
+
+
 
 
     

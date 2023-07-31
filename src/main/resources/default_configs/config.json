@@ -1,4 +1,5 @@
 {
   "showItemEmcOrigin": false,
-  "mapper_enabled": true
+  "mapper.enabled": true,
+  "transmutationTable.animated": true
 }

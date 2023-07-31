@@ -1,12 +1,12 @@
 package com.skirlez.fabricatedexchange.block;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
 
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.interfaces.ImplementedInventory;
-import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.AntiMatterRelayScreen;
 import com.skirlez.fabricatedexchange.screen.AntiMatterRelayScreenHandler;
 import com.skirlez.fabricatedexchange.screen.slot.FuelSlot;
@@ -17,9 +17,6 @@ import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -35,7 +32,6 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -50,6 +46,7 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
     private final SuperNumber bonusEmc;
     private final int level;
     private final DefaultedList<ItemStack> inventory;
+    private final LinkedList<ServerPlayerEntity> players = new LinkedList<>();
     private int tick;
 
     private final DefaultedList<InputSlot> inputSlots = DefaultedList.of();
@@ -111,7 +108,7 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
     }
 
 
-    public static void tick(World world, BlockPos blockPos, BlockState blockState, AntiMatterRelayBlockEntity entity) {
+    public static void serverTick(World world, BlockPos blockPos, BlockState blockState, AntiMatterRelayBlockEntity entity) {
         if (entity.fuelSlot.hasStack()) {
             SuperNumber value = EmcData.getItemEmc(entity.fuelSlot.getStack().getItem());                
             SuperNumber emcCopy = new SuperNumber(entity.emc);
@@ -139,7 +136,7 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
             }
         }
 
-        entity.serverSync();
+        entity.serverSync(blockPos, entity.emc, entity.players);
         if (entity.tick % 120 == 0) 
             entity.markDirty();
         entity.tick++;
@@ -162,8 +159,9 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-        serverSyncPlayer((ServerPlayerEntity)player);
-        return new AntiMatterRelayScreenHandler(syncId, inv, this, level, null);
+        serverSyncPlayer(pos, emc, (ServerPlayerEntity)player);
+        players.add((ServerPlayerEntity)player);
+        return new AntiMatterRelayScreenHandler(syncId, inv, pos, level, null);
     }
 
     @Override
@@ -213,24 +211,6 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
     @Override
     public SuperNumber getBonusEmc() {
         return bonusEmc;
-    }
-
-
-    private void serverSync() {
-        PacketByteBuf data = PacketByteBufs.create();
-        data.writeBlockPos(getPos());
-        data.writeString(emc.divisionString());
-        
-        for(ServerPlayerEntity player : PlayerLookup.tracking((ServerWorld) world, getPos())) {
-            if (player.currentScreenHandler instanceof AntiMatterRelayScreenHandler screenHandler && screenHandler.getPos().equals(pos)) 
-                ServerPlayNetworking.send(player, ModMessages.CONSUMER_BLOCK_SYNC, data);
-        }
-    }
-    private void serverSyncPlayer(ServerPlayerEntity player) {
-        PacketByteBuf data = PacketByteBufs.create();
-        data.writeBlockPos(getPos());
-        data.writeString(emc.divisionString());
-        ServerPlayNetworking.send(player, ModMessages.CONSUMER_BLOCK_SYNC, data);
     }
 
     public void update(SuperNumber emc) {

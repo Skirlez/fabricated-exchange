@@ -1,7 +1,10 @@
 package com.skirlez.fabricatedexchange.screen.slot.transmutation;
 
+import com.skirlez.fabricatedexchange.block.TransmutationTable;
+import com.skirlez.fabricatedexchange.screen.TransmutationTableScreen;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandler;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
@@ -20,5 +23,10 @@ public class MidSlot extends Slot {
         super.setStack(stack);
         if (!isClient)
             screenHandler.refreshOffering();
+        else {
+            MinecraftClient client = MinecraftClient.getInstance();
+            if (client.currentScreen instanceof TransmutationTableScreen screen)
+                screen.resetAngleTime();
+        }
     }
 }

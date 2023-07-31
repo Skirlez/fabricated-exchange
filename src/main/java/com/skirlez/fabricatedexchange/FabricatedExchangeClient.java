@@ -40,8 +40,9 @@ public class FabricatedExchangeClient implements ClientModInitializer {
         HandledScreens.register(ModScreenHandlers.ANTIMATTER_RELAY_SCREEN_HANDLER, AntiMatterRelayScreen::new);
         HandledScreens.register(ModScreenHandlers.ALCHEMICAL_CHEST_SCREEN_HANDLER, AlchemicalChestScreen::new);
         HandledScreens.register(ModScreenHandlers.ENERGY_CONDENSER_SCREEN_HANDLER, EnergyCondenserScreen::new);
-        ModMessages.registerS2CPackets();
         KeyInputHandler.register();
+        ModMessages.registerS2CPackets();
+        
 
         // we can use the vanilla renderers due to the texture mixin, see ModTexturedRenderLayers
         BlockEntityRendererFactories.register(ModBlockEntities.ALCHEMICAL_CHEST, ChestBlockEntityRenderer::new);

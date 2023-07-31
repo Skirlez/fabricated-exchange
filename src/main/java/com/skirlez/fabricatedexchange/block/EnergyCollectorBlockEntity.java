@@ -1,9 +1,10 @@
 package com.skirlez.fabricatedexchange.block;
 
+import java.util.LinkedList;
+
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.interfaces.ImplementedInventory;
-import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreen;
 import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreenHandler;
 import com.skirlez.fabricatedexchange.screen.slot.FakeSlot;
@@ -14,9 +15,6 @@ import com.skirlez.fabricatedexchange.screen.slot.collection.OutputSlot;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -32,7 +30,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -51,6 +48,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
     private final SuperNumber maximumEmc;
     private final SuperNumber genPerTick;
     private final SuperNumber outputRate;
+    private final LinkedList<ServerPlayerEntity> players = new LinkedList<>();
 
     private final DefaultedList<InputSlot> inputSlots = DefaultedList.of();
     private final FuelSlot fuelSlot;
@@ -108,8 +106,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
     }
     
     public static void tick(World world, BlockPos blockPos, BlockState blockState, EnergyCollectorBlockEntity entity) {
-        entity.light = 
-        Math.max(world.getLightLevel(LightType.BLOCK, blockPos.add(0, 1, 0)),
+        entity.light = Math.max(world.getLightLevel(LightType.BLOCK, blockPos.add(0, 1, 0)),
             world.getLightLevel(LightType.SKY, blockPos.add(0, 1, 0)) - world.getAmbientDarkness());
         if (entity.light < 0)
             entity.light = 0;
@@ -136,7 +133,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
             entity.distributeEmc(GeneralUtil.getNeighboringBlockEntities(world, blockPos));
         }
         
-        entity.serverSync();
+        entity.serverSync(blockPos, entity.emc, entity.players);
         if (entity.tick % 120 == 0) 
             entity.markDirty();
         entity.tick++;
@@ -204,8 +201,9 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-        serverSyncPlayer((ServerPlayerEntity)player);
-        return new EnergyCollectorScreenHandler(syncId, inv, this, level, null);
+        serverSyncPlayer(pos, emc, (ServerPlayerEntity)player);
+        players.add((ServerPlayerEntity)player);
+        return new EnergyCollectorScreenHandler(syncId, inv, pos, level, null);
     }
 
     @Override
@@ -256,24 +254,6 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
         return maximumEmc;
     }
 
-    private void serverSync() {
-        PacketByteBuf data = PacketByteBufs.create();
-        data.writeBlockPos(getPos());
-        data.writeString(emc.divisionString());
-        
-        for (ServerPlayerEntity player : PlayerLookup.tracking((ServerWorld) world, getPos())) {
-            if (player.currentScreenHandler instanceof EnergyCollectorScreenHandler screenHandler 
-                    && screenHandler.getPos().equals(pos)) 
-                ServerPlayNetworking.send(player, ModMessages.ENERGY_COLLECTOR_SYNC, data);
-        }
-    }
-    private void serverSyncPlayer(ServerPlayerEntity player) {
-        PacketByteBuf data = PacketByteBufs.create();
-        data.writeBlockPos(getPos());
-        data.writeString(emc.divisionString());
- 
-        ServerPlayNetworking.send(player, ModMessages.ENERGY_COLLECTOR_SYNC, data);
-    }
     public void update(SuperNumber emc) {
         this.emc = emc;
     }

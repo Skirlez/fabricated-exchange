@@ -65,7 +65,7 @@ public class AntiMatterRelay extends BlockWithEntityAndRotation {
             ? (world2, pos, state2, blockEntity) 
                 -> AntiMatterRelayBlockEntity.clientTick(world2, pos, state2, (AntiMatterRelayBlockEntity)blockEntity)
             : (world2, pos, state2, blockEntity) 
-                -> AntiMatterRelayBlockEntity.tick(world2, pos, state2, (AntiMatterRelayBlockEntity)blockEntity);
+                -> AntiMatterRelayBlockEntity.serverTick(world2, pos, state2, (AntiMatterRelayBlockEntity)blockEntity);
 
     }
     // World world, BlockPos blockPos, BlockState blockState, AntiMatterRelayBlockEntity entity

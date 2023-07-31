@@ -32,7 +32,8 @@ public class ModItems {
         new Item(new FabricItemSettings()));
     public static final Item RED_MATTER = registerItemWithGroup("red_matter", 
         new Item(new FabricItemSettings()));    
-    
+    public static final Item TOME_OF_KNOWLEDGE = registerItemWithGroup("tome_of_knowledge", 
+        new Item(new FabricItemSettings()));   
 
     private static Item registerItem(String name, Item item) {
         Registry.register(Registries.ITEM, new Identifier(FabricatedExchange.MOD_ID, name), item);

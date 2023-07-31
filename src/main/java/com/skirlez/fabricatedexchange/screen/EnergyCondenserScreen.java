@@ -54,7 +54,7 @@ public class EnergyCondenserScreen extends HandledScreen<EnergyCondenserScreenHa
         drawTexture(matrices, i, j, 0, 0, backgroundWidth, backgroundHeight);
         
         
-        ItemStack stack = handler.inventory.getStack(0);
+        ItemStack stack = handler.getInventory().getStack(0);
         if (stack.isEmpty())
             return;
         SuperNumber targetEmc = EmcData.getItemEmc(stack.getItem());
