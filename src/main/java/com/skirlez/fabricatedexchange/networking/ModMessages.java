@@ -14,16 +14,16 @@ public class ModMessages {
     public static final Identifier CONSUMER_BLOCK_SYNC = new Identifier(FabricatedExchange.MOD_ID, "antimatter_relay_sync");
     public static final Identifier EMC_SYNC_IDENTIFIER = new Identifier(FabricatedExchange.MOD_ID, "emc_sync");
     public static final Identifier EMC_MAP_SYNC_IDENTIFIER = new Identifier(FabricatedExchange.MOD_ID, "emc_map_sync");
-
+    public static final Identifier TRANSMUTATION_TABLE_MAX_PAGE = new Identifier(FabricatedExchange.MOD_ID, "transmutation_max_page");
     public static void registerC2SPackets() {
         ServerPlayNetworking.registerGlobalReceiver(ITEM_CHARGE_IDENTIFIER, ItemChargeC2SPacket::receive);
         ServerPlayNetworking.registerGlobalReceiver(TRANSMUTATION_TABLE_WIDGETS, TransmutationTableWidgetsC2SPacket::receive);
-        
     }
 
     public static void registerS2CPackets() {
         ClientPlayNetworking.registerGlobalReceiver(EMC_SYNC_IDENTIFIER, EmcSyncS2CPacket::receive);
         ClientPlayNetworking.registerGlobalReceiver(EMC_MAP_SYNC_IDENTIFIER, EmcMapSyncS2CPacket::receive);
         ClientPlayNetworking.registerGlobalReceiver(CONSUMER_BLOCK_SYNC, ConsumerBlockSyncS2CPacket::receive);
+        ClientPlayNetworking.registerGlobalReceiver(TRANSMUTATION_TABLE_MAX_PAGE, TransmutationTableMaxPageS2CPacket::receive);
     }
 }

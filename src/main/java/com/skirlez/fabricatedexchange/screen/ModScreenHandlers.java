@@ -12,7 +12,7 @@ import net.minecraft.util.Identifier;
 
 public class ModScreenHandlers {
     public static final ScreenHandlerType<TransmutationTableScreenHandler> TRANSMUTATION_TABLE_SCREEN_HANDLER = 
-        new ScreenHandlerType<>(TransmutationTableScreenHandler::new, FeatureSet.empty());
+        new ExtendedScreenHandlerType<>(TransmutationTableScreenHandler::new);
 
     public static final ScreenHandlerType<EnergyCollectorScreenHandler> ENERGY_COLLECTOR_SCREEN_HANDLER = 
         new ExtendedScreenHandlerType<>(EnergyCollectorScreenHandler::new);

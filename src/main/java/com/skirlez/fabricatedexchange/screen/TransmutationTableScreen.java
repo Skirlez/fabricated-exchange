@@ -37,10 +37,13 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 
     private long distStartTime = System.currentTimeMillis();
     private long angleStartTime = System.currentTimeMillis();
+    private long declineStartTime = -1;
     private int rotationDir = 1;
 
     private double distanceFromCenter;
     private boolean animated;
+    private int offeringPageNum = 0;
+
     public TransmutationTableScreen(TransmutationTableScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
         animated = ModConfig.CONFIG_FILE.getOption(ConfigFile.Bool.TRANSMUTATION_TABLE_ANIMATED);
@@ -48,7 +51,6 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
             distanceFromCenter = 0.0;
         else 
             distanceFromCenter = 1.0;
-        
     }
 
     @Override
@@ -100,14 +102,14 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         
         addDrawableChild(ButtonWidget.builder(
             Text.of("<"),
-            button -> updatePage(1)
-        ).dimensions(x + 126, y + 83, 13, 13)
+            button -> updatePage(false)
+        ).dimensions(x + 126, y + 84, 13, 13)
         .build());
 
         addDrawableChild(ButtonWidget.builder(
             Text.of(">"),
-            button -> updatePage(2)
-        ).dimensions(x + 191, y + 83, 13, 13)
+            button -> updatePage(true)
+        ).dimensions(x + 193, y + 84, 13, 13)
         .build());
 
     }
@@ -150,10 +152,24 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         textRenderer.draw(matrices, Text.literal("EMC:"), 4, 79, 0x404040);
         textRenderer.draw(matrices, Text.literal(emc), 4, 89, 0x404040);
 
+        int lastPage = handler.getLastPageNum();
+        if (offeringPageNum > lastPage) 
+            offeringPageNum = lastPage;
+
+        Text text = Text.literal((offeringPageNum + 1) + "/" + (lastPage + 1));
+        textRenderer.draw(matrices, text, 167 - textRenderer.getWidth(text) / 2, 89, 0x404040);
     }
 
     public void resetAngleTime() {
-        angleStartTime = System.currentTimeMillis();
+        long add = 0;
+        double angleTime = (double)(System.currentTimeMillis() - angleStartTime);
+        if (angleTime < 800 && angleTime > 0) {
+            double x = angleTime / 800.0;
+            double angleOffset = (Math.pow(x - 1.0, 3.0) + 1.0);
+
+            add = (long)(208.0 - 208.0 * angleOffset );
+        }
+        angleStartTime = System.currentTimeMillis() + add;
     }
 
     @Override
@@ -169,7 +185,6 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
             double angleTime = (double)(System.currentTimeMillis() - angleStartTime);
             double x = angleTime / 800.0;
 
-
             if (angleTime < 800.0)
                 angleOffset = 360.0 * (Math.pow(x - 1.0, 3.0) + 1.0);
             
@@ -182,12 +197,29 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         }
 
         
+        double xOffsetGlobal = 0;
+        if (declineStartTime != -1) {
+            double declineTime = (double)(System.currentTimeMillis() - declineStartTime);           
+            if (declineTime < 150.0) {
+                double x = declineTime / 150.0;
+                if (x < 0.5)
+                    xOffsetGlobal = Math.sin(Math.PI * x * 2.0);
+                else
+                    xOffsetGlobal = Math.sin(Math.PI * x * 2.0) / 2.0;
+
+                xOffsetGlobal *= 10.0 * rotationDir;
+
+            }
+            
+        }
+
+
         // outer ring
         for (int i = 0; i < 12; i++) {
             TransmutationSlot slot = list.get(i);
             double radianAngle = Math.toRadians(slot.angle + (angleOffset * rotationDir));
             int yOffset = (int)(Math.sin(radianAngle) * distanceFromCenter * 41.0);
-            int xOffset = (int)(Math.cos(radianAngle) * distanceFromCenter * 41.0);
+            int xOffset = (int)(Math.cos(radianAngle) * distanceFromCenter * 41.0) + (int)xOffsetGlobal;
 
 
             slot.setPosition(158 + xOffset, 32 + yOffset);
@@ -198,7 +230,7 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
             TransmutationSlot slot = list.get(i);
             double radianAngle = Math.toRadians(slot.angle - angleOffset * rotationDir);
             int yOffset = (int)(Math.sin(radianAngle) * distanceFromCenter * 19.0);
-            int xOffset = (int)(Math.cos(radianAngle) * distanceFromCenter * 19.0);
+            int xOffset = (int)(Math.cos(radianAngle) * distanceFromCenter * 19.0 + (int)xOffsetGlobal);
             slot.setPosition(158 + xOffset, 32 + yOffset);
         }
         
@@ -209,6 +241,8 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
     private void updateSearchText(String searchText) {
         if (searchText.equals(oldSearchText))
             return;
+        resetAngleTime();
+        offeringPageNum = 0;
         oldSearchText = searchText;
         PacketByteBuf buffer = PacketByteBufs.create();
         buffer.writeInt(0);
@@ -216,30 +250,44 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         
         ClientPlayNetworking.send(ModMessages.TRANSMUTATION_TABLE_WIDGETS, buffer);
     }
-    private void updatePage(int num) {
-
-        if (num == 1) 
-            rotationDir = -1;
-        else
-            rotationDir = 1;
+    private void updatePage(boolean dir) {
         PacketByteBuf buffer = PacketByteBufs.create();
-        buffer.writeInt(num);
-
-        if (animated) {
-            long add = 0;
-            double angleTime = (double)(System.currentTimeMillis() - angleStartTime);
-        
-            if (angleTime < 800 && angleTime > 0) {
-
-                double x = angleTime / 800.0;
-                double angleOffset = (Math.pow(x - 1.0, 3.0) + 1.0);
-
-                add = (long)(208.0 - 208.0 * angleOffset );
-            }
-            angleStartTime = System.currentTimeMillis() + add;
+        buffer.writeInt(1);
+        boolean changedPage = false;
+        if (dir == false) { // left 
+            offeringPageNum--;
+            rotationDir = -1;
+            if (offeringPageNum < 0)
+                offeringPageNum = 0;
+            else 
+                changedPage = true;
+            
+            buffer.writeInt(offeringPageNum);
         }
+        else { // right
+            int lastOfferingPage = handler.getLastPageNum();
+            rotationDir = 1;
+            offeringPageNum++;
+            if (offeringPageNum > lastOfferingPage)
+                offeringPageNum = lastOfferingPage;
+            else
+                changedPage = true;
+            buffer.writeInt(offeringPageNum);
+        }
+        
+        if (animated) {
+            if (changedPage) {
+                resetAngleTime();
+            }
+            else {
+                declineStartTime = System.currentTimeMillis();
+            }
+        }
+
         ClientPlayNetworking.send(ModMessages.TRANSMUTATION_TABLE_WIDGETS, buffer);
     }
+
+
 
     public Slot getFocusedSlot() {
         return focusedSlot;

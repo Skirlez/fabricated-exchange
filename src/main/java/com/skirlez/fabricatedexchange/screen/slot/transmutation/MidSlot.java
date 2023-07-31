@@ -1,6 +1,5 @@
 package com.skirlez.fabricatedexchange.screen.slot.transmutation;
 
-import com.skirlez.fabricatedexchange.block.TransmutationTable;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreen;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandler;
 

@@ -1,20 +1,24 @@
 package com.skirlez.fabricatedexchange.screen;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.emc.EmcData;
+import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.slot.transmutation.ConsumeSlot;
 import com.skirlez.fabricatedexchange.screen.slot.transmutation.MidSlot;
 import com.skirlez.fabricatedexchange.screen.slot.transmutation.TransmutationSlot;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
-import com.skirlez.fabricatedexchange.util.ModTags;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -22,9 +26,11 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.collection.DefaultedList;
@@ -36,10 +42,12 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
     private ConsumeSlot emcSlot;
     private String searchText = "";
     private int offeringPageNum = 0;
+    private int lastOfferingPage = 0;
     private List<Pair<Item, SuperNumber>> knowledge = new ArrayList<Pair<Item,SuperNumber>>();
     private final DefaultedList<TransmutationSlot> transmutationSlots = DefaultedList.of();
-    public TransmutationTableScreenHandler(int syncId, PlayerInventory inventory) {
+    public TransmutationTableScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
         this(syncId, inventory, new SimpleInventory(18));
+        this.lastOfferingPage = buf.readInt();
     }
     
     public TransmutationTableScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory) {
@@ -91,10 +99,19 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 
     public void setSearchText(String searchText) {
         this.searchText = searchText;
+        offeringPageNum = 0;
     }
     public void changeOfferingPage(int value) {
-        offeringPageNum += value;
+        offeringPageNum = value;
         refreshOffering();
+    }
+
+    public int getLastPageNum() {
+        return lastOfferingPage;
+    }
+
+    public void setLastPageNum(int lastOfferingPage) {
+        this.lastOfferingPage = lastOfferingPage;
     }
 
     public void refreshOffering() {
@@ -102,36 +119,48 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         SuperNumber midItemEmc = EmcData.getItemStackEmc(this.slots.get(17).getStack());
         if (!midItemEmc.equalsZero())
             emc = SuperNumber.min(emc, midItemEmc);
+        
         LinkedList<Pair<Item, SuperNumber>> newKnowledge = new LinkedList<Pair<Item, SuperNumber>>(knowledge);
         LinkedList<Pair<Item, SuperNumber>> fuelKnowledge = new LinkedList<Pair<Item, SuperNumber>>();
-        int len = newKnowledge.size();
-        for (int i = 0; i < len; i++) {
-            SuperNumber itemEmc = newKnowledge.get(i).getRight();
+        boolean isSearching = !searchText.isEmpty();
+
+        Iterator<Pair<Item, SuperNumber>> iterator = newKnowledge.iterator();
+        while (iterator.hasNext()) {
+            Pair<Item, SuperNumber> pair = iterator.next();
+            SuperNumber itemEmc = pair.getRight();
+            // emc filter - items who's emc value is greater than the players' emc shouldn't be displayed
+            // (or if the item has 0 EMC which can happen if you learn it and then set the emc to 0)
             if (emc.compareTo(itemEmc) == -1 || itemEmc.equalsZero()) {
-                // emc filter - items who's emc value is greater than the players' emc shouldn't be displayed
-                // (or if the item has 0 EMC which can happen if you learn it and then set the emc to 0)
-                newKnowledge.remove(i); 
-                i--;
-                len--;
-                continue;
+                iterator.remove();
+                continue;            
             }
-            Item item = newKnowledge.get(i).getLeft();
-            if (Registries.ITEM.getEntry(item).streamTags().anyMatch(tag -> tag == ModTags.FUEL)) {
-                newKnowledge.remove(i); // "fuel" items go in the inner ring, so we put them in this list
-                i--;
-                len--;
+
+            // search filter - items who don't have the search text as a substring shouldn't be displayed.
+            // TODO: does this work for other languages?
+            Item item = pair.getLeft();
+            String name = item.getName().getString();
+            if (isSearching && !name.toLowerCase().contains(searchText.toLowerCase())) {
+                iterator.remove();
+                continue; 
+            }
+            if (FabricatedExchange.fuelProgressionMap.containsKey(item)) {
+                // "fuel" items go in the inner ring, so we put them in this list
+                iterator.remove(); 
                 fuelKnowledge.add(new Pair<Item, SuperNumber>(item, itemEmc));
             }
         }
-
+        lastOfferingPage = (newKnowledge.size() - 1) / 12;
         // make sure offering page is within bounds
         if (offeringPageNum != 0) {
-            if (offeringPageNum * 12 >= newKnowledge.size())
-                offeringPageNum--;
+            if (offeringPageNum > lastOfferingPage)
+                offeringPageNum = lastOfferingPage;
             else if (offeringPageNum < 0)
                 offeringPageNum = 0;
         }
-
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeInt(lastOfferingPage);
+        if (((ServerPlayerEntity)player).currentScreenHandler instanceof TransmutationTableScreenHandler)
+            ServerPlayNetworking.send((ServerPlayerEntity)player, ModMessages.TRANSMUTATION_TABLE_MAX_PAGE, buf);
 
 
         // clear all the transmutation slots
@@ -139,16 +168,10 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
             transmutationSlots.get(i).setStack(ItemStack.EMPTY);
         }
 
-        boolean isSearching = !searchText.isEmpty();
+        
         int num = 0;
-        for (int i = (isSearching) ? 0 : offeringPageNum * 12; i < newKnowledge.size(); i++) {
+        for (int i = offeringPageNum * 12; i < newKnowledge.size(); i++) {
             Item item = newKnowledge.get(i).getLeft();
-
-            String name = item.getName().getString();
-            if (isSearching && !name.toLowerCase().contains(searchText.toLowerCase())) 
-                continue; // search filter - items who don't have the search text as a substring shouldn't be displayed.
-                // TODO: does this work for other languages?
-            
             ItemStack stack = new ItemStack(item);
             transmutationSlots.get(num).setStack(stack);
             num++;
@@ -287,8 +310,4 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         return transmutationSlots;
     }
 
-
-
-
-    
 }

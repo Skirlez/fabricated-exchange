@@ -1,11 +1,8 @@
 package com.skirlez.fabricatedexchange.networking.packet;
 
-import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandler;
 
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -20,8 +17,9 @@ public class TransmutationTableWidgetsC2SPacket {
                 screenHandler.setSearchText(buf.readString());
                 screenHandler.refreshOffering();
             }
-            else
-                screenHandler.changeOfferingPage((type == 1) ? -1 : 1); // type 1 is left, type 2 is right
+            else {
+                screenHandler.changeOfferingPage(buf.readInt()); 
+            }
         }
       
     }
