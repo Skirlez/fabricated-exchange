@@ -1,12 +1,12 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_mobius_fuel": {
+    "has_radiant_coal": {
       "conditions": {
         "items": [
           {
             "items": [
-              "fabricated-exchange:mobius_fuel"
+              "fabricated-exchange:radiant_coal"
             ]
           }
         ]
@@ -15,20 +15,20 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "minecraft:mobius_fuel_from_block"
+        "recipe": "minecraft:radiant_coal_block_from_item"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
-      "has_mobius_fuel",
+      "has_radiant_coal",
       "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "minecraft:mobius_fuel_from_block"
+      "minecraft:radiant_coal_block_from_item"
     ]
   }
 }

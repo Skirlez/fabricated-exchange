@@ -1,6 +1,0 @@
-{
-    "parent": "block/cube_all",
-    "textures": {
-        "all": "fabricated-exchange:block/mobius_fuel_block"
-    }
-}

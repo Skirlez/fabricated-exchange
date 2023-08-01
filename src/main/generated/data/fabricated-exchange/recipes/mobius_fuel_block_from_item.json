@@ -1,0 +1,36 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "fabricated-exchange:mobius_fuel"
+    },
+    {
+      "item": "fabricated-exchange:mobius_fuel"
+    },
+    {
+      "item": "fabricated-exchange:mobius_fuel"
+    },
+    {
+      "item": "fabricated-exchange:mobius_fuel"
+    },
+    {
+      "item": "fabricated-exchange:mobius_fuel"
+    },
+    {
+      "item": "fabricated-exchange:mobius_fuel"
+    },
+    {
+      "item": "fabricated-exchange:mobius_fuel"
+    },
+    {
+      "item": "fabricated-exchange:mobius_fuel"
+    },
+    {
+      "item": "fabricated-exchange:mobius_fuel"
+    }
+  ],
+  "result": {
+    "item": "fabricated-exchange:mobius_fuel_block"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "fabricated-exchange:block/energy_collector_mk3",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "fabricated-exchange:block/energy_collector_mk3"
+    },
+    "facing=south": {
+      "model": "fabricated-exchange:block/energy_collector_mk3",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "fabricated-exchange:block/energy_collector_mk3",
+      "y": 270
+    }
+  }
+}

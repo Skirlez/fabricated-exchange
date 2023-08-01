@@ -1,12 +1,12 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_mobius_fuel": {
+    "has_aeternalis_fuel": {
       "conditions": {
         "items": [
           {
             "items": [
-              "fabricated-exchange:mobius_fuel"
+              "fabricated-exchange:aeternalis_fuel"
             ]
           }
         ]
@@ -15,20 +15,20 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "minecraft:mobius_fuel_from_block"
+        "recipe": "minecraft:aeternalis_fuel_block_from_item"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
-      "has_mobius_fuel",
+      "has_aeternalis_fuel",
       "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "minecraft:mobius_fuel_from_block"
+      "minecraft:aeternalis_fuel_block_from_item"
     ]
   }
 }

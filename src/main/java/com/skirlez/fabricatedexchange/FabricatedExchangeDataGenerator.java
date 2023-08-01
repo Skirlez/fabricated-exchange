@@ -4,11 +4,21 @@ import java.util.function.Consumer;
 
 import com.skirlez.fabricatedexchange.block.ModBlocks;
 import com.skirlez.fabricatedexchange.item.ModItems;
+
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.block.Block;
+import net.minecraft.data.client.BlockStateModelGenerator;
+import net.minecraft.data.client.BlockStateVariant;
+import net.minecraft.data.client.ItemModelGenerator;
+import net.minecraft.data.client.Models;
+import net.minecraft.data.client.TextureKey;
+import net.minecraft.data.client.TextureMap;
+import net.minecraft.data.client.VariantSettings;
+import net.minecraft.data.client.VariantsBlockStateSupplier;
 import net.minecraft.data.server.recipe.RecipeJsonProvider;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
@@ -20,6 +30,7 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 
+
 // welcome to the data gen
 
 public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint {
@@ -28,8 +39,68 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
     public void onInitializeDataGenerator(FabricDataGenerator fabricDataGenerator) {
         FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
         pack.addProvider(RecipeGenerator::new);
+        pack.addProvider(ModelGenerator::new);
     }
     
+
+   private static class ModelGenerator extends FabricModelProvider {
+        private ModelGenerator(FabricDataOutput generator) {
+            super(generator);
+        }
+    
+        @Override
+        public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
+            generateCubeAllBlockModels(blockStateModelGenerator, 
+            ModBlocks.ALCHEMICAL_COAL_BLOCK, ModBlocks.RADIANT_COAL_BLOCK, ModBlocks.MOBIUS_FUEL_BLOCK,
+            ModBlocks.AETERNALIS_FUEL_BLOCK);
+            
+            //blockStateModelGenerator.registerNorthDefaultHorizontalRotation();
+            registerLeveledHorizontalOrientables(blockStateModelGenerator, "antimatter_relays", 
+                ModBlocks.ANTIMATTER_RELAY_MK1, ModBlocks.ANTIMATTER_RELAY_MK2, ModBlocks.ANTIMATTER_RELAY_MK3);
+            registerLeveledHorizontalOrientables(blockStateModelGenerator, "energy_collectors", 
+                ModBlocks.ENERGY_COLLECTOR_MK1, ModBlocks.ENERGY_COLLECTOR_MK2, ModBlocks.ENERGY_COLLECTOR_MK3);
+            
+    
+        }
+    
+        @Override
+        public void generateItemModels(ItemModelGenerator itemModelGenerator) {
+            generateSpriteModels(itemModelGenerator, 
+            ModItems.PHILOSOPHERS_STONE, ModItems.ALCHEMICAL_COAL, ModItems.RADIANT_COAL, ModItems.MOBIUS_FUEL, 
+            ModItems.AETERNALIS_FUEL, ModItems.LOW_COVALENCE_DUST, ModItems.MEDIUM_COVALENCE_DUST, ModItems.HIGH_COVALENCE_DUST,
+            ModItems.DARK_MATTER, ModItems.RED_MATTER, ModItems.TOME_OF_KNOWLEDGE, ModItems.TRANSMUTATION_TABLET);
+        }
+
+        public void generateSpriteModels(ItemModelGenerator itemModelGenerator, Item... items) {
+            for (int i = 0; i < items.length; i++) {
+                itemModelGenerator.register(items[i], Models.GENERATED);
+            }
+        }
+
+        public void generateCubeAllBlockModels(BlockStateModelGenerator blockStateModelGenerator, Block... blocks) {
+            for (int i = 0; i < blocks.length; i++)
+                blockStateModelGenerator.registerSimpleCubeAll(blocks[i]);
+        }
+
+        public void registerLeveledHorizontalOrientables(BlockStateModelGenerator blockStateModelGenerator, String path, Block... blocks) {
+            Identifier id = new Identifier(FabricatedExchange.MOD_ID, "block/" + path + "/");
+
+            for (int i = 0; i < blocks.length; i++) {
+                Block block = blocks[i];
+                System.out.println(id.withSuffixedPath(Registries.ITEM.getId(block.asItem()).getPath()));
+                TextureMap textureMap = new TextureMap()
+                    .put(TextureKey.TOP, id.withSuffixedPath("top_" + (i + 1)))
+                    .put(TextureKey.BOTTOM, id.withSuffixedPath("bottom"))
+                    .put(TextureKey.SIDE, id.withSuffixedPath("other"))
+                    .put(TextureKey.FRONT, id.withSuffixedPath("front"));
+                Identifier identifier = Models.ORIENTABLE.upload(block, textureMap, blockStateModelGenerator.modelCollector);
+                blockStateModelGenerator.blockStateCollector.accept(VariantsBlockStateSupplier.create(block, BlockStateVariant.create().put(VariantSettings.MODEL, identifier)).coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates()));        
+            }
+        }
+
+    }
+ 
+
 
     private static class RecipeGenerator extends FabricRecipeProvider {
         private RecipeGenerator(FabricDataOutput generator) {
@@ -38,7 +109,6 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 
         @Override
         public void generate(Consumer<RecipeJsonProvider> exporter) {
-
             generateToAndFromBlockRecipes(ModItems.ALCHEMICAL_COAL, ModBlocks.ALCHEMICAL_COAL_BLOCK, exporter);
             generateToAndFromBlockRecipes(ModItems.RADIANT_COAL, ModBlocks.RADIANT_COAL_BLOCK, exporter);
             generateToAndFromBlockRecipes(ModItems.MOBIUS_FUEL, ModBlocks.MOBIUS_FUEL_BLOCK, exporter);
@@ -117,15 +187,15 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
             String blockName = Registries.ITEM.getId(block.asItem()).getPath();
             ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, item, 9)
                 .input(block)
-                .criterion(FabricRecipeProvider.hasItem(ModItems.PHILOSOPHERS_STONE), 
-                    FabricRecipeProvider.conditionsFromItem(ModItems.PHILOSOPHERS_STONE))
+                .criterion(FabricRecipeProvider.hasItem(item), 
+                    FabricRecipeProvider.conditionsFromItem(item))
                 .offerTo(exporter, itemName + "_from_block");
                     
-            ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, item)
+            ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, block)
                 .input(item, 9)
-                .criterion(FabricRecipeProvider.hasItem(ModItems.PHILOSOPHERS_STONE), 
-                    FabricRecipeProvider.conditionsFromItem(ModItems.PHILOSOPHERS_STONE))
-                .offerTo(exporter, blockName + "from_item");
+                .criterion(FabricRecipeProvider.hasItem(item), 
+                    FabricRecipeProvider.conditionsFromItem(item))
+                .offerTo(exporter, blockName + "_from_item");
         }
 
 

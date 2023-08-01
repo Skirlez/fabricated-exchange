@@ -15,7 +15,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "minecraft:mobius_fuel_from_block"
+        "recipe": "minecraft:mobius_fuel_block_from_item"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -28,7 +28,7 @@
   ],
   "rewards": {
     "recipes": [
-      "minecraft:mobius_fuel_from_block"
+      "minecraft:mobius_fuel_block_from_item"
     ]
   }
 }

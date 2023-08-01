@@ -1,12 +1,12 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_philosophers_stone": {
+    "has_alchemical_coal": {
       "conditions": {
         "items": [
           {
             "items": [
-              "fabricated-exchange:philosophers_stone"
+              "fabricated-exchange:alchemical_coal"
             ]
           }
         ]
@@ -22,7 +22,7 @@
   },
   "requirements": [
     [
-      "has_philosophers_stone",
+      "has_alchemical_coal",
       "has_the_recipe"
     ]
   ],

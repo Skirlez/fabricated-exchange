@@ -104,6 +104,9 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
     public void removeKnowledge(Item item) {
         orderedKnowledge.remove(item);
     }
+    public void clearKnowledge() {
+        orderedKnowledge = new ArrayList<Item>();
+    }
 
     public void setSearchText(String searchText) {
         this.searchText = searchText;

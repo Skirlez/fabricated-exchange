@@ -33,6 +33,7 @@ public class ForgetSlot extends Slot {
             String idName = Registries.ITEM.getId(item).toString();
             if (item.equals(ModItems.TOME_OF_KNOWLEDGE)) {
                 playerState.knowledge = new HashSet<String>();
+                screenHandler.clearKnowledge();
             }
             else if (playerState.knowledge.contains(idName)) {
                 playerState.knowledge.remove(idName);

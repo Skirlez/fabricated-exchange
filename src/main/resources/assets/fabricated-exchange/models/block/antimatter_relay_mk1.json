@@ -1,9 +1,0 @@
-{
-    "parent": "minecraft:block/orientable_with_bottom",
-    "textures": {
-        "side": "fabricated-exchange:block/antimatter_relays/other",
-        "front": "fabricated-exchange:block/antimatter_relays/front",
-        "bottom": "fabricated-exchange:block/antimatter_relays/other",
-        "top": "fabricated-exchange:block/antimatter_relays/top_1"
-    }
-}

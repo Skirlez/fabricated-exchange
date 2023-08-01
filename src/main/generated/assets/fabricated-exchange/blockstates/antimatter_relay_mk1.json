@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "fabricated-exchange:block/antimatter_relay_mk1",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "fabricated-exchange:block/antimatter_relay_mk1"
+    },
+    "facing=south": {
+      "model": "fabricated-exchange:block/antimatter_relay_mk1",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "fabricated-exchange:block/antimatter_relay_mk1",
+      "y": 270
+    }
+  }
+}

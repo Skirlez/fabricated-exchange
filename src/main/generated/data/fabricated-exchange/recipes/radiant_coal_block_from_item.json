@@ -1,0 +1,36 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "fabricated-exchange:radiant_coal"
+    },
+    {
+      "item": "fabricated-exchange:radiant_coal"
+    },
+    {
+      "item": "fabricated-exchange:radiant_coal"
+    },
+    {
+      "item": "fabricated-exchange:radiant_coal"
+    },
+    {
+      "item": "fabricated-exchange:radiant_coal"
+    },
+    {
+      "item": "fabricated-exchange:radiant_coal"
+    },
+    {
+      "item": "fabricated-exchange:radiant_coal"
+    },
+    {
+      "item": "fabricated-exchange:radiant_coal"
+    },
+    {
+      "item": "fabricated-exchange:radiant_coal"
+    }
+  ],
+  "result": {
+    "item": "fabricated-exchange:radiant_coal_block"
+  }
+}

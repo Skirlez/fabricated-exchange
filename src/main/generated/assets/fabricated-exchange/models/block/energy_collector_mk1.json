@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "fabricated-exchange:block/energy_collectors/front",
+    "side": "fabricated-exchange:block/energy_collectors/other",
+    "top": "fabricated-exchange:block/energy_collectors/top_1"
+  }
+}

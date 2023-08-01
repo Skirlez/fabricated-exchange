@@ -1,12 +1,12 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_philosophers_stone": {
+    "has_aeternalis_fuel": {
       "conditions": {
         "items": [
           {
             "items": [
-              "fabricated-exchange:philosophers_stone"
+              "fabricated-exchange:aeternalis_fuel"
             ]
           }
         ]
@@ -22,7 +22,7 @@
   },
   "requirements": [
     [
-      "has_philosophers_stone",
+      "has_aeternalis_fuel",
       "has_the_recipe"
     ]
   ],
