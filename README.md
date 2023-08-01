@@ -55,6 +55,7 @@ All of the code in this repository is licensed under the terms of the LGPLv3. I 
 - Antimatter Relays Mk1-Mk3
 - Alchemical Chest
 - Energy Condensers Mk1, Mk2
+- Tome of Knowledge
 - Alchemical Fuels + Blocks, Dark/Red Matter, Covalence Dusts
 - Configurable EMC Mapper
 
@@ -62,6 +63,7 @@ All of the code in this repository is licensed under the terms of the LGPLv3. I 
 
 - As much EMC as your RAM can store
 - Infinitely precise EMC fractions (No more slabs without EMC values!)
+- Fancy animated Transmutation Table (Toggleable)
  
 # Screenshot
 ![image](https://github.com/Skirlez/fabricated-exchange/assets/17904548/c389d2f9-c129-4207-be85-51735b0e682e)

@@ -20,7 +20,6 @@ public class TransmutationTableScreenHandlerFactory implements ExtendedScreenHan
     public TransmutationTableScreenHandlerFactory() {
 
     }
-
     public Text getDisplayName() {
         return Text.translatable("screen.fabricated-exchange.transmutation");
     }

@@ -138,8 +138,8 @@ public class EmcMapper {
         }
         Map<String, SuperNumber> customEmcMap = ModConfig.CUSTOM_EMC_MAP_FILE.getValue();
         if (customEmcMap != null)
-            GeneralUtil.mergeMap(EmcData.emcMap, customEmcMap);
-
+            GeneralUtil.mergeMap(emcMap, customEmcMap);
+        
         FabricatedExchange.LOGGER.info("End EMC mapper");
     }
 
@@ -165,8 +165,9 @@ public class EmcMapper {
         to the right side of the equation, and numbers to the left.
         This variable represents the left side.
         */
-
-
+        if (recipe.getId().toString().equals("fabricated-exchange:ps_diamond_from_emerald")) {
+            System.out.println("here");
+        }
         SuperNumber sum = SuperNumber.Zero();
         
         // The amount of unknown ingredients that are present. If above 1, we give up on this recipe.
@@ -182,7 +183,7 @@ public class EmcMapper {
         int unknownMult = 0;
 
         ItemStack outputStack = recipe.getOutput(dynamicRegistryManager);
-        SuperNumber outputEmc = getStackEmc(outputStack);
+        SuperNumber outputEmc = getItemEmc(outputStack.getItem());
         if (outputEmc.equalsZero()) {
             // The output is our unknown.
             unknownCount = 1;
@@ -425,8 +426,10 @@ public class EmcMapper {
             else {
                 if (inEmc.equalTo(outEmc)) // we already know both inemc and outemc, run an inequality check
                     iterator.remove();
-                else
-                    warn("Inequality in recipe " + recipe.getId().toString());
+                else {
+                    inEmc.subtract(outEmc);
+                    warn("Inequality detected in recipe " + recipe.getId().toString() + "! Disparity: " + inEmc.divisionString());
+                }
             }
         }
         return newInfo;
@@ -493,7 +496,9 @@ public class EmcMapper {
             + " a value lower or equal to 0. Current recipe: " + recipe.getId().toString());
             return false;
         }
-
+        if (itemName(item).equals("fabricated-exchange:philosophers_stone")) {
+            System.out.println("why");
+        }
         if (!emcMapHasEntry(item)) {
             emcMap.put(itemName(item), value);
             return true;
@@ -514,22 +519,6 @@ public class EmcMapper {
         String id = itemName(item);
         if (emcMap.containsKey(id)) 
             return new SuperNumber(emcMap.get(id));
-        return SuperNumber.Zero(); 
-    }
-
-    private SuperNumber getStackEmc(ItemStack stack) {
-        if (stack == null)
-            return SuperNumber.Zero(); 
-        String id = itemName(stack.getItem());
-        if (emcMap.containsKey(id)) {
-            SuperNumber emc = new SuperNumber(emcMap.get(id));
-
-            emc.multiply(stack.getCount());
-            if (stack.getMaxDamage() != 0) {
-                emc.multiply(new SuperNumber(stack.getMaxDamage()-stack.getDamage(), stack.getMaxDamage()));
-                emc.floor();
-            }
-        }
         return SuperNumber.Zero(); 
     }
 

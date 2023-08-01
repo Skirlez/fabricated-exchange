@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "c:diamonds"
+    },
+    {
+      "tag": "c:coal"
+    },
+    {
+      "tag": "c:coal"
+    },
+    {
+      "tag": "c:coal"
+    },
+    {
+      "tag": "c:coal"
+    }
+  ],
+  "result": {
+    "count": 40,
+    "item": "fabricated-exchange:high_covalence_dust"
+  }
+}

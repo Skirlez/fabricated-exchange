@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "fabricated-exchange:philosophers_stone"
+    },
+    {
+      "item": "fabricated-exchange:alchemical_coal"
+    }
+  ],
+  "result": {
+    "count": 8,
+    "item": "minecraft:coal"
+  }
+}

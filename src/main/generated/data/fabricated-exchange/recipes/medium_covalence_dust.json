@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "c:iron_ingots"
+    },
+    {
+      "tag": "c:redstone_dusts"
+    }
+  ],
+  "result": {
+    "count": 40,
+    "item": "fabricated-exchange:medium_covalence_dust"
+  }
+}

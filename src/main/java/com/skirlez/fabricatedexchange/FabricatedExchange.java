@@ -155,7 +155,4 @@ public class FabricatedExchange implements ModInitializer {
         }
         blockTransmutationMap.put(b1, b2);
     };
-     
-
-
 }
