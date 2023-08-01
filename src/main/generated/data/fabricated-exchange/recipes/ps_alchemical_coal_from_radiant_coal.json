@@ -6,11 +6,11 @@
       "item": "fabricated-exchange:philosophers_stone"
     },
     {
-      "item": "fabricated-exchange:mobius_fuel"
+      "item": "fabricated-exchange:radiant_coal"
     }
   ],
   "result": {
-    "count": 8,
+    "count": 4,
     "item": "fabricated-exchange:alchemical_coal"
   }
 }

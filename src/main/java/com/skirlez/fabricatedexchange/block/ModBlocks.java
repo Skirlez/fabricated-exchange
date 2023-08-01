@@ -18,6 +18,8 @@ import net.minecraft.util.Identifier;
 public class ModBlocks {
     public static final Block ALCHEMICAL_COAL_BLOCK = registerBlock("alchemical_coal_block", 
         new Block(FabricBlockSettings.of(Material.STONE, MapColor.RED).requiresTool().strength(5.0f, 6.0f)));
+    public static final Block RADIANT_COAL_BLOCK = registerBlock("radiant_coal_block", 
+        new Block(FabricBlockSettings.of(Material.STONE, MapColor.WHITE).requiresTool().strength(5.0f, 6.0f)));
     public static final Block MOBIUS_FUEL_BLOCK = registerBlock("mobius_fuel_block", 
         new Block(FabricBlockSettings.of(Material.STONE, MapColor.RED).requiresTool().strength(5.0f, 6.0f)));
     public static final Block AETERNALIS_FUEL_BLOCK = registerBlock("aeternalis_fuel_block", 

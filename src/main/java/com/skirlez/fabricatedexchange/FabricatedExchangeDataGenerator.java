@@ -2,11 +2,13 @@ package com.skirlez.fabricatedexchange;
 
 import java.util.function.Consumer;
 
+import com.skirlez.fabricatedexchange.block.ModBlocks;
 import com.skirlez.fabricatedexchange.item.ModItems;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
+import net.minecraft.block.Block;
 import net.minecraft.data.server.recipe.RecipeJsonProvider;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
@@ -36,6 +38,12 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 
         @Override
         public void generate(Consumer<RecipeJsonProvider> exporter) {
+
+            generateToAndFromBlockRecipes(ModItems.ALCHEMICAL_COAL, ModBlocks.ALCHEMICAL_COAL_BLOCK, exporter);
+            generateToAndFromBlockRecipes(ModItems.RADIANT_COAL, ModBlocks.RADIANT_COAL_BLOCK, exporter);
+            generateToAndFromBlockRecipes(ModItems.MOBIUS_FUEL, ModBlocks.MOBIUS_FUEL_BLOCK, exporter);
+            generateToAndFromBlockRecipes(ModItems.AETERNALIS_FUEL, ModBlocks.AETERNALIS_FUEL_BLOCK, exporter);
+
             ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.PHILOSOPHERS_STONE)
                 .pattern("RGR")
                 .pattern("GDG")
@@ -51,8 +59,9 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
             generatePhilosopherStoneRecipe(Items.GOLD_INGOT, Items.DIAMOND, 4, exporter);
             generatePhilosopherStoneRecipe(Items.DIAMOND, Items.EMERALD, 2, exporter);
 
-            generatePhilosopherStoneRecipe(Items.COAL, ModItems.ALCHEMICAL_COAL, 8, exporter);
-            generatePhilosopherStoneRecipe(ModItems.ALCHEMICAL_COAL, ModItems.MOBIUS_FUEL, 8, exporter);
+            generatePhilosopherStoneRecipe(Items.COAL, ModItems.ALCHEMICAL_COAL, 4, exporter);
+            generatePhilosopherStoneRecipe(ModItems.ALCHEMICAL_COAL, ModItems.RADIANT_COAL, 4, exporter);
+            generatePhilosopherStoneRecipe(ModItems.RADIANT_COAL, ModItems.MOBIUS_FUEL, 4, exporter);
             generatePhilosopherStoneRecipe(ModItems.MOBIUS_FUEL, ModItems.AETERNALIS_FUEL, 4, exporter);
 
             TagKey<Item> coal = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "coal"));
@@ -103,6 +112,22 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                     FabricRecipeProvider.conditionsFromItem(ModItems.PHILOSOPHERS_STONE))
                 .offerTo(exporter, "ps_" + name1 + "_from_" + name2);
         }
+        private void generateToAndFromBlockRecipes(Item item, Block block, Consumer<RecipeJsonProvider> exporter) {
+            String itemName = Registries.ITEM.getId(item).getPath();
+            String blockName = Registries.ITEM.getId(block.asItem()).getPath();
+            ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, item, 9)
+                .input(block)
+                .criterion(FabricRecipeProvider.hasItem(ModItems.PHILOSOPHERS_STONE), 
+                    FabricRecipeProvider.conditionsFromItem(ModItems.PHILOSOPHERS_STONE))
+                .offerTo(exporter, itemName + "_from_block");
+                    
+            ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, item)
+                .input(item, 9)
+                .criterion(FabricRecipeProvider.hasItem(ModItems.PHILOSOPHERS_STONE), 
+                    FabricRecipeProvider.conditionsFromItem(ModItems.PHILOSOPHERS_STONE))
+                .offerTo(exporter, blockName + "from_item");
+        }
+
 
     }   
 }

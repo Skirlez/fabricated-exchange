@@ -15,7 +15,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "minecraft:ps_mobius_fuel_from_alchemical_coal"
+        "recipe": "minecraft:ps_mobius_fuel_from_radiant_coal"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -28,7 +28,7 @@
   ],
   "rewards": {
     "recipes": [
-      "minecraft:ps_mobius_fuel_from_alchemical_coal"
+      "minecraft:ps_mobius_fuel_from_radiant_coal"
     ]
   }
 }

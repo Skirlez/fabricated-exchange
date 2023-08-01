@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "fabricated-exchange:aeternalis_fuel_block"
+    }
+  ],
+  "result": {
+    "count": 9,
+    "item": "fabricated-exchange:aeternalis_fuel"
+  }
+}

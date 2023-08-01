@@ -18,6 +18,8 @@ public class ModItems {
         new TransmutationTablet(new FabricItemSettings().maxCount(1)));
     public static final Item ALCHEMICAL_COAL = registerItemWithGroup("alchemical_coal", 
         new Item(new FabricItemSettings()));
+    public static final Item RADIANT_COAL = registerItemWithGroup("radiant_coal", 
+        new Item(new FabricItemSettings()));
     public static final Item MOBIUS_FUEL = registerItemWithGroup("mobius_fuel", 
         new Item(new FabricItemSettings()));
     public static final Item AETERNALIS_FUEL = registerItemWithGroup("aeternalis_fuel", 

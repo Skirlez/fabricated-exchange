@@ -1,5 +1,6 @@
 {
     "item.fabricated-exchange.philosophers_stone": "Philosopher's Stone",
+    "item.fabricated-exchange.radiant_coal": "Radiant Coal",
     "item.fabricated-exchange.alchemical_coal": "Alchemical Coal",
     "item.fabricated-exchange.mobius_fuel": "Mobius Fuel",
     "item.fabricated-exchange.aeternalis_fuel": "Aeternalis Fuel",
@@ -11,7 +12,8 @@
     "item.fabricated-exchange.high_covalence_dust": "High Covalence Dust",
     "item.fabricated-exchange.tome_of_knowledge": "Tome of Knowledge",
 
-
+    
+    "block.fabricated-exchange.radiant_coal_block": "Radiant Coal Block",
     "block.fabricated-exchange.alchemical_coal_block": "Alchemical Coal Block",
     "block.fabricated-exchange.mobius_fuel_block": "Mobius Fuel Block",
     "block.fabricated-exchange.aeternalis_fuel_block": "Aeternalis Fuel Block",

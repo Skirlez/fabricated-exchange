@@ -16,21 +16,9 @@
     },
     {
       "item": "fabricated-exchange:alchemical_coal"
-    },
-    {
-      "item": "fabricated-exchange:alchemical_coal"
-    },
-    {
-      "item": "fabricated-exchange:alchemical_coal"
-    },
-    {
-      "item": "fabricated-exchange:alchemical_coal"
-    },
-    {
-      "item": "fabricated-exchange:alchemical_coal"
     }
   ],
   "result": {
-    "item": "fabricated-exchange:mobius_fuel"
+    "item": "fabricated-exchange:radiant_coal"
   }
 }
