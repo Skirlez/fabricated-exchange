@@ -1,6 +1,6 @@
 # fabricated-exchange
 
-A Fabric remake of the Minecraft mod Project E/Equivalent Exchange 2.
+A Fabric remake of the Minecraft mod ProjectE/Equivalent Exchange 2.
 The mod attaches an "EMC" number value to every item. Some are worth more, some less.
 Transmute items and blocks into EMC, and EMC to different items you've obtained before.
 
