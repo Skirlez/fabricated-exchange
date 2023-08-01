@@ -8,22 +8,22 @@ import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 public class TransmutationSlot extends Slot {
     // This slot will contain an item the player has learned. taking it will subtract from the player's EMC.
-    private LivingEntity player;
+    private PlayerEntity player;
     public double angle;
     public double distanceFromCenter = 0;
     public long startTime = System.currentTimeMillis();
     private TransmutationTableScreenHandler screenHandler;
-    public TransmutationSlot(Inventory inventory, int index, double angle, LivingEntity player, 
+    public TransmutationSlot(Inventory inventory, int index, double angle, PlayerEntity player, 
             TransmutationTableScreenHandler screenHandler) {
-        super(inventory, index, 158, 32);
+        super(inventory, index, 159, 49);
         this.player = player;
         this.screenHandler = screenHandler;
         this.angle = angle;
@@ -68,7 +68,7 @@ public class TransmutationSlot extends Slot {
         if (!player.world.isClient()) {
             SuperNumber emc = EmcData.getEmc(player);
             if (emc.compareTo(itemCost) != -1) {
-                EmcData.subtractEmc(player, itemCost);
+                EmcData.subtractEmc((ServerPlayerEntity)player, itemCost);
                 screenHandler.refreshOffering();
                 return stack;
             }

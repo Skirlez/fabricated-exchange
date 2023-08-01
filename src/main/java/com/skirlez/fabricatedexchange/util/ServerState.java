@@ -1,5 +1,6 @@
 package com.skirlez.fabricatedexchange.util;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,9 +27,10 @@ public class ServerState extends PersistentState {
  
             playerStateNbt.putString("emc", playerState.emc.divisionString());
             NbtList knowledgeList = new NbtList();
-            for (int i = 0; i < playerState.knowledge.size(); i++) {
-                knowledgeList.add(NbtString.of(playerState.knowledge.get(i)));
-            }
+            Iterator<String> iterator = playerState.knowledge.iterator();
+            while (iterator.hasNext())
+                knowledgeList.add(NbtString.of(iterator.next()));
+            
             playerStateNbt.put("knowledge", knowledgeList);
 
             playersNbtCompound.put(String.valueOf(UUID), playerStateNbt);
@@ -69,7 +71,6 @@ public class ServerState extends PersistentState {
  
     public static PlayerState getPlayerState(LivingEntity player) {
         ServerState serverState = getServerState(player.world.getServer());
- 
         // Either get the player by the uuid, or we don't have data for him yet, make a new player state
         PlayerState playerState = serverState.players.computeIfAbsent(player.getUuid(), uuid -> new PlayerState(serverState));
  

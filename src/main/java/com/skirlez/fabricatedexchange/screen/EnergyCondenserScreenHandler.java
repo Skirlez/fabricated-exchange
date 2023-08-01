@@ -18,7 +18,7 @@ import net.minecraft.util.math.BlockPos;
 
 public class EnergyCondenserScreenHandler extends CoolScreenHandler implements ChestScreenHandler {
     private Inventory inventory;
-    
+    private int size;
     public EnergyCondenserScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
         this(syncId, playerInventory, buf.readBlockPos(), buf.readInt(), buf);
     }
@@ -28,11 +28,12 @@ public class EnergyCondenserScreenHandler extends CoolScreenHandler implements C
         EnergyCondenserBlockEntity blockEntity = (EnergyCondenserBlockEntity)playerInventory.player.getWorld().getBlockEntity(pos);
         this.pos = pos;
         this.level = level;
+        this.size = (13 - level) * 7 + 1;
         if (blockEntity == null)
-            this.inventory = new SimpleInventory(((13 - level) * 7 + 1));
+            this.inventory = new SimpleInventory(size);
         else {
             this.inventory = (Inventory)blockEntity;
-            checkSize(inventory, (13 - level) * 7 + 1);
+            checkSize(inventory, size);
         }
         inventory.onOpen(playerInventory.player);
         this.buf = buf;
@@ -84,12 +85,12 @@ public class EnergyCondenserScreenHandler extends CoolScreenHandler implements C
         if (slot2 != null && slot2.hasStack()) {
             ItemStack itemStack2 = slot2.getStack();
             itemStack = itemStack2.copy();
-            if (slot < 104) {
-                if (!this.insertItem(itemStack2, 104, this.slots.size(), true)) {
+            if (slot < size) {
+                if (!this.insertItem(itemStack2, size, this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
-            } 
-            else if (!this.insertItem(itemStack2, 0, 104, false)) {
+            }
+            else if (level == 1 && !this.insertItem(itemStack2, 1, 43, false)) {
                 return ItemStack.EMPTY;
             }
 

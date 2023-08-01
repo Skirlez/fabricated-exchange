@@ -8,7 +8,6 @@ import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.mixin.client.HandledScreenAccessor;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.slot.transmutation.TransmutationSlot;
-import com.skirlez.fabricatedexchange.util.ConfigFile;
 import com.skirlez.fabricatedexchange.util.ModConfig;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -33,6 +32,10 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
     private static final Identifier TEXTURE =
             new Identifier(FabricatedExchange.MOD_ID, "textures/gui/transmute.png");
 
+
+    private int fullAngleTime = 800;
+    private int fullDistTime = 800;
+
     private String oldSearchText = "";
 
     private long distStartTime = System.currentTimeMillis();
@@ -46,7 +49,7 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 
     public TransmutationTableScreen(TransmutationTableScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
-        animated = ModConfig.CONFIG_FILE.getOption(ConfigFile.Bool.TRANSMUTATION_TABLE_ANIMATED);
+        animated = ModConfig.CONFIG_FILE.transmutationTable_animated;
         if (animated) 
             distanceFromCenter = 0.0;
         else 
@@ -89,12 +92,12 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         this.backgroundHeight = 197;
         super.init();
 
-        titleX = 4;     
-        titleY = -10; 
+        titleX = 5;     
+        titleY = 5; 
 
         Consumer<String> updater = searchText -> updateSearchText(searchText);
 
-        searchBar = new TextFieldWidget(this.textRenderer, x + 64, y - 31, 100, 10, Text.empty());
+        searchBar = new TextFieldWidget(this.textRenderer, x + 78, y + 4, 60, 10, Text.empty());
         searchBar.setMaxLength(30);
         searchBar.setChangedListener(updater);
         
@@ -103,13 +106,13 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         addDrawableChild(ButtonWidget.builder(
             Text.of("<"),
             button -> updatePage(false)
-        ).dimensions(x + 126, y + 84, 13, 13)
+        ).dimensions(x + 127, y + 101, 13, 13)
         .build());
 
         addDrawableChild(ButtonWidget.builder(
             Text.of(">"),
             button -> updatePage(true)
-        ).dimensions(x + 193, y + 84, 13, 13)
+        ).dimensions(x + 194, y + 101, 13, 13)
         .build());
 
     }
@@ -119,13 +122,10 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);
-        int x = (width - backgroundWidth) / 2 - 1;
-        int y = (height - backgroundHeight) / 2 - 17;
+        int x = (width - backgroundWidth) / 2;
+        int y = (height - backgroundHeight) / 2;
         
         drawTexture(matrices, x, y, 0, 0, backgroundWidth, backgroundHeight);
-       
-        
-        
     }
 
     @Override
@@ -149,22 +149,25 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         textRenderer.draw(matrices, this.title, (float)this.titleX, (float)this.titleY, 0x404040);
         String emc = FabricatedExchangeClient.clientEmc.shortString();
 
-        textRenderer.draw(matrices, Text.literal("EMC:"), 4, 79, 0x404040);
-        textRenderer.draw(matrices, Text.literal(emc), 4, 89, 0x404040);
+        textRenderer.draw(matrices, Text.literal("EMC:"), 4, 96, 0x404040);
+        textRenderer.draw(matrices, Text.literal(emc), 4, 106, 0x404040);
 
         int lastPage = handler.getLastPageNum();
         if (offeringPageNum > lastPage) 
             offeringPageNum = lastPage;
 
         Text text = Text.literal((offeringPageNum + 1) + "/" + (lastPage + 1));
-        textRenderer.draw(matrices, text, 167 - textRenderer.getWidth(text) / 2, 89, 0x404040);
+        textRenderer.draw(matrices, text, 167 - textRenderer.getWidth(text) / 2, 106, 0x404040);
     }
 
     public void resetAngleTime() {
         long add = 0;
         double angleTime = (double)(System.currentTimeMillis() - angleStartTime);
-        if (angleTime < 800 && angleTime > 0) {
-            double x = angleTime / 800.0;
+        if (angleTime < fullAngleTime) {
+            if (angleTime < 0)
+                angleTime %= 208;
+            
+            double x = angleTime / fullAngleTime;
             double angleOffset = (Math.pow(x - 1.0, 3.0) + 1.0);
 
             add = (long)(208.0 - 208.0 * angleOffset );
@@ -183,17 +186,18 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 
         if (animated) {
             double angleTime = (double)(System.currentTimeMillis() - angleStartTime);
-            double x = angleTime / 800.0;
-
-            if (angleTime < 800.0)
+            if (angleTime < fullAngleTime) {
+                double x = angleTime / fullAngleTime;
                 angleOffset = 360.0 * (Math.pow(x - 1.0, 3.0) + 1.0);
-            
-
+            }
             double distTime = (double)(System.currentTimeMillis() - distStartTime);
-            if (distTime < 800.0) {
-                x = distTime / 800.0;
+            if (distTime < fullDistTime) {
+                double x = distTime / fullDistTime;
                 distanceFromCenter = Math.pow(x - 1.0, 3.0) + 1.0;
             }
+            else
+                distanceFromCenter = 1.0;
+            
         }
 
         
@@ -218,20 +222,20 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         for (int i = 0; i < 12; i++) {
             TransmutationSlot slot = list.get(i);
             double radianAngle = Math.toRadians(slot.angle + (angleOffset * rotationDir));
-            int yOffset = (int)(Math.sin(radianAngle) * distanceFromCenter * 41.0);
-            int xOffset = (int)(Math.cos(radianAngle) * distanceFromCenter * 41.0) + (int)xOffsetGlobal;
+            int yOffset = (int)(Math.sin(radianAngle) * distanceFromCenter * 41.6);
+            int xOffset = (int)(Math.cos(radianAngle) * distanceFromCenter * 41.6) + (int)xOffsetGlobal;
 
 
-            slot.setPosition(158 + xOffset, 32 + yOffset);
+            slot.setPosition(159 + xOffset, 49 + yOffset);
         }
         
         // inner ring
         for (int i = 12; i < 16; i++) {
             TransmutationSlot slot = list.get(i);
             double radianAngle = Math.toRadians(slot.angle - angleOffset * rotationDir);
-            int yOffset = (int)(Math.sin(radianAngle) * distanceFromCenter * 19.0);
-            int xOffset = (int)(Math.cos(radianAngle) * distanceFromCenter * 19.0 + (int)xOffsetGlobal);
-            slot.setPosition(158 + xOffset, 32 + yOffset);
+            int yOffset = (int)(Math.sin(radianAngle) * distanceFromCenter * 19.6);
+            int xOffset = (int)(Math.cos(radianAngle) * distanceFromCenter * 19.6 + (int)xOffsetGlobal);
+            slot.setPosition(159 + xOffset, 49 + yOffset);
         }
         
 

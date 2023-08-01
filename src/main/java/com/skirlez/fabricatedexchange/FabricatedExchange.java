@@ -88,7 +88,7 @@ public class FabricatedExchange implements ModInitializer {
         Iterator<RegistryEntry<Item>> iterator = Registries.ITEM.getEntryList(ModTags.FUEL).get().iterator();
         while (iterator.hasNext()) {
             Item item = iterator.next().value();
-            GeneralUtil.addSortedEmcList(fuelItemList, item);
+            GeneralUtil.addSortedEmcList(fuelItemList, item, false);
         }
         Map<Item, Item> newFuelProgressionMap = new HashMap<Item, Item>();
         for (int i = 0; i < fuelItemList.size(); i++) {

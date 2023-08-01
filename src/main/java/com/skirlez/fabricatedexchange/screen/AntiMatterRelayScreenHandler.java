@@ -8,9 +8,6 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
 
-
-
-
 public class AntiMatterRelayScreenHandler extends FuelScreenHandler  {
     public AntiMatterRelayScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
         this(syncId, playerInventory, buf.readBlockPos(), buf.readInt(), buf);

@@ -83,22 +83,19 @@ public class EmcData {
 
 
 
-    public static void setEmc(LivingEntity player, SuperNumber amount) {
+    public static void setEmc(ServerPlayerEntity player, SuperNumber amount) {
         PlayerState playerState = ServerState.getPlayerState(player);
         playerState.emc = amount;
-        playerState.markDirty();
-        syncEmc((ServerPlayerEntity) player, playerState.emc);
+        syncEmc(player, playerState.emc);
     }    
-    public static void addEmc(LivingEntity player, SuperNumber amount) {
+    public static void addEmc(ServerPlayerEntity player, SuperNumber amount) {
         PlayerState playerState = ServerState.getPlayerState(player);
         playerState.emc.add(amount);
-        playerState.markDirty();
-        syncEmc((ServerPlayerEntity) player, playerState.emc);
+        syncEmc(player, playerState.emc);
     }    
-    public static void subtractEmc(LivingEntity player, SuperNumber amount) {
+    public static void subtractEmc(ServerPlayerEntity player, SuperNumber amount) {
         PlayerState playerState = ServerState.getPlayerState(player);
         playerState.emc.subtract(amount);
-        playerState.markDirty();
         syncEmc((ServerPlayerEntity) player, playerState.emc);
     }    
     public static void syncEmc(ServerPlayerEntity player, SuperNumber emc) {

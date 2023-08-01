@@ -8,22 +8,20 @@ import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.Pair;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 public class ConsumeSlot extends Slot {
     // This slot destroys any item put inside and adds its EMC to it to a player.
     // if the item doesn't have EMC, it rejects it.
-
-    private LivingEntity player;
+    private PlayerEntity player;
     private TransmutationTableScreenHandler screenHandler;
-    public ConsumeSlot(Inventory inventory, int index, int x, int y, LivingEntity player, TransmutationTableScreenHandler screenHandler) {
+    public ConsumeSlot(Inventory inventory, int index, int x, int y, PlayerEntity player, TransmutationTableScreenHandler screenHandler) {
         super(inventory, index, x, y);
         this.player = player;
         this.screenHandler = screenHandler;
@@ -37,13 +35,13 @@ public class ConsumeSlot extends Slot {
         if (emc.equalsZero() && !stack.getItem().equals(ModItems.TOME_OF_KNOWLEDGE))
             return stack;
         if (!player.getWorld().isClient()) {
-            EmcData.addEmc(player, emc);
+            EmcData.addEmc((ServerPlayerEntity)player, emc);
             PlayerState playerState = ServerState.getPlayerState(player);
             String idName = Registries.ITEM.getId(stack.getItem()).toString();
             Item item = stack.getItem();
             if (!playerState.knowledge.contains(idName)) {
                 playerState.knowledge.add(idName);
-                screenHandler.addKnowledgePair(new Pair<Item, SuperNumber>(item, EmcData.getItemEmc(item)));
+                screenHandler.addKnowledge(item);
             }
             if (item.equals(ModItems.TOME_OF_KNOWLEDGE)) {
                 Registries.ITEM.forEach(
@@ -52,7 +50,7 @@ public class ConsumeSlot extends Slot {
                     SuperNumber currentEmc = EmcData.getItemEmc(currentId);
                     if (!currentEmc.equalsZero() && !playerState.knowledge.contains(currentId)) {
                         playerState.knowledge.add(currentId);
-                        screenHandler.addKnowledgePair(new Pair<Item, SuperNumber>(currentItem, currentEmc));
+                        screenHandler.addKnowledge(currentItem);
                     }
                 });
             }

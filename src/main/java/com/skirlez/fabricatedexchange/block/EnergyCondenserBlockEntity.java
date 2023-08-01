@@ -59,9 +59,10 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
         Inventory inv = (Inventory)this;
         Item target = inv.getStack(0).getItem();
         SuperNumber targetEmc = EmcData.getItemEmc(target);
+        
         if (!targetEmc.equalsZero() && emc.compareTo(targetEmc) >= 0) {
-            boolean success = false;
             int start = (level == 0) ? 1 : 43;
+            boolean success = false;
             for (int i = start; i < inv.size() && !success; i++) {
                 ItemStack stack = inv.getStack(i);
                 if (stack.isEmpty()) {
@@ -78,7 +79,7 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
                 inv.markDirty();
             }
         }
-        if (level == 1) {;
+        if (level == 1 && emc.compareTo(targetEmc) == -1) {
             for (int i = 1; i < 43; i++) {
                 ItemStack stack = inv.getStack(i);
                 if (stack.isEmpty())
@@ -87,11 +88,14 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
                 SuperNumber itemEmc = EmcData.getItemEmc(stack.getItem());
                 if (itemEmc.equalsZero())
                     continue;
+                
+                
                 stack.decrement(1);
                 emc.add(itemEmc);
                 break;
             }
         }
+
 
         serverSync(pos, emc, players);
         if (tick % 120 == 0) 
@@ -101,17 +105,16 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 
     @Override
     public boolean isValid(int slot, ItemStack stack) {
-        return (level == 0) ? false : slot < 43 && slot > 0;
+        return (level == 0) ? false : (slot < 43 && slot > 0 && !EmcData.getItemEmc(stack.getItem()).equalsZero());
     }
     @Override
     public boolean canTransferTo(Inventory hopperInventory, int slot, ItemStack stack) {
         return (level == 0) ? slot != 0 : slot > 42;
     }
 
-
     @Override
     public int size() {
-        return 92;
+        return (13 - level) * 7 + 1;
     }
 
     @Override

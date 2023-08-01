@@ -15,7 +15,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 
 public class TransmutationTableScreenHandlerFactory implements ExtendedScreenHandlerFactory, ImplementedInventory {
-    private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(18, ItemStack.EMPTY);
+    private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(19, ItemStack.EMPTY);
     private TransmutationTableScreenHandler handler;
     public TransmutationTableScreenHandlerFactory() {
 

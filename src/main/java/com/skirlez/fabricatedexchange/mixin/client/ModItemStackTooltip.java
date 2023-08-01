@@ -12,7 +12,6 @@ import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreen;
 import com.skirlez.fabricatedexchange.screen.slot.transmutation.TransmutationSlot;
-import com.skirlez.fabricatedexchange.util.ConfigFile;
 import com.skirlez.fabricatedexchange.util.ModConfig;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
@@ -64,7 +63,7 @@ public class ModItemStackTooltip {
 				}
 			}
 		}
-		if (ModConfig.CONFIG_FILE.getOption(ConfigFile.Bool.SHOW_ITEM_EMC_ORIGIN)) {
+		if (ModConfig.CONFIG_FILE.showItemEmcOrigin) {
 			boolean seed = EmcData.isItemInSeedValues(itemStack.getItem());
 			boolean custom = EmcData.isItemInCustomValues(itemStack.getItem());
 			if (seed)

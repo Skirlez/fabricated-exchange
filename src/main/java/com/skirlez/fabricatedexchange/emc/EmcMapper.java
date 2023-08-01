@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.mixin.LegacySmithingRecipeAccessor;
-import com.skirlez.fabricatedexchange.util.ConfigFile;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.ModConfig;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
@@ -60,7 +59,7 @@ public class EmcMapper {
         if (seedEmcMap != null)
             GeneralUtil.mergeMap(emcMap, seedEmcMap);
 
-        if (ModConfig.CONFIG_FILE.getOption(ConfigFile.Bool.MAPPER_ENABLED)) {
+        if (ModConfig.CONFIG_FILE.mapper_enabled) {
             // i don't know what this thing is, but you need it for some functions
             DynamicRegistryManager dynamicRegistryManager = world.getRegistryManager();
 
@@ -165,9 +164,6 @@ public class EmcMapper {
         to the right side of the equation, and numbers to the left.
         This variable represents the left side.
         */
-        if (recipe.getId().toString().equals("fabricated-exchange:ps_diamond_from_emerald")) {
-            System.out.println("here");
-        }
         SuperNumber sum = SuperNumber.Zero();
         
         // The amount of unknown ingredients that are present. If above 1, we give up on this recipe.
@@ -495,9 +491,6 @@ public class EmcMapper {
             warn("EMC Mapper tried assigning item " + itemName(item) 
             + " a value lower or equal to 0. Current recipe: " + recipe.getId().toString());
             return false;
-        }
-        if (itemName(item).equals("fabricated-exchange:philosophers_stone")) {
-            System.out.println("why");
         }
         if (!emcMapHasEntry(item)) {
             emcMap.put(itemName(item), value);

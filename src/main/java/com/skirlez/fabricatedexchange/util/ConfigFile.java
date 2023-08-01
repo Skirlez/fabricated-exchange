@@ -11,6 +11,10 @@ public class ConfigFile extends DataFile<Map<String, Object>> {
         super(type, name);
     }
 
+    public boolean showItemEmcOrigin;
+    public boolean mapper_enabled;
+    public boolean transmutationTable_animated;
+
     public static enum Bool {
         SHOW_ITEM_EMC_ORIGIN,
         MAPPER_ENABLED,
@@ -28,8 +32,6 @@ public class ConfigFile extends DataFile<Map<String, Object>> {
         boolean changed = false;
         if (value != null) {
             Iterator<String> iterator = defaultValue.keySet().iterator();
-            
-            
             while (iterator.hasNext()) {
                 String key = iterator.next();
                 if (!value.containsKey(key)) {
@@ -47,26 +49,10 @@ public class ConfigFile extends DataFile<Map<String, Object>> {
             }
         }
         save();
-    }
-    
-    public boolean getOption(Bool option) {
-        String str;
-        switch (option) {
-            case SHOW_ITEM_EMC_ORIGIN:
-                str = "showItemEmcOrigin";
-                break;
-            case MAPPER_ENABLED:
-                str = "mapper.enabled";
-                break;
-            case TRANSMUTATION_TABLE_ANIMATED:
-                str = "transmutationTable.animated";
-                break;
-            default:
-                FabricatedExchange.LOGGER.error("Config file has enum without a matching string! Enum: " + option.name());
-                return false;
-        }
-        return (boolean)value.get(str);
-    }
 
+        showItemEmcOrigin = (boolean)value.get("showItemEmcOrigin");
+        mapper_enabled = (boolean)value.get("mapper.enabled");
+        transmutationTable_animated = (boolean)value.get("transmutationTable.animated");
+    }
 }
 

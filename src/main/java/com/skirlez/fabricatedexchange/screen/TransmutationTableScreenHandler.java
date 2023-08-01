@@ -10,6 +10,7 @@ import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.slot.transmutation.ConsumeSlot;
+import com.skirlez.fabricatedexchange.screen.slot.transmutation.ForgetSlot;
 import com.skirlez.fabricatedexchange.screen.slot.transmutation.MidSlot;
 import com.skirlez.fabricatedexchange.screen.slot.transmutation.TransmutationSlot;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
@@ -19,7 +20,6 @@ import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -32,69 +32,77 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
 import net.minecraft.util.collection.DefaultedList;
 
 public class TransmutationTableScreenHandler extends ScreenHandler {
     private final Inventory inventory; // the transmutation slots
-    private final Inventory minorInventory; // the middle slot and the slots on the left
-    private final LivingEntity player;
-    private ConsumeSlot emcSlot;
+    private final PlayerEntity player;
+    private final ConsumeSlot emcSlot;
     private String searchText = "";
     private int offeringPageNum = 0;
     private int lastOfferingPage = 0;
-    private List<Pair<Item, SuperNumber>> knowledge = new ArrayList<Pair<Item,SuperNumber>>();
+    private List<Item> orderedKnowledge = new ArrayList<Item>();
     private final DefaultedList<TransmutationSlot> transmutationSlots = DefaultedList.of();
     public TransmutationTableScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
-        this(syncId, inventory, new SimpleInventory(18));
+        this(syncId, inventory, new SimpleInventory(19));
         this.lastOfferingPage = buf.readInt();
     }
     
     public TransmutationTableScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory) {
         super(ModScreenHandlers.TRANSMUTATION_TABLE_SCREEN_HANDLER, syncId);
-        checkSize(inventory, 18);
-        minorInventory = new SimpleInventory(1);
+        checkSize(inventory, 19);
         this.inventory = inventory;
         this.player = playerInventory.player;
         inventory.onOpen(playerInventory.player);
-        emcSlot = new ConsumeSlot(inventory, 0, 108, 80, player, this);
-        this.addSlot(emcSlot);
+        emcSlot = new ConsumeSlot(inventory, 2, 109, 97, player, this);
+        addSlot(emcSlot);
+        addSlot(new ForgetSlot(inventory, 1, 91, 97, player, this));
+        addSlot(new MidSlot(inventory, 0, 159, 49, this, player.world.isClient));
         
         // use trigonometry to create the transmutation slots
 
         // outer ring
         double angle = 270.0;
         for (int i = 0; i < 12; i++) {
-            addTransmutationSlot(new TransmutationSlot(inventory, i + 1, angle, player, this));
+            addTransmutationSlot(new TransmutationSlot(inventory, i + 3, angle, player, this));
             angle += 360.0 / 12.0;
         }
 
         // inner ring
         angle = 270.0;
         for (int i = 0; i < 4; i++) {
-            addTransmutationSlot(new TransmutationSlot(inventory, i + 13, angle, player, this));
+            addTransmutationSlot(new TransmutationSlot(inventory, i + 15, angle, player, this));
             angle += 360.0 / 4.0;
         }
 
 
 
-        addSlot(new MidSlot(minorInventory, 0, 158, 32, this, player.world.isClient));
-        GeneralUtil.addPlayerInventory(this, playerInventory, 36, 100);
-        GeneralUtil.addPlayerHotbar(this, playerInventory, 36, 158);
+        
+        // Inventory inventory, int index, int x, int y, PlayerEntity player,
+       // TransmutationTableScreenHandler screenHandler
+        
+        GeneralUtil.addPlayerInventory(this, playerInventory, 37, 117);
+        GeneralUtil.addPlayerHotbar(this, playerInventory, 37, 175);
 
 
         if (!player.getWorld().isClient()) {
             PlayerState playerState = ServerState.getPlayerState(player);
-            for (int i = 0; i < playerState.knowledge.size(); i++) {
-                String location = playerState.knowledge.get(i);
+            Iterator<String> iterator = playerState.knowledge.iterator();
+            while (iterator.hasNext()) {
+                String location = iterator.next();
                 String[] parts = location.split(":");
                 Item item = Registries.ITEM.get(new Identifier(parts[0], parts[1]));
-                SuperNumber emc = EmcData.getItemEmc(item);
-                Pair<Item, SuperNumber> pair = new Pair<Item,SuperNumber>(item, emc);
-                addKnowledgePair(pair);
+                addKnowledge(item);
             }
             refreshOffering();
         }
+    }
+
+    public void addKnowledge(Item item) {
+        GeneralUtil.addSortedEmcList(orderedKnowledge, item, true);
+    }
+    public void removeKnowledge(Item item) {
+        orderedKnowledge.remove(item);
     }
 
     public void setSearchText(String searchText) {
@@ -116,38 +124,36 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 
     public void refreshOffering() {
         SuperNumber emc = ServerState.getPlayerState(this.player).emc;
-        SuperNumber midItemEmc = EmcData.getItemStackEmc(this.slots.get(17).getStack());
+        SuperNumber midItemEmc = EmcData.getItemStackEmc(this.slots.get(0).getStack());
         if (!midItemEmc.equalsZero())
             emc = SuperNumber.min(emc, midItemEmc);
         
-        LinkedList<Pair<Item, SuperNumber>> newKnowledge = new LinkedList<Pair<Item, SuperNumber>>(knowledge);
-        LinkedList<Pair<Item, SuperNumber>> fuelKnowledge = new LinkedList<Pair<Item, SuperNumber>>();
+        List<Item> newKnowledge = new LinkedList<Item>();
+        List<Item> fuelKnowledge = new LinkedList<Item>();
         boolean isSearching = !searchText.isEmpty();
 
-        Iterator<Pair<Item, SuperNumber>> iterator = newKnowledge.iterator();
-        while (iterator.hasNext()) {
-            Pair<Item, SuperNumber> pair = iterator.next();
-            SuperNumber itemEmc = pair.getRight();
+        for (int i = 0; i < orderedKnowledge.size(); i++) {
+            Item item = orderedKnowledge.get(i);
+            SuperNumber itemEmc = EmcData.getItemEmc(item);
             // emc filter - items who's emc value is greater than the players' emc shouldn't be displayed
             // (or if the item has 0 EMC which can happen if you learn it and then set the emc to 0)
             if (emc.compareTo(itemEmc) == -1 || itemEmc.equalsZero()) {
-                iterator.remove();
                 continue;            
             }
 
             // search filter - items who don't have the search text as a substring shouldn't be displayed.
             // TODO: does this work for other languages?
-            Item item = pair.getLeft();
+            
             String name = item.getName().getString();
             if (isSearching && !name.toLowerCase().contains(searchText.toLowerCase())) {
-                iterator.remove();
                 continue; 
             }
             if (FabricatedExchange.fuelProgressionMap.containsKey(item)) {
-                // "fuel" items go in the inner ring, so we put them in this list
-                iterator.remove(); 
-                fuelKnowledge.add(new Pair<Item, SuperNumber>(item, itemEmc));
+                // fuel items go in the inner ring, so we put them in this list
+                fuelKnowledge.add(item);
             }
+            else
+                newKnowledge.add(item);
         }
         lastOfferingPage = (newKnowledge.size() - 1) / 12;
         // make sure offering page is within bounds
@@ -157,11 +163,12 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
             else if (offeringPageNum < 0)
                 offeringPageNum = 0;
         }
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeInt(lastOfferingPage);
-        if (((ServerPlayerEntity)player).currentScreenHandler instanceof TransmutationTableScreenHandler)
+        if (((ServerPlayerEntity)player).currentScreenHandler 
+                instanceof TransmutationTableScreenHandler) {
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeInt(lastOfferingPage);
             ServerPlayNetworking.send((ServerPlayerEntity)player, ModMessages.TRANSMUTATION_TABLE_MAX_PAGE, buf);
-
+        }
 
         // clear all the transmutation slots
         for (int i = 0; i < transmutationSlots.size(); i++) {
@@ -171,7 +178,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         
         int num = 0;
         for (int i = offeringPageNum * 12; i < newKnowledge.size(); i++) {
-            Item item = newKnowledge.get(i).getLeft();
+            Item item = newKnowledge.get(i);
             ItemStack stack = new ItemStack(item);
             transmutationSlots.get(num).setStack(stack);
             num++;
@@ -180,8 +187,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         }
         num = 0;
         for (int i = 0; i < fuelKnowledge.size(); i++) {
-            Item item = fuelKnowledge.get(i).getLeft();
-
+            Item item = fuelKnowledge.get(i);
             String name = item.getName().getString();
             if (isSearching && !name.toLowerCase().contains(searchText.toLowerCase())) 
                 continue; 
@@ -198,7 +204,6 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
     @Override
     public void onClosed(PlayerEntity player) {
         super.onClosed(player);
-        dropInventory(player, minorInventory);
     }
 
 
@@ -242,7 +247,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
                         return ItemStack.EMPTY;
                     
                     if (!client) {
-                        EmcData.subtractEmc(player, itemCost);
+                        EmcData.subtractEmc((ServerPlayerEntity)player, itemCost);
                         refreshOffering();
                     }
                     return stack;
@@ -269,35 +274,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
     }
 
 
-    public void addKnowledgePair(Pair<Item, SuperNumber> pair) {
-        if (knowledge.size() == 0) {
-            knowledge.add(pair);
-            return;
-        }
 
-        SuperNumber num = pair.getRight();
-        int low = 0;
-        int high = knowledge.size() - 1;
-        
-        while (low <= high) {
-            int mid = (low + high) / 2;
-            Pair<Item, SuperNumber> midPair = knowledge.get(mid);
-            SuperNumber midNum = midPair.getRight();
-            
-            if (num.compareTo(midNum) == 1) {
-                high = mid - 1;
-            } 
-            else if (num.compareTo(midNum) == -1) {
-                low = mid + 1;
-            } 
-            else {
-                knowledge.add(mid + 1, pair);
-                return;
-            }
-        }
-        
-        knowledge.add(low, pair);
-    }
 
 
 

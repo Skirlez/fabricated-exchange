@@ -25,7 +25,12 @@ public class GeneralUtil {
             map.put(s, newMap.get(s));
         }
     }
-    public static void addSortedEmcList(List<Item> list, Item item) {
+    public static void addSortedEmcList(List<Item> list, Item item, boolean descending) {
+        int check;
+        if (descending)
+            check = -1;
+        else
+            check = 1;
         if (list.size() == 0) {
             list.add(item);
             return;
@@ -33,15 +38,14 @@ public class GeneralUtil {
         SuperNumber num = EmcData.getItemEmc(item);
         int low = 0;
         int high = list.size() - 1;
-        
         while (low <= high) {
             int mid = (low + high) / 2;
             SuperNumber midNum = EmcData.getItemEmc(list.get(mid));
             
-            if (num.compareTo(midNum) == -1) {
+            if (num.compareTo(midNum) == -check) {
                 high = mid - 1;
             } 
-            else if (num.compareTo(midNum) == 1) {
+            else if (num.compareTo(midNum) == check) {
                 low = mid + 1;
             } 
             else {
@@ -49,7 +53,6 @@ public class GeneralUtil {
                 return;
             }
         }
-        
         list.add(low, item);
     }
 
