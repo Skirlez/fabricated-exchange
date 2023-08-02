@@ -76,9 +76,10 @@ public class SuperNumber {
     }
 
 
-    public int toInt() { // TODO: this is dumb
-        if (this.compareTo(INTEGER_LIMIT) == 1 || numerator.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) == 1) {
-            return 0;
+    public int toInt(int failsafe) { // TODO: this is still dumb
+        this.floor();
+        if (numerator.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) == 1) {
+            return failsafe;
         }
         return (numerator.intValue()/denominator.intValue());
     }

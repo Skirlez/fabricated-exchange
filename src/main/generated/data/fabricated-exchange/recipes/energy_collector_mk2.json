@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "D": {
+      "item": "fabricated-exchange:dark_matter"
+    },
+    "E": {
+      "item": "fabricated-exchange:antimatter_relay_mk1"
+    },
+    "G": {
+      "item": "minecraft:glowstone"
+    }
+  },
+  "pattern": [
+    "GDG",
+    "GEG",
+    "GGG"
+  ],
+  "result": {
+    "item": "fabricated-exchange:energy_collector_mk2"
+  },
+  "show_notification": true
+}

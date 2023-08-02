@@ -1,0 +1,36 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "item": "minecraft:chest"
+    },
+    "D": {
+      "tag": "c:diamonds"
+    },
+    "H": {
+      "item": "fabricated-exchange:high_covalence_dust"
+    },
+    "I": {
+      "tag": "c:iron_ingots"
+    },
+    "L": {
+      "item": "fabricated-exchange:low_covalence_dust"
+    },
+    "M": {
+      "item": "fabricated-exchange:medium_covalence_dust"
+    },
+    "S": {
+      "item": "minecraft:stone"
+    }
+  },
+  "pattern": [
+    "LMH",
+    "SDS",
+    "ICI"
+  ],
+  "result": {
+    "item": "fabricated-exchange:alchemical_chest"
+  },
+  "show_notification": true
+}

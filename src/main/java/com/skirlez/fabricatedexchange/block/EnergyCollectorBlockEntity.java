@@ -83,7 +83,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
             outputRate = new SuperNumber(50);
             xOffset = 34;
         }
-        int inputOffset = 36 + level * 18;
+        int inputOffset = (level == 0) ? 38 : 36 + level * 18;
         inventory = DefaultedList.ofSize(11 + level * 4, ItemStack.EMPTY);
 
         Inventory inv = (Inventory)this;

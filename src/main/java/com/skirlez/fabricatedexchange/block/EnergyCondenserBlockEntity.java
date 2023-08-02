@@ -59,22 +59,28 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
         Inventory inv = (Inventory)this;
         Item target = inv.getStack(0).getItem();
         SuperNumber targetEmc = EmcData.getItemEmc(target);
-        
         if (!targetEmc.equalsZero() && emc.compareTo(targetEmc) >= 0) {
             int start = (level == 0) ? 1 : 43;
+            SuperNumber emcCopy = new SuperNumber(emc);
+            emcCopy.divide(targetEmc);
+            int maxStacks = Math.min(emcCopy.toInt(target.getMaxCount()), target.getMaxCount());
+
             boolean success = false;
             for (int i = start; i < inv.size() && !success; i++) {
                 ItemStack stack = inv.getStack(i);
                 if (stack.isEmpty()) {
-                    inv.setStack(i, new ItemStack(target));
+                    inv.setStack(i, new ItemStack(target, maxStacks));
+                    targetEmc.multiply(maxStacks);
                     success = true;
                 }
                 else if ((stack.getItem().equals(target) && stack.getCount() < stack.getMaxCount())) {
-                    stack.increment(1);
+                    int increment = Math.min(stack.getMaxCount()-stack.getCount(), maxStacks);
+                    stack.increment(increment);
+                    targetEmc.multiply(increment);
                     success = true;
                 }
             }
-            if (success) {
+            if (success) {   
                 emc.subtract(targetEmc);
                 inv.markDirty();
             }
@@ -85,13 +91,12 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
                 if (stack.isEmpty())
                     continue;
                 
-                SuperNumber itemEmc = EmcData.getItemEmc(stack.getItem());
-                if (itemEmc.equalsZero())
+                SuperNumber stackEmc = EmcData.getItemStackEmc(stack);
+                if (stackEmc.equalsZero())
                     continue;
                 
-                
-                stack.decrement(1);
-                emc.add(itemEmc);
+                stack.setCount(0);
+                emc.add(stackEmc);
                 break;
             }
         }
@@ -141,7 +146,10 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 
     @Override
     public SuperNumber getMaximumEmc() {
-        return SuperNumber.ZERO;
+        Inventory inv = (Inventory)this;
+        Item target = inv.getStack(0).getItem();
+        SuperNumber targetEmc = EmcData.getItemEmc(target);
+        return targetEmc;
     }
 
     @Override

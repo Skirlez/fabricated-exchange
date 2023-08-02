@@ -70,7 +70,12 @@ public class EnergyCondenserScreen extends HandledScreen<EnergyCondenserScreenHa
 
     @Override
     protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
-        SuperNumber emcCopy = new SuperNumber(emc);
+        ItemStack stack = handler.getInventory().getStack(0);
+        SuperNumber targetEmc;
+        if (stack.isEmpty())
+            targetEmc = emc;
+        targetEmc = EmcData.getItemEmc(stack.getItem());
+        SuperNumber emcCopy = new SuperNumber(SuperNumber.min(emc, targetEmc));
         emcCopy.floor();
 
         textRenderer.draw(matrices, emcCopy.toString(), 150, 10, 0x404040);

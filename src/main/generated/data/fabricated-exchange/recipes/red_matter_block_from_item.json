@@ -1,0 +1,36 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "fabricated-exchange:red_matter"
+    },
+    {
+      "item": "fabricated-exchange:red_matter"
+    },
+    {
+      "item": "fabricated-exchange:red_matter"
+    },
+    {
+      "item": "fabricated-exchange:red_matter"
+    },
+    {
+      "item": "fabricated-exchange:red_matter"
+    },
+    {
+      "item": "fabricated-exchange:red_matter"
+    },
+    {
+      "item": "fabricated-exchange:red_matter"
+    },
+    {
+      "item": "fabricated-exchange:red_matter"
+    },
+    {
+      "item": "fabricated-exchange:red_matter"
+    }
+  ],
+  "result": {
+    "item": "fabricated-exchange:red_matter_block"
+  }
+}

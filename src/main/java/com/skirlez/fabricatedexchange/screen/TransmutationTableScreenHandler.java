@@ -213,7 +213,6 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
     @Override
     public ItemStack quickMove(PlayerEntity player, int invSlot) {
         if (invSlot >= 1 && invSlot < 17) {
-            
             ItemStack stack = ItemStack.EMPTY;
             TransmutationSlot slot = (TransmutationSlot)this.slots.get(invSlot);
             if (slot != null && slot.hasStack()) {
@@ -236,7 +235,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
                 
                 SuperNumber sMaxCount = new SuperNumber(stack.getMaxCount());
                 sMaxCount = SuperNumber.min(sMaxCount, itemCount);
-                int a = sMaxCount.toInt();
+                int a = sMaxCount.toInt(64);
                 stack.setCount(a);
 
                 SuperNumber itemCost = EmcData.getItemStackEmc(stack);

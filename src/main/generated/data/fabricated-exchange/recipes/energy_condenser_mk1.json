@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "fabricated-exchange:alchemical_chest"
+    },
+    "D": {
+      "tag": "c:diamonds"
+    },
+    "O": {
+      "item": "minecraft:obsidian"
+    }
+  },
+  "pattern": [
+    "ODO",
+    "DAD",
+    "ODO"
+  ],
+  "result": {
+    "item": "fabricated-exchange:energy_condenser_mk1"
+  },
+  "show_notification": true
+}

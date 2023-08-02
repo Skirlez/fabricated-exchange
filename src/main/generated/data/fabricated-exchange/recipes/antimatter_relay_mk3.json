@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "fabricated-exchange:antimatter_relay_mk2"
+    },
+    "O": {
+      "item": "minecraft:obsidian"
+    },
+    "R": {
+      "item": "fabricated-exchange:red_matter"
+    }
+  },
+  "pattern": [
+    "ORO",
+    "OAO",
+    "OOO"
+  ],
+  "result": {
+    "item": "fabricated-exchange:antimatter_relay_mk3"
+  },
+  "show_notification": true
+}

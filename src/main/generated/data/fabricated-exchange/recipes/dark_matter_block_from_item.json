@@ -1,0 +1,36 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "fabricated-exchange:dark_matter"
+    },
+    {
+      "item": "fabricated-exchange:dark_matter"
+    },
+    {
+      "item": "fabricated-exchange:dark_matter"
+    },
+    {
+      "item": "fabricated-exchange:dark_matter"
+    },
+    {
+      "item": "fabricated-exchange:dark_matter"
+    },
+    {
+      "item": "fabricated-exchange:dark_matter"
+    },
+    {
+      "item": "fabricated-exchange:dark_matter"
+    },
+    {
+      "item": "fabricated-exchange:dark_matter"
+    },
+    {
+      "item": "fabricated-exchange:dark_matter"
+    }
+  ],
+  "result": {
+    "item": "fabricated-exchange:dark_matter_block"
+  }
+}

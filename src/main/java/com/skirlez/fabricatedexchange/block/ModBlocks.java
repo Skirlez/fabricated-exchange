@@ -25,6 +25,13 @@ public class ModBlocks {
     public static final Block AETERNALIS_FUEL_BLOCK = registerBlock("aeternalis_fuel_block", 
         new Block(FabricBlockSettings.of(Material.STONE, MapColor.WHITE).requiresTool().strength(5.0f, 6.0f)));
 
+    public static final Block DARK_MATTER_BLOCK = registerBlock("dark_matter_block", 
+        new Block(FabricBlockSettings.of(Material.STONE, MapColor.BLACK).requiresTool().strength(5.0f, 6.0f)));
+    public static final Block RED_MATTER_BLOCK = registerBlock("red_matter_block", 
+        new Block(FabricBlockSettings.of(Material.STONE, MapColor.RED).requiresTool().strength(5.0f, 6.0f)));
+
+
+
     public static final Block TRANSMUTATION_TABLE = registerBlock("transmutation_table", 
         new TransmutationTable(FabricBlockSettings.of(Material.STONE, MapColor.WHITE)));
 
