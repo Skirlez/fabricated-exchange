@@ -73,7 +73,6 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 
             for (int i = 0; i < blocks.length; i++) {
                 Block block = blocks[i];
-                System.out.println(id.withSuffixedPath(Registries.ITEM.getId(block.asItem()).getPath()));
                 TextureMap textureMap = new TextureMap()
                     .put(TextureKey.TOP, id.withSuffixedPath("top_" + (i + 1)))
                     .put(TextureKey.BOTTOM, id.withSuffixedPath("other"))

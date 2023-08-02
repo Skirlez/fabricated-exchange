@@ -212,7 +212,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 
     @Override
     public ItemStack quickMove(PlayerEntity player, int invSlot) {
-        if (invSlot >= 1 && invSlot < 17) {
+        if (invSlot > 2 && invSlot < 19) {
             ItemStack stack = ItemStack.EMPTY;
             TransmutationSlot slot = (TransmutationSlot)this.slots.get(invSlot);
             if (slot != null && slot.hasStack()) {

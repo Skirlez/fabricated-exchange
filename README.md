@@ -11,7 +11,7 @@ All of the assets were taken from https://github.com/sinkillerj/ProjectE.
 If the author(s) of the assets do not want this project using them, I will take the project 
 down until I can replace the assets myself. 
 
-According to the Project E description, the following people deserve credit for the assets:
+According to the ProjectE description, the following people deserve credit for the assets:
 
 Magic Banana: https://twitter.com/Magic_Banana
 
@@ -56,7 +56,7 @@ All of the code in this repository is licensed under the terms of the LGPLv3. I 
 - Alchemical Chest
 - Energy Condensers Mk1, Mk2
 - Tome of Knowledge
-- Alchemical Fuels + Blocks, Dark/Red Matter, Covalence Dusts
+- Alchemical Fuels + Blocks, Dark/Red Matter + Blocks, Covalence Dusts
 - Configurable EMC Mapper
 
 # NEW Features
