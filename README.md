@@ -66,4 +66,4 @@ All of the code in this repository is licensed under the terms of the LGPLv3. I 
 - Fancy animated Transmutation Table (Toggleable)
  
 # Screenshot
-![image](https://github.com/Skirlez/fabricated-exchange/assets/17904548/c389d2f9-c129-4207-be85-51735b0e682e)
+![image](https://github.com/Skirlez/fabricated-exchange/assets/17904548/454070ff-fa47-4207-b18b-b72e3a1e0192)
