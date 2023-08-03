@@ -42,6 +42,7 @@ public class TheCommand {
         
         LiteralCommandNode<ServerCommandSource> setNode = CommandManager
         .literal("set")
+        .requires(source -> source.hasPermissionLevel(2))
         .build();
         LiteralCommandNode<ServerCommandSource> setSeedNode = CommandManager
         .literal("seed")
@@ -57,6 +58,7 @@ public class TheCommand {
 
         LiteralCommandNode<ServerCommandSource> removeNode = CommandManager
         .literal("remove")
+        .requires(source -> source.hasPermissionLevel(2))
         .build();
         LiteralCommandNode<ServerCommandSource> removeSeedNode = CommandManager
         .literal("seed")
@@ -69,6 +71,7 @@ public class TheCommand {
 
         LiteralCommandNode<ServerCommandSource> recipeNode = CommandManager
         .literal("recipe")
+        .requires(source -> source.hasPermissionLevel(2))
         .build();
         
         LiteralCommandNode<ServerCommandSource> banRecipeNode = CommandManager
@@ -85,9 +88,9 @@ public class TheCommand {
         
         LiteralCommandNode<ServerCommandSource> reloadNode = CommandManager
         .literal("reload")
+        .requires(source -> source.hasPermissionLevel(2))
         .executes(context -> reload(context))
         .build();
-
 
         dispatcher.getRoot().addChild(mainNode);
 
@@ -106,11 +109,16 @@ public class TheCommand {
         recipeNode.addChild(pardonRecipeNode);
 
         mainNode.addChild(reloadNode);
+
     }
+
+
+
+
+
     private static int help(CommandContext<ServerCommandSource> context) {
         context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.help"));
-        return 1;
-        
+        return 1;    
     }
 
     private static int setEmc(CommandContext<ServerCommandSource> context, boolean seed) {

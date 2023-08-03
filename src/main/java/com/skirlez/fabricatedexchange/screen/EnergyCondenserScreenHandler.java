@@ -16,7 +16,7 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.BlockPos;
 
-public class EnergyCondenserScreenHandler extends CoolScreenHandler implements ChestScreenHandler {
+public class EnergyCondenserScreenHandler extends LeveledScreenHandler implements ChestScreenHandler {
     private Inventory inventory;
     private int size;
     public EnergyCondenserScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {

@@ -14,6 +14,7 @@ public class ConfigFile extends DataFile<Map<String, Object>> {
     public boolean showItemEmcOrigin;
     public boolean mapper_enabled;
     public boolean transmutationTable_animated;
+    public boolean transmutationTable_floorButton;
 
     public static enum Bool {
         SHOW_ITEM_EMC_ORIGIN,
@@ -53,6 +54,7 @@ public class ConfigFile extends DataFile<Map<String, Object>> {
         showItemEmcOrigin = (boolean)value.get("showItemEmcOrigin");
         mapper_enabled = (boolean)value.get("mapper.enabled");
         transmutationTable_animated = (boolean)value.get("transmutationTable.animated");
+        transmutationTable_floorButton = (boolean)value.get("transmutationTable.floorButton");
     }
 }
 

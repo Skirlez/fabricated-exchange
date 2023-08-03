@@ -3,6 +3,7 @@ import com.skirlez.fabricatedexchange.block.AlchemicalChestBlockEntity;
 import com.skirlez.fabricatedexchange.block.EnergyCondenserBlockEntity;
 import com.skirlez.fabricatedexchange.block.ModBlockEntities;
 import com.skirlez.fabricatedexchange.block.ModBlocks;
+import com.skirlez.fabricatedexchange.command.ClientCommand;
 import com.skirlez.fabricatedexchange.event.KeyInputHandler;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.AlchemicalChestScreen;
@@ -15,6 +16,7 @@ import com.skirlez.fabricatedexchange.util.ModConfig;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
@@ -43,7 +45,9 @@ public class FabricatedExchangeClient implements ClientModInitializer {
         KeyInputHandler.register();
         ModMessages.registerS2CPackets();
         
-
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+            ClientCommand.register(dispatcher);
+        });
         // we can use the vanilla renderers due to the texture mixin, see ModTexturedRenderLayers
         BlockEntityRendererFactories.register(ModBlockEntities.ALCHEMICAL_CHEST, ChestBlockEntityRenderer::new);
         BlockEntityRendererFactories.register(ModBlockEntities.ENERGY_CONDENSER, ChestBlockEntityRenderer::new);

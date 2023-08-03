@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.skirlez.fabricatedexchange.networking.ModMessages;
-import com.skirlez.fabricatedexchange.screen.CoolScreenHandler;
+import com.skirlez.fabricatedexchange.screen.LeveledScreenHandler;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -75,7 +75,7 @@ public interface ConsumerBlockEntity {
         Iterator<ServerPlayerEntity> iterator = list.iterator();
         while (iterator.hasNext()) {
             ServerPlayerEntity player = iterator.next();
-            if (player.currentScreenHandler instanceof CoolScreenHandler screenHandler
+            if (player.currentScreenHandler instanceof LeveledScreenHandler screenHandler
                     && pos.equals(screenHandler.getPos())) 
                 ServerPlayNetworking.send(player, ModMessages.CONSUMER_BLOCK_SYNC, data);
             else

@@ -58,7 +58,7 @@ public class EnergyCollectorScreen extends HandledScreen<FuelScreenHandler> {
             emcProgress = 0d;
         }
 
-        texture = new Identifier(FabricatedExchange.MOD_ID, "textures/gui/energy_collector" + String.valueOf(level + 1) + ".png");
+        texture = new Identifier(FabricatedExchange.MOD_ID, "textures/gui/energy_collector_mk" + String.valueOf(level + 1) + ".png");
     }
 
     @Override

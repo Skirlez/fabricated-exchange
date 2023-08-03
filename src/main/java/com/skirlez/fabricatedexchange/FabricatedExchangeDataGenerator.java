@@ -1,9 +1,11 @@
 package com.skirlez.fabricatedexchange;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import com.skirlez.fabricatedexchange.block.ModBlocks;
 import com.skirlez.fabricatedexchange.item.ModItems;
+import com.skirlez.fabricatedexchange.util.ModTags;
 
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
@@ -11,6 +13,8 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
+import net.fabricmc.fabric.impl.datagen.FabricTagBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.data.client.BlockStateModelGenerator;
@@ -25,28 +29,104 @@ import net.minecraft.data.server.recipe.RecipeJsonProvider;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryWrapper.WrapperLookup;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 
 
 // welcome to the data gen
 
-public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint {
+// TODO: This class could use some organization into multiple files
 
+public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint {
+    
     @Override
     public void onInitializeDataGenerator(FabricDataGenerator fabricDataGenerator) {
         FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
+        pack.addProvider(ItemTagGenerator::new);
+        pack.addProvider(BlockTagGenerator::new);
         pack.addProvider(RecipeGenerator::new);
         pack.addProvider(ModelGenerator::new);
         pack.addProvider(BlockLootTables::new);
     }
-    
 
-   private static class ModelGenerator extends FabricModelProvider {
+    private static class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
+        public ItemTagGenerator(FabricDataOutput output, CompletableFuture<WrapperLookup> completableFuture) {
+            super(output, completableFuture);
+        }
+
+        @Override
+        protected void configure(WrapperLookup arg) {
+            addItemsToTag(ModTags.FUEL, Items.COAL, Items.CHARCOAL, Items.REDSTONE, Items.REDSTONE_BLOCK,
+                Items.GUNPOWDER, Items.COAL_BLOCK, Items.BLAZE_POWDER, Items.GLOWSTONE_DUST, Items.GLOWSTONE,
+                ModItems.ALCHEMICAL_COAL, ModBlocks.ALCHEMICAL_COAL_BLOCK, ModItems.RADIANT_COAL, ModBlocks.RADIANT_COAL_BLOCK,
+                ModItems.MOBIUS_FUEL, ModBlocks.MOBIUS_FUEL_BLOCK, ModItems.AETERNALIS_FUEL, ModBlocks.AETERNALIS_FUEL_BLOCK);
+        }
+
+        private void addItemsToTag(TagKey<Item> tag, ItemConvertible... items) {
+            FabricTagBuilder builder = getOrCreateTagBuilder(tag);
+            for (int i = 0; i < items.length; i++) {
+                builder.add(items[i].asItem());
+            }
+        }
+    }
+
+    private static class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
+        public BlockTagGenerator(FabricDataOutput output, CompletableFuture<WrapperLookup> completableFuture) {
+            super(output, completableFuture);
+        }
+
+        @Override
+        protected void configure(WrapperLookup arg) {
+            Block[] blocks = {ModBlocks.ALCHEMICAL_COAL_BLOCK, ModBlocks.RADIANT_COAL_BLOCK, ModBlocks.MOBIUS_FUEL_BLOCK,
+                ModBlocks.AETERNALIS_FUEL_BLOCK, ModBlocks.DARK_MATTER_BLOCK, ModBlocks.RED_MATTER_BLOCK,
+                ModBlocks.ENERGY_COLLECTOR_MK1, ModBlocks.ENERGY_COLLECTOR_MK2, ModBlocks.ENERGY_COLLECTOR_MK3,
+                ModBlocks.ANTIMATTER_RELAY_MK1, ModBlocks.ANTIMATTER_RELAY_MK2, ModBlocks.ANTIMATTER_RELAY_MK3,
+                ModBlocks.ALCHEMICAL_CHEST, ModBlocks.ENERGY_CONDENSER_MK1, ModBlocks.ENERGY_CONDENSER_MK2};
+
+            addBlocksToTag(BlockTags.PICKAXE_MINEABLE, blocks);
+            addBlocksToTag(BlockTags.NEEDS_IRON_TOOL, blocks);
+        }
+
+        private void addBlocksToTag(TagKey<Block> tag, Block... blocks) {
+            FabricTagBuilder builder = getOrCreateTagBuilder(tag);
+            for (int i = 0; i < blocks.length; i++) {
+                builder.add(blocks[i]);
+            }
+        }
+    }
+
+
+    private static class BlockLootTables extends FabricBlockLootTableProvider {
+        public BlockLootTables(FabricDataOutput dataOutput) {
+            super(dataOutput);
+        }
+    
+        @Override
+        public void generate() {
+            dropBlocksAsThemselves(
+            ModBlocks.ALCHEMICAL_COAL_BLOCK, ModBlocks.RADIANT_COAL_BLOCK, ModBlocks.MOBIUS_FUEL_BLOCK,
+            ModBlocks.AETERNALIS_FUEL_BLOCK, ModBlocks.DARK_MATTER_BLOCK, ModBlocks.RED_MATTER_BLOCK,
+            ModBlocks.ENERGY_COLLECTOR_MK1, ModBlocks.ENERGY_COLLECTOR_MK2, ModBlocks.ENERGY_COLLECTOR_MK3,
+            ModBlocks.ANTIMATTER_RELAY_MK1, ModBlocks.ANTIMATTER_RELAY_MK2, ModBlocks.ANTIMATTER_RELAY_MK3,
+            ModBlocks.ALCHEMICAL_CHEST, ModBlocks.ENERGY_CONDENSER_MK1, ModBlocks.ENERGY_CONDENSER_MK2, 
+            ModBlocks.TRANSMUTATION_TABLE);
+            
+        }
+
+        private void dropBlocksAsThemselves(Block... blocks) {
+            for (int i = 0; i < blocks.length; i++)
+                addDrop(blocks[i]);
+        }
+    }
+
+    private static class ModelGenerator extends FabricModelProvider {
         private ModelGenerator(FabricDataOutput generator) {
             super(generator);
         }
@@ -367,28 +447,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 
     }   
     
-    private static class BlockLootTables extends FabricBlockLootTableProvider {
-        public BlockLootTables(FabricDataOutput dataOutput) {
-            super(dataOutput);
-        }
-    
-        @Override
-        public void generate() {
-            dropBlocksAsThemselves(
-            ModBlocks.ALCHEMICAL_COAL_BLOCK, ModBlocks.RADIANT_COAL_BLOCK, ModBlocks.MOBIUS_FUEL_BLOCK,
-            ModBlocks.AETERNALIS_FUEL_BLOCK, ModBlocks.DARK_MATTER_BLOCK, ModBlocks.RED_MATTER_BLOCK,
-            ModBlocks.ENERGY_COLLECTOR_MK1, ModBlocks.ENERGY_COLLECTOR_MK2, ModBlocks.ENERGY_COLLECTOR_MK3,
-            ModBlocks.ANTIMATTER_RELAY_MK1, ModBlocks.ANTIMATTER_RELAY_MK2, ModBlocks.ANTIMATTER_RELAY_MK3,
-            ModBlocks.ALCHEMICAL_CHEST, ModBlocks.ENERGY_CONDENSER_MK1, ModBlocks.ENERGY_CONDENSER_MK2, 
-            ModBlocks.TRANSMUTATION_TABLE);
-            
-        }
 
-        private void dropBlocksAsThemselves(Block... blocks) {
-            for (int i = 0; i < blocks.length; i++)
-                addDrop(blocks[i]);
-        }
-    }
 
 }
 

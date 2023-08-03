@@ -50,12 +50,12 @@ public class ModBlocks {
         new AntiMatterRelay(FabricBlockSettings.of(Material.GLASS, MapColor.BLACK).requiresTool().strength(3.5f).luminance(state -> 15), 2));
 
     public static final Block ALCHEMICAL_CHEST = registerBlock("alchemical_chest", 
-        new AlchemicalChest(FabricBlockSettings.of(Material.GLASS, MapColor.GRAY).requiresTool().strength(3.5f)));
+        new AlchemicalChest(FabricBlockSettings.of(Material.STONE, MapColor.GRAY).requiresTool().strength(3.5f)));
 
     public static final Block ENERGY_CONDENSER_MK1 = registerBlock("energy_condenser_mk1", 
-        new EnergyCondenser(FabricBlockSettings.of(Material.GLASS, MapColor.GRAY).requiresTool().strength(3.5f), 0));
+        new EnergyCondenser(FabricBlockSettings.of(Material.STONE, MapColor.BLACK).requiresTool().strength(3.5f), 0));
     public static final Block ENERGY_CONDENSER_MK2 = registerBlock("energy_condenser_mk2", 
-        new EnergyCondenser(FabricBlockSettings.of(Material.GLASS, MapColor.GRAY).requiresTool().strength(3.5f), 1));
+        new EnergyCondenser(FabricBlockSettings.of(Material.STONE, MapColor.BLACK).requiresTool().strength(3.5f), 1));
 
     private static Block registerBlock(String name, Block block) {
         registerBlockItem(name, block);

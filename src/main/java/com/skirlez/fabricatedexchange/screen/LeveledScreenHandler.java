@@ -8,13 +8,12 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
 
 
-// TODO: rename to something more appropriate.
-// All block entities that have levels inherit from this class.
-public abstract class CoolScreenHandler extends ScreenHandler {
+// All screen handlers that have levels inherit from this class.
+public abstract class LeveledScreenHandler extends ScreenHandler {
     protected PacketByteBuf buf;
     protected BlockPos pos;
     protected int level;
-    protected CoolScreenHandler(ScreenHandlerType<?> type, int syncId) {
+    protected LeveledScreenHandler(ScreenHandlerType<?> type, int syncId) {
         super(type, syncId);
     }
 

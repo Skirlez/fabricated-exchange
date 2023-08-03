@@ -101,6 +101,10 @@ public class SuperNumber {
         return numerator.equals(BigInteger.ONE) && denominator.equals(BigInteger.ONE);
     }
 
+    public boolean isWhole() {
+        return denominator.equals(BigInteger.ONE);
+    }
+
     /** Rounds the SuperNumber to the closest whole number. 
      * If it's the same distance from two whole numbers, it'll choose the one greater than itself. */
     public void round() {
@@ -490,6 +494,7 @@ public class SuperNumber {
     public static SuperNumber min(SuperNumber a, SuperNumber b) {
         return (a.compareTo(b) == -1) ? a : b;
     }
+
 }
 
 

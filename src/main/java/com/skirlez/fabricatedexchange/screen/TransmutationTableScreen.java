@@ -29,11 +29,21 @@ import net.minecraft.util.collection.DefaultedList;
 public class TransmutationTableScreen extends HandledScreen<TransmutationTableScreenHandler> {
     
     public TextFieldWidget searchBar;
+    private ButtonWidget floorButton;
+
+    private boolean floorButtonEnabled;
     private static final Identifier TEXTURE =
             new Identifier(FabricatedExchange.MOD_ID, "textures/gui/transmute.png");
 
 
     private int fullAngleTime = 800;
+
+    // 0.26 is the intersection point of the angle function (x-1)^3+1 and y=-1.
+    // if it is between this and 0, the items will do at most 1 additional rotation if you click fast enough,
+    // which is the behavior we want. you can increase this to 2 additional rotations, for example if you multiply by the intersection
+    // with y=-2 (it's 0.442)
+    private double maxNegativeAngle = (double)fullAngleTime * 0.26; 
+
     private int fullDistTime = 800;
 
     private String oldSearchText = "";
@@ -50,6 +60,7 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
     public TransmutationTableScreen(TransmutationTableScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
         animated = ModConfig.CONFIG_FILE.transmutationTable_animated;
+        floorButtonEnabled = ModConfig.CONFIG_FILE.transmutationTable_floorButton;
         if (animated) 
             distanceFromCenter = 0.0;
         else 
@@ -100,21 +111,30 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         searchBar = new TextFieldWidget(this.textRenderer, x + 78, y + 4, 60, 10, Text.empty());
         searchBar.setMaxLength(30);
         searchBar.setChangedListener(updater);
-        
         addDrawableChild(searchBar);
-        
+
         addDrawableChild(ButtonWidget.builder(
             Text.of("<"),
-            button -> updatePage(false)
-        ).dimensions(x + 127, y + 101, 13, 13)
-        .build());
+            button -> updatePage(false))
+            .dimensions(x + 127, y + 101, 13, 13)
+            .build());
 
         addDrawableChild(ButtonWidget.builder(
             Text.of(">"),
-            button -> updatePage(true)
-        ).dimensions(x + 194, y + 101, 13, 13)
-        .build());
+            button -> updatePage(true))
+            .dimensions(x + 194, y + 101, 13, 13)
+            .build());
 
+
+        if (floorButtonEnabled) {
+            this.floorButton = ButtonWidget.builder(
+                Text.of("Floor"),
+                button -> floorEmc())
+                .dimensions(x + 4, y + 116, 31, 12)
+                .build();
+            
+            addDrawableChild(floorButton);
+        }
     }
 
     @Override
@@ -149,15 +169,26 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         textRenderer.draw(matrices, this.title, (float)this.titleX, (float)this.titleY, 0x404040);
         String emc = FabricatedExchangeClient.clientEmc.shortString();
 
-        textRenderer.draw(matrices, Text.literal("EMC:"), 4, 96, 0x404040);
-        textRenderer.draw(matrices, Text.literal(emc), 4, 106, 0x404040);
+        textRenderer.draw(matrices, Text.literal("EMC:"), 5, 96, 0x404040);
+        textRenderer.draw(matrices, Text.literal(emc), 5, 106, 0x404040);
+
+        if (floorButtonEnabled) {
+            if (FabricatedExchangeClient.clientEmc.isWhole()) {
+                if (floorButton.active) {
+                    floorButton.active = false;
+                }
+            }
+            else if (!floorButton.active) {
+                floorButton.active = true;
+            }
+        }
 
         int lastPage = handler.getLastPageNum();
         if (offeringPageNum > lastPage) 
             offeringPageNum = lastPage;
 
         Text text = Text.literal((offeringPageNum + 1) + "/" + (lastPage + 1));
-        textRenderer.draw(matrices, text, 167 - textRenderer.getWidth(text) / 2, 106, 0x404040);
+        textRenderer.draw(matrices, text, 168 - textRenderer.getWidth(text) / 2, 107, 0x404040);
     }
 
     public void resetAngleTime() {
@@ -165,12 +196,12 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         double angleTime = (double)(System.currentTimeMillis() - angleStartTime);
         if (angleTime < fullAngleTime) {
             if (angleTime < 0)
-                angleTime %= 208;
+                angleTime %= maxNegativeAngle;
             
             double x = angleTime / fullAngleTime;
             double angleOffset = (Math.pow(x - 1.0, 3.0) + 1.0);
 
-            add = (long)(208.0 - 208.0 * angleOffset );
+            add = (long)(maxNegativeAngle - maxNegativeAngle * angleOffset );
         }
         angleStartTime = System.currentTimeMillis() + add;
     }
@@ -197,7 +228,6 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
             }
             else
                 distanceFromCenter = 1.0;
-            
         }
 
         
@@ -209,7 +239,7 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
                 if (x < 0.5)
                     xOffsetGlobal = Math.sin(Math.PI * x * 2.0);
                 else
-                    xOffsetGlobal = Math.sin(Math.PI * x * 2.0) / 2.0;
+                    xOffsetGlobal = Math.sin(Math.PI * x * 2.0) / 3.0;
 
                 xOffsetGlobal *= 10.0 * rotationDir;
 
@@ -289,6 +319,10 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         }
 
         ClientPlayNetworking.send(ModMessages.TRANSMUTATION_TABLE_WIDGETS, buffer);
+    }
+
+    private void floorEmc() {
+        ClientPlayNetworking.send(ModMessages.FLOOR_EMC_IDENTIFIER, PacketByteBufs.create());
     }
 
 

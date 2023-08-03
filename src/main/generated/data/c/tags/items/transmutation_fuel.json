@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:coal",
+    "minecraft:charcoal",
+    "minecraft:redstone",
+    "minecraft:redstone_block",
+    "minecraft:gunpowder",
+    "minecraft:coal_block",
+    "minecraft:blaze_powder",
+    "minecraft:glowstone_dust",
+    "minecraft:glowstone",
+    "fabricated-exchange:alchemical_coal",
+    "fabricated-exchange:alchemical_coal_block",
+    "fabricated-exchange:radiant_coal",
+    "fabricated-exchange:radiant_coal_block",
+    "fabricated-exchange:mobius_fuel",
+    "fabricated-exchange:mobius_fuel_block",
+    "fabricated-exchange:aeternalis_fuel",
+    "fabricated-exchange:aeternalis_fuel_block"
+  ]
+}

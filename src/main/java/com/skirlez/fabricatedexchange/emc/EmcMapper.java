@@ -437,9 +437,14 @@ public class EmcMapper {
 
         Iterator<SmithingRecipe> iterator = recipesList.iterator();
         while (iterator.hasNext()) {
-            // this is deprecated but at the moment the recipe list function gives us LegacySmithingRecipe,
+            // LegacySmithingRecipe is deprecated but at the moment the recipe list function gives it to us,
             // when the mod is updated we will properly use SmithingTransformRecipe and SmithingTrimRecipe
-            LegacySmithingRecipe recipe = (LegacySmithingRecipe)iterator.next();
+
+            SmithingRecipe unsureRecipe = iterator.next();
+            if (!(unsureRecipe instanceof LegacySmithingRecipe)) {
+                continue;
+            }
+            LegacySmithingRecipe recipe = (LegacySmithingRecipe)unsureRecipe;
 
             LegacySmithingRecipeAccessor recipeAccessor = (LegacySmithingRecipeAccessor) recipe;
             Ingredient base = recipeAccessor.getBase();

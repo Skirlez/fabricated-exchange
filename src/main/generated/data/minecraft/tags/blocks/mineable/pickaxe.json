@@ -1,0 +1,20 @@
+{
+  "replace": false,
+  "values": [
+    "fabricated-exchange:alchemical_coal_block",
+    "fabricated-exchange:radiant_coal_block",
+    "fabricated-exchange:mobius_fuel_block",
+    "fabricated-exchange:aeternalis_fuel_block",
+    "fabricated-exchange:dark_matter_block",
+    "fabricated-exchange:red_matter_block",
+    "fabricated-exchange:energy_collector_mk1",
+    "fabricated-exchange:energy_collector_mk2",
+    "fabricated-exchange:energy_collector_mk3",
+    "fabricated-exchange:antimatter_relay_mk1",
+    "fabricated-exchange:antimatter_relay_mk2",
+    "fabricated-exchange:antimatter_relay_mk3",
+    "fabricated-exchange:alchemical_chest",
+    "fabricated-exchange:energy_condenser_mk1",
+    "fabricated-exchange:energy_condenser_mk2"
+  ]
+}

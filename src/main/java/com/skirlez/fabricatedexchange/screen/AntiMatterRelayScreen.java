@@ -41,7 +41,7 @@ public class AntiMatterRelayScreen extends HandledScreen<AntiMatterRelayScreenHa
             maximumEmc = new SuperNumber(10000000);
         
         texture = new Identifier(FabricatedExchange.MOD_ID, 
-            "textures/gui/antimatter_relay" + String.valueOf(level + 1) + ".png");
+            "textures/gui/antimatter_relay_mk" + String.valueOf(level + 1) + ".png");
 
 
     }

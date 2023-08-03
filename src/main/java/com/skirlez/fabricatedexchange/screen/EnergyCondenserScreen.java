@@ -29,7 +29,7 @@ public class EnergyCondenserScreen extends HandledScreen<EnergyCondenserScreenHa
             emc = SuperNumber.Zero();
         else
             emc = new SuperNumber(buf.readString());
-        this.texture = new Identifier(FabricatedExchange.MOD_ID, "textures/gui/energy_condenser" + (level + 1) + ".png");
+        this.texture = new Identifier(FabricatedExchange.MOD_ID, "textures/gui/energy_condenser_mk" + (level + 1) + ".png");
     }
 
     @Override

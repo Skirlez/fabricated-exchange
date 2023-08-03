@@ -17,7 +17,7 @@ import net.minecraft.util.math.BlockPos;
 
 // This is the parent class of EnergyCollectorScreenHandler and AntiMatterRelayScreenHandler, as they
 // both share a considerable amount of code
-public abstract class FuelScreenHandler extends CoolScreenHandler {
+public abstract class FuelScreenHandler extends LeveledScreenHandler {
     protected Inventory inventory;
     protected DefaultedList<InputSlot> inputSlots = DefaultedList.of();
     protected FuelScreenHandler(ScreenHandlerType<?> type, int syncId, BlockPos pos, int level, PacketByteBuf buf) {
