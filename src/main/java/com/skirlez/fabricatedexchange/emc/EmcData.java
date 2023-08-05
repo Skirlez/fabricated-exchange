@@ -38,9 +38,9 @@ public class EmcData {
         return getItemEmc(id);
     }
     public static SuperNumber getItemStackEmc(ItemStack itemStack) {
-        Item item = itemStack.getItem();
-        if (item == null)
+        if (itemStack.isEmpty())
             return SuperNumber.Zero(); 
+        Item item = itemStack.getItem();
         String id = Registries.ITEM.getId(item).toString();
         SuperNumber baseEmc = getItemEmc(id);
         baseEmc.multiply(itemStack.getCount());

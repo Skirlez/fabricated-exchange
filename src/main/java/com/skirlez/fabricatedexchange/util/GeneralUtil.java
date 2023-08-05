@@ -14,6 +14,8 @@ import net.minecraft.item.Item;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class GeneralUtil {
@@ -99,6 +101,12 @@ public class GeneralUtil {
     public static void addPlayerHotbar(ScreenHandler self, PlayerInventory playerInventory, int x, int y) {
         for (int i = 0; i < 9; i++)
             ((ScreenHandlerInvoker)self).invokeAddSlot(new Slot(playerInventory, i, x + i * 18, y));
+    }
+
+    public static Box boxAroundPos(Vec3d pos, double size) {
+        return new Box(
+            pos.getX() - size, pos.getY() - size, pos.getZ() - size,
+            pos.getX() + size, pos.getY() + size, pos.getZ() + size);
     }
 
 }

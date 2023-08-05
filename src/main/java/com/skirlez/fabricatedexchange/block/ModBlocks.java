@@ -30,8 +30,6 @@ public class ModBlocks {
     public static final Block RED_MATTER_BLOCK = registerBlock("red_matter_block", 
         new Block(FabricBlockSettings.of(Material.STONE, MapColor.RED).requiresTool().strength(5.0f, 6.0f)));
 
-
-
     public static final Block TRANSMUTATION_TABLE = registerBlock("transmutation_table", 
         new TransmutationTable(FabricBlockSettings.of(Material.STONE, MapColor.WHITE)));
 

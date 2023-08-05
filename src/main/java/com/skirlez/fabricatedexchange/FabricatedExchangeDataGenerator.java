@@ -14,7 +14,6 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
-import net.fabricmc.fabric.impl.datagen.FabricTagBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.data.client.BlockStateModelGenerator;
@@ -102,7 +101,6 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
         }
     }
 
-
     private static class BlockLootTables extends FabricBlockLootTableProvider {
         public BlockLootTables(FabricDataOutput dataOutput) {
             super(dataOutput);
@@ -111,12 +109,12 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
         @Override
         public void generate() {
             dropBlocksAsThemselves(
-            ModBlocks.ALCHEMICAL_COAL_BLOCK, ModBlocks.RADIANT_COAL_BLOCK, ModBlocks.MOBIUS_FUEL_BLOCK,
-            ModBlocks.AETERNALIS_FUEL_BLOCK, ModBlocks.DARK_MATTER_BLOCK, ModBlocks.RED_MATTER_BLOCK,
-            ModBlocks.ENERGY_COLLECTOR_MK1, ModBlocks.ENERGY_COLLECTOR_MK2, ModBlocks.ENERGY_COLLECTOR_MK3,
-            ModBlocks.ANTIMATTER_RELAY_MK1, ModBlocks.ANTIMATTER_RELAY_MK2, ModBlocks.ANTIMATTER_RELAY_MK3,
-            ModBlocks.ALCHEMICAL_CHEST, ModBlocks.ENERGY_CONDENSER_MK1, ModBlocks.ENERGY_CONDENSER_MK2, 
-            ModBlocks.TRANSMUTATION_TABLE);
+                ModBlocks.ALCHEMICAL_COAL_BLOCK, ModBlocks.RADIANT_COAL_BLOCK, ModBlocks.MOBIUS_FUEL_BLOCK,
+                ModBlocks.AETERNALIS_FUEL_BLOCK, ModBlocks.DARK_MATTER_BLOCK, ModBlocks.RED_MATTER_BLOCK,
+                ModBlocks.ENERGY_COLLECTOR_MK1, ModBlocks.ENERGY_COLLECTOR_MK2, ModBlocks.ENERGY_COLLECTOR_MK3,
+                ModBlocks.ANTIMATTER_RELAY_MK1, ModBlocks.ANTIMATTER_RELAY_MK2, ModBlocks.ANTIMATTER_RELAY_MK3,
+                ModBlocks.ALCHEMICAL_CHEST, ModBlocks.ENERGY_CONDENSER_MK1, ModBlocks.ENERGY_CONDENSER_MK2, 
+                ModBlocks.TRANSMUTATION_TABLE);
             
         }
 
@@ -166,15 +164,23 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 
         @Override
         public void generateItemModels(ItemModelGenerator itemModelGenerator) {
-            generateSpriteModels(itemModelGenerator, 
-            ModItems.PHILOSOPHERS_STONE, ModItems.ALCHEMICAL_COAL, ModItems.RADIANT_COAL, ModItems.MOBIUS_FUEL, 
-            ModItems.AETERNALIS_FUEL, ModItems.LOW_COVALENCE_DUST, ModItems.MEDIUM_COVALENCE_DUST, ModItems.HIGH_COVALENCE_DUST,
-            ModItems.DARK_MATTER, ModItems.RED_MATTER, ModItems.TOME_OF_KNOWLEDGE, ModItems.TRANSMUTATION_TABLET);
+            registerGeneratedModels(itemModelGenerator, 
+                ModItems.PHILOSOPHERS_STONE, ModItems.ALCHEMICAL_COAL, ModItems.RADIANT_COAL, ModItems.MOBIUS_FUEL, 
+                ModItems.AETERNALIS_FUEL, ModItems.LOW_COVALENCE_DUST, ModItems.MEDIUM_COVALENCE_DUST, ModItems.HIGH_COVALENCE_DUST,
+                ModItems.DARK_MATTER, ModItems.RED_MATTER, ModItems.TOME_OF_KNOWLEDGE, ModItems.TRANSMUTATION_TABLET);
+            registerHandheldModels(itemModelGenerator, ModItems.DARK_MATTER_SWORD, ModItems.DARK_MATTER_PICKAXE, ModItems.DARK_MATTER_AXE, 
+                ModItems.DARK_MATTER_SHOVEL, ModItems.DARK_MATTER_HOE);
+
         }
 
-        public void generateSpriteModels(ItemModelGenerator itemModelGenerator, Item... items) {
+        public void registerGeneratedModels(ItemModelGenerator itemModelGenerator, Item... items) {
             for (int i = 0; i < items.length; i++) {
                 itemModelGenerator.register(items[i], Models.GENERATED);
+            }
+        }
+        public void registerHandheldModels(ItemModelGenerator itemModelGenerator, Item... items) {
+            for (int i = 0; i < items.length; i++) {
+                itemModelGenerator.register(items[i], Models.HANDHELD);
             }
         }
 
@@ -406,10 +412,24 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                 .offerTo(exporter, "red_matter_vertical");
 
 
-
-
-
+            generateSwordRecipe(ModItems.DARK_MATTER_SWORD, Items.DIAMOND, ModItems.DARK_MATTER, exporter);
         }
+
+
+        private void generateSwordRecipe(Item sword, Item stick, Item material, Consumer<RecipeJsonProvider> exporter) {
+            ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, sword)
+                .pattern("M")
+                .pattern("M")
+                .pattern("S")
+                .input('M', material)
+                .input('S', stick)
+                .criterion(FabricRecipeProvider.hasItem(material), 
+                    FabricRecipeProvider.conditionsFromItem(material))
+                .criterion(FabricRecipeProvider.hasItem(stick), 
+                    FabricRecipeProvider.conditionsFromItem(stick))
+                .offerTo(exporter);
+        }
+
 
         private void generatePhilosopherStoneRecipe(Item item1, Item item2, int ratio, Consumer<RecipeJsonProvider> exporter) {
             String name1 = Registries.ITEM.getId(item1).getPath();

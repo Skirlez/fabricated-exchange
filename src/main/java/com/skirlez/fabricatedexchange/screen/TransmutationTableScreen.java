@@ -41,7 +41,7 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
     // 0.26 is the intersection point of the angle function (x-1)^3+1 and y=-1.
     // if it is between this and 0, the items will do at most 1 additional rotation if you click fast enough,
     // which is the behavior we want. you can increase this to 2 additional rotations, for example if you multiply by the intersection
-    // with y=-2 (it's 0.442)
+    // with y=-2 (0.442)
     private double maxNegativeAngle = (double)fullAngleTime * 0.26; 
 
     private int fullDistTime = 800;

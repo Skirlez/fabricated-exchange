@@ -54,10 +54,12 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         this.inventory = inventory;
         this.player = playerInventory.player;
         inventory.onOpen(playerInventory.player);
+        addSlot(new MidSlot(inventory, 0, 159, 49, this, player.world.isClient));
+        addSlot(new ForgetSlot(inventory, 1, 91, 97, player, this));
         emcSlot = new ConsumeSlot(inventory, 2, 109, 97, player, this);
         addSlot(emcSlot);
-        addSlot(new ForgetSlot(inventory, 1, 91, 97, player, this));
-        addSlot(new MidSlot(inventory, 0, 159, 49, this, player.world.isClient));
+        
+        
         
         // use trigonometry to create the transmutation slots
 
@@ -140,21 +142,20 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
             SuperNumber itemEmc = EmcData.getItemEmc(item);
             // emc filter - items who's emc value is greater than the players' emc shouldn't be displayed
             // (or if the item has 0 EMC which can happen if you learn it and then set the emc to 0)
-            if (emc.compareTo(itemEmc) == -1 || itemEmc.equalsZero()) {
+            if (emc.compareTo(itemEmc) == -1 || itemEmc.equalsZero()) 
                 continue;            
-            }
 
             // search filter - items who don't have the search text as a substring shouldn't be displayed.
-            // TODO: does this work for other languages?
+            // TODO: this does not work for multiple languages.
             
             String name = item.getName().getString();
-            if (isSearching && !name.toLowerCase().contains(searchText.toLowerCase())) {
+            if (isSearching && !name.toLowerCase().contains(searchText.toLowerCase())) 
                 continue; 
-            }
-            if (FabricatedExchange.fuelProgressionMap.containsKey(item)) {
-                // fuel items go in the inner ring, so we put them in this list
+            
+            // fuel items go in the inner ring, so we put them in this list
+            if (FabricatedExchange.fuelProgressionMap.containsKey(item)) 
                 fuelKnowledge.add(item);
-            }
+            
             else
                 newKnowledge.add(item);
         }
@@ -191,10 +192,6 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
         num = 0;
         for (int i = 0; i < fuelKnowledge.size(); i++) {
             Item item = fuelKnowledge.get(i);
-            String name = item.getName().getString();
-            if (isSearching && !name.toLowerCase().contains(searchText.toLowerCase())) 
-                continue; 
-            
             ItemStack stack = new ItemStack(item);
             transmutationSlots.get(num + 12).setStack(stack);
             num++;

@@ -11,7 +11,11 @@
     "item.fabricated-exchange.medium_covalence_dust": "Medium Covalence Dust",
     "item.fabricated-exchange.high_covalence_dust": "High Covalence Dust",
     "item.fabricated-exchange.tome_of_knowledge": "Tome of Knowledge",
-
+    "item.fabricated-exchange.dark_matter_sword": "Dark Matter Sword",
+    "item.fabricated-exchange.dark_matter_pickaxe": "Dark Matter Pickaxe",
+    "item.fabricated-exchange.dark_matter_axe": "Dark Matter Axe",
+    "item.fabricated-exchange.dark_matter_shovel": "Dark Matter Shovel",
+    "item.fabricated-exchange.dark_matter_hoe": "Dark Matter Hoe",
     
     "block.fabricated-exchange.alchemical_coal_block": "Alchemical Coal Block",
     "block.fabricated-exchange.radiant_coal_block": "Radiant Coal Block",

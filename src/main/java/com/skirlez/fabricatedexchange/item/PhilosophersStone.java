@@ -3,26 +3,29 @@ package com.skirlez.fabricatedexchange.item;
 import java.util.Random;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.mixin.ItemAccessor;
+import com.skirlez.fabricatedexchange.screen.BlocklessCraftingScreenHandler;
 import com.skirlez.fabricatedexchange.sound.ModSounds;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.screen.CraftingScreenHandler;
+import net.minecraft.screen.ScreenHandlerContext;
+import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
-public class PhilosophersStone extends Item {
+public class PhilosophersStone extends Item implements ChargeableItem, ExtraFunctionItem {
     public PhilosophersStone(Settings settings) {
         super(settings);
         ItemAccessor self = (ItemAccessor) this;
         self.setRecipeRemainder(this);
     }
-    public static final String CHARGE_KEY = "Charge";
-    public static final int maxCharge = 4;
     private Random r = new Random();
 
     @Override
@@ -31,16 +34,14 @@ public class PhilosophersStone extends Item {
     }
 
     @Override
-    public int getItemBarColor(ItemStack stack) {;
-        return MathHelper.packRgb(0f, 0.7f, 1f);
+    public int getItemBarColor(ItemStack stack) {
+        return ChargeableItem.COLOR;
     }
 
     @Override
     public int getItemBarStep(ItemStack stack) {
-        int charge = stack.getOrCreateNbt().getInt(CHARGE_KEY);
-        return Math.round((float)charge * 13.0f / (float)maxCharge);
+        return ChargeableItem.getItemBarStep(stack, getMaxCharge());
     }
-
 
 
     @Override
@@ -64,9 +65,8 @@ public class PhilosophersStone extends Item {
         return ActionResult.success(valid);
     }
 
-
     private void switchBlock(World world, BlockPos pos, ItemStack stack, Direction d) {
-        int charge = stack.getOrCreateNbt().getInt("Charge");
+        int charge = stack.getOrCreateNbt().getInt(CHARGE_KEY);
         Block block = world.getBlockState(pos).getBlock();
         if (charge == 0) {
             world.setBlockState(pos, FabricatedExchange.blockTransmutationMap.get(block).getDefaultState());
@@ -111,5 +111,17 @@ public class PhilosophersStone extends Item {
         }
         
     }
+
+    private final Text TITLE = Text.translatable("container.crafting");
+
+    @Override
+    public void doExtraFunction(ItemStack stack, ServerPlayerEntity player) {
+        player.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, inventory, player2) 
+            -> new BlocklessCraftingScreenHandler(syncId, inventory), TITLE));
+    }
+
+    
+
+
 }
 
