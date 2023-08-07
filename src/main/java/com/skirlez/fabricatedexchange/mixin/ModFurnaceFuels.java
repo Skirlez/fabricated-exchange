@@ -24,15 +24,16 @@ public class ModFurnaceFuels {
     @Inject(method = "createFuelTimeMap", at = @At("RETURN"))
     private static void addModFuels(CallbackInfoReturnable<Map<Item, Integer>> cir) {
         Map<Item, Integer> mappa = cir.getReturnValue();
-        // each one of these has x1.5 more burn time than the previous, with alchemical coal having 1.5x the burn time of coal
-        addFuel(mappa, ModItems.ALCHEMICAL_COAL, 2400);
-        addFuel(mappa, ModItems.RADIANT_COAL, 3600);
-        addFuel(mappa, ModItems.MOBIUS_FUEL, 5400);
-        addFuel(mappa, ModItems.AETERNALIS_FUEL, 8100);
+        // each one of these has x4 more burn time than the previous, with alchemical coal having 4x the burn time of coal
+        // i would have ideally made it something like 1.5x for each jump but it would just mean the fuels are useless since coal blocks and a hopper are cheaper and burn longer
+        addFuel(mappa, ModItems.ALCHEMICAL_COAL, 6400);
+        addFuel(mappa, ModItems.RADIANT_COAL, 25600);
+        addFuel(mappa, ModItems.MOBIUS_FUEL, 21600);
+        addFuel(mappa, ModItems.AETERNALIS_FUEL, 86400);
 
-        addFuel(mappa, ModBlocks.ALCHEMICAL_COAL_BLOCK, 24000);
-        addFuel(mappa, ModBlocks.RADIANT_COAL_BLOCK, 36000);
-        addFuel(mappa, ModBlocks.MOBIUS_FUEL_BLOCK, 54000);
-        addFuel(mappa, ModBlocks.AETERNALIS_FUEL_BLOCK, 81000); // absurd
+        addFuel(mappa, ModBlocks.ALCHEMICAL_COAL_BLOCK, 64000);
+        addFuel(mappa, ModBlocks.RADIANT_COAL_BLOCK, 256000);
+        addFuel(mappa, ModBlocks.MOBIUS_FUEL_BLOCK, 216000);
+        addFuel(mappa, ModBlocks.AETERNALIS_FUEL_BLOCK, 864000); // 720 hours and 20 minutes in a regular furnace btw
     }
 }

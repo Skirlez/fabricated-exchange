@@ -4,8 +4,8 @@ A Fabric remake of the Minecraft mod ProjectE/Equivalent Exchange 2.
 The mod attaches an "EMC" number value to every item. Some are worth more, some less.
 Transmute items and blocks into EMC, and EMC to different items you've obtained before.
 
-The mod is currently in beta. It is targetting 1.19.4. Once it is in a stable, feature complete state, I will port it to 1.19.2, 1.18.2, 
-and then 1.16.5. Afterwards it will be upgraded to whatever versions after 1.19.4 that are most popular for mods.
+The mod is currently in beta. It will attempt to update to the latest minecraft releases. 
+Once it is in a stable, feature complete state, it will be ported into popular older versions.
 
 All of the assets were taken from https://github.com/sinkillerj/ProjectE.
 If the author(s) of the assets do not want this project using them, I will take the project 
@@ -56,7 +56,9 @@ All of the code in this repository is licensed under the terms of the LGPLv3. I 
 - Alchemical Chest
 - Energy Condensers Mk1, Mk2
 - Tome of Knowledge
-- Alchemical Fuels + Blocks, Dark/Red Matter + Blocks, Covalence Dusts
+- Alchemical Fuels + Blocks
+- Dark/Red Matter + Blocks
+- Covalence Dusts
 - Configurable EMC Mapper
 
 # NEW Features

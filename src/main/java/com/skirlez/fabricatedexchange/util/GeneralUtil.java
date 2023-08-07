@@ -27,6 +27,9 @@ public class GeneralUtil {
             map.put(s, newMap.get(s));
         }
     }
+
+
+    /** Uses a binary search algorithm to insert an item into an ordered place in a list of items */
     public static void addSortedEmcList(List<Item> list, Item item, boolean descending) {
         int check;
         if (descending)
@@ -102,7 +105,6 @@ public class GeneralUtil {
         for (int i = 0; i < 9; i++)
             ((ScreenHandlerInvoker)self).invokeAddSlot(new Slot(playerInventory, i, x + i * 18, y));
     }
-
     public static Box boxAroundPos(Vec3d pos, double size) {
         return new Box(
             pos.getX() - size, pos.getY() - size, pos.getZ() - size,

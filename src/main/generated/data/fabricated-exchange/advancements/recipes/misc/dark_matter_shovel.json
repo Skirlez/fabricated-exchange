@@ -15,7 +15,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "fabricated-exchange:dark_matter_sword"
+        "recipe": "fabricated-exchange:dark_matter_shovel"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -28,7 +28,7 @@
   ],
   "rewards": {
     "recipes": [
-      "fabricated-exchange:dark_matter_sword"
+      "fabricated-exchange:dark_matter_shovel"
     ]
   }
 }

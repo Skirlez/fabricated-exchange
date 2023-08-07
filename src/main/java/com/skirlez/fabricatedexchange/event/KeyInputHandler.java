@@ -37,7 +37,7 @@ public class KeyInputHandler {
                     if (!(stack.getItem() instanceof ChargeableItem))
                         return;
                 }
-                
+
                 PacketByteBuf buffer = PacketByteBufs.create();
                 buffer.writeBoolean(Screen.hasShiftDown());
                 ClientPlayNetworking.send(ModMessages.ITEM_CHARGE_IDENTIFIER, buffer);

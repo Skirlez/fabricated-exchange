@@ -1,15 +1,15 @@
 package com.skirlez.fabricatedexchange.item;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
-import com.skirlez.fabricatedexchange.item.dark_matter_tools.DarkMatterSword;
+import com.skirlez.fabricatedexchange.item.tools.DarkMatterPickaxe;
+import com.skirlez.fabricatedexchange.item.tools.DarkMatterShovel;
+import com.skirlez.fabricatedexchange.item.tools.DarkMatterSword;
 
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.HoeItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.PickaxeItem;
-import net.minecraft.item.ShovelItem;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
@@ -45,11 +45,11 @@ public class ModItems {
 
 
     public static final Item DARK_MATTER_SWORD = 
-       registerItemWithGroup("dark_matter_sword", new DarkMatterSword(12, -2.4f, new Item.Settings().fireproof()));
-    public static final Item DARK_MATTER_SHOVEL = 
-        registerItemWithGroup("dark_matter_shovel", new ShovelItem(DarkMatterMaterial.INSTANCE, 5f, -3.0f, new Item.Settings().fireproof()));
+       registerItemWithGroup("dark_matter_sword", new DarkMatterSword(DarkMatterMaterial.INSTANCE, 12, -2.4f, new Item.Settings().fireproof()));
     public static final Item DARK_MATTER_PICKAXE = 
-        registerItemWithGroup("dark_matter_pickaxe", new PickaxeItem(DarkMatterMaterial.INSTANCE, 7, -2.8f, new Item.Settings().fireproof()));
+        registerItemWithGroup("dark_matter_pickaxe", new DarkMatterPickaxe(DarkMatterMaterial.INSTANCE, 7, -2.8f, new Item.Settings().fireproof()));
+    public static final Item DARK_MATTER_SHOVEL = 
+        registerItemWithGroup("dark_matter_shovel", new DarkMatterShovel(DarkMatterMaterial.INSTANCE, 5f, -3.0f, new Item.Settings().fireproof()));
     public static final Item DARK_MATTER_AXE = 
         registerItemWithGroup("dark_matter_axe", new AxeItem(DarkMatterMaterial.INSTANCE, 8f, -3.0f, new Item.Settings().fireproof()));
     public static final Item DARK_MATTER_HOE = 

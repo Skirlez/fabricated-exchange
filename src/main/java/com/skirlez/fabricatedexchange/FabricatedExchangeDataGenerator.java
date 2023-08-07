@@ -412,24 +412,38 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                 .offerTo(exporter, "red_matter_vertical");
 
 
-            generateSwordRecipe(ModItems.DARK_MATTER_SWORD, Items.DIAMOND, ModItems.DARK_MATTER, exporter);
-        }
-
-
-        private void generateSwordRecipe(Item sword, Item stick, Item material, Consumer<RecipeJsonProvider> exporter) {
-            ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, sword)
+    
+            ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.DARK_MATTER_SWORD)
                 .pattern("M")
                 .pattern("M")
-                .pattern("S")
-                .input('M', material)
-                .input('S', stick)
-                .criterion(FabricRecipeProvider.hasItem(material), 
-                    FabricRecipeProvider.conditionsFromItem(material))
-                .criterion(FabricRecipeProvider.hasItem(stick), 
-                    FabricRecipeProvider.conditionsFromItem(stick))
+                .pattern("D")
+                .input('M', ModItems.DARK_MATTER)
+                .input('D', diamond)
+                .criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER),
+                    FabricRecipeProvider.conditionsFromItem(ModItems.DARK_MATTER))
                 .offerTo(exporter);
-        }
 
+            ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.DARK_MATTER_PICKAXE)
+                .pattern("MMM")
+                .pattern(" D ") 
+                .pattern(" D ")
+                .input('M', ModItems.DARK_MATTER)
+                .input('D', diamond)
+                .criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER),
+                    FabricRecipeProvider.conditionsFromItem(ModItems.DARK_MATTER))
+                .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.DARK_MATTER_SHOVEL)
+                .pattern("M")
+                .pattern("D") 
+                .pattern("D")
+                .input('M', ModItems.DARK_MATTER)
+                .input('D', diamond)
+                .criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER),
+                    FabricRecipeProvider.conditionsFromItem(ModItems.DARK_MATTER))
+                .offerTo(exporter);
+
+        }
 
         private void generatePhilosopherStoneRecipe(Item item1, Item item2, int ratio, Consumer<RecipeJsonProvider> exporter) {
             String name1 = Registries.ITEM.getId(item1).getPath();

@@ -68,7 +68,6 @@ public class AntiMatterRelay extends BlockWithEntityAndRotation {
                 -> AntiMatterRelayBlockEntity.serverTick(world2, pos, state2, (AntiMatterRelayBlockEntity)blockEntity);
 
     }
-    // World world, BlockPos blockPos, BlockState blockState, AntiMatterRelayBlockEntity entity
 
     public int getLevel() {
         return level;

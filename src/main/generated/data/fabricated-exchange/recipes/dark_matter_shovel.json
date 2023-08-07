@@ -11,11 +11,11 @@
   },
   "pattern": [
     "M",
-    "M",
+    "D",
     "D"
   ],
   "result": {
-    "item": "fabricated-exchange:dark_matter_sword"
+    "item": "fabricated-exchange:dark_matter_shovel"
   },
   "show_notification": true
 }

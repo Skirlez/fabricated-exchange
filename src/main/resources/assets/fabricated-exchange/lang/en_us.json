@@ -36,6 +36,7 @@
     "screen.fabricated-exchange.transmutation": "Transmutation",
     "screen.fabricated-exchange.emc_collection": "EMC Collection",
     "itemgroup.fabricated-exchange": "Fabricated Exchange", 
+
     "sounds.fabricated-exchange.philosophers_stone_use": "Blocks transmuted",
     "sounds.fabricated-exchange.item_charge": "Item charged",
     "sounds.fabricated-exchange.item_discharge": "Item discharged",
@@ -58,6 +59,8 @@
     "commands.fabricated-exchange.recipe.pardon.unsupported_type": "Cannot pardon this recipe because its type (%s) is unsupported. You couldn't ban it if you wanted to.",
     "commands.fabricated-exchange.recipe.pardon.success": "Done! The recipe will now be evaluated by the EMC mapper!",
     "commands.fabricated-exchange.nothing": "Nothing has changed.",
+
     "key.category.fabricated-exchange": "Fabricated Exchange bindings",
-    "key.fabricated-exchange.charge": "Charge/Discharge Item"
+    "key.fabricated-exchange.charge": "Item Charge/Discharge",
+    "key.fabricated-exchange.extra": "Item Extra Function"
 }
