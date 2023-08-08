@@ -52,8 +52,8 @@ public class PhilosophersStone extends Item implements ChargeableItem, ExtraFunc
         Block block = world.getBlockState(pos).getBlock();
         boolean valid = FabricatedExchange.blockTransmutationMap.containsKey(block);
         if (valid) {
+            context.getPlayer().playSound(ModSounds.PS_USE, 1f, 1f);
             if (world.isClient()) {
-                context.getPlayer().playSound(ModSounds.PS_USE, 1F, 1F);
                 for (int i = 0; i < 3; i++) {
                     world.addParticle(ParticleTypes.LARGE_SMOKE, 
                         (double)pos.getX() + 0.5, (double)pos.getY() + 0.5, 
@@ -68,9 +68,10 @@ public class PhilosophersStone extends Item implements ChargeableItem, ExtraFunc
                 else {
                     List<BlockPos> positions = getPositionsToOutline(context.getPlayer(), stack, pos);
                     for (BlockPos newPos : positions) {
-                        world.setBlockState(newPos, FabricatedExchange.blockTransmutationMap.get(block).getDefaultState().with(null, null));
+                        world.setBlockState(newPos, FabricatedExchange.blockTransmutationMap.get(block).getDefaultState());
                     }
                 }
+                
             }
         }
         return ActionResult.success(valid);

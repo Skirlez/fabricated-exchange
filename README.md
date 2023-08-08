@@ -22,7 +22,10 @@ MidnightLightning: https://github.com/MidnightLightning
 # Something isn't working
 
 You're actually wrong. Everything is working. You must be hallucinating.
-In any case, open an issue on this repository.
+In any case, open an issue on this repository. Also, take note of mod incompatibilities:
+
+- Enhanced Block Entities (EBE): Breaks rendering the mods chest items in the inventory.
+To fix, you can set Enhanced Chests to Off with Mod Menu (or`render_enhanced_chests` to `false` in the config file).
 
 # Contributing
 
@@ -68,4 +71,5 @@ All of the code in this repository is licensed under the terms of the LGPLv3. I 
 - Fancy animated Transmutation Table (Toggleable)
  
 # Screenshot
-![image](https://github.com/Skirlez/fabricated-exchange/assets/17904548/454070ff-fa47-4207-b18b-b72e3a1e0192)
+![image](https://github.com/Skirlez/fabricated-exchange/assets/17904548/615b45d2-cbe0-4206-a2ed-d0192c6d8885)
+

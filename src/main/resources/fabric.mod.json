@@ -3,7 +3,7 @@
 	"id": "fabricated-exchange",
 	"version": "${version}",
 	"name": "Fabricated Exchange",
-	"description": "A Fabric remake of Project E/Equivalent Exchange 2.",
+	"description": "A Fabric remake of ProjectE/Equivalent Exchange 2.",
 	"authors": [
 		"Skirlez"
 	],

@@ -60,7 +60,7 @@
     "commands.fabricated-exchange.recipe.pardon.success": "Done! The recipe will now be evaluated by the EMC mapper!",
     "commands.fabricated-exchange.nothing": "Nothing has changed.",
 
-    "key.category.fabricated-exchange": "Fabricated Exchange bindings",
+    "key.category.fabricated-exchange": "Fabricated Exchange",
     "key.fabricated-exchange.charge": "Item Charge/Discharge",
     "key.fabricated-exchange.extra": "Item Extra Function"
 }

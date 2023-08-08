@@ -235,9 +235,10 @@ public class TheCommand {
         ModConfig.fetchAll();
         context.getSource().sendMessage(Text.literal("Data files reloaded!"));
         long startTime = System.nanoTime();
+        FabricatedExchange.generateBlockRotationMap(ModConfig.BLOCK_TRANSMUTATION_MAP_FILE.getValue());
         String log = FabricatedExchange.reloadEmcMap(server);
         FabricatedExchange.syncMaps(server);
-
+        FabricatedExchange.syncBlockTransmutations(server);
         String add = (log.isEmpty()) ? "\nNo errors or warnings." : "\n" + log;
         context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.reloademc.success",
         String.valueOf((System.nanoTime() - startTime) / 1000000)).append(add));

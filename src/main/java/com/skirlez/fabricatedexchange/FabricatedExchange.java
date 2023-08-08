@@ -3,9 +3,12 @@ package com.skirlez.fabricatedexchange;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
@@ -17,6 +20,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,19 +68,19 @@ public class FabricatedExchange implements ModInitializer {
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> { 
             // send the player's own emc value
-            PlayerState playerState = ServerState.getPlayerState(handler.player);
-            EmcData.syncEmc(handler.player, playerState.emc);
-            EmcData.syncMap(handler.player);
+            ServerPlayerEntity player = handler.player;
+            PlayerState playerState = ServerState.getPlayerState(player);
+            EmcData.syncEmc(player, playerState.emc);
+            EmcData.syncMap(player);
+            syncBlockTransmutation(player);
         });
 
         ServerLifecycleEvents.SERVER_STARTED.register((server) -> {
             ModConfig.fetchAll();
-            fetchBlockRotationMap();
+            generateBlockRotationMap(ModConfig.BLOCK_TRANSMUTATION_MAP_FILE.getValue());
             reloadEmcMap(server);
         });
     }
-
-
 
     public static String reloadEmcMap(MinecraftServer server) {
         EmcMapper mapper = new EmcMapper();
@@ -114,12 +119,29 @@ public class FabricatedExchange implements ModInitializer {
             EmcData.syncMap(player);
         }
     }
+    public static void syncBlockTransmutations(MinecraftServer server) {
+        for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+            syncBlockTransmutation(player);
+        }
+    }
 
-    private static void fetchBlockRotationMap() {
-        blockTransmutationMap.clear();
-        String[][] blockTransmutationData = ModConfig.BLOCK_TRANSMUTATION_MAP_FILE.getValue();
+    private static void syncBlockTransmutation(ServerPlayerEntity player) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        Set<Block> keySet = blockTransmutationMap.keySet();
+        buf.writeInt(keySet.size());
+        Iterator<Block> iterator = keySet.iterator();
+        while (iterator.hasNext()) {
+            Block block = iterator.next();
+            buf.writeString(Registries.BLOCK.getId(block).toString());
+            buf.writeString(Registries.BLOCK.getId(blockTransmutationMap.get(block)).toString());
+        }
+        ServerPlayNetworking.send(player, ModMessages.BLOCK_TRANSMUTATION_SYNC_IDENTIFIER, buf);
+    }
+
+    public static void generateBlockRotationMap(String[][] blockTransmutationData) {
         if (blockTransmutationData == null)
             return;
+        blockTransmutationMap.clear();
         for (int i = 0; i < blockTransmutationData.length; i++) {
             int j = 0;
             // GSON just packages the String[][] with a FREE (100% off) NULL™ for no reason so i guess we have to check for it
