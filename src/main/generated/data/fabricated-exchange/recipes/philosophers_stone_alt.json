@@ -3,13 +3,13 @@
   "category": "misc",
   "key": {
     "D": {
-      "item": "minecraft:diamond"
+      "tag": "c:diamonds"
     },
     "G": {
       "item": "minecraft:glowstone_dust"
     },
     "R": {
-      "item": "minecraft:redstone"
+      "tag": "c:redstone_dusts"
     }
   },
   "pattern": [

@@ -8,20 +8,22 @@ import com.skirlez.fabricatedexchange.item.FakeItemUsageContext;
 import com.skirlez.fabricatedexchange.item.OutliningItem;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.item.ShovelItem;
 import net.minecraft.item.ToolMaterial;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
-public class DarkMatterShovel extends ShovelItem implements ChargeableItem, OutliningItem {
-    public DarkMatterShovel(ToolMaterial material, float attackDamage, float attackSpeed, Settings settings) {
+public class DarkMatterAxe extends AxeItem implements ChargeableItem, OutliningItem {
+
+    public DarkMatterAxe(ToolMaterial material, float attackDamage, float attackSpeed, Settings settings) {
         super(material, attackDamage, attackSpeed, settings);
     }
 
@@ -52,15 +54,12 @@ public class DarkMatterShovel extends ShovelItem implements ChargeableItem, Outl
             return super.useOnBlock(context);
 
 
-        World world = context.getWorld();
         boolean anySuccess = false;
         List<BlockPos> positions = getPositionsToOutline(context.getPlayer(), context.getStack(), context.getBlockPos());
         for (BlockPos newPos : positions) {
-            if (world.getBlockState(newPos.add(0, 1, 0)).getBlock().equals(Blocks.AIR)) {
-                FakeItemUsageContext fakeContext = 
-                    new FakeItemUsageContext(context.getPlayer(), context.getHand(), newPos, Direction.UP);
-                anySuccess = (super.useOnBlock(fakeContext).isAccepted()) || anySuccess;
-            }
+            FakeItemUsageContext fakeContext = 
+                new FakeItemUsageContext(context.getPlayer(), context.getHand(), newPos, Direction.WEST);
+            anySuccess = (super.useOnBlock(fakeContext).isAccepted()) || anySuccess;
         }
 
         return ActionResult.success(anySuccess);
@@ -77,24 +76,29 @@ public class DarkMatterShovel extends ShovelItem implements ChargeableItem, Outl
         return super.postMine(stack, world, state, pos, miner);
     }
 
+
     @Override
     public boolean outlineEntryCondition(BlockState state) {
-        return isSuitableFor(state);
+        return Registries.BLOCK.getEntry(state.getBlock()).isIn(BlockTags.LOGS);
     }
 
     @Override
     public List<BlockPos> getPositionsToOutline(PlayerEntity player, ItemStack stack, BlockPos center) {
         List<BlockPos> list = new ArrayList<BlockPos>();
-        int size = ChargeableItem.getCharge(stack);
-        center = center.add(-size, 0, -size);
-        int len = size * 2 + 1;
-        for (int i = 0; i < len; i++) {
-            for (int j = 0; j < len; j++) {
-                BlockPos newPos = center.add(i, 0, j);
-                if (isSuitableFor(player.getWorld().getBlockState(newPos)))
-                    list.add(newPos);
+        World world = player.getWorld();
+
+        list.add(center);
+        int len = ChargeableItem.getCharge(stack) * 3;
+        for (int y = 1; y < len; y++) {
+            BlockPos newPos = center.add(0, y, 0);
+            if (isSuitableFor(world.getBlockState(newPos))) {
+                list.add(newPos);
+                continue;
             }
+            break;
         }
         return list;
     }
+
+    
 }

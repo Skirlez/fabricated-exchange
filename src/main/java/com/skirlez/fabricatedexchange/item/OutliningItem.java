@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockPos;
 
 // Items that should highlight multiple blocks implement this interface.
 public interface OutliningItem {
-    boolean outlineEntryCondition(BlockState block);
+    boolean outlineEntryCondition(BlockState state);
 
     List<BlockPos> getPositionsToOutline(PlayerEntity player, ItemStack stack, BlockPos center);
 }

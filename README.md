@@ -4,7 +4,7 @@ A Fabric remake of the Minecraft mod ProjectE/Equivalent Exchange 2.
 The mod attaches an "EMC" number value to every item. Some are worth more, some less.
 Transmute items and blocks into EMC, and EMC to different items you've obtained before.
 
-The mod is currently in beta. It will attempt to update to the latest minecraft releases. 
+The mod is currently in beta. It will attempt to keep up with the latest minecraft releases. 
 Once it is in a stable, feature complete state, it will be ported into popular older versions.
 
 All of the assets were taken from https://github.com/sinkillerj/ProjectE.

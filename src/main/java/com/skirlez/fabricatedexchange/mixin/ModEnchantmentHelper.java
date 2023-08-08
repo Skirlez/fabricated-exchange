@@ -9,18 +9,19 @@ import com.skirlez.fabricatedexchange.item.ChargeableItem;
 
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityGroup;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.SwordItem;
+
 
 @Mixin(EnchantmentHelper.class)
 public abstract class ModEnchantmentHelper {
     @Inject(method = "getAttackDamage", at = @At("RETURN"), cancellable = true)
     private static void considerChargeAttackDamage(ItemStack stack, EntityGroup group, CallbackInfoReturnable<Float> cir) {
-        float value = cir.getReturnValueF();
-        float add;
-        if (stack.getItem() instanceof ChargeableItem)
-            add = ChargeableItem.getCharge(stack);
-        else
-            add = 0f;
-        cir.setReturnValue(Float.valueOf(value + add));
+        Item item = stack.getItem();
+        if (item instanceof ChargeableItem && item instanceof SwordItem) {
+            cir.setReturnValue(cir.getReturnValue() + ChargeableItem.getCharge(stack));
+        }
+        
     }
 }

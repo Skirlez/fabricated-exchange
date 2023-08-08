@@ -10,12 +10,12 @@
     }
   },
   "pattern": [
-    "MMM",
-    " D ",
-    " D "
+    "MM",
+    "MD",
+    " D"
   ],
   "result": {
-    "item": "fabricated-exchange:dark_matter_pickaxe"
+    "item": "fabricated-exchange:dark_matter_axe"
   },
   "show_notification": true
 }

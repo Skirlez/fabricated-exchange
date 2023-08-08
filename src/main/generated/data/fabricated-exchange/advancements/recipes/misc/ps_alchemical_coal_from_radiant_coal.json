@@ -15,7 +15,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "minecraft:ps_alchemical_coal_from_radiant_coal"
+        "recipe": "fabricated-exchange:ps_alchemical_coal_from_radiant_coal"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -28,7 +28,7 @@
   ],
   "rewards": {
     "recipes": [
-      "minecraft:ps_alchemical_coal_from_radiant_coal"
+      "fabricated-exchange:ps_alchemical_coal_from_radiant_coal"
     ]
   }
 }

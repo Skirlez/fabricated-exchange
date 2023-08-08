@@ -1,14 +1,14 @@
 package com.skirlez.fabricatedexchange.item;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
+import com.skirlez.fabricatedexchange.item.tools.DarkMatterAxe;
+import com.skirlez.fabricatedexchange.item.tools.DarkMatterHoe;
 import com.skirlez.fabricatedexchange.item.tools.DarkMatterPickaxe;
 import com.skirlez.fabricatedexchange.item.tools.DarkMatterShovel;
 import com.skirlez.fabricatedexchange.item.tools.DarkMatterSword;
 
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.minecraft.item.AxeItem;
-import net.minecraft.item.HoeItem;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.Registries;
@@ -42,8 +42,6 @@ public class ModItems {
     public static final Item TOME_OF_KNOWLEDGE = registerItemWithGroup("tome_of_knowledge", 
         new Item(new FabricItemSettings()));   
 
-
-
     public static final Item DARK_MATTER_SWORD = 
        registerItemWithGroup("dark_matter_sword", new DarkMatterSword(DarkMatterMaterial.INSTANCE, 12, -2.4f, new Item.Settings().fireproof()));
     public static final Item DARK_MATTER_PICKAXE = 
@@ -51,9 +49,9 @@ public class ModItems {
     public static final Item DARK_MATTER_SHOVEL = 
         registerItemWithGroup("dark_matter_shovel", new DarkMatterShovel(DarkMatterMaterial.INSTANCE, 5f, -3.0f, new Item.Settings().fireproof()));
     public static final Item DARK_MATTER_AXE = 
-        registerItemWithGroup("dark_matter_axe", new AxeItem(DarkMatterMaterial.INSTANCE, 8f, -3.0f, new Item.Settings().fireproof()));
+        registerItemWithGroup("dark_matter_axe", new DarkMatterAxe(DarkMatterMaterial.INSTANCE, 8f, -3.0f, new Item.Settings().fireproof()));
     public static final Item DARK_MATTER_HOE = 
-        registerItemWithGroup("dark_matter_hoe", new HoeItem(DarkMatterMaterial.INSTANCE, 5, 0.0f, new Item.Settings().fireproof()));
+        registerItemWithGroup("dark_matter_hoe", new DarkMatterHoe(DarkMatterMaterial.INSTANCE, 5, 0.0f, new Item.Settings().fireproof()));
 
 
     private static Item registerItem(String name, Item item) {

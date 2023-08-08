@@ -15,7 +15,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "minecraft:ps_gold_ingot_from_diamond"
+        "recipe": "fabricated-exchange:ps_gold_ingot_from_diamond"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -28,7 +28,7 @@
   ],
   "rewards": {
     "recipes": [
-      "minecraft:ps_gold_ingot_from_diamond"
+      "fabricated-exchange:ps_gold_ingot_from_diamond"
     ]
   }
 }

@@ -67,8 +67,9 @@ public class PhilosophersStone extends Item implements ChargeableItem, ExtraFunc
                     world.setBlockState(pos, FabricatedExchange.blockTransmutationMap.get(block).getDefaultState());
                 else {
                     List<BlockPos> positions = getPositionsToOutline(context.getPlayer(), stack, pos);
-                    for (BlockPos newPos : positions)
-                        world.setBlockState(newPos, FabricatedExchange.blockTransmutationMap.get(block).getDefaultState());
+                    for (BlockPos newPos : positions) {
+                        world.setBlockState(newPos, FabricatedExchange.blockTransmutationMap.get(block).getDefaultState().with(null, null));
+                    }
                 }
             }
         }

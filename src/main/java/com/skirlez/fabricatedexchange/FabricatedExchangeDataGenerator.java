@@ -191,6 +191,8 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
             super(generator);
         }
 
+
+
         @Override
         public void generate(Consumer<RecipeJsonProvider> exporter) {
             generateToAndFromBlockRecipes(ModItems.ALCHEMICAL_COAL, ModBlocks.ALCHEMICAL_COAL_BLOCK, exporter);
@@ -201,27 +203,28 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
             generateToAndFromBlockRecipes(ModItems.DARK_MATTER, ModBlocks.DARK_MATTER_BLOCK, exporter);
             generateToAndFromBlockRecipes(ModItems.RED_MATTER, ModBlocks.RED_MATTER_BLOCK, exporter);
 
+            TagKey<Item> diamond = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "diamonds"));
+            TagKey<Item> redstone = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "redstone_dusts"));
+
             ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.PHILOSOPHERS_STONE)
                 .pattern("RGR")
                 .pattern("GDG")
                 .pattern("RGR")
-                .input('D', Items.DIAMOND)
-                .input('R', Items.REDSTONE)
+                .input('D', diamond)
+                .input('R', redstone)
                 .input('G', Items.GLOWSTONE_DUST)
-                .criterion(FabricRecipeProvider.hasItem(Items.DIAMOND), FabricRecipeProvider.conditionsFromItem(Items.DIAMOND))
-                .criterion(FabricRecipeProvider.hasItem(Items.REDSTONE), FabricRecipeProvider.conditionsFromItem(Items.REDSTONE))
-                .offerTo(exporter);
+                .criterion("has_diamond", FabricRecipeProvider.conditionsFromTag(diamond))
+                .offerTo(exporter, new Identifier(FabricatedExchange.MOD_ID, "philosophers_stone"));
 
             ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.PHILOSOPHERS_STONE)
                 .pattern("GRG")
                 .pattern("RDR")
                 .pattern("GRG")
-                .input('D', Items.DIAMOND)
-                .input('R', Items.REDSTONE)
+                .input('D', diamond)
+                .input('R', redstone)
                 .input('G', Items.GLOWSTONE_DUST)
-                .criterion(FabricRecipeProvider.hasItem(Items.DIAMOND), FabricRecipeProvider.conditionsFromItem(Items.DIAMOND))
-                .criterion(FabricRecipeProvider.hasItem(Items.REDSTONE), FabricRecipeProvider.conditionsFromItem(Items.REDSTONE))
-                .offerTo(exporter, "philosophers_stone_alt");
+                .criterion("has_diamond", FabricRecipeProvider.conditionsFromTag(diamond))
+                .offerTo(exporter, new Identifier(FabricatedExchange.MOD_ID, "philosophers_stone_alt"));
 
 
             generatePhilosopherStoneRecipe(Items.IRON_INGOT, Items.GOLD_INGOT, 8, exporter);
@@ -241,7 +244,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                 .criterion("has_coal", FabricRecipeProvider.conditionsFromTag(coal))
                 .offerTo(exporter);
 
-            TagKey<Item> redstone = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "redstone_dusts"));
+            
             TagKey<Item> iron = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "iron_ingots"));
 
             ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.MEDIUM_COVALENCE_DUST, 40)
@@ -251,7 +254,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                 .criterion("has_redstone", FabricRecipeProvider.conditionsFromTag(redstone))
                 .offerTo(exporter);
 
-            TagKey<Item> diamond = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "diamonds"));
+            
             
             ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.HIGH_COVALENCE_DUST, 40)
                 .input(diamond)
@@ -276,11 +279,11 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                 .input('C', Blocks.CHEST)
                 .input('S', Blocks.STONE)
                 .criterion(FabricRecipeProvider.hasItem(ModItems.LOW_COVALENCE_DUST), 
-                FabricRecipeProvider.conditionsFromItem(ModItems.LOW_COVALENCE_DUST))
+                    FabricRecipeProvider.conditionsFromItem(ModItems.LOW_COVALENCE_DUST))
                 .criterion(FabricRecipeProvider.hasItem(ModItems.MEDIUM_COVALENCE_DUST), 
-                FabricRecipeProvider.conditionsFromItem(ModItems.MEDIUM_COVALENCE_DUST))
+                    FabricRecipeProvider.conditionsFromItem(ModItems.MEDIUM_COVALENCE_DUST))
                 .criterion(FabricRecipeProvider.hasItem(ModItems.HIGH_COVALENCE_DUST), 
-                FabricRecipeProvider.conditionsFromItem(ModItems.HIGH_COVALENCE_DUST))
+                    FabricRecipeProvider.conditionsFromItem(ModItems.HIGH_COVALENCE_DUST))
                 .offerTo(exporter);
 
 
@@ -315,9 +318,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                 .input('D', Blocks.DIAMOND_BLOCK)
                 .input('O', Blocks.OBSIDIAN)
                 .criterion(FabricRecipeProvider.hasItem(Blocks.OBSIDIAN),
-                FabricRecipeProvider.conditionsFromItem(Blocks.OBSIDIAN))
-                .criterion(FabricRecipeProvider.hasItem(Items.DIAMOND),
-                FabricRecipeProvider.conditionsFromItem(Items.DIAMOND))
+                    FabricRecipeProvider.conditionsFromItem(Blocks.OBSIDIAN))
                 .offerTo(exporter);
             ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModBlocks.ANTIMATTER_RELAY_MK2)
                 .pattern("ODO")
@@ -350,10 +351,10 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                 .input('T', Blocks.GLASS)
                 .input('D', Blocks.DIAMOND_BLOCK)
                 .input('F', Blocks.FURNACE)
-                .criterion(FabricRecipeProvider.hasItem(Blocks.GLOWSTONE),
-                FabricRecipeProvider.conditionsFromItem(Blocks.GLOWSTONE))
-                .criterion(FabricRecipeProvider.hasItem(Items.DIAMOND),
-                FabricRecipeProvider.conditionsFromItem(Items.DIAMOND))
+                .criterion(FabricRecipeProvider.hasItem(Items.GLOWSTONE),
+                    FabricRecipeProvider.conditionsFromItem(Items.GLOWSTONE))
+                .criterion(FabricRecipeProvider.hasItem(Items.GLOWSTONE_DUST),
+                    FabricRecipeProvider.conditionsFromItem(Items.GLOWSTONE_DUST))
                 .offerTo(exporter);
 
             ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModBlocks.ENERGY_COLLECTOR_MK2)
@@ -385,9 +386,9 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                 .input('A', ModItems.AETERNALIS_FUEL)
                 .input('D', Blocks.DIAMOND_BLOCK)
                 .criterion(FabricRecipeProvider.hasItem(ModItems.AETERNALIS_FUEL),
-                FabricRecipeProvider.conditionsFromItem(ModItems.AETERNALIS_FUEL))
+                    FabricRecipeProvider.conditionsFromItem(ModItems.AETERNALIS_FUEL))
                 .criterion(FabricRecipeProvider.hasItem(Items.DIAMOND),
-                FabricRecipeProvider.conditionsFromItem(Items.DIAMOND))
+                    FabricRecipeProvider.conditionsFromItem(Items.DIAMOND))
                 .offerTo(exporter);
 
             ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.RED_MATTER)
@@ -398,7 +399,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                 .input('D', ModItems.DARK_MATTER)
                 .criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER),
                 FabricRecipeProvider.conditionsFromItem(ModItems.DARK_MATTER))
-                .offerTo(exporter, "red_matter_horizontal");
+                .offerTo(exporter, new Identifier(FabricatedExchange.MOD_ID, "red_matter_horizontal"));
 
 
             ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.RED_MATTER)
@@ -409,11 +410,9 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                 .input('D', ModItems.DARK_MATTER)
                 .criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER),
                 FabricRecipeProvider.conditionsFromItem(ModItems.DARK_MATTER))
-                .offerTo(exporter, "red_matter_vertical");
+                .offerTo(exporter, new Identifier(FabricatedExchange.MOD_ID, "red_matter_vertical"));
 
-
-    
-            ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.DARK_MATTER_SWORD)
+            ShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, ModItems.DARK_MATTER_SWORD)
                 .pattern("M")
                 .pattern("M")
                 .pattern("D")
@@ -423,7 +422,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                     FabricRecipeProvider.conditionsFromItem(ModItems.DARK_MATTER))
                 .offerTo(exporter);
 
-            ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.DARK_MATTER_PICKAXE)
+            ShapedRecipeJsonBuilder.create(RecipeCategory.TOOLS, ModItems.DARK_MATTER_PICKAXE)
                 .pattern("MMM")
                 .pattern(" D ") 
                 .pattern(" D ")
@@ -433,7 +432,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                     FabricRecipeProvider.conditionsFromItem(ModItems.DARK_MATTER))
                 .offerTo(exporter);
 
-            ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.DARK_MATTER_SHOVEL)
+            ShapedRecipeJsonBuilder.create(RecipeCategory.TOOLS, ModItems.DARK_MATTER_SHOVEL)
                 .pattern("M")
                 .pattern("D") 
                 .pattern("D")
@@ -442,6 +441,27 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                 .criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER),
                     FabricRecipeProvider.conditionsFromItem(ModItems.DARK_MATTER))
                 .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(RecipeCategory.TOOLS, ModItems.DARK_MATTER_AXE)
+                .pattern("MM")
+                .pattern("MD") 
+                .pattern(" D")
+                .input('M', ModItems.DARK_MATTER)
+                .input('D', diamond)
+                .criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER),
+                    FabricRecipeProvider.conditionsFromItem(ModItems.DARK_MATTER))
+                .offerTo(exporter, new Identifier(FabricatedExchange.MOD_ID, "dark_matter_axe"));
+
+            ShapedRecipeJsonBuilder.create(RecipeCategory.TOOLS, ModItems.DARK_MATTER_HOE)
+                .pattern("MM")
+                .pattern(" D") 
+                .pattern(" D")
+                .input('M', ModItems.DARK_MATTER)
+                .input('D', diamond)
+                .criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER),
+                    FabricRecipeProvider.conditionsFromItem(ModItems.DARK_MATTER))
+                .offerTo(exporter);
+
 
         }
 
@@ -453,15 +473,16 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                 .input(item1, ratio)
                 .criterion(FabricRecipeProvider.hasItem(ModItems.PHILOSOPHERS_STONE), 
                     FabricRecipeProvider.conditionsFromItem(ModItems.PHILOSOPHERS_STONE))
-                .offerTo(exporter, "ps_" + name2 + "_from_" + name1);
+                .offerTo(exporter, new Identifier(FabricatedExchange.MOD_ID, "ps_" + name2 + "_from_" + name1));
                     
             ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, item1, ratio)
                 .input(ModItems.PHILOSOPHERS_STONE)
                 .input(item2)
                 .criterion(FabricRecipeProvider.hasItem(ModItems.PHILOSOPHERS_STONE), 
                     FabricRecipeProvider.conditionsFromItem(ModItems.PHILOSOPHERS_STONE))
-                .offerTo(exporter, "ps_" + name1 + "_from_" + name2);
+                .offerTo(exporter, new Identifier(FabricatedExchange.MOD_ID, "ps_" + name1 + "_from_" + name2));
         }
+
         private void generateToAndFromBlockRecipes(Item item, Block block, Consumer<RecipeJsonProvider> exporter) {
             String itemName = Registries.ITEM.getId(item).getPath();
             String blockName = Registries.ITEM.getId(block.asItem()).getPath();
@@ -469,13 +490,13 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                 .input(block)
                 .criterion(FabricRecipeProvider.hasItem(item), 
                     FabricRecipeProvider.conditionsFromItem(item))
-                .offerTo(exporter, itemName + "_from_block");
+                .offerTo(exporter, new Identifier(FabricatedExchange.MOD_ID, itemName + "_from_block"));
                     
             ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, block)
                 .input(item, 9)
                 .criterion(FabricRecipeProvider.hasItem(item), 
                     FabricRecipeProvider.conditionsFromItem(item))
-                .offerTo(exporter, blockName + "_from_item");
+                .offerTo(exporter, new Identifier(blockName + "_from_item"));
         }
 
 

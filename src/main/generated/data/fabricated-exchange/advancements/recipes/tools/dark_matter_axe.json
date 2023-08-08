@@ -1,12 +1,12 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_philosophers_stone": {
+    "has_dark_matter": {
       "conditions": {
         "items": [
           {
             "items": [
-              "fabricated-exchange:philosophers_stone"
+              "fabricated-exchange:dark_matter"
             ]
           }
         ]
@@ -15,20 +15,20 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "fabricated-exchange:ps_gold_ingot_from_iron_ingot"
+        "recipe": "fabricated-exchange:dark_matter_axe"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
-      "has_philosophers_stone",
+      "has_dark_matter",
       "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "fabricated-exchange:ps_gold_ingot_from_iron_ingot"
+      "fabricated-exchange:dark_matter_axe"
     ]
   }
 }

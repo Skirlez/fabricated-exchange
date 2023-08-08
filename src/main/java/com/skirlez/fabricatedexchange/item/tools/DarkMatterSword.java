@@ -6,10 +6,11 @@ import com.skirlez.fabricatedexchange.item.ChargeableItem;
 import com.skirlez.fabricatedexchange.item.ExtraFunctionItem;
 import com.skirlez.fabricatedexchange.sound.ModSounds;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
+
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.Monster;
-import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SwordItem;
@@ -44,16 +45,15 @@ public class DarkMatterSword extends SwordItem implements ChargeableItem, ExtraF
     }
 
     protected boolean entityCondition(Entity entity) {
-        // TODO: do entities have tags? this is silly.
-        return ((entity instanceof AnimalEntity) || (entity instanceof Monster) || (entity instanceof HostileEntity) || (entity instanceof PlayerEntity));
+        // Entities don't have tags for these things. why
+        return (entity instanceof Monster) || (entity instanceof HostileEntity) || (entity instanceof PlayerEntity);
     }
-
 
     @Override
     public void doExtraFunction(ItemStack stack, ServerPlayerEntity player) {
         if (player.getAttackCooldownProgress(0.0f) >= 1.0f) {
             player.resetLastAttackedTicks();
-            player.swingHand(Hand.MAIN_HAND, true);
+            player.swingHand(Hand.MAIN_HAND);
 
             List<Entity> entities = player.getWorld()
                 .getOtherEntities(player, GeneralUtil.boxAroundPos(player.getPos(), ChargeableItem.getCharge(stack) + 1), DarkMatterSword.this::entityCondition);
@@ -67,5 +67,12 @@ public class DarkMatterSword extends SwordItem implements ChargeableItem, ExtraF
         }
     }
 
+    @Override 
+    public void doExtraFunctionClient(ItemStack stack, ClientPlayerEntity player) {
+        if (player.getAttackCooldownProgress(0.0f) >= 1.0f) {
+            player.resetLastAttackedTicks();
+            player.swingHand(Hand.MAIN_HAND, false);
+        }
+    }
 
 }

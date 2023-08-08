@@ -15,7 +15,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "minecraft:ps_radiant_coal_from_mobius_fuel"
+        "recipe": "fabricated-exchange:ps_radiant_coal_from_mobius_fuel"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -28,7 +28,7 @@
   ],
   "rewards": {
     "recipes": [
-      "minecraft:ps_radiant_coal_from_mobius_fuel"
+      "fabricated-exchange:ps_radiant_coal_from_mobius_fuel"
     ]
   }
 }

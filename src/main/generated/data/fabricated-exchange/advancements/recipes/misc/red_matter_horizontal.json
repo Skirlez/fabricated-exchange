@@ -15,7 +15,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "minecraft:red_matter_horizontal"
+        "recipe": "fabricated-exchange:red_matter_horizontal"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -28,7 +28,7 @@
   ],
   "rewards": {
     "recipes": [
-      "minecraft:red_matter_horizontal"
+      "fabricated-exchange:red_matter_horizontal"
     ]
   }
 }

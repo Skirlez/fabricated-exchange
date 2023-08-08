@@ -66,7 +66,7 @@ public class DarkMatterPickaxe extends PickaxeItem implements ChargeableItem, Ou
 
 
     @Override
-    public boolean outlineEntryCondition(BlockState block) {
+    public boolean outlineEntryCondition(BlockState state) {
         return true;
     }
 
