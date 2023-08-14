@@ -57,7 +57,7 @@ public class EnergyCondenserScreen extends HandledScreen<EnergyCondenserScreenHa
         ItemStack stack = handler.getInventory().getStack(0);
         if (stack.isEmpty())
             return;
-        SuperNumber targetEmc = EmcData.getItemEmc(stack.getItem());
+        SuperNumber targetEmc = EmcData.getItemStackEmc(stack);
         if (targetEmc.equalsZero())
             return;
         SuperNumber emcCopy = new SuperNumber(emc);
@@ -74,7 +74,7 @@ public class EnergyCondenserScreen extends HandledScreen<EnergyCondenserScreenHa
         SuperNumber targetEmc;
         if (stack.isEmpty())
             targetEmc = emc;
-        targetEmc = EmcData.getItemEmc(stack.getItem());
+        targetEmc = EmcData.getItemStackEmc(stack);
         SuperNumber emcCopy = new SuperNumber(SuperNumber.min(emc, targetEmc));
         emcCopy.floor();
 

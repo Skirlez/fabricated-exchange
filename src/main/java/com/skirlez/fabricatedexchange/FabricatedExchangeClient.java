@@ -12,12 +12,15 @@ import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreen;
 import com.skirlez.fabricatedexchange.screen.EnergyCondenserScreen;
 import com.skirlez.fabricatedexchange.screen.ModScreenHandlers;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreen;
-import com.skirlez.fabricatedexchange.util.ModConfig;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
+import com.skirlez.fabricatedexchange.util.config.ModConfig;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.impl.event.lifecycle.LifecycleEventsImpl;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
@@ -28,11 +31,11 @@ public class FabricatedExchangeClient implements ClientModInitializer {
     
     public static SuperNumber clientEmc = SuperNumber.Zero();
 
-    private static final BlockEntity renderAlchemicalChest = 
+    private static final BlockEntity RENDER_ALCHEMICAL_CHEST = 
         new AlchemicalChestBlockEntity(BlockPos.ORIGIN, ModBlocks.ALCHEMICAL_CHEST.getDefaultState());
-    private static final BlockEntity renderEnergyCollectorMk1 = 
+    private static final BlockEntity RENDER_ENERGY_CONDENSER_MK1 = 
         new EnergyCondenserBlockEntity(BlockPos.ORIGIN, ModBlocks.ENERGY_CONDENSER_MK1.getDefaultState());
-    private static final BlockEntity renderEnergyCollectorMk2 = 
+    private static final BlockEntity RENDER_ENERGY_CONDENSER_MK2 = 
         new EnergyCondenserBlockEntity(BlockPos.ORIGIN, ModBlocks.ENERGY_CONDENSER_MK2.getDefaultState());
 
     @Override
@@ -52,14 +55,14 @@ public class FabricatedExchangeClient implements ClientModInitializer {
         BlockEntityRendererFactories.register(ModBlockEntities.ALCHEMICAL_CHEST, ChestBlockEntityRenderer::new);
         BlockEntityRendererFactories.register(ModBlockEntities.ENERGY_CONDENSER, ChestBlockEntityRenderer::new);
 
-        BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.ALCHEMICAL_CHEST.asItem(), (stack, mode, matrices, vertexConsumers, light, overlay) 
-            -> MinecraftClient.getInstance().getBlockEntityRenderDispatcher().renderEntity(renderAlchemicalChest, matrices, vertexConsumers, light, overlay));
+        BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.ALCHEMICAL_CHEST.asItem(), (stack, mode, matrices, vertexConsumers, light, overlay)
+            -> MinecraftClient.getInstance().getBlockEntityRenderDispatcher().renderEntity(RENDER_ALCHEMICAL_CHEST, matrices, vertexConsumers, light, overlay));
         BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.ENERGY_CONDENSER_MK1.asItem(), (stack, mode, matrices, vertexConsumers, light, overlay) 
-            -> MinecraftClient.getInstance().getBlockEntityRenderDispatcher().renderEntity(renderEnergyCollectorMk1, matrices, vertexConsumers, light, overlay));
+            -> MinecraftClient.getInstance().getBlockEntityRenderDispatcher().renderEntity(RENDER_ENERGY_CONDENSER_MK1, matrices, vertexConsumers, light, overlay));
         BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.ENERGY_CONDENSER_MK2.asItem(), (stack, mode, matrices, vertexConsumers, light, overlay) 
-            -> MinecraftClient.getInstance().getBlockEntityRenderDispatcher().renderEntity(renderEnergyCollectorMk2, matrices, vertexConsumers, light, overlay));
+            -> MinecraftClient.getInstance().getBlockEntityRenderDispatcher().renderEntity(RENDER_ENERGY_CONDENSER_MK2, matrices, vertexConsumers, light, overlay));
 
-        ModConfig.fetchAll();
+
     }
 
 

@@ -9,8 +9,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
-import com.skirlez.fabricatedexchange.util.ModConfig;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
+import com.skirlez.fabricatedexchange.util.config.ModConfig;
 
 import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.command.suggestion.SuggestionProviders;

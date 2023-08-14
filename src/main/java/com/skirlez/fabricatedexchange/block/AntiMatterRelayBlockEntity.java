@@ -110,12 +110,9 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 
     public static void serverTick(World world, BlockPos blockPos, BlockState blockState, AntiMatterRelayBlockEntity entity) {
         if (entity.fuelSlot.hasStack()) {
-            ItemStack stack = entity.fuelSlot.getStack();
-            SuperNumber value = EmcData.getItemEmc(stack.getItem());          
-            if (stack.getMaxDamage() != 0) {
-                value.multiply(new SuperNumber(stack.getMaxDamage()-stack.getDamage(), stack.getMaxDamage()));
-                value.floor();
-            }
+            ItemStack stack = entity.fuelSlot.getStack().copy();
+            stack.setCount(1);
+            SuperNumber value = EmcData.getItemStackEmc(stack);          
             SuperNumber emcCopy = new SuperNumber(entity.emc);
             emcCopy.add(value);
             if (emcCopy.compareTo(entity.maximumEmc) != 1) {

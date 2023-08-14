@@ -8,7 +8,7 @@ import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.mixin.client.HandledScreenAccessor;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.slot.transmutation.TransmutationSlot;
-import com.skirlez.fabricatedexchange.util.ModConfig;
+import com.skirlez.fabricatedexchange.util.config.ModConfig;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -26,6 +26,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 
+// a graphing calculator is recommended to understand the animation portion of this class!
 public class TransmutationTableScreen extends HandledScreen<TransmutationTableScreenHandler> {
     
     public TextFieldWidget searchBar;
@@ -37,13 +38,6 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 
 
     private int fullAngleTime = 800;
-
-    // 0.26 is the intersection point of the angle function (x-1)^3+1 and y=-1.
-    // if it is between this and 0, the items will do at most 1 additional rotation if you click fast enough,
-    // which is the behavior we want. you can increase this to 2 additional rotations, for example if you multiply by the intersection
-    // with y=-2 (0.442)
-    private double maxNegativeAngle = (double)fullAngleTime * 0.26; 
-
     private int fullDistTime = 800;
 
     private String oldSearchText = "";
@@ -91,8 +85,9 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
     private Slot getSlotAt(double x, double y) {
         for (int i = 0; i < ((ScreenHandler)this.handler).slots.size(); ++i) {
             Slot slot = ((ScreenHandler)this.handler).slots.get(i);
-            if (!isPointWithinBounds(slot.x, slot.y, 16, 16, x, y) || !slot.isEnabled()) continue;
-                return slot;
+            if (!isPointWithinBounds(slot.x, slot.y, 16, 16, x, y) || !slot.isEnabled())
+                continue;
+            return slot;
         }
         return null;
     }
@@ -191,7 +186,14 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         textRenderer.draw(matrices, text, 168 - textRenderer.getWidth(text) / 2, 107, 0x404040);
     }
 
-    public void resetAngleTime() {
+    public void resetAngleTime(double additonalRotations) {
+        // cbrt(x + 1) - 1 is the inverse function of the angle function modified with some funny offsets to give us
+        // what we want: the x of the intersection between y=addtionalRotations and the angle function.
+        // any angle below fullAngleTime * multiplier will be floored in order to keep it within that range.
+        // and so for additionalRotations = 1, the x position will stay in the negative range such that the y
+        // never exceeds -1, so it will only do 1 additional rotation at most.
+        double multiplier = Math.cbrt(additonalRotations + 1) - 1; 
+        double maxNegativeAngle = (double)fullAngleTime * multiplier; 
         long add = 0;
         double angleTime = (double)(System.currentTimeMillis() - angleStartTime);
         if (angleTime < fullAngleTime) {
@@ -275,7 +277,7 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
     private void updateSearchText(String searchText) {
         if (searchText.equals(oldSearchText))
             return;
-        resetAngleTime();
+        resetAngleTime(0.5);
         offeringPageNum = 0;
         oldSearchText = searchText;
         PacketByteBuf buffer = PacketByteBufs.create();
@@ -308,10 +310,12 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
                 changedPage = true;
             buffer.writeInt(offeringPageNum);
         }
-        
+
+
+
         if (animated) {
             if (changedPage) {
-                resetAngleTime();
+                resetAngleTime(1);
             }
             else {
                 declineStartTime = System.currentTimeMillis();

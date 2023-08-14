@@ -62,10 +62,16 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 
         @Override
         protected void configure(WrapperLookup arg) {
-            addItemsToTag(ModTags.FUEL, Items.COAL, Items.CHARCOAL, Items.REDSTONE, Items.REDSTONE_BLOCK,
+            addItemsToTag(ModTags.FUEL, 
+    
+                Items.COAL, Items.CHARCOAL, Items.REDSTONE, Items.REDSTONE_BLOCK,
                 Items.GUNPOWDER, Items.COAL_BLOCK, Items.BLAZE_POWDER, Items.GLOWSTONE_DUST, Items.GLOWSTONE,
                 ModItems.ALCHEMICAL_COAL, ModBlocks.ALCHEMICAL_COAL_BLOCK, ModItems.RADIANT_COAL, ModBlocks.RADIANT_COAL_BLOCK,
                 ModItems.MOBIUS_FUEL, ModBlocks.MOBIUS_FUEL_BLOCK, ModItems.AETERNALIS_FUEL, ModBlocks.AETERNALIS_FUEL_BLOCK);
+        
+            addItemsToTag(ModTags.STONE, 
+    
+                Items.STONE);
         }
 
         private void addItemsToTag(TagKey<Item> tag, ItemConvertible... items) {
@@ -226,6 +232,15 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                 .criterion("has_diamond", FabricRecipeProvider.conditionsFromTag(diamond))
                 .offerTo(exporter, new Identifier(FabricatedExchange.MOD_ID, "philosophers_stone_alt"));
 
+            ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.TRANSMUTATION_TABLET)
+                .pattern("DSD")
+                .pattern("STS")
+                .pattern("DSD")
+                .input('D', ModBlocks.DARK_MATTER_BLOCK)
+                .input('S', ModTags.STONE)
+                .input('T', ModBlocks.TRANSMUTATION_TABLE)
+                .criterion(FabricRecipeProvider.hasItem(ModBlocks.DARK_MATTER_BLOCK), FabricRecipeProvider.conditionsFromItem(ModBlocks.DARK_MATTER_BLOCK))
+                .offerTo(exporter);
 
             generatePhilosopherStoneRecipe(Items.IRON_INGOT, Items.GOLD_INGOT, 8, exporter);
             generatePhilosopherStoneRecipe(Items.GOLD_INGOT, Items.DIAMOND, 4, exporter);
@@ -277,7 +292,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                 .input('D', diamond)
                 .input('I', iron)
                 .input('C', Blocks.CHEST)
-                .input('S', Blocks.STONE)
+                .input('S', ModTags.STONE)
                 .criterion(FabricRecipeProvider.hasItem(ModItems.LOW_COVALENCE_DUST), 
                     FabricRecipeProvider.conditionsFromItem(ModItems.LOW_COVALENCE_DUST))
                 .criterion(FabricRecipeProvider.hasItem(ModItems.MEDIUM_COVALENCE_DUST), 
@@ -450,7 +465,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                 .input('D', diamond)
                 .criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER),
                     FabricRecipeProvider.conditionsFromItem(ModItems.DARK_MATTER))
-                .offerTo(exporter, new Identifier(FabricatedExchange.MOD_ID, "dark_matter_axe"));
+                .offerTo(exporter);
 
             ShapedRecipeJsonBuilder.create(RecipeCategory.TOOLS, ModItems.DARK_MATTER_HOE)
                 .pattern("MM")

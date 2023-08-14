@@ -27,7 +27,7 @@ public class PhilosophersStone extends Item implements ChargeableItem, ExtraFunc
         ItemAccessor self = (ItemAccessor) this;
         self.setRecipeRemainder(this);
     }
-    private Random r = new Random();
+    private static Random r = new Random();
 
     @Override
     public boolean isItemBarVisible(ItemStack stack) {

@@ -25,7 +25,7 @@ public class MidSlot extends Slot {
         else {
             MinecraftClient client = MinecraftClient.getInstance();
             if (client.currentScreen instanceof TransmutationTableScreen screen)
-                screen.resetAngleTime();
+                screen.resetAngleTime(1);
         }
     }
 }

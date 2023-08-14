@@ -5,14 +5,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.skirlez.fabricatedexchange.emc.EmcData;
+import org.jetbrains.annotations.Nullable;
+
 import com.skirlez.fabricatedexchange.mixin.ScreenHandlerInvoker;
 
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntryList.Named;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -28,38 +33,6 @@ public class GeneralUtil {
         }
     }
 
-
-    /** Uses a binary search algorithm to insert an item into an ordered place in a list of items */
-    public static void addSortedEmcList(List<Item> list, Item item, boolean descending) {
-        int check;
-        if (descending)
-            check = -1;
-        else
-            check = 1;
-        if (list.size() == 0) {
-            list.add(item);
-            return;
-        }
-        SuperNumber num = EmcData.getItemEmc(item);
-        int low = 0;
-        int high = list.size() - 1;
-        while (low <= high) {
-            int mid = (low + high) / 2;
-            SuperNumber midNum = EmcData.getItemEmc(list.get(mid));
-            
-            if (num.compareTo(midNum) == -check) {
-                high = mid - 1;
-            } 
-            else if (num.compareTo(midNum) == check) {
-                low = mid + 1;
-            } 
-            else {
-                list.add(mid + 1, item);
-                return;
-            }
-        }
-        list.add(low, item);
-    }
 
     public static List<BlockEntity> getNeighboringBlockEntities(World world, BlockPos pos) {
         ArrayList<BlockEntity> list = new ArrayList<BlockEntity>(6);
@@ -110,5 +83,21 @@ public class GeneralUtil {
             pos.getX() - size, pos.getY() - size, pos.getZ() - size,
             pos.getX() + size, pos.getY() + size, pos.getZ() + size);
     }
+
+    @Nullable
+    public static String[] getItemStringsFromTagString(String tagString) {
+        Identifier tagId = new Identifier(tagString);
+        
+        TagKey<Item> tag = Registries.ITEM.streamTags().filter((key) -> key.id().equals(tagId)).findFirst().orElse(null);
+        Named<Item> named = Registries.ITEM.getEntryList(tag).get();
+        String[] array = new String[named.size()];
+        for (int i = 0; i < named.size(); i++)
+            array[i] = Registries.ITEM.getId(named.get(i).value()).toString();
+        
+        
+        return array;
+    } 
+
+
 
 }

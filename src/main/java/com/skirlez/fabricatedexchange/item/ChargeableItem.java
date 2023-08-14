@@ -16,7 +16,10 @@ public interface ChargeableItem {
     public static final int COLOR = MathHelper.packRgb(0.1f, 0.47f, 0.82f);
 
     public static int getCharge(ItemStack stack) {
-        return stack.getOrCreateNbt().getInt(CHARGE_KEY);
+        NbtCompound nbt = stack.getNbt();
+        if (nbt == null)
+            return 0;
+        return nbt.getInt(CHARGE_KEY);
     }
 
     public static void chargeStack(ItemStack stack, int value, int min, int max, PlayerEntity player) {
@@ -41,7 +44,7 @@ public interface ChargeableItem {
             }
 
             ChargeableItem item = (ChargeableItem)stack.getItem();
-            item.onCharge(stack, newValue);
+            item.onCharge(stack, newValue, player);
         }
     }
 
@@ -50,11 +53,11 @@ public interface ChargeableItem {
     }
 
     public static int getItemBarStep(ItemStack stack, int maxCharge) {
-        int charge = stack.getOrCreateNbt().getInt(CHARGE_KEY);
+        int charge = getCharge(stack);
         return Math.round((float)charge * 13.0f / (float)maxCharge);
     }
 
-    default void onCharge(ItemStack stack, int charge) {
+    default void onCharge(ItemStack stack, int charge, PlayerEntity player) {
 
     }
 

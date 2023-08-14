@@ -1,4 +1,4 @@
-package com.skirlez.fabricatedexchange.util;
+package com.skirlez.fabricatedexchange.util.config;
 
 import java.lang.reflect.Type;
 import java.nio.file.Path;
@@ -17,6 +17,8 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
+import com.skirlez.fabricatedexchange.util.DataFile;
+import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
@@ -45,6 +47,7 @@ public class ModConfig {
     private static final Type jsonType = new TypeToken<HashMap<String, Object>>() {}.getType();
     private static final Type emcMapType = new TypeToken<HashMap<String, SuperNumber>>() {}.getType();
     private static final Type stringSetType = new TypeToken<HashSet<String>>() {}.getType();
+    private static final Type nbtItemsType = new TypeToken<HashMap<String, List<String>>>() {}.getType();
     private static final Type recipeBlacklistType = new TypeToken<HashMap<String, HashSet<String>>>() {}.getType();
     private static final Type blockTransmutationMapType = new TypeToken<String[][]>() {}.getType();
 
@@ -63,6 +66,8 @@ public class ModConfig {
         = new DataFile<HashSet<String>>(stringSetType, 
         "modifiers.json");
 
+    public static final NbtItemsFile NBT_ITEMS = new NbtItemsFile(nbtItemsType, "nbt_items.json");
+
     public static final DataFile<Map<String, HashSet<String>>> BLACKLISTED_MAPPER_RECIPES_FILE
         = new DataFile<Map<String, HashSet<String>>>(recipeBlacklistType,
         "blacklisted_mapper_recipes.json");
@@ -77,6 +82,7 @@ public class ModConfig {
         SEED_EMC_MAP_FILE.fetch();
         CUSTOM_EMC_MAP_FILE.fetch();
         MODIFIERS.fetch();
+        NBT_ITEMS.fetch();
         BLACKLISTED_MAPPER_RECIPES_FILE.fetch();
         BLOCK_TRANSMUTATION_MAP_FILE.fetch();
     }
@@ -87,16 +93,13 @@ class EmcMap extends DataFile<Map<String, SuperNumber>> {
         super(type, name);
     }
     @Override
-    public void process() {
+    protected void process() {
         List<Pair<String, SuperNumber>> pairs = new ArrayList<Pair<String, SuperNumber>>();
         Iterator<String> iterator = value.keySet().iterator();
         while (iterator.hasNext()) {
             String entry = iterator.next();
             if (!entry.startsWith("#"))
                 continue;
-            
-            SuperNumber emc = value.get(entry);
-
             entry = entry.substring(1);
             // tag found
             iterator.remove();
@@ -111,6 +114,7 @@ class EmcMap extends DataFile<Map<String, SuperNumber>> {
                 continue;
             }
             
+            SuperNumber emc = value.get(entry);
             Iterator<RegistryEntry<Item>> itemIterator = Registries.ITEM.getEntryList(tag).get().iterator();
             while (itemIterator.hasNext()) {
                 Item item = itemIterator.next().value();
@@ -122,8 +126,6 @@ class EmcMap extends DataFile<Map<String, SuperNumber>> {
             Pair<String, SuperNumber> pair = pairs.get(i);
             value.put(pair.getLeft(), pair.getRight());
         }
-
-
     }
 }
 
@@ -132,7 +134,7 @@ class SeedEmcMap extends EmcMap {
         super(type, name);
     }
     @Override
-    public void process() {
+    protected void process() {
         super.process();
         EmcData.seedEmcMap = this.value;
     }
@@ -142,7 +144,7 @@ class CustomEmcMap extends EmcMap {
         super(type, name);
     }
     @Override
-    public void process() {
+    protected void process() {
         super.process();
         EmcData.customEmcMap = this.value;
     }

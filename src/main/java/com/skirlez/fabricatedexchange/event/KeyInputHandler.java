@@ -1,5 +1,6 @@
 package com.skirlez.fabricatedexchange.event;
 
+import com.skirlez.fabricatedexchange.item.ItemWithModes;
 import org.lwjgl.glfw.GLFW;
 
 import com.skirlez.fabricatedexchange.item.ChargeableItem;
@@ -20,10 +21,12 @@ import net.minecraft.util.Hand;
 public class KeyInputHandler {
     public static final String KEY_CATEGORY = "key.category.fabricated-exchange";
     public static final String KEY_CHARGE_ITEM = "key.fabricated-exchange.charge";
+    public static final String KEY_MODE_ITEM = "key.fabricated-exchange.mode";
     public static final String KEY_EXTRA_FUNCTION = "key.fabricated-exchange.extra";
 
 
     public static KeyBinding chargingKey;
+    public static KeyBinding modeChangeKey;
     public static KeyBinding extraFunctionKey;
 
 
@@ -57,7 +60,18 @@ public class KeyInputHandler {
                 ClientPlayNetworking.send(ModMessages.EXTRA_FUNCTION_IDENTIFIER, PacketByteBufs.create());
                 ((ExtraFunctionItem)stack.getItem()).doExtraFunctionClient(stack, client.player);
             }
+        });
 
+
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            while (modeChangeKey.wasPressed()) {
+                ItemStack stack = client.player.getStackInHand(Hand.MAIN_HAND);
+                if (!(stack.getItem() instanceof ItemWithModes)) {
+                    return;
+                }
+                ClientPlayNetworking.send(ModMessages.CYCLE_ITEM_MODE_IDENTIFIER, PacketByteBufs.create());
+                ItemWithModes.cycleModes(stack, null);
+            }
         });
     }
 
@@ -67,6 +81,13 @@ public class KeyInputHandler {
             InputUtil.Type.KEYSYM,
             GLFW.GLFW_KEY_V,
             KEY_CATEGORY
+        ));
+
+        modeChangeKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                KEY_MODE_ITEM,
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_G,
+                KEY_CATEGORY
         ));
 
         extraFunctionKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(

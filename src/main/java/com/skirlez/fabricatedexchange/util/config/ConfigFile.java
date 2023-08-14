@@ -1,10 +1,11 @@
-package com.skirlez.fabricatedexchange.util;
+package com.skirlez.fabricatedexchange.util.config;
 
 import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.Map;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
+import com.skirlez.fabricatedexchange.util.DataFile;
 
 public class ConfigFile extends DataFile<Map<String, Object>> {
     ConfigFile(Type type, String name) {
@@ -12,6 +13,7 @@ public class ConfigFile extends DataFile<Map<String, Object>> {
     }
 
     public boolean showItemEmcOrigin;
+    public boolean showEnchantedBookRepairCost;
     public boolean mapper_enabled;
     public boolean transmutationTable_animated;
     public boolean transmutationTable_floorButton;
@@ -52,6 +54,7 @@ public class ConfigFile extends DataFile<Map<String, Object>> {
         save();
 
         showItemEmcOrigin = (boolean)value.get("showItemEmcOrigin");
+        showEnchantedBookRepairCost = (boolean)value.get("showEnchantedBookRepairCost");
         mapper_enabled = (boolean)value.get("mapper.enabled");
         transmutationTable_animated = (boolean)value.get("transmutationTable.animated");
         transmutationTable_floorButton = (boolean)value.get("transmutationTable.floorButton");

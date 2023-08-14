@@ -38,8 +38,7 @@ public class TransmutationTable extends Block {
         BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (!world.isClient) {
             TransmutationTableScreenHandlerFactory screenHandlerFactory = new TransmutationTableScreenHandlerFactory();
-            if (screenHandlerFactory != null) 
-                player.openHandledScreen(screenHandlerFactory);
+            player.openHandledScreen(screenHandlerFactory);
         }
 
         return ActionResult.SUCCESS;

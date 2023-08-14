@@ -1,0 +1,24 @@
+{
+    "minecraft:enchanted_book": [
+        "StoredEnchantments",
+        "RepairCost"
+    ],
+    "minecraft:potion": [
+        "Potion"
+    ],
+    "minecraft:splash_potion": [
+        "Potion"
+    ],
+	"minecraft:lingering_potion": [
+        "Potion"
+    ],
+    "minecraft:goat_horn": [
+        "instrument"
+    ],
+    "#c:shulker_boxes": [
+        "BlockEntityTag"
+    ],
+    "#minecraft:banners": [
+        "BlockEntityTag"
+    ]
+}

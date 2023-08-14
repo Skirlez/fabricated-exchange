@@ -75,7 +75,7 @@ public class SuperNumber {
         this.denominator = BigInteger.ONE;
     }
 
-
+    /** Convert the SuperNumber to an integer. If above the integer limit, return the failsafe parameter. */
     public int toInt(int failsafe) { // TODO: this is still dumb
         this.floor();
         if (numerator.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) == 1) {
@@ -123,7 +123,9 @@ public class SuperNumber {
             return;
         BigInteger mod = numerator.mod(denominator);
         numerator = numerator.subtract(mod);
-        simplify();
+
+        numerator = numerator.divide(denominator);
+        denominator = BigInteger.ONE;
     }
 
     /** Rounds the SuperNumber to the closest whole number greater than itself */
@@ -132,7 +134,9 @@ public class SuperNumber {
             return;
         BigInteger mod = numerator.mod(denominator);
         numerator = numerator.add(denominator.subtract(mod));
-        simplify();
+
+        numerator = numerator.divide(denominator);
+        denominator = BigInteger.ONE;
     }
     
     // addition methods
@@ -316,7 +320,7 @@ public class SuperNumber {
             return "0";
         StringBuilder newStr = new StringBuilder();
         
-        if (numerator.abs().compareTo(denominator) == -1) { // This will fail for numbers who's decimal representation is longer than the 32 bit integer limit due to zeroLen. Too bad!
+        if (numerator.abs().compareTo(denominator) == -1) { // This will fail for numbers who's decimal representation is longer than the 32-bit integer limit due to zeroLen. Too bad!
             /* Our desired output for numbers smaller than zero is as follows:
                 1. if there are any zeros before the first real digit, get ALL of them
                 2. afterwards get a maximum of 3 digits

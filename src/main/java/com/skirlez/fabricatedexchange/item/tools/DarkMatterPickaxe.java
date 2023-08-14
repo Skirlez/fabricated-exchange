@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.skirlez.fabricatedexchange.item.ChargeableItem;
+import com.skirlez.fabricatedexchange.item.ItemWithModes;
 import com.skirlez.fabricatedexchange.item.OutliningItem;
 
 import net.minecraft.block.BlockState;
@@ -17,8 +18,12 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public class DarkMatterPickaxe extends PickaxeItem implements ChargeableItem, OutliningItem {
+public class DarkMatterPickaxe extends PickaxeItem implements ChargeableItem, OutliningItem, ItemWithModes {
 
+    @Override
+    public int getModeAmount() {
+        return 3;
+    }
     @Override
     public boolean isItemBarVisible(ItemStack stack) {
         return true;
@@ -36,11 +41,11 @@ public class DarkMatterPickaxe extends PickaxeItem implements ChargeableItem, Ou
 
     @Override
     public int getMaxCharge() {
-        return 2;
+        return 1;
     }
-    
-
     // Increase mining speed based on charge
+
+    /*
     @Override
     public float getMiningSpeedMultiplier(ItemStack stack, BlockState state) {
         float value = super.getMiningSpeedMultiplier(stack, state);
@@ -49,7 +54,7 @@ public class DarkMatterPickaxe extends PickaxeItem implements ChargeableItem, Ou
         }
         return value;
     }
-
+    */
 
     public DarkMatterPickaxe(ToolMaterial material, int attackDamage, float attackSpeed, Settings settings) {
         super(material, attackDamage, attackSpeed, settings);
@@ -57,7 +62,7 @@ public class DarkMatterPickaxe extends PickaxeItem implements ChargeableItem, Ou
     @Override
     public boolean postMine(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity miner) {
         if (isSuitableFor(state) && miner instanceof PlayerEntity player) {
-            List<BlockPos> positions = getBlocksToMine(world, miner.getPos(), pos, state);
+            List<BlockPos> positions = getBlocksToMine(world, stack, miner.getPos(), pos, state);
             for (BlockPos newPos : positions)
                 world.breakBlock(newPos, true, miner);
         }
@@ -70,8 +75,10 @@ public class DarkMatterPickaxe extends PickaxeItem implements ChargeableItem, Ou
         return true;
     }
 
-    protected List<BlockPos> getBlocksToMine(World world, Vec3d playerPos, BlockPos center, BlockState centerState) {
+    protected List<BlockPos> getBlocksToMine(World world, ItemStack stack, Vec3d playerPos, BlockPos center, BlockState centerState) {
         List<BlockPos> list = new ArrayList<BlockPos>();
+        if (ChargeableItem.getCharge(stack) == 0)
+            return list;
 
         Vec3d relativePos = playerPos.subtract(center.toCenterPos());
         double x = relativePos.getX(), z = relativePos.getZ();
@@ -84,7 +91,16 @@ public class DarkMatterPickaxe extends PickaxeItem implements ChargeableItem, Ou
             x = Math.signum(x);
         }
         Direction dir = Direction.fromVector((int)x, 0, (int)z);
-    
+        assert dir != null;
+
+        int mode = ItemWithModes.getMode(stack);
+        switch (mode) {
+            // case 0 don't do anything
+            case 1 -> dir = Direction.UP;
+            case 2 -> dir = dir.rotateYClockwise();
+        }
+
+
 
         BlockPos pos1 = center.offset(dir);
         BlockState state1 = world.getBlockState(pos1);
@@ -104,7 +120,9 @@ public class DarkMatterPickaxe extends PickaxeItem implements ChargeableItem, Ou
     @Override
     public List<BlockPos> getPositionsToOutline(PlayerEntity player, ItemStack stack, BlockPos center) {
         BlockState state = player.getWorld().getBlockState(center);
-        return getBlocksToMine(player.getWorld(), player.getPos(), center, state);
+        return getBlocksToMine(player.getWorld(), stack, player.getPos(), center, state);
     }
+
+
 }
 

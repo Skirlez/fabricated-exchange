@@ -7,7 +7,9 @@
 		"LegacySmithingRecipeAccessor",
 		"ItemAccessor",
 		"ScreenHandlerInvoker",
-		"ModFurnaceFuels"
+		"ModFurnaceFuels",
+		"BrewingRecipeRegistryAccessor",
+		"BrewingRecipeAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1

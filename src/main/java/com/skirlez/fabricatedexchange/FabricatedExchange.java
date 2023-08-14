@@ -16,6 +16,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -35,12 +36,12 @@ import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.ModScreenHandlers;
 import com.skirlez.fabricatedexchange.sound.ModSounds;
-import com.skirlez.fabricatedexchange.util.GeneralUtil;
-import com.skirlez.fabricatedexchange.util.ModConfig;
 import com.skirlez.fabricatedexchange.util.ModTags;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
+import com.skirlez.fabricatedexchange.util.config.ModConfig;
+
 
 public class FabricatedExchange implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("fabricated-exchange");
@@ -86,14 +87,26 @@ public class FabricatedExchange implements ModInitializer {
         EmcMapper mapper = new EmcMapper();
 
         mapper.fillEmcMap(server.getOverworld(), server.getOverworld().getRecipeManager());
-        EmcData.emcMap = mapper.getMap();
-
+        EmcData.emcMap = mapper.getEmcMap();
+        EmcData.potionEmcMap = mapper.getPotionMap();
+        
         List<Item> fuelItemList = new ArrayList<Item>();
  
         Iterator<RegistryEntry<Item>> iterator = Registries.ITEM.getEntryList(ModTags.FUEL).get().iterator();
         while (iterator.hasNext()) {
             Item item = iterator.next().value();
-            GeneralUtil.addSortedEmcList(fuelItemList, item, false);
+
+            int index = Collections.binarySearch(fuelItemList, item, 
+                (item1, item2) -> 
+                    EmcData.getItemEmc(item1)
+                    .compareTo(
+                    EmcData.getItemEmc(item2)));
+
+            if (index < 0)
+                index = -index - 1;
+
+            fuelItemList.add(index, item);
+            //GeneralUtil.addSortedEmcList(fuelItemList, item, false);
         }
         Map<Item, Item> newFuelProgressionMap = new HashMap<Item, Item>();
         for (int i = 0; i < fuelItemList.size(); i++) {

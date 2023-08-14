@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
+import com.skirlez.fabricatedexchange.util.config.ModConfig;
 
 // This class represents a JSON file.
 public class DataFile<T> {

@@ -1,5 +1,6 @@
 {
   "showItemEmcOrigin": false,
+  "showEnchantedBookRepairCost": true,
   "mapper.enabled": true,
   "transmutationTable.animated": true,
   "transmutationTable.floorButton": false

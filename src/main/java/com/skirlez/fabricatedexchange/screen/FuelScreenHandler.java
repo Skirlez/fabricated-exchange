@@ -101,13 +101,4 @@ public abstract class FuelScreenHandler extends LeveledScreenHandler {
         buf = null;
         return copy;
     }
-
-    public BlockPos getPos() {
-        return pos;
-    }
-    public int getLevel() {
-        return level;
-    }
-
-
 }

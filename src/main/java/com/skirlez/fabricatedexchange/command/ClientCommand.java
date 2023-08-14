@@ -3,7 +3,7 @@ package com.skirlez.fabricatedexchange.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import com.skirlez.fabricatedexchange.util.ModConfig;
+import com.skirlez.fabricatedexchange.util.config.ModConfig;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

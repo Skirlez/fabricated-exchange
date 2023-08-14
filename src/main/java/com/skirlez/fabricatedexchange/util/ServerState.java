@@ -5,13 +5,16 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
+import com.skirlez.fabricatedexchange.item.NbtItem;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
@@ -27,11 +30,22 @@ public class ServerState extends PersistentState {
  
             playerStateNbt.putString("emc", playerState.emc.divisionString());
             NbtList knowledgeList = new NbtList();
-            Iterator<String> iterator = playerState.knowledge.iterator();
-            while (iterator.hasNext())
-                knowledgeList.add(NbtString.of(iterator.next()));
+            Iterator<String> stringIterator = playerState.knowledge.iterator();
+            while (stringIterator.hasNext())
+                knowledgeList.add(NbtString.of(stringIterator.next()));
             
             playerStateNbt.put("knowledge", knowledgeList);
+
+            NbtList specialKnowledgeItemList = new NbtList();
+            NbtList specialKnowledgeCompoundList = new NbtList();
+            Iterator<NbtItem> itemStackIterator = playerState.specialKnowledge.iterator();
+            while (itemStackIterator.hasNext()) {
+                NbtItem item = itemStackIterator.next();
+                specialKnowledgeItemList.add(NbtString.of(Registries.ITEM.getId(item.asItem()).toString()));
+                specialKnowledgeCompoundList.add(item.getNbt());
+            }
+            playerStateNbt.put("specialKnowledgeItems", specialKnowledgeItemList);
+            playerStateNbt.put("specialKnowledgeCompounds", specialKnowledgeCompoundList);
 
             playersNbtCompound.put(String.valueOf(UUID), playerStateNbt);
         });
@@ -51,6 +65,22 @@ public class ServerState extends PersistentState {
             NbtList knowledgeNbtList = playersTag.getCompound(key).getList("knowledge", NbtElement.STRING_TYPE);
             for (int i = 0; i < knowledgeNbtList.size(); i++) 
                 playerState.knowledge.add(knowledgeNbtList.getString(i));
+
+            NbtList specialKnowledgeItemList = 
+                playersTag.getCompound(key).getList("specialKnowledgeItems", NbtElement.STRING_TYPE);
+            NbtList specialKnowledgeCompoundList = 
+                playersTag.getCompound(key).getList("specialKnowledgeCompounds", NbtElement.COMPOUND_TYPE);
+            for (int i = 0; i < specialKnowledgeItemList.size(); i++) {
+                String id = specialKnowledgeItemList.getString(i);
+                NbtCompound nbt = specialKnowledgeCompoundList.getCompound(i);
+                
+                NbtItem nbtItem = new NbtItem(Registries.ITEM.get(new Identifier(id)), nbt);
+                
+                playerState.specialKnowledge.add(nbtItem);
+            }
+
+
+
             UUID uuid = UUID.fromString(key);
             serverState.players.put(uuid, playerState);
         });

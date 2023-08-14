@@ -13,10 +13,14 @@
     "item.fabricated-exchange.tome_of_knowledge": "Tome of Knowledge",
     "item.fabricated-exchange.dark_matter_sword": "Dark Matter Sword",
     "item.fabricated-exchange.dark_matter_pickaxe": "Dark Matter Pickaxe",
+    "item.fabricated-exchange.dark_matter_pickaxe.mode_1": "Wideshot",
+    "item.fabricated-exchange.dark_matter_pickaxe.mode_2": "Tallshot",
+    "item.fabricated-exchange.dark_matter_pickaxe.mode_3": "Longshot",
     "item.fabricated-exchange.dark_matter_axe": "Dark Matter Axe",
     "item.fabricated-exchange.dark_matter_shovel": "Dark Matter Shovel",
     "item.fabricated-exchange.dark_matter_hoe": "Dark Matter Hoe",
-    
+    "item.fabricated-exchange.mode_switch": "Mode:",
+
     "block.fabricated-exchange.alchemical_coal_block": "Alchemical Coal Block",
     "block.fabricated-exchange.radiant_coal_block": "Radiant Coal Block",
     "block.fabricated-exchange.mobius_fuel_block": "Mobius Fuel Block",
@@ -62,5 +66,6 @@
 
     "key.category.fabricated-exchange": "Fabricated Exchange",
     "key.fabricated-exchange.charge": "Item Charge/Discharge",
+    "key.fabricated-exchange.mode": "Item Mode",
     "key.fabricated-exchange.extra": "Item Extra Function"
 }

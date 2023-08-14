@@ -4,8 +4,8 @@ A Fabric remake of the Minecraft mod ProjectE/Equivalent Exchange 2.
 The mod attaches an "EMC" number value to every item. Some are worth more, some less.
 Transmute items and blocks into EMC, and EMC to different items you've obtained before.
 
-The mod is currently in beta. It will attempt to keep up with the latest minecraft releases. 
-Once it is in a stable, feature complete state, it will be ported into popular older versions.
+The mod is currently in beta. It is targetting 1.19.4. Once it is in a stable, feature complete state, 
+I will port it to older versions that are popular for moddding. Afterwards it will be upgraded to whatever versions after 1.19.4 that are most popular for mods.
 
 All of the assets were taken from https://github.com/sinkillerj/ProjectE.
 If the author(s) of the assets do not want this project using them, I will take the project 
@@ -22,10 +22,7 @@ MidnightLightning: https://github.com/MidnightLightning
 # Something isn't working
 
 You're actually wrong. Everything is working. You must be hallucinating.
-In any case, open an issue on this repository. Also, take note of mod incompatibilities:
-
-- Enhanced Block Entities (EBE): Breaks rendering the mods chest items in the inventory.
-To fix, you can set Enhanced Chests to Off with Mod Menu (or`render_enhanced_chests` to `false` in the config file).
+In any case, open an issue on this repository. 
 
 # Contributing
 

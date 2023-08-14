@@ -3,7 +3,7 @@ plugins {
 	id 'maven-publish'
 }
 
-version = "${project.mod_version}-mc${project.minecraft_version}"
+version = "${project.mod_version}+${project.minecraft_version}"
 group = project.maven_group
 
 repositories {
@@ -74,6 +74,7 @@ publishing {
 }
 
 loom {
+	accessWidenerPath = file("src/main/resources/${project.archives_base_name}.accesswidener")
     runs {
         //
         // This adds a new gradle task that runs the datagen API: "gradlew runDatagenClient"

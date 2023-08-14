@@ -1,17 +1,22 @@
 package com.skirlez.fabricatedexchange.screen.slot.transmutation;
 
+import java.util.Iterator;
+import java.util.List;
 
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.item.ModItems;
+import com.skirlez.fabricatedexchange.item.NbtItem;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandler;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
+import com.skirlez.fabricatedexchange.util.config.ModConfig;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -29,34 +34,60 @@ public class ConsumeSlot extends Slot {
 
     @Override
     public ItemStack insertStack(ItemStack stack, int count) {
-        ItemStack newStack = stack.copy();
-        newStack.setCount(count);
-        SuperNumber emc = EmcData.getItemStackEmc(newStack);
+        SuperNumber emc = EmcData.getItemStackEmc(stack);
         if (emc.equalsZero() && !stack.getItem().equals(ModItems.TOME_OF_KNOWLEDGE))
             return stack;
         if (!player.getWorld().isClient()) {
             EmcData.addEmc((ServerPlayerEntity)player, emc);
             PlayerState playerState = ServerState.getPlayerState(player);
             String idName = Registries.ITEM.getId(stack.getItem()).toString();
-            Item item = stack.getItem();
-            if (!playerState.knowledge.contains(idName)) {
-                playerState.knowledge.add(idName);
-                screenHandler.addKnowledge(item);
-            }
-            if (item.equals(ModItems.TOME_OF_KNOWLEDGE)) {
-                Registries.ITEM.forEach(
-                currentItem -> {
-                    String currentId = Registries.ITEM.getId(currentItem).toString();
-                    SuperNumber currentEmc = EmcData.getItemEmc(currentId);
-                    if (!currentEmc.equalsZero() && !playerState.knowledge.contains(currentId)) {
-                        playerState.knowledge.add(currentId);
-                        screenHandler.addKnowledge(currentItem);
+            if (ModConfig.NBT_ITEMS.hasItem(idName)) {
+                List<String> allowedKeys = ModConfig.NBT_ITEMS.getAllowedKeys(idName);
+                NbtCompound nbt = stack.getNbt();
+                if (nbt == null)
+                    nbt = new NbtCompound();
+                if (!nbt.isEmpty()) {
+                    Iterator<String> keyIterator = nbt.getKeys().iterator();
+                    while (keyIterator.hasNext()) {
+                        String key = keyIterator.next();
+                        if (!allowedKeys.contains(key))
+                            keyIterator.remove();
                     }
-                });
+                }
+                boolean match = false;
+                NbtItem nbtItem = new NbtItem(stack.getItem(), nbt);
+                for (NbtItem currentNbtItem : playerState.specialKnowledge) {
+                    if (nbtItem.equalTo(currentNbtItem)) {
+                        match = true;
+                        break;
+                    }
+                }
+                if (!match) {
+                    playerState.specialKnowledge.add(nbtItem);
+                    screenHandler.addKnowledge(nbtItem);
+                }
+            }
+            else {
+                Item item = stack.getItem();
+                if (!playerState.knowledge.contains(idName)) {
+                    playerState.knowledge.add(idName);
+                    screenHandler.addKnowledge(new NbtItem(item));
+                }
+                if (item.equals(ModItems.TOME_OF_KNOWLEDGE)) {
+                    Registries.ITEM.forEach(
+                    currentItem -> {
+                        String currentId = Registries.ITEM.getId(currentItem).toString();
+                        if (ModConfig.NBT_ITEMS.getValue().containsKey(currentId))
+                            return;
+                        SuperNumber currentEmc = EmcData.getItemEmc(currentId);
+                        if (!currentEmc.equalsZero() && !playerState.knowledge.contains(currentId)) {
+                            playerState.knowledge.add(currentId);
+                            screenHandler.addKnowledge(new NbtItem(currentItem));
+                        }
+                    });
+                }
             }
             playerState.markDirty();
-            
-            
             screenHandler.refreshOffering();    
         }
 
