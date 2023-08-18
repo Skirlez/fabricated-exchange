@@ -58,6 +58,7 @@ All of the code in this repository is licensed under the terms of the LGPLv3. I 
 - Tome of Knowledge
 - Alchemical Fuels + Blocks
 - Dark/Red Matter + Blocks
+- (some) Dark Matter tools
 - Covalence Dusts
 - Configurable EMC Mapper
 
@@ -65,6 +66,7 @@ All of the code in this repository is licensed under the terms of the LGPLv3. I 
 
 - As much EMC as your RAM can store
 - Infinitely precise EMC fractions (No more slabs without EMC values!)
+- Configurable support for items with NBT data in the Transmutation Table
 - Fancy animated Transmutation Table (Toggleable)
  
 # Screenshot

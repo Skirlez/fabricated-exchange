@@ -27,14 +27,16 @@ public class ClientCommand {
         dispatcher.getRoot().addChild(mainNode);
 
         mainNode.addChild(reloadConfigNode);
-
     }
 
     private static int reloadConfig(CommandContext<FabricClientCommandSource> context) {
         ModConfig.fetchAll();
-        context.getSource().sendFeedback(Text.literal("Data files reloaded!"));
+        context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.reloademc.data_success"));
         return 1;
+
     }
+
+
 
 
 

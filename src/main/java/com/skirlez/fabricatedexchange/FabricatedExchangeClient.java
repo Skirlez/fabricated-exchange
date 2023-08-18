@@ -17,10 +17,8 @@ import com.skirlez.fabricatedexchange.util.config.ModConfig;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.impl.event.lifecycle.LifecycleEventsImpl;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
@@ -62,7 +60,9 @@ public class FabricatedExchangeClient implements ClientModInitializer {
         BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.ENERGY_CONDENSER_MK2.asItem(), (stack, mode, matrices, vertexConsumers, light, overlay) 
             -> MinecraftClient.getInstance().getBlockEntityRenderDispatcher().renderEntity(RENDER_ENERGY_CONDENSER_MK2, matrices, vertexConsumers, light, overlay));
 
-
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+            ModConfig.fetchAll();
+        });
     }
 
 

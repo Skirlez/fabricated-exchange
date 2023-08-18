@@ -1,5 +1,6 @@
 package com.skirlez.fabricatedexchange.emc;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -87,7 +88,11 @@ public class EmcData {
     private static void considerNbt(Item item, NbtCompound nbt, SuperNumber emc) {
         if (nbt.contains("emc"))
             emc.add(new SuperNumber(nbt.getString("emc")));
-        else if (item instanceof PotionItem) {
+
+        if (!ModConfig.NBT_ITEMS.hasItem(Registries.ITEM.getId(item).toString()))
+            return;
+
+        if (item instanceof PotionItem) {
             String potion = nbt.getString("Potion");
             if (!potion.isEmpty() && potionEmcMap.containsKey(potion)) {
 
@@ -101,11 +106,21 @@ public class EmcData {
             for (int i = 0; i < enchantments.size(); i++) {
                 NbtCompound enchantmentCompound = enchantments.getCompound(i);
                 String enchantment = enchantmentCompound.getString("id");
+                
+                int repairCost = nbt.getInt("RepairCost");
+                // anvil uses = log2(repairCost)
+                int anvilUses = 32 - Integer.numberOfLeadingZeros(repairCost);
+                // (x/7-1)^2
+                SuperNumber repairCostPenalty = new SuperNumber(anvilUses, 7);
+                repairCostPenalty.subtract(BigInteger.ONE);
+                repairCostPenalty.square();          
 
                 // TODO: Give enchantments EMC value (For now, all of them are worth 32)
                 SuperNumber enchantmentEmc = new SuperNumber(32);
                 int level = enchantmentCompound.getInt("lvl");
                 enchantmentEmc.multiply(level);
+                enchantmentEmc.multiply(repairCostPenalty);
+                enchantmentEmc.floor();
                 emc.add(enchantmentEmc);
             }
         }
@@ -187,14 +202,17 @@ public class EmcData {
     public static void syncMap(ServerPlayerEntity player) {
         // send the entire emc map
         PacketByteBuf buffer = PacketByteBufs.create();
-        int iterations = EmcData.emcMap.keySet().size();
-        buffer.writeInt(iterations);
-        Iterator<String> iterator = EmcData.emcMap.keySet().iterator();
-        for (int i = 0; i < iterations; i++) {
-            String s = (String)iterator.next();
+        buffer.writeInt(EmcData.emcMap.keySet().size());
+        for (String s : EmcData.emcMap.keySet()) {
             buffer.writeString(s);
             buffer.writeString(EmcData.emcMap.get(s).divisionString());
         }
+        buffer.writeInt(EmcData.potionEmcMap.keySet().size());
+        for (String s : EmcData.potionEmcMap.keySet()) {
+            buffer.writeString(s);
+            buffer.writeString(EmcData.potionEmcMap.get(s).divisionString());
+        }
+
         ServerPlayNetworking.send(player, ModMessages.EMC_MAP_SYNC_IDENTIFIER, buffer);
     }
 }

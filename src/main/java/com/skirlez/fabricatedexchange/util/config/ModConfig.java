@@ -18,14 +18,10 @@ import com.google.gson.JsonSerializer;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.util.DataFile;
+import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 
 
@@ -101,25 +97,12 @@ class EmcMap extends DataFile<Map<String, SuperNumber>> {
             if (!entry.startsWith("#"))
                 continue;
             entry = entry.substring(1);
-            // tag found
-            iterator.remove();
+            String[] items = GeneralUtil.getItemStringsFromTagString(entry);
+            SuperNumber emc = value.get("#" + entry);
+            for (int i = 0; i < items.length; i++)
+                pairs.add(new Pair<String, SuperNumber>(items[i], emc));
 
-            String[] parts = entry.split(":");
-            if (parts.length != 2)
-                return;
-            Identifier tagId = new Identifier(parts[0], parts[1]);
-            TagKey<Item> tag = Registries.ITEM.streamTags().filter((key) -> (key.id().equals(tagId))).findFirst().orElse(null);
-            if (tag == null) {
-                FabricatedExchange.LOGGER.error("Invalid tag in " + name + "! Tag: " + tagId.toString());
-                continue;
-            }
-            
-            SuperNumber emc = value.get(entry);
-            Iterator<RegistryEntry<Item>> itemIterator = Registries.ITEM.getEntryList(tag).get().iterator();
-            while (itemIterator.hasNext()) {
-                Item item = itemIterator.next().value();
-                pairs.add(new Pair<String, SuperNumber>(Registries.ITEM.getId(item).toString(), emc));
-            }
+            iterator.remove();
         }
 
         for (int i = 0; i < pairs.size(); i++) {

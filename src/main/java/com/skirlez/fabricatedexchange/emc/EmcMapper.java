@@ -35,7 +35,6 @@ public class EmcMapper {
     private ConcurrentMap<String, SuperNumber> emcMap;
     private ConcurrentMap<String, SuperNumber> potionEmcMap;
 
-
     private HashSet<String> log;
     private final HashSet<String> modifiers;
     public EmcMapper() {

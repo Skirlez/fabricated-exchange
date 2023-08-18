@@ -261,6 +261,13 @@ public class SuperNumber {
         simplify();
     }
 
+    /** Raises the SuperNumber to the power of 2.*/
+    public void square() {
+        numerator = numerator.multiply(numerator);
+        denominator = denominator.multiply(denominator);
+        // There is no need to simplify
+    }
+
 
     /** Swaps the numerator and denominator. This instance will become the inverse of the original number. 
      * <p> (0.5 = 1/2) -> (2 = 2/1)
@@ -498,7 +505,6 @@ public class SuperNumber {
     public static SuperNumber min(SuperNumber a, SuperNumber b) {
         return (a.compareTo(b) == -1) ? a : b;
     }
-
 }
 
 

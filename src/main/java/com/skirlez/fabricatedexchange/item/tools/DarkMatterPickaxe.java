@@ -8,11 +8,15 @@ import com.skirlez.fabricatedexchange.item.ItemWithModes;
 import com.skirlez.fabricatedexchange.item.OutliningItem;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PickaxeItem;
 import net.minecraft.item.ToolMaterial;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -23,6 +27,10 @@ public class DarkMatterPickaxe extends PickaxeItem implements ChargeableItem, Ou
     @Override
     public int getModeAmount() {
         return 3;
+    }
+    @Override
+    public boolean modeSwitchCondition(ItemStack stack) {
+        return ChargeableItem.getCharge(stack) != 0;
     }
     @Override
     public boolean isItemBarVisible(ItemStack stack) {
@@ -68,6 +76,21 @@ public class DarkMatterPickaxe extends PickaxeItem implements ChargeableItem, Ou
         }
         return super.postMine(stack, world, state, pos, miner);
     }
+    @Override
+    public void appendTooltip(ItemStack stack, World world, List<Text> tooltip, TooltipContext context) {
+        super.appendTooltip(stack, world, tooltip, context);
+        int charge = ChargeableItem.getCharge(stack);
+        if (charge == 0) {
+            tooltip.add(Text.translatable("item.fabricated-exchange.mode_switch")                    
+                .append(" ")
+                .append(Text.translatable("item.fabricated-exchange.dark_matter_pickaxe.uncharged")
+                    .setStyle(Style.EMPTY.withColor(Formatting.DARK_GRAY))));
+        }
+        else
+            ItemWithModes.addModeToTooltip(stack, tooltip);
+    }
+
+
 
 
     @Override

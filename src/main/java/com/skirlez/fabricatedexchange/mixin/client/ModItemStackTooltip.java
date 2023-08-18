@@ -41,14 +41,13 @@ public class ModItemStackTooltip {
 		MinecraftClient client = MinecraftClient.getInstance();
 
 		EmcData.considerStackDurability(itemStack, emc);
-
-
+		
 		if (ModConfig.CONFIG_FILE.showEnchantedBookRepairCost && itemStack.getItem().equals(Items.ENCHANTED_BOOK)) {
 			NbtCompound nbt = itemStack.getNbt();
 			if (nbt != null) {
 				int repairCost = nbt.getInt("RepairCost");
 				if (repairCost != 0)
-					list.add(Text.literal("§6Repair Cost: " + repairCost + "§r"));
+					list.add(Text.literal("§6Added Repair Cost: " + repairCost + "§r"));
 			}
 		}
 

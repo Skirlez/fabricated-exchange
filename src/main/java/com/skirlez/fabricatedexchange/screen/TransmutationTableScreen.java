@@ -188,7 +188,7 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 
     public void resetAngleTime(double additonalRotations) {
         // cbrt(x + 1) - 1 is the inverse function of the angle function modified with some funny offsets to give us
-        // what we want: the x of the intersection between y=addtionalRotations and the angle function.
+        // what we want: the x of the intersection between y=-addtionalRotations and the angle function.
         // any angle below fullAngleTime * multiplier will be floored in order to keep it within that range.
         // and so for additionalRotations = 1, the x position will stay in the negative range such that the y
         // never exceeds -1, so it will only do 1 additional rotation at most.
@@ -245,10 +245,8 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 
                 xOffsetGlobal *= 10.0 * rotationDir;
 
-            }
-            
+            }    
         }
-
 
         // outer ring
         for (int i = 0; i < 12; i++) {
@@ -277,7 +275,7 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
     private void updateSearchText(String searchText) {
         if (searchText.equals(oldSearchText))
             return;
-        resetAngleTime(0.5);
+        resetAngleTime(0.4);
         offeringPageNum = 0;
         oldSearchText = searchText;
         PacketByteBuf buffer = PacketByteBufs.create();
@@ -328,8 +326,6 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
     private void floorEmc() {
         ClientPlayNetworking.send(ModMessages.FLOOR_EMC_IDENTIFIER, PacketByteBufs.create());
     }
-
-
 
     public Slot getFocusedSlot() {
         return focusedSlot;

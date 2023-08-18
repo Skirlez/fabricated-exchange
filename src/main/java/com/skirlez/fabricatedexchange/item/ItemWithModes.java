@@ -4,7 +4,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.OverlayMessageS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import java.util.List;
+
 import org.jetbrains.annotations.Nullable;
 
 public interface ItemWithModes {
@@ -23,7 +28,7 @@ public interface ItemWithModes {
             OverlayMessageS2CPacket packet = new OverlayMessageS2CPacket(
                     Text.translatable("item.fabricated-exchange.mode_switch")
                     .append(" ")
-                    .append(Text.translatable(stack.getTranslationKey() + ".mode_" + (newMode + 1))));
+                    .append(getModeName(stack, newMode).setStyle(Style.EMPTY.withColor(Formatting.GOLD))));
             ((ServerPlayerEntity)player).networkHandler.sendPacket(packet);
         }
     }
@@ -33,6 +38,22 @@ public interface ItemWithModes {
         if (nbt == null)
             return 0;
         return nbt.getInt(MODE_KEY);
+    }
+
+    public static void addModeToTooltip(ItemStack stack, List<Text> tooltip) {
+        int mode = getMode(stack);
+        tooltip.add(Text.translatable("item.fabricated-exchange.mode_switch")                    
+                    .append(" ")
+                    .append(getModeName(stack, mode).setStyle(Style.EMPTY.withColor(Formatting.GOLD))));
+    }
+
+
+    default boolean modeSwitchCondition(ItemStack stack) {
+        return true;
+    }
+
+    private static MutableText getModeName(ItemStack stack, int mode) {
+        return Text.translatable(stack.getTranslationKey() + ".mode_" + (mode + 1)); // additional + 1 because mode translation keys are 1 indexed 
     }
 
 

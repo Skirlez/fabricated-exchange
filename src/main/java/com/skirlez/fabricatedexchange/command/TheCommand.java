@@ -2,13 +2,19 @@ package com.skirlez.fabricatedexchange.command;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
+import com.skirlez.fabricatedexchange.util.DataFile;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import com.skirlez.fabricatedexchange.util.config.ModConfig;
 
@@ -46,12 +52,12 @@ public class TheCommand {
         .build();
         LiteralCommandNode<ServerCommandSource> setSeedNode = CommandManager
         .literal("seed")
-        .then(CommandManager.argument("number", StringArgumentType.string())
+        .then(CommandManager.argument("number", StringArgumentType.greedyString())
         .executes(context -> setEmc(context, true)))
         .build();
         LiteralCommandNode<ServerCommandSource> setCustomNode = CommandManager
         .literal("custom")
-        .then(CommandManager.argument("number", StringArgumentType.string())
+        .then(CommandManager.argument("number", StringArgumentType.greedyString())
         .executes(context -> setEmc(context, false)))
         .build();
 
@@ -92,6 +98,23 @@ public class TheCommand {
         .executes(context -> reload(context))
         .build();
 
+        LiteralCommandNode<ServerCommandSource> resetNode = CommandManager
+        .literal("reset")
+        .requires(source -> source.hasPermissionLevel(2))
+        .then(CommandManager.argument("datafile", StringArgumentType.word()).suggests(new SuggestionProvider<ServerCommandSource>() {
+            @Override
+            public CompletableFuture<Suggestions> getSuggestions(CommandContext<ServerCommandSource> context,
+                    SuggestionsBuilder builder) throws CommandSyntaxException {
+                builder.suggest("config");
+                builder.suggest("seed_emc_map");
+                builder.suggest("custom_emc_map");
+                return builder.buildFuture();
+            }
+            
+        })
+        .executes(context -> reset(context)))
+        .build();
+
         dispatcher.getRoot().addChild(mainNode);
 
         mainNode.addChild(helpNode);
@@ -110,7 +133,10 @@ public class TheCommand {
 
         mainNode.addChild(reloadNode);
 
+        mainNode.addChild(resetNode);
+
     }
+
 
 
 
@@ -233,7 +259,7 @@ public class TheCommand {
     private static int reload(CommandContext<ServerCommandSource> context) {
         MinecraftServer server = context.getSource().getServer();
         ModConfig.fetchAll();
-        context.getSource().sendMessage(Text.literal("Data files reloaded!"));
+        context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.reloademc.data_success"));
         long startTime = System.nanoTime();
         FabricatedExchange.generateBlockRotationMap(ModConfig.BLOCK_TRANSMUTATION_MAP_FILE.getValue());
         String log = FabricatedExchange.reloadEmcMap(server);
@@ -244,6 +270,26 @@ public class TheCommand {
         String.valueOf((System.nanoTime() - startTime) / 1000000)).append(add));
         return 1;
     }
+    private static int reset(CommandContext<ServerCommandSource> context) {
+        String str = context.getArgument("datafile", String.class);
+        DataFile<?> datafile = switch (str) {
+            case "config" -> ModConfig.CONFIG_FILE;
+            case "seed_emc_map" -> ModConfig.SEED_EMC_MAP_FILE;
+            case "custom_emc_map" -> ModConfig.CUSTOM_EMC_MAP_FILE;
+            default -> null;            
+        };
+        if (datafile == null) {
+            context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.reset.no_file", str));
+            return -1;
+        }
+        datafile.setValueToDefault();
+        datafile.save();
+        context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.reset.success", str));
+        return 1;
+    }
+
+
+
 
     private static boolean isRecipeTypeSupported(String type) {
         switch (type) {
@@ -255,5 +301,10 @@ public class TheCommand {
                 return false;
         }
     }
+
+
+
+
+
 
 }

@@ -77,7 +77,7 @@ public class ConsumeSlot extends Slot {
                     Registries.ITEM.forEach(
                     currentItem -> {
                         String currentId = Registries.ITEM.getId(currentItem).toString();
-                        if (ModConfig.NBT_ITEMS.getValue().containsKey(currentId))
+                        if (ModConfig.NBT_ITEMS.hasItem(currentId))
                             return;
                         SuperNumber currentEmc = EmcData.getItemEmc(currentId);
                         if (!currentEmc.equalsZero() && !playerState.knowledge.contains(currentId)) {

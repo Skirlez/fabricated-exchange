@@ -57,6 +57,7 @@ public class EnergyCollector extends BlockWithEntityAndRotation {
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new EnergyCollectorBlockEntity(pos, state);
+        
     }
 
     @Override

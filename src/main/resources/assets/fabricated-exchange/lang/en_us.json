@@ -13,6 +13,7 @@
     "item.fabricated-exchange.tome_of_knowledge": "Tome of Knowledge",
     "item.fabricated-exchange.dark_matter_sword": "Dark Matter Sword",
     "item.fabricated-exchange.dark_matter_pickaxe": "Dark Matter Pickaxe",
+    "item.fabricated-exchange.dark_matter_pickaxe.uncharged": "Uncharged",
     "item.fabricated-exchange.dark_matter_pickaxe.mode_1": "Wideshot",
     "item.fabricated-exchange.dark_matter_pickaxe.mode_2": "Tallshot",
     "item.fabricated-exchange.dark_matter_pickaxe.mode_3": "Longshot",
@@ -45,7 +46,7 @@
     "sounds.fabricated-exchange.item_charge": "Item charged",
     "sounds.fabricated-exchange.item_discharge": "Item discharged",
 
-    "commands.fabricated-exchange.help": "/fe set (seed/custom) <number> - Set the currently held item's seed or custom EMC value\n/fe remove (seed/custom) - Remove the currently held item's seed or custom EMC value\n/fe recipe (ban/pardon) <recipe> - Ban/Unban a recipe from being considered by the EMC mapper\n/fe reload - Reload all config files and regenerate all EMC values using the the EMC mapper\n/fe help - I don't know what this one does\n",
+    "commands.fabricated-exchange.help": "/fe set (seed/custom) <number> - Set the currently held item's seed or custom EMC value\n/fe remove (seed/custom) - Remove the currently held item's seed or custom EMC value\n/fe recipe (ban/pardon) <recipe> - Ban/Unban a recipe from being considered by the EMC mapper\n/fe reload - Reload all config files and regenerate all EMC values using the the EMC mapper\n/fe reset <datafile> - Resets a datafile to its default state.\n/fe help - I don't know what this one does\n",
     
     "commands.fabricated-exchange.reload_notice": "Run '/fe reload' to regenerate the EMC values.",
     "commands.fabricated-exchange.zero_notice": "If you want this specific item to not have EMC, run '/fe set custom 0'.",
@@ -57,11 +58,14 @@
     "commands.fabricated-exchange.removeemc.seed_confused": "This item does not have a seed value.",
     "commands.fabricated-exchange.removeemc.custom_success": "Custom Item EMC removed!",
     "commands.fabricated-exchange.removeemc.custom_confused": "This item does not have a custom EMC value.",
+    "commands.fabricated-exchange.reloademc.data_success": "Data files reloaded!",
     "commands.fabricated-exchange.reloademc.success": "Done! (%sms) EMC mapper output:",
     "commands.fabricated-exchange.recipe.ban.unsupported_type": "Cannot ban this recipe because its type (%s) is unsupported.",
     "commands.fabricated-exchange.recipe.ban.success": "Done! The recipe will be skipped by the EMC mapper!",
     "commands.fabricated-exchange.recipe.pardon.unsupported_type": "Cannot pardon this recipe because its type (%s) is unsupported. You couldn't ban it if you wanted to.",
     "commands.fabricated-exchange.recipe.pardon.success": "Done! The recipe will now be evaluated by the EMC mapper!",
+    "commands.fabricated-exchange.reset.success": "Done! %s has been reset to its default state.",
+    "commands.fabricated-exchange.reset.no_file": "%s is not a valid data file!",
     "commands.fabricated-exchange.nothing": "Nothing has changed.",
 
     "key.category.fabricated-exchange": "Fabricated Exchange",

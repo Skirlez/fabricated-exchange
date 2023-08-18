@@ -117,7 +117,6 @@
   "minecraft:mangrove_roots": "1",
   "minecraft:chicken": "64",
   "minecraft:exposed_copper": "1152",
-  "minecraft:shulker_shell": "2048",
   "minecraft:salmon_bucket": "832",
   "minecraft:gilded_blackstone": "4096",
   "minecraft:twisting_vines": "8",
@@ -246,5 +245,7 @@
   "minecraft:kelp": "1",
   "minecraft:warped_roots": "1",
   "minecraft:crying_obsidian": "768",
-  "minecraft:dead_bubble_coral_block": "4"
+  "#c:shulker_boxes": "4160",
+  "minecraft:dead_bubble_coral_block": "4",
+  "minecraft:potion": "1"
 }

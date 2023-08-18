@@ -16,6 +16,8 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 
 public class KeyInputHandler {
@@ -66,11 +68,14 @@ public class KeyInputHandler {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (modeChangeKey.wasPressed()) {
                 ItemStack stack = client.player.getStackInHand(Hand.MAIN_HAND);
-                if (!(stack.getItem() instanceof ItemWithModes)) {
+                if (!(stack.getItem() instanceof ItemWithModes item))
                     return;
+            
+                if (item.modeSwitchCondition(stack)) {
+                    ClientPlayNetworking.send(ModMessages.CYCLE_ITEM_MODE_IDENTIFIER, PacketByteBufs.create());
+                    ItemWithModes.cycleModes(stack, null);
+                    client.player.playSound(SoundEvents.BLOCK_STONE_BREAK, SoundCategory.PLAYERS, 1f, 1.4f);
                 }
-                ClientPlayNetworking.send(ModMessages.CYCLE_ITEM_MODE_IDENTIFIER, PacketByteBufs.create());
-                ItemWithModes.cycleModes(stack, null);
             }
         });
     }
