@@ -262,12 +262,15 @@ public class TheCommand {
         context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.reloademc.data_success"));
         long startTime = System.nanoTime();
         FabricatedExchange.generateBlockRotationMap(ModConfig.BLOCK_TRANSMUTATION_MAP_FILE.getValue());
-        String log = FabricatedExchange.reloadEmcMap(server);
+        boolean hasWarned = FabricatedExchange.reloadEmcMap(server);
         FabricatedExchange.syncMaps(server);
         FabricatedExchange.syncBlockTransmutations(server);
-        String add = (log.isEmpty()) ? "\nNo errors or warnings." : "\n" + log;
+        String add = (hasWarned)
+            ? Text.translatable("commands.fabricated-exchange.reloademc.bad").getString()
+            : Text.translatable("commands.fabricated-exchange.reloademc.good").getString();
+
         context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.reloademc.success",
-        String.valueOf((System.nanoTime() - startTime) / 1000000)).append(add));
+        String.valueOf((System.nanoTime() - startTime) / 1000000)).append("\n").append(add));
         return 1;
     }
     private static int reset(CommandContext<ServerCommandSource> context) {

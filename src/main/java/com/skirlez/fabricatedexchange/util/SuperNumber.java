@@ -17,7 +17,6 @@ import com.google.common.math.BigIntegerMath;
 *@author Jesus H. Christ
 *@see BigInteger
 **/
-
 public class SuperNumber {
     private BigInteger numerator;
     private BigInteger denominator;
@@ -121,7 +120,7 @@ public class SuperNumber {
     public void floor() {
         if (numerator.equals(BigInteger.ZERO) || denominator.equals(BigInteger.ONE))
             return;
-        BigInteger mod = numerator.mod(denominator);
+        BigInteger mod = numerator.remainder(denominator);
         numerator = numerator.subtract(mod);
 
         numerator = numerator.divide(denominator);
@@ -232,6 +231,8 @@ public class SuperNumber {
     // division methods
 
     public void divide(int other) {
+        if (other == 0)
+            throw new ArithmeticException("SuperNumber: division by zero");
         if (denominator.equals(BigInteger.ONE)) {
             denominator = BigInteger.valueOf(other);
             simplify();
@@ -490,6 +491,10 @@ public class SuperNumber {
 
     /** divides the fraction it's most simplified form. Example: (3/6) -> (1/2) */
     private void simplify() {
+        if (denominator.signum() == -1 && numerator.signum() == -1) {
+            denominator = denominator.negate();
+            numerator = numerator.negate();
+        }
         if (denominator.equals(BigInteger.ONE) || numerator.equals(BigInteger.ONE))
             return;
         if (equalsZero())

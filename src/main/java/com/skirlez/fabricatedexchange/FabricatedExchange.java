@@ -22,7 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,13 +83,16 @@ public class FabricatedExchange implements ModInitializer {
         });
     }
 
-    public static String reloadEmcMap(MinecraftServer server) {
-        EmcMapper mapper = new EmcMapper();
-
-        mapper.fillEmcMap(server.getOverworld(), server.getOverworld().getRecipeManager());
-        EmcData.emcMap = mapper.getEmcMap();
-        EmcData.potionEmcMap = mapper.getPotionMap();
+    public static boolean reloadEmcMap(MinecraftServer server) {
         
+        //EmcMapper mapper = new EmcMapper();
+
+        //mapper.fillEmcMap(server.getOverworld(), server.getOverworld().getRecipeManager());
+        
+        EmcMapper mapper = new EmcMapper(server.getRegistryManager(), server.getOverworld().getRecipeManager());
+        boolean hasWarned = mapper.map();
+        EmcData.emcMap = mapper.getEmcMap();
+        EmcData.potionEmcMap =  mapper.getPotionEmcMap();
         List<Item> fuelItemList = new ArrayList<Item>();
  
         Iterator<RegistryEntry<Item>> iterator = Registries.ITEM.getEntryList(ModTags.FUEL).get().iterator();
@@ -124,7 +127,7 @@ public class FabricatedExchange implements ModInitializer {
         fuelProgressionMap = newFuelProgressionMap;
 
 
-        return mapper.getLog();
+        return hasWarned;
     }
 
     public static void syncMaps(MinecraftServer server) {
