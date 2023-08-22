@@ -4,7 +4,6 @@ import org.jetbrains.annotations.Nullable;
 
 import com.skirlez.fabricatedexchange.screen.slot.FuelSlot;
 import com.skirlez.fabricatedexchange.screen.slot.InputSlot;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -29,11 +28,11 @@ public abstract class FuelScreenHandler extends LeveledScreenHandler {
 
     @Override
     public boolean canUse(PlayerEntity player) {
-        return Inventory.canPlayerUse((BlockEntity)inventory, player);
+        return inventory.canPlayerUse(player);
     }
 
     @Override
-    public ItemStack quickMove(PlayerEntity player, int invSlot) {
+    public ItemStack transferSlot(PlayerEntity player, int invSlot) {
         // if we don't do this, shift-clicking the fuel slot will not only transfer anything in it
         // to the player inventory, but also any item of the same type in all of the input slots
         // this is because the act of moving it to the inventory immediately updates the input slots which
@@ -53,7 +52,7 @@ public abstract class FuelScreenHandler extends LeveledScreenHandler {
             FuelSlot fuelSlot = (FuelSlot)slot;
             if (result.isEmpty())
                 return ItemStack.EMPTY;
-            if (fuelSlot.hasStack() && ItemStack.areItemsEqual(startStack, fuelSlot.getStack()))
+            if (fuelSlot.hasStack() && ItemStack.areItemsEqualIgnoreDamage(startStack, fuelSlot.getStack()))
                 fuelSlot.setQuickMoved(true);
         }
         return result;

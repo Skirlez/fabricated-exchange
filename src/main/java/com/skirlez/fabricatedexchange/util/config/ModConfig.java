@@ -47,22 +47,20 @@ public class ModConfig {
     private static final Type recipeBlacklistType = new TypeToken<HashMap<String, HashSet<String>>>() {}.getType();
     private static final Type blockTransmutationMapType = new TypeToken<String[][]>() {}.getType();
 
-    public static final ConfigFile CONFIG_FILE = new ConfigFile(jsonType, 
-        "config.json");
+    public static final ConfigFile CONFIG_FILE = 
+        new ConfigFile(jsonType,  "config.json");
 
     public static final DataFile<Map<String, SuperNumber>> SEED_EMC_MAP_FILE 
-        = new SeedEmcMap(emcMapType, 
-        "seed_emc_map.json");
+        = new SeedEmcMap(emcMapType, "seed_emc_map.json");
 
     public static final DataFile<Map<String, SuperNumber>> CUSTOM_EMC_MAP_FILE
-        = new CustomEmcMap(emcMapType, 
-        "custom_emc_map.json");
+        = new CustomEmcMap(emcMapType, "custom_emc_map.json");
 
-    public static final DataFile<HashSet<String>> MODIFIERS
-        = new DataFile<HashSet<String>>(stringSetType, 
-        "modifiers.json");
+    public static final ModifiersFile MODIFIERS
+        = new ModifiersFile(stringSetType, "modifiers.json");
 
-    public static final NbtItemsFile NBT_ITEMS = new NbtItemsFile(nbtItemsType, "nbt_items.json");
+    public static final NbtItemsFile NBT_ITEMS = 
+        new NbtItemsFile(nbtItemsType, "nbt_items.json");
 
     public static final DataFile<Map<String, HashSet<String>>> BLACKLISTED_MAPPER_RECIPES_FILE
         = new DataFile<Map<String, HashSet<String>>>(recipeBlacklistType,

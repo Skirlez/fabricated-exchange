@@ -9,8 +9,8 @@ import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 public class BlockTransmutationSyncS2CPacket {
     public static void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
@@ -19,7 +19,7 @@ public class BlockTransmutationSyncS2CPacket {
         for (int i = 0; i < iterations; i++) {
             String block1 = buf.readString();
             String block2 = buf.readString();
-            newBlockTransmutationMap.put(Registries.BLOCK.get(new Identifier(block1)), Registries.BLOCK.get(new Identifier(block2)));
+            newBlockTransmutationMap.put(Registry.BLOCK.get(new Identifier(block1)), Registry.BLOCK.get(new Identifier(block2)));
         }
         FabricatedExchange.blockTransmutationMap = newBlockTransmutationMap;
     }

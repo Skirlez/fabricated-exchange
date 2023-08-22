@@ -1,6 +1,7 @@
 package com.skirlez.fabricatedexchange.block;
 
 import java.util.LinkedList;
+import java.util.stream.IntStream;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
@@ -24,6 +25,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -33,10 +35,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 
-public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory,
+public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory, SidedInventory,
         ConsumerBlockEntity {
     private final DefaultedList<ItemStack> inventory;
     private SuperNumber emc;
@@ -54,6 +57,8 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
     private final FuelSlot fuelSlot;
     private final OutputSlot outputSlot;
     private final FakeSlot targetSlot;
+
+    private final int amountOfSlots;
     public EnergyCollectorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.ENERGY_COLLECTOR, pos, state);
         emc = SuperNumber.Zero();
@@ -97,6 +102,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
                 inputSlots.add(new InputSlot(inv, ind++, inputOffset - j * 18, 62 - i * 18, fuelSlot, SlotCondition.isFuel));
             }
         }
+        amountOfSlots = ind;
     }
 
 
@@ -189,14 +195,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
         return true;
     }
 
-    @Override
-    public boolean isValid(int slot, ItemStack stack) {
-        return (slot > 2) || slot == 0;
-    }
-    @Override
-    public boolean canTransferTo(Inventory hopperInventory, int slot, ItemStack stack) {
-        return (slot == 1);
-    }
+
 
 
     @Override
@@ -273,5 +272,24 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 
     public int getLevel() {
         return this.level;
+    }
+
+
+    @Override
+    public int[] getAvailableSlots(Direction var1) {
+        return IntStream.range(0, amountOfSlots).toArray();
+    }
+    @Override
+    public boolean canInsert(int slot, ItemStack stack, Direction var3) {
+        return isValid(slot, stack);
+    }
+    @Override
+    public boolean canExtract(int slot, ItemStack var2, Direction var3) {
+        return slot == 1;
+    }
+
+    @Override
+    public boolean isValid(int slot, ItemStack stack) {
+        return (slot > 2) || slot == 0;
     }
 }

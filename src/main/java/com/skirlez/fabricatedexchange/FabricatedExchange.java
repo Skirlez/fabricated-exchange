@@ -9,12 +9,11 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -89,13 +88,13 @@ public class FabricatedExchange implements ModInitializer {
 
         //mapper.fillEmcMap(server.getOverworld(), server.getOverworld().getRecipeManager());
         
-        EmcMapper mapper = new EmcMapper(server.getRegistryManager(), server.getOverworld().getRecipeManager());
+        EmcMapper mapper = new EmcMapper(server.getOverworld().getRecipeManager());
         boolean hasWarned = mapper.map();
         EmcData.emcMap = mapper.getEmcMap();
         EmcData.potionEmcMap =  mapper.getPotionEmcMap();
         List<Item> fuelItemList = new ArrayList<Item>();
  
-        Iterator<RegistryEntry<Item>> iterator = Registries.ITEM.getEntryList(ModTags.FUEL).get().iterator();
+        Iterator<RegistryEntry<Item>> iterator = Registry.ITEM.getEntryList(ModTags.FUEL).get().iterator();
         while (iterator.hasNext()) {
             Item item = iterator.next().value();
 
@@ -148,8 +147,8 @@ public class FabricatedExchange implements ModInitializer {
         Iterator<Block> iterator = keySet.iterator();
         while (iterator.hasNext()) {
             Block block = iterator.next();
-            buf.writeString(Registries.BLOCK.getId(block).toString());
-            buf.writeString(Registries.BLOCK.getId(blockTransmutationMap.get(block)).toString());
+            buf.writeString(Registry.BLOCK.getId(block).toString());
+            buf.writeString(Registry.BLOCK.getId(blockTransmutationMap.get(block)).toString());
         }
         ServerPlayNetworking.send(player, ModMessages.BLOCK_TRANSMUTATION_SYNC_IDENTIFIER, buf);
     }
@@ -181,8 +180,8 @@ public class FabricatedExchange implements ModInitializer {
     }
 
     private static void addBlockRelation(String str1, String str2) {
-        Block b1 = Registries.BLOCK.get(new Identifier(str1));
-        Block b2 = Registries.BLOCK.get(new Identifier(str2));
+        Block b1 = Registry.BLOCK.get(new Identifier(str1));
+        Block b2 = Registry.BLOCK.get(new Identifier(str2));
         if (b1 == null || b2 == null) {
             FabricatedExchange.LOGGER.error("Invalid block(s) found in block_transmutation_map.json! Block 1: " + str1 + " -> Block 2: " + str2);
             return;

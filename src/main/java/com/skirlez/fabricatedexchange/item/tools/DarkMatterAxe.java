@@ -2,11 +2,13 @@ package com.skirlez.fabricatedexchange.item.tools;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.skirlez.fabricatedexchange.item.ChargeableItem;
 import com.skirlez.fabricatedexchange.item.FakeItemUsageContext;
 import com.skirlez.fabricatedexchange.item.OutliningItem;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -14,11 +16,12 @@ import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.ToolMaterial;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.world.World;
 
 public class DarkMatterAxe extends AxeItem implements ChargeableItem, OutliningItem {
@@ -79,7 +82,11 @@ public class DarkMatterAxe extends AxeItem implements ChargeableItem, OutliningI
 
     @Override
     public boolean outlineEntryCondition(BlockState state) {
-        return Registries.BLOCK.getEntry(state.getBlock()).isIn(BlockTags.LOGS);
+        Optional<RegistryEntry<Block>> entryOptional = Registry.BLOCK.getEntry(Registry.BLOCK.getRawId(state.getBlock()));
+        if (entryOptional.isEmpty())
+            return false;
+        RegistryEntry<Block> entry = entryOptional.get();
+        return entry.isIn(BlockTags.LOGS);
     }
 
     @Override

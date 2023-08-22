@@ -40,7 +40,7 @@
     "block.fabricated-exchange.energy_condenser_mk2": "Energy Condenser MK2",
     "screen.fabricated-exchange.transmutation": "Transmutation",
     "screen.fabricated-exchange.emc_collection": "EMC Collection",
-    "itemgroup.fabricated-exchange": "Fabricated Exchange", 
+    "itemGroup.fabricated-exchange.fabricated-exchange": "Fabricated Exchange", 
 
     "sounds.fabricated-exchange.philosophers_stone_use": "Blocks transmuted",
     "sounds.fabricated-exchange.item_charge": "Item charged",

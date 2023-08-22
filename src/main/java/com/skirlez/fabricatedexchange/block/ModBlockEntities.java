@@ -5,9 +5,8 @@ import com.skirlez.fabricatedexchange.FabricatedExchange;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 public class ModBlockEntities {
     public static final BlockEntityType<EnergyCollectorBlockEntity> ENERGY_COLLECTOR = 
@@ -37,7 +36,7 @@ public class ModBlockEntities {
 
 
     private static <T extends BlockEntity> BlockEntityType<T> registerBlockEntity(String name, BlockEntityType<T> blockEntityType) {
-        return Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier(FabricatedExchange.MOD_ID, name), blockEntityType);
+        return Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier(FabricatedExchange.MOD_ID, name), blockEntityType);
     }
 
     public static void registerBlockEntities() {

@@ -9,6 +9,7 @@ import com.skirlez.fabricatedexchange.util.GeneralUtil;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.player.PlayerEntity;
@@ -60,7 +61,7 @@ public class DarkMatterSword extends SwordItem implements ChargeableItem, ExtraF
 
             for (int i = 0; i < entities.size(); i++) {
                 Entity entity = entities.get(i);
-                entity.damage(player.getDamageSources().playerAttack(player), getAttackDamage());
+                entity.damage(DamageSource.player(player), getAttackDamage());
             }
             player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.ITEM_CHARGE, 
                 SoundCategory.PLAYERS, 1, 1.0f);

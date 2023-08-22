@@ -26,9 +26,9 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 public class EmcData {
 
@@ -52,14 +52,14 @@ public class EmcData {
     public static SuperNumber getItemEmc(Item item) {
         if (item == null)
             return SuperNumber.Zero(); 
-        String id = Registries.ITEM.getId(item).toString();
+        String id = Registry.ITEM.getId(item).toString();
         return getItemEmc(id);
     }
     public static SuperNumber getItemStackEmc(ItemStack itemStack) {
         if (itemStack.isEmpty())
             return SuperNumber.Zero(); 
         Item item = itemStack.getItem();
-        String id = Registries.ITEM.getId(item).toString();
+        String id = Registry.ITEM.getId(item).toString();
         SuperNumber emc = getItemEmc(id);
         emc.multiply(itemStack.getCount());
         considerStackDurability(itemStack, emc);
@@ -88,7 +88,7 @@ public class EmcData {
         if (nbt.contains("emc"))
             emc.add(new SuperNumber(nbt.getString("emc")));
 
-        if (!ModConfig.NBT_ITEMS.hasItem(Registries.ITEM.getId(item).toString()))
+        if (!ModConfig.NBT_ITEMS.hasItem(Registry.ITEM.getId(item).toString()))
             return;
 
         if (item instanceof PotionItem) {
@@ -128,7 +128,7 @@ public class EmcData {
             for (int i = 0; i < list.size(); i++) {
                 NbtCompound itemCompound = list.getCompound(i);
                 String id = itemCompound.getString("id");
-                ItemStack stack = new ItemStack(Registries.ITEM.get(new Identifier(id)));
+                ItemStack stack = new ItemStack(Registry.ITEM.get(new Identifier(id)));
                 stack.setCount(itemCompound.getInt("Count"));
                 
                 NbtCompound extraData = itemCompound.getCompound("tag");
@@ -151,10 +151,10 @@ public class EmcData {
 
 
     public static boolean isItemInSeedValues(Item item) {
-        return seedEmcMap.containsKey(Registries.ITEM.getId(item).toString());
+        return seedEmcMap.containsKey(Registry.ITEM.getId(item).toString());
     }
     public static boolean isItemInCustomValues(Item item) {
-        return customEmcMap.containsKey(Registries.ITEM.getId(item).toString());
+        return customEmcMap.containsKey(Registry.ITEM.getId(item).toString());
     }
 
     // only the server can use these
@@ -167,7 +167,7 @@ public class EmcData {
         DataFile<Map<String, SuperNumber>> file = seed ? ModConfig.SEED_EMC_MAP_FILE : ModConfig.CUSTOM_EMC_MAP_FILE;
         if (item == null)
             return;
-        String id = Registries.ITEM.getId(item).toString();
+        String id = Registry.ITEM.getId(item).toString();
         Map<String, SuperNumber> newEmcMap = file.getValue();
         if (newEmcMap == null)
             newEmcMap = new HashMap<String, SuperNumber>();

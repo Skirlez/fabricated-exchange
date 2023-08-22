@@ -62,8 +62,8 @@ public class EnergyCondenserScreenHandler extends LeveledScreenHandler implement
     }
 
     @Override
-    public void onClosed(PlayerEntity player){
-        super.onClosed(player);
+    public void close(PlayerEntity player){
+        super.close(player);
         this.inventory.onClose(player);
     }
 
@@ -79,7 +79,7 @@ public class EnergyCondenserScreenHandler extends LeveledScreenHandler implement
 
 
     @Override
-    public ItemStack quickMove(PlayerEntity player, int slot) {
+    public ItemStack transferSlot(PlayerEntity player, int slot) {
         ItemStack itemStack = ItemStack.EMPTY;
         Slot slot2 = this.slots.get(slot);
         if (slot2 != null && slot2.hasStack()) {
@@ -110,14 +110,14 @@ public class EnergyCondenserScreenHandler extends LeveledScreenHandler implement
             FakeSlot slot = (FakeSlot)slots.get(0);
             ItemStack cursorStack = getCursorStack();
             if (slot.hasStack() && !cursorStack.isEmpty()
-                    && ItemStack.areItemsEqual(slot.getStack(), cursorStack)) {
-                slot.setStackNoCallbacks(ItemStack.EMPTY);
+                    && ItemStack.areItemsEqualIgnoreDamage(slot.getStack(), cursorStack)) {
+                slot.setStack(ItemStack.EMPTY);
                 return;
             }
             if (cursorStack.isEmpty() || !EmcData.getItemEmc(cursorStack.getItem()).equalsZero()) {
                 cursorStack = cursorStack.copy();
                 cursorStack.setCount(1);
-                slot.setStackNoCallbacks(cursorStack);
+                slot.setStack(cursorStack);
             }
   
         }

@@ -108,33 +108,20 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
         searchBar.setChangedListener(updater);
         addDrawableChild(searchBar);
 
-        addDrawableChild(ButtonWidget.builder(
-            Text.of("<"),
-            button -> updatePage(false))
-            .dimensions(x + 127, y + 101, 13, 13)
-            .build());
+        addDrawableChild(new ButtonWidget(x + 127, y + 101, 13, 13, Text.of("<"), button -> updatePage(false)));
 
-        addDrawableChild(ButtonWidget.builder(
-            Text.of(">"),
-            button -> updatePage(true))
-            .dimensions(x + 194, y + 101, 13, 13)
-            .build());
+        addDrawableChild(new ButtonWidget(x + 194, y + 101, 13, 13, Text.of(">"), button -> updatePage(true)));
 
 
         if (floorButtonEnabled) {
-            this.floorButton = ButtonWidget.builder(
-                Text.of("Floor"),
-                button -> floorEmc())
-                .dimensions(x + 4, y + 116, 31, 12)
-                .build();
-            
+            this.floorButton = new ButtonWidget(x + 4, y + 116, 31, 12, Text.of("Floor"), button -> floorEmc());
             addDrawableChild(floorButton);
         }
     }
 
     @Override
     protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);
         int x = (width - backgroundWidth) / 2;

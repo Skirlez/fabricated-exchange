@@ -32,8 +32,8 @@ public class AlchemicalChestScreenHandler extends ScreenHandler implements Chest
     }
 
     @Override
-    public void onClosed(PlayerEntity player){
-        super.onClosed(player);
+    public void close(PlayerEntity player){
+        super.close(player);
         this.inventory.onClose(player);
     }
 
@@ -48,7 +48,7 @@ public class AlchemicalChestScreenHandler extends ScreenHandler implements Chest
     }
 
     @Override
-    public ItemStack quickMove(PlayerEntity player, int slot) {
+    public ItemStack transferSlot(PlayerEntity player, int slot) {
         ItemStack itemStack = ItemStack.EMPTY;
         Slot slot2 = this.slots.get(slot);
         if (slot2 != null && slot2.hasStack()) {

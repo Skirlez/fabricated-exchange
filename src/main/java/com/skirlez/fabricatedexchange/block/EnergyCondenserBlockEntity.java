@@ -1,6 +1,7 @@
 package com.skirlez.fabricatedexchange.block;
 
 import java.util.LinkedList;
+import java.util.stream.IntStream;
 
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.screen.EnergyCondenserScreen;
@@ -16,15 +17,17 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
-public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements ExtendedScreenHandlerFactory, ConsumerBlockEntity {
+public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements ExtendedScreenHandlerFactory, ConsumerBlockEntity, SidedInventory {
     private final int level;
     private SuperNumber emc;
     private int tick;
@@ -70,7 +73,9 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
             for (int i = start; i < inv.size() && !success; i++) {
                 ItemStack stack = inv.getStack(i);
                 if (stack.isEmpty()) {
-                    inv.setStack(i, target.copyWithCount(maxStacks));
+                    ItemStack targetCopy = target.copy();
+                    targetCopy.setCount(maxStacks);
+                    inv.setStack(i, targetCopy);
                     targetEmc.multiply(maxStacks);
                     success = true;
                 }
@@ -109,14 +114,7 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
         tick++;
     }
 
-    @Override
-    public boolean isValid(int slot, ItemStack stack) {
-        return (level == 0) ? false : (slot < 43 && slot > 0 && !EmcData.getItemEmc(stack.getItem()).equalsZero());
-    }
-    @Override
-    public boolean canTransferTo(Inventory hopperInventory, int slot, ItemStack stack) {
-        return (level == 0) ? slot != 0 : slot > 42;
-    }
+
 
     @Override
     public int size() {
@@ -171,4 +169,23 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
         this.emc = emc;
     }
 
+    @Override
+    public int[] getAvailableSlots(Direction dir) {
+        return IntStream.range(0, size()).toArray();
+    }
+
+    @Override
+    public boolean canInsert(int slot, ItemStack stack, Direction dir) {
+        return isValid(slot, stack);
+    }
+
+    @Override
+    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+        return (level == 0) ? slot != 0 : slot > 42;
+    }
+
+    @Override
+    public boolean isValid(int slot, ItemStack stack) {
+        return (level == 0) ? false : (slot < 43 && slot > 0 && !EmcData.getItemEmc(stack.getItem()).equalsZero());
+    }
 }

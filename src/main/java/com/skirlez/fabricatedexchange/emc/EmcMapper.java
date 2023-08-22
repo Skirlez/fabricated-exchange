@@ -9,10 +9,12 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.LinkedTransferQueue;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -25,6 +27,7 @@ import com.skirlez.fabricatedexchange.mixin.LegacySmithingRecipeAccessor;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import com.skirlez.fabricatedexchange.util.config.ModConfig;
+import com.skirlez.fabricatedexchange.util.config.ModifiersFile;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -32,15 +35,16 @@ import net.minecraft.potion.Potion;
 import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.LegacySmithingRecipe;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.SmeltingRecipe;
 import net.minecraft.recipe.SmithingRecipe;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registries;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.registry.DynamicRegistryManager;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
 
 
 // This class tries to infer EMC values of items through in-game recipes.
@@ -53,20 +57,19 @@ public class EmcMapper {
 
     private boolean warninged = false;
     
-    private DynamicRegistryManager dynamicRegistryManager;
     private RecipeManager recipeManager;
     private Map<String, Set<UnknownEquationNode>> unknownEquationMap = new HashMap<String, Set<UnknownEquationNode>>();
-    private Queue<ItemEquation> queue = new ArrayDeque<ItemEquation>();
-    private final HashSet<String> modifiers;
+    
+    private HashMap<String, Queue<ItemEquation>> splitQueues = new HashMap<String, Queue<ItemEquation>>();
+    private final ModifiersFile modifiers;
 
-    public EmcMapper(DynamicRegistryManager dynamicRegistryManager, RecipeManager recipeManager) {
+    public EmcMapper(RecipeManager recipeManager) {
         this.recipeManager = recipeManager;
-        this.dynamicRegistryManager = dynamicRegistryManager;
 
         emcMap = new ConcurrentHashMap<String, SuperNumber>();
         potionEmcMap = new ConcurrentHashMap<String, SuperNumber>();
 
-        modifiers = ModConfig.MODIFIERS.getValue();
+        modifiers = ModConfig.MODIFIERS;
     }
 
     public ConcurrentMap<String, SuperNumber> getEmcMap() {
@@ -101,10 +104,9 @@ public class EmcMapper {
 
         namespaces.add("minecraft");
 
-        Map<String, LinkedList<ItemEquation>> splitEquations = new HashMap<>();
-        splitRecipesToMods(allCraftingRecipes, splitEquations, namespaces, craftingRecipesBlacklist, this::createEquation);
-        splitRecipesToMods(allSmithingRecipes, splitEquations, namespaces, smithingRecipesBlacklist, this::createEquation);
-        splitRecipesToMods(allSmeltingRecipes, splitEquations, namespaces, smeltingRecipesBlacklist, this::createEquation);
+        splitRecipesToMods(allCraftingRecipes, namespaces, craftingRecipesBlacklist, this::createEquation);
+        splitRecipesToMods(allSmithingRecipes, namespaces, smithingRecipesBlacklist, this::createEquation);
+        splitRecipesToMods(allSmeltingRecipes, namespaces, smeltingRecipesBlacklist, this::createEquation);
 
 
         // potion recipes are special recipes, and don't inherit from the Recipe interface. So we treat them in a special way.
@@ -121,17 +123,16 @@ public class EmcMapper {
             ingredientList.add(Ingredient.ofItems(input));
             ingredientList.add(Ingredient.ofItems(input));
 
-            String name = "minecraft:" + Registries.ITEM.getId(input).getPath() + "_to_" + 
-                Registries.ITEM.getId(output).getPath() + "_using_" + 
-                Registries.ITEM.getId(ingredient.getMatchingStacks()[0].getItem()).getPath();
-            System.out.println(name);
+            String name = "minecraft:" + Registry.ITEM.getId(input).getPath() + "_to_" + 
+                Registry.ITEM.getId(output).getPath() + "_using_" + 
+                Registry.ITEM.getId(ingredient.getMatchingStacks()[0].getItem()).getPath();
 
             ItemEquation equation = new ItemEquation(
                 ingredientList, 
                 Collections.singletonList(new ItemStack(output, 3)), 
-                name);
+                new Identifier(name));
                 
-            splitEquations.get("minecraft").add(equation);
+            countUnknowns(equation);
         }
 
         // TODO: inject recipes provided by mods here
@@ -144,21 +145,16 @@ public class EmcMapper {
 
         for (int m = 0; m < mods.size(); m++) {
             String mod = mods.get(m);
-            LinkedList<ItemEquation> equations = splitEquations.get(mod);
-            for (ItemEquation equation : equations)
-                countUnknowns(equation);
-            
-           
+            Queue<ItemEquation> queue = splitQueues.get(mod);
+            if (queue == null)
+                continue;
             while (!queue.isEmpty()) {
                 ItemEquation equation = queue.poll();
                 if (equation.amountUnknown != 1)
                     continue;
+
                 solve(equation);
             }
-
-            // clear the data for the next mod
-            unknownEquationMap.clear();
-            queue.clear();
         }
 
 
@@ -190,7 +186,7 @@ public class EmcMapper {
     private ItemEquation createEquation(CraftingRecipe recipe) {
         List<Ingredient> ingredients = recipe.getIngredients();
         List<ItemStack> output = new ArrayList<ItemStack>(1);
-        output.add(recipe.getOutput(dynamicRegistryManager));
+        output.add(recipe.getOutput());
         List<Ingredient> filteredIngredients = new ArrayList<Ingredient>(ingredients.size());
 
         for (int i = 0; i < ingredients.size(); i++) {
@@ -203,10 +199,9 @@ public class EmcMapper {
             for (ItemStack stack : ingredient.getMatchingStacks()) {
                 if (stack.isEmpty())
                     break;
-                if (isItemModifier(stack.getItem()) && ingredients.size() != 1)
+                if (modifiers.hasItem(Registry.ITEM.getId(stack.getItem()).toString()) && ingredients.size() != 1)
                     break;
 
-                
                 ItemStack remainder = stack.getRecipeRemainder();
                 if (!remainder.isEmpty()) {
                     if (!ItemStack.areEqual(stack, remainder)) {
@@ -223,21 +218,21 @@ public class EmcMapper {
                 filteredIngredients.add(ingredient);
         }
         return new ItemEquation(filteredIngredients,
-            Collections.singletonList(recipe.getOutput(dynamicRegistryManager)),
-            recipe.getId().toString());
+            Collections.singletonList(recipe.getOutput()),
+            recipe.getId());
     }
 
     private ItemEquation createEquation(SmeltingRecipe recipe) {
         return new ItemEquation(
             Collections.singletonList(recipe.getIngredients().get(0)),
-            Collections.singletonList(recipe.getOutput(dynamicRegistryManager)),
-            recipe.getId().toString());
+            Collections.singletonList(recipe.getOutput()),
+            recipe.getId());
     }
 
 
     @Nullable
     private ItemEquation createEquation(SmithingRecipe recipe) {
-        if (!(recipe instanceof LegacySmithingRecipe))
+        if (!(recipe instanceof SmithingRecipe))
             return null;
 
         LegacySmithingRecipeAccessor recipeAccessor = (LegacySmithingRecipeAccessor) recipe;
@@ -247,13 +242,13 @@ public class EmcMapper {
 
         return new ItemEquation(
             ingredients,
-            Collections.singletonList(recipe.getOutput(dynamicRegistryManager)),
-            recipe.getId().toString());
+            Collections.singletonList(recipe.getOutput()),
+            recipe.getId());
     }
 
 
 
-    private <T extends Recipe<?>> void splitRecipesToMods(List<T> allRecipes, Map<String, LinkedList<ItemEquation>> splitRecipes, HashSet<String> namespaces, 
+    private <T extends Recipe<?>> void splitRecipesToMods(List<T> allRecipes, HashSet<String> namespaces, 
             HashSet<String> blacklist, Function<T, ItemEquation> equationConvertion) {
         for (int i = 0; i < allRecipes.size(); i++) {
             T recipe = allRecipes.get(i);
@@ -265,13 +260,7 @@ public class EmcMapper {
                 continue;
             if (!namespaces.contains(namespace))
                 namespaces.add(namespace);
-            if (!splitRecipes.containsKey(namespace)) {
-                LinkedList<ItemEquation> newList = new LinkedList<ItemEquation>();
-                newList.add(equation);
-                splitRecipes.put(namespace, newList);
-            }
-            else
-                splitRecipes.get(namespace).add(equation);
+            countUnknowns(equation);
         }
     }
 
@@ -279,20 +268,10 @@ public class EmcMapper {
     private boolean emcMapHasEntry(Item item) {
         return emcMap.containsKey(itemName(item));
     }
-    private boolean isItemModifier(Item item) {
-        if (modifiers.contains(itemName(item)))
-            return true;
-        List<String> tags = Registries.ITEM.getEntry(item).streamTags().map((key) -> ("#" + key.id().toString())).collect(Collectors.toList());
-        for (int i = 0; i < tags.size(); i++) {
-            if (modifiers.contains(tags.get(i)))
-                return true;
-        }
-        return false;
-    }
 
 
     private String itemName(Item item) {
-        return Registries.ITEM.getId(item).toString();
+        return Registry.ITEM.getId(item).toString();
     }
 
     private void registerUnknownEquation(String itemId, ItemEquation equation) {
@@ -350,8 +329,15 @@ public class EmcMapper {
         }
 
         if (amountUnknown > 0) {
-            if (amountUnknown == 1)
-                queue.add(equation);
+            if (amountUnknown == 1) {
+                if (splitQueues.containsKey(equation.origin))
+                    splitQueues.get(equation.origin).add(equation);
+                else {
+                    Queue<ItemEquation> modQueue = new LinkedList<ItemEquation>();
+                    modQueue.add(equation);
+                    splitQueues.put(equation.origin, modQueue);
+                }
+            }
             for (String item : unknownItems)
                 registerUnknownEquation(item, equation);
             for (Ingredient ingredient : unknownIngredients)
@@ -364,8 +350,6 @@ public class EmcMapper {
     }
 
     private void solve(ItemEquation equation) {
-        if (equation.name.equals("minecraft:potion_to_splash_potion_using_gunpowder"))
-            System.out.println("here");
         SuperNumber sum = SuperNumber.Zero();
 
         HashSet<Item> unknownItems = new HashSet<Item>();
@@ -432,8 +416,8 @@ public class EmcMapper {
         if (emc.equalTo(value))
             return false;
         warn("EMC Conflict for item " + itemName(item) 
-        + ", EMC Mapper tried assigning two different values! Original value: " + emc + ", new value: " + value
-        + ", current recipe: " + name);
+            + ", EMC Mapper tried assigning two different values! Original value: " + emc + ", new value: " + value
+            + ", current recipe: " + name);
         return false;
     }
 
@@ -495,7 +479,13 @@ public class EmcMapper {
             ItemEquation equation = node.equation;
             equation.amountUnknown--;
             if (equation.amountUnknown == 1) {
-                queue.add(equation);
+                if (splitQueues.containsKey(equation.origin))
+                    splitQueues.get(equation.origin).add(equation);
+                else {
+                    Queue<ItemEquation> modQueue = new LinkedList<ItemEquation>();
+                    modQueue.add(equation);
+                    splitQueues.put(equation.origin, modQueue);
+                }
             }
         }
         unknownEquationMap.remove(itemName);
@@ -542,7 +532,7 @@ public class EmcMapper {
 
 
     private boolean putPotionEmcMap(Potion potion, SuperNumber value) {
-        String id = Registries.POTION.getId(potion).toString();
+        String id = Registry.POTION.getId(potion).toString();
         if (!potionEmcMap.containsKey(id)) {
             potionEmcMap.put(id, value);
             return true;
@@ -552,7 +542,7 @@ public class EmcMapper {
 
     // Potions, unlike items, return -1 when the map doesn't contain the potion
     private SuperNumber getPotionEmc(Potion potion) {
-        String id = Registries.POTION.getId(potion).toString();
+        String id = Registry.POTION.getId(potion).toString();
         if (potionEmcMap.containsKey(id)) 
             return new SuperNumber(potionEmcMap.get(id));
         return SuperNumber.NegativeOne(); 

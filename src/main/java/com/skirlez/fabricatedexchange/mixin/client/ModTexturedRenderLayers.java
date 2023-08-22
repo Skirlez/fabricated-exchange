@@ -1,8 +1,11 @@
 package com.skirlez.fabricatedexchange.mixin.client;
 
+import java.util.function.Consumer;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
@@ -25,8 +28,8 @@ public abstract class ModTexturedRenderLayers {
         new SpriteIdentifier(TexturedRenderLayers.CHEST_ATLAS_TEXTURE, new Identifier(FabricatedExchange.MOD_ID, "entity/chest/energy_condenser_mk2"));
 
 
-    @Inject(method = "getChestTextureId", at = @At("HEAD"), cancellable = true)
-    private static void addMoreTextureIds(BlockEntity blockEntity, ChestType type, boolean christmas, CallbackInfoReturnable<SpriteIdentifier> cir) {
+    @Inject(method = "getChestTexture", at = @At("HEAD"), cancellable = true)
+    private static void addMoreTextures(BlockEntity blockEntity, ChestType type, boolean christmas, CallbackInfoReturnable<SpriteIdentifier> cir) {
         if (blockEntity instanceof AlchemicalChestBlockEntity)
             cir.setReturnValue(ALCHEMICAL_CHEST);
         else if (blockEntity instanceof EnergyCondenserBlockEntity condenser) {
@@ -35,5 +38,12 @@ public abstract class ModTexturedRenderLayers {
             else
                 cir.setReturnValue(ENERGY_CONDENSER_MK2);
         }
+    }
+
+    @Inject(method = "addDefaultTextures", at = @At("TAIL"))
+    private static void addMoreDefaultTextures(Consumer<SpriteIdentifier> adder, CallbackInfo ci) {
+        adder.accept(ALCHEMICAL_CHEST);
+        adder.accept(ENERGY_CONDENSER_MK1);
+        adder.accept(ENERGY_CONDENSER_MK2);
     }
 }

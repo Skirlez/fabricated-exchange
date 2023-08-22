@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "C": {
       "item": "minecraft:chest"
@@ -21,7 +20,7 @@
       "item": "fabricated-exchange:medium_covalence_dust"
     },
     "S": {
-      "item": "minecraft:stone"
+      "tag": "c:stone"
     }
   },
   "pattern": [
@@ -31,6 +30,5 @@
   ],
   "result": {
     "item": "fabricated-exchange:alchemical_chest"
-  },
-  "show_notification": true
+  }
 }

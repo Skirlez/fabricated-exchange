@@ -103,7 +103,9 @@ public class DarkMatterPickaxe extends PickaxeItem implements ChargeableItem, Ou
         if (ChargeableItem.getCharge(stack) == 0)
             return list;
 
-        Vec3d relativePos = playerPos.subtract(center.toCenterPos());
+
+
+        Vec3d relativePos = playerPos.subtract(Vec3d.of(center));
         double x = relativePos.getX(), z = relativePos.getZ();
         if (Math.abs(x) > Math.abs(z)) {
             x = 0;

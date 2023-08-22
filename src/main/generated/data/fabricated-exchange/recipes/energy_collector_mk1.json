@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "D": {
       "item": "minecraft:diamond_block"
@@ -22,6 +21,5 @@
   ],
   "result": {
     "item": "fabricated-exchange:energy_collector_mk1"
-  },
-  "show_notification": true
+  }
 }

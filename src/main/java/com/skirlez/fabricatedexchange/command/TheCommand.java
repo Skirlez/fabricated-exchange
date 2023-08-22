@@ -24,13 +24,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
-import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
+import net.minecraft.util.registry.Registry;
 
 public class TheCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
@@ -190,7 +190,7 @@ public class TheCommand {
         }
         
         Item item = stack.getItem();
-        String id = Registries.ITEM.getId(item).toString();
+        String id = Registry.ITEM.getId(item).toString();
         if (seed) {
             Map<String, SuperNumber> map = ModConfig.SEED_EMC_MAP_FILE.getValue();
             if (!map.containsKey(id)) {

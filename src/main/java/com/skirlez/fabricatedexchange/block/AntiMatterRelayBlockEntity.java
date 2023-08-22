@@ -2,6 +2,7 @@ package com.skirlez.fabricatedexchange.block;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -26,6 +27,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
@@ -35,9 +37,10 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
-public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory,
+public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory, SidedInventory,
         ConsumerBlockEntity {
 
     private SuperNumber emc;
@@ -52,7 +55,7 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
     private final DefaultedList<InputSlot> inputSlots = DefaultedList.of();
     private final FuelSlot fuelSlot;
     private final Slot chargeSlot;
-
+    private final int amountOfSlots;
     public AntiMatterRelayBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.ANTIMATTER_RELAY, pos, state);
         Block block = state.getBlock();
@@ -92,7 +95,7 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
                 inputSlots.add(new InputSlot(inv, i * (2 + level) + j + 2, xInput + 27 + j * 18, yInput + 12 + i * 18, fuelSlot, SlotCondition.alwaysTrue));
         }
 
-
+        amountOfSlots = 9 + 3 * level;
         emc = SuperNumber.Zero();
         tick = 0;
     }
@@ -142,15 +145,6 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
         if (entity.tick % 120 == 0) 
             entity.markDirty();
         entity.tick++;
-    }
-
-    @Override
-    public boolean isValid(int slot, ItemStack stack) {
-        return (slot > 1);
-    }
-    @Override
-    public boolean canTransferTo(Inventory hopperInventory, int slot, ItemStack stack) {
-        return false;
     }
 
     @Override
@@ -229,4 +223,29 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
     public Slot getChargeSlot() {
         return this.chargeSlot;
     }
+
+
+    
+
+
+    @Override
+    public int[] getAvailableSlots(Direction dir) {
+        return IntStream.range(0, amountOfSlots).toArray();
+    }
+
+    @Override
+    public boolean canInsert(int slot, ItemStack stack, Direction dir) {
+        return isValid(slot, stack);
+    }
+
+    @Override
+    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+        return false;
+    }
+
+    @Override
+    public boolean isValid(int slot, ItemStack stack) {
+        return (slot > 1);
+    }
+
 }

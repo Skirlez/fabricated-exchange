@@ -1,18 +1,16 @@
 package com.skirlez.fabricatedexchange.screen;
 
+import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.block.EnergyCollectorBlockEntity;
 import com.skirlez.fabricatedexchange.screen.slot.FakeSlot;
 import com.skirlez.fabricatedexchange.screen.slot.collection.OutputSlot;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
-import com.skirlez.fabricatedexchange.util.ModTags;
-
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.BlockPos;
@@ -60,12 +58,12 @@ public class EnergyCollectorScreenHandler extends FuelScreenHandler {
             FakeSlot slot = (FakeSlot)slots.get(2);
             ItemStack cursorStack = getCursorStack();
             if (slot.hasStack() && !cursorStack.isEmpty()
-                    && ItemStack.areItemsEqual(slot.getStack(), cursorStack)) {
+                    && ItemStack.areItemsEqualIgnoreDamage(slot.getStack(), cursorStack)) {
                 slot.setStackNoCallbacks(ItemStack.EMPTY);
                 ((OutputSlot)slots.get(1)).moveToInputSlots();
                 return;
             }
-            if (cursorStack.isEmpty() || Registries.ITEM.getEntry(cursorStack.getItem()).streamTags().anyMatch(tag -> tag == ModTags.FUEL)) {
+            if (cursorStack.isEmpty() || FabricatedExchange.fuelProgressionMap.containsKey(cursorStack.getItem())) {
                 cursorStack = cursorStack.copy();
                 cursorStack.setCount(1);
                 slot.setStackNoCallbacks(cursorStack);

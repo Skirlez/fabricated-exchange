@@ -41,8 +41,7 @@ public class TransmutationSlot extends Slot {
     public void setStack(ItemStack stack) {
         if (isEnabled())
             startTime = System.currentTimeMillis();
-        this.setStackNoCallbacks(stack);
-
+        super.setStack(stack);
     }
 
     @Override

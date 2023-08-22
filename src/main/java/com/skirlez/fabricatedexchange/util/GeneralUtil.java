@@ -12,15 +12,15 @@ import com.skirlez.fabricatedexchange.mixin.ScreenHandlerInvoker;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.entry.RegistryEntryList.Named;
-import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntryList.Named;
 import net.minecraft.world.World;
 
 public class GeneralUtil {
@@ -89,11 +89,11 @@ public class GeneralUtil {
     public static String[] getItemStringsFromTagString(String tagString) {
         Identifier tagId = new Identifier(tagString);
         
-        TagKey<Item> tag = Registries.ITEM.streamTags().filter((key) -> key.id().equals(tagId)).findFirst().orElse(null);
-        Named<Item> named = Registries.ITEM.getEntryList(tag).get();
+        TagKey<Item> tag = Registry.ITEM.streamTags().filter((key) -> key.id().equals(tagId)).findFirst().orElse(null);
+        Named<Item> named = Registry.ITEM.getEntryList(tag).get();
         String[] array = new String[named.size()];
         for (int i = 0; i < named.size(); i++)
-            array[i] = Registries.ITEM.getId(named.get(i).value()).toString();
+            array[i] = Registry.ITEM.getId(named.get(i).value()).toString();
         
         
         return array;
