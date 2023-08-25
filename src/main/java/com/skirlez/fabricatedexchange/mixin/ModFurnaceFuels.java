@@ -28,12 +28,12 @@ public class ModFurnaceFuels {
         // i would have ideally made it something like 1.5x for each jump but it would just mean the fuels are useless since coal blocks and a hopper are cheaper and burn longer
         addFuel(mappa, ModItems.ALCHEMICAL_COAL, 6400);
         addFuel(mappa, ModItems.RADIANT_COAL, 25600);
-        addFuel(mappa, ModItems.MOBIUS_FUEL, 21600);
-        addFuel(mappa, ModItems.AETERNALIS_FUEL, 86400);
+        addFuel(mappa, ModItems.MOBIUS_FUEL, 102400);
+        addFuel(mappa, ModItems.AETERNALIS_FUEL, 409600);
 
         addFuel(mappa, ModBlocks.ALCHEMICAL_COAL_BLOCK, 64000);
         addFuel(mappa, ModBlocks.RADIANT_COAL_BLOCK, 256000);
-        addFuel(mappa, ModBlocks.MOBIUS_FUEL_BLOCK, 216000);
-        addFuel(mappa, ModBlocks.AETERNALIS_FUEL_BLOCK, 864000); // 720 hours and 20 minutes in a regular furnace btw
+        addFuel(mappa, ModBlocks.MOBIUS_FUEL_BLOCK, 1024000); 
+        addFuel(mappa, ModBlocks.AETERNALIS_FUEL_BLOCK, 4096000); // 56.8888... hours in a regular furnace btw
     }
 }

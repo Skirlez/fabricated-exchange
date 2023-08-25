@@ -227,6 +227,10 @@ public class TheCommand {
             return 0;
         }
         Map<String, HashSet<String>> blacklisted = ModConfig.BLACKLISTED_MAPPER_RECIPES_FILE.getValue();
+        if (!blacklisted.containsKey(type)) {
+            blacklisted.put(type, new HashSet<String>());
+        }
+
         String name = recipe.getId().toString();
         if (blacklisted.get(type).contains(name)) {
             context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.nothing"));
@@ -244,7 +248,14 @@ public class TheCommand {
             context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.recipe.pardon.unsupported_type", type));
             return 0;
         }
+        
         Map<String, HashSet<String>> blacklisted = ModConfig.BLACKLISTED_MAPPER_RECIPES_FILE.getValue();
+        if (!blacklisted.containsKey(type)) {
+            blacklisted.put(type, new HashSet<String>());
+            context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.nothing"));
+            return 0;
+        }
+        
         String name = recipe.getId().toString();
         if (!blacklisted.get(type).contains(name)) {
             context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.nothing"));
@@ -299,6 +310,7 @@ public class TheCommand {
             case "crafting":
             case "smelting":
             case "smithing":
+            case "stonecutting":
                 return true;
             default:
                 return false;
