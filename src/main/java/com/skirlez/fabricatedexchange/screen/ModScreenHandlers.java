@@ -21,7 +21,7 @@ public class ModScreenHandlers {
         new ExtendedScreenHandlerType<>(AntiMatterRelayScreenHandler::new);
 
     public static final ScreenHandlerType<AlchemicalChestScreenHandler> ALCHEMICAL_CHEST_SCREEN_HANDLER = 
-        new ScreenHandlerType<>(AlchemicalChestScreenHandler::new, FeatureSet.empty());
+        new ScreenHandlerType<AlchemicalChestScreenHandler>(AlchemicalChestScreenHandler::new, FeatureSet.empty());
 
     public static final ScreenHandlerType<EnergyCondenserScreenHandler> ENERGY_CONDENSER_SCREEN_HANDLER = 
         new ExtendedScreenHandlerType<>(EnergyCondenserScreenHandler::new);

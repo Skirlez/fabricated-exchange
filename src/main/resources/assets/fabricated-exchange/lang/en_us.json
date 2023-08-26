@@ -46,7 +46,7 @@
     "sounds.fabricated-exchange.item_charge": "Item charged",
     "sounds.fabricated-exchange.item_discharge": "Item discharged",
 
-    "commands.fabricated-exchange.help": "/fe set (seed/custom) <number> - Set the currently held item's seed or custom EMC value\n/fe remove (seed/custom) - Remove the currently held item's seed or custom EMC value\n/fe recipe (ban/pardon) <recipe> - Ban/Unban a recipe from being considered by the EMC mapper\n/fe reload - Reload all config files and regenerate all EMC values using the the EMC mapper\n/fe reset <datafile> - Resets a datafile to its default state.\n/fe help - I don't know what this one does\n",
+    "commands.fabricated-exchange.help": "/fe set (seed/custom) <number> - Set the currently held item's seed or custom EMC value\n/fe remove (seed/custom) - Remove the currently held item's seed or custom EMC value\n/fe recipe (ban/pardon) <recipe> - Ban/Unban a recipe from being considered by the EMC mapper\n/fe reload - Reload all config files and regenerate all EMC values using the the EMC mapper\n/fe reset <datafile> - Resets a datafile to its default state\n/fe help - I don't know what this one does\n",
     
     "commands.fabricated-exchange.reload_notice": "Run '/fe reload' to regenerate the EMC values.",
     "commands.fabricated-exchange.zero_notice": "If you want this specific item to not have EMC, run '/fe set custom 0'.",
@@ -73,5 +73,7 @@
     "key.category.fabricated-exchange": "Fabricated Exchange",
     "key.fabricated-exchange.charge": "Item Charge/Discharge",
     "key.fabricated-exchange.mode": "Item Mode",
-    "key.fabricated-exchange.extra": "Item Extra Function"
+    "key.fabricated-exchange.extra": "Item Extra Function",
+
+    "tag.item.c.transmutation_fuel": "Transmutation Fuel"
 }

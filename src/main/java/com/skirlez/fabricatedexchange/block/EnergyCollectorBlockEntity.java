@@ -191,7 +191,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 
     @Override
     public boolean isValid(int slot, ItemStack stack) {
-        return (slot > 2) || slot == 0;
+        return ((slot > 2) || slot == 0) && FabricatedExchange.fuelProgressionMap.containsKey(stack.getItem());
     }
     @Override
     public boolean canTransferTo(Inventory hopperInventory, int slot, ItemStack stack) {
