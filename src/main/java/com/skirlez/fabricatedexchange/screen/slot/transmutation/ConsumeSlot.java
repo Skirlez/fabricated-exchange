@@ -34,13 +34,19 @@ public class ConsumeSlot extends Slot {
 
     @Override
     public ItemStack insertStack(ItemStack stack, int count) {
+        Item item = stack.getItem();
+        ItemStack originalStack = stack;
+        
+        stack = stack.copy();
+        stack.setCount(count);
+
         SuperNumber emc = EmcData.getItemStackEmc(stack);
-        if (emc.equalsZero() && !stack.getItem().equals(ModItems.TOME_OF_KNOWLEDGE))
-            return stack;
+        if (emc.equalsZero() && !item.equals(ModItems.TOME_OF_KNOWLEDGE))
+            return originalStack;
         if (!player.getWorld().isClient()) {
             EmcData.addEmc((ServerPlayerEntity)player, emc);
             PlayerState playerState = ServerState.getPlayerState(player);
-            String idName = Registry.ITEM.getId(stack.getItem()).toString();
+            String idName = Registry.ITEM.getId(item).toString();
             if (ModConfig.NBT_ITEMS.hasItem(idName)) {
                 List<String> allowedKeys = ModConfig.NBT_ITEMS.getAllowedKeys(idName);
                 NbtCompound nbt = stack.getNbt();
@@ -55,24 +61,19 @@ public class ConsumeSlot extends Slot {
                     }
                 }
                 boolean match = false;
-                NbtItem nbtItem = new NbtItem(stack.getItem(), nbt);
+                NbtItem nbtItem = new NbtItem(item, nbt);
                 for (NbtItem currentNbtItem : playerState.specialKnowledge) {
                     if (nbtItem.equalTo(currentNbtItem)) {
                         match = true;
                         break;
                     }
                 }
-                if (!match) {
+                if (match == false) {
                     playerState.specialKnowledge.add(nbtItem);
                     screenHandler.addKnowledge(nbtItem);
                 }
             }
             else {
-                Item item = stack.getItem();
-                if (!playerState.knowledge.contains(idName)) {
-                    playerState.knowledge.add(idName);
-                    screenHandler.addKnowledge(new NbtItem(item));
-                }
                 if (item.equals(ModItems.TOME_OF_KNOWLEDGE)) {
                     Registry.ITEM.forEach(
                     currentItem -> {
@@ -86,13 +87,17 @@ public class ConsumeSlot extends Slot {
                         }
                     });
                 }
+                else if (!playerState.knowledge.contains(idName)) {
+                    playerState.knowledge.add(idName);
+                    screenHandler.addKnowledge(new NbtItem(item));
+                }
             }
             playerState.markDirty();
             screenHandler.refreshOffering();    
         }
 
         // diff is the amount of the item the player had minus the amount they put in. if it's zero we give empty, otherwise we give what's left back.
-        int diff = stack.getCount() - count;
+        int diff = originalStack.getCount() - count;
         if (diff == 0) 
             return ItemStack.EMPTY; 
         stack.setCount(diff);
