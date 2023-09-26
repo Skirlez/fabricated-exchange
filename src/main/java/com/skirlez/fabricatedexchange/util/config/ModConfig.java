@@ -1,134 +1,89 @@
 package com.skirlez.fabricatedexchange.util.config;
 
 import java.lang.reflect.Type;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializer;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
-import com.skirlez.fabricatedexchange.emc.EmcData;
-import com.skirlez.fabricatedexchange.util.DataFile;
-import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
-
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.util.Pair;
+import com.skirlez.fabricatedexchange.util.config.lib.ConfigFile;
 
 
-public class ModConfig {
-    private ModConfig() {
-    
+/** The central config file of the mod. It will compare itself to the default config to make sure the config file is not broken, and "repairs" itself if necessary. */
+public class ModConfig extends ConfigFile<Map<String, Object>> {
+    private static final Map<String, String[]> commentsMap;
+    static {
+        commentsMap = new HashMap<String, String[]>();
+        addComments("version", "Do not modify this string!");
+        addComments("showItemEmcOrigin", "Show how the mod decided this item's EMC value.", "Will not be accurate on multiplayer servers. Useful when setting values!",
+        "(default: false)");
+        addComments("showEnchantedBookRepairCost", "Show the hidden repair cost attribute for Enchanted Books.", 
+        "(default: true)");
+        addComments("mapper.enabled", "Whether or not the EMC mapper is enabled.",
+        "(default: true)");
+        addComments("transmutationTable.animated", "When disabled, the Transmutation Table will look boring.",
+        "(default: true)");
+        addComments("transmutationTable.floorButton", "When enabled, a button to round down your EMC will appear", "in the transmutation table when your EMC is not a whole number.",
+        "(default: true)");
+        addComments("emcInMultiplier", "The amount of personal EMC you gain be multiplied by this number.",
+        "(default: 1)");
+        addComments("emcOutMultiplier", "The amount of personal EMC you need to spend will be multiplied by this number.",
+        "(default: 1)");
     }
-    
-    public static final Gson GSON = new GsonBuilder()
-        .registerTypeAdapter(SuperNumber.class, (JsonSerializer<SuperNumber>)(superNumber, type, jsonSerializationContext) 
-        -> new JsonPrimitive(superNumber.divisionString()))
-        .registerTypeAdapter(SuperNumber.class, (JsonDeserializer<SuperNumber>) (jsonElement, type, jsonDeserializationContext) 
-        -> new SuperNumber(jsonElement.getAsString()))
-        .setPrettyPrinting() // we do want these to be editable by users
-        .create();
 
-    public static final Path CONFIG_DIR = FabricLoader.getInstance().getConfigDir().resolve(FabricatedExchange.MOD_ID);
-
-    private static final Type jsonType = new TypeToken<HashMap<String, Object>>() {}.getType();
-    private static final Type emcMapType = new TypeToken<HashMap<String, SuperNumber>>() {}.getType();
-    private static final Type stringSetType = new TypeToken<HashSet<String>>() {}.getType();
-    private static final Type nbtItemsType = new TypeToken<HashMap<String, List<String>>>() {}.getType();
-    private static final Type recipeBlacklistType = new TypeToken<HashMap<String, HashSet<String>>>() {}.getType();
-    private static final Type blockTransmutationMapType = new TypeToken<String[][]>() {}.getType();
-
-    public static final ConfigFile CONFIG_FILE = 
-        new ConfigFile(jsonType,  "config.json");
-
-    public static final DataFile<Map<String, SuperNumber>> SEED_EMC_MAP_FILE 
-        = new SeedEmcMap(emcMapType, "seed_emc_map.json");
-
-    public static final DataFile<Map<String, SuperNumber>> CUSTOM_EMC_MAP_FILE
-        = new CustomEmcMap(emcMapType, "custom_emc_map.json");
-
-    public static final ModifiersFile MODIFIERS
-        = new ModifiersFile(stringSetType, "modifiers.json");
-
-    public static final NbtItemsFile NBT_ITEMS = 
-        new NbtItemsFile(nbtItemsType, "nbt_items.json");
-
-    public static final DataFile<Map<String, HashSet<String>>> BLACKLISTED_MAPPER_RECIPES_FILE
-        = new DataFile<Map<String, HashSet<String>>>(recipeBlacklistType,
-        "blacklisted_mapper_recipes.json");
-
-    public static final DataFile<String[][]> BLOCK_TRANSMUTATION_MAP_FILE
-        = new DataFile<String[][]>(blockTransmutationMapType,
-        "block_transmutation_map.json");
-
-
-    public static void fetchAll() {
-        CONFIG_FILE.fetch();
-        SEED_EMC_MAP_FILE.fetch();
-        CUSTOM_EMC_MAP_FILE.fetch();
-        MODIFIERS.fetch();
-        NBT_ITEMS.fetch();
-        BLACKLISTED_MAPPER_RECIPES_FILE.fetch();
-        BLOCK_TRANSMUTATION_MAP_FILE.fetch();
+    private static void addComments(String field, String... comments) {
+        commentsMap.put(field, comments);
     }
-}
 
-class EmcMap extends DataFile<Map<String, SuperNumber>> {
-    public EmcMap(Type type, String name) {
-        super(type, name);
+    ModConfig(Type type, String name) {
+        super(type, name, commentsMap);
     }
+
+    public boolean showItemEmcOrigin;
+    public boolean showEnchantedBookRepairCost;
+    public boolean mapper_enabled;
+    public boolean transmutationTable_animated;
+    public boolean transmutationTable_floorButton;
+    public SuperNumber emcInMultiplier;
+    public SuperNumber emcOutMultiplier;
+
+    /* Fetch the config and compare to the default config to see if any keys
+    are missing or any of them have mismatched value types. If true, set that 
+    key to the default value and save */
     @Override
-    protected void process() {
-        List<Pair<String, SuperNumber>> pairs = new ArrayList<Pair<String, SuperNumber>>();
-        Iterator<String> iterator = value.keySet().iterator();
-        while (iterator.hasNext()) {
-            String entry = iterator.next();
-            if (!entry.startsWith("#"))
-                continue;
-            entry = entry.substring(1);
-            String[] items = GeneralUtil.getItemStringsFromTagString(entry);
-            SuperNumber emc = value.get("#" + entry);
-            for (int i = 0; i < items.length; i++)
-                pairs.add(new Pair<String, SuperNumber>(items[i], emc));
+    public void fetch() {
+        super.fetch();
+        
+        Map<String, Object> defaultValue = getDefaultValue();
+        boolean changed = false;
+        if (value == null)
+            value = new LinkedHashMap<String, Object>();
 
-            iterator.remove();
+        for (String key : defaultValue.keySet()) {
+            if (!value.containsKey(key)) {
+                FabricatedExchange.LOGGER.info("Config file is missing key " + key + "! Inserting it into the config with the default value.");
+                value.put(key, defaultValue.get(key));
+                if (!changed)
+                    changed = true;
+            }
+            else if (!value.get(key).getClass().equals(defaultValue.get(key).getClass())) {
+                FabricatedExchange.LOGGER.info("Key " + key + " has different value type than the default type! Reseting it to the default value.");
+                value.put(key, defaultValue.get(key));
+                if (!changed)
+                    changed = true;
+            }
         }
+        
+        save();
 
-        for (int i = 0; i < pairs.size(); i++) {
-            Pair<String, SuperNumber> pair = pairs.get(i);
-            value.put(pair.getLeft(), pair.getRight());
-        }
+        showItemEmcOrigin = (boolean)value.get("showItemEmcOrigin");
+        showEnchantedBookRepairCost = (boolean)value.get("showEnchantedBookRepairCost");
+        mapper_enabled = (boolean)value.get("mapper.enabled");
+        transmutationTable_animated = (boolean)value.get("transmutationTable.animated");
+        transmutationTable_floorButton = (boolean)value.get("transmutationTable.floorButton");
+        emcInMultiplier = new SuperNumber((String)value.get("emcInMultiplier"));
+        emcOutMultiplier = new SuperNumber((String)value.get("emcOutMultiplier"));
     }
 }
-
-class SeedEmcMap extends EmcMap {
-    public SeedEmcMap(Type type, String name) {
-        super(type, name);
-    }
-    @Override
-    protected void process() {
-        super.process();
-        EmcData.seedEmcMap = this.value;
-    }
-}
-class CustomEmcMap extends EmcMap {
-    public CustomEmcMap(Type type, String name) {
-        super(type, name);
-    }
-    @Override
-    protected void process() {
-        super.process();
-        EmcData.customEmcMap = this.value;
-    }
-}
-
 

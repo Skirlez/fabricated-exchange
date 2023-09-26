@@ -8,12 +8,12 @@ import java.util.concurrent.ConcurrentMap;
 
 import com.skirlez.fabricatedexchange.item.NbtItem;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
-import com.skirlez.fabricatedexchange.util.DataFile;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
-import com.skirlez.fabricatedexchange.util.config.ModConfig;
+import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
+import com.skirlez.fabricatedexchange.util.config.lib.DataFile;
 
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -35,11 +35,11 @@ public class EmcData {
     // both the server and the client can use these
     public static ConcurrentMap<String, SuperNumber> emcMap = new ConcurrentHashMap<String, SuperNumber>();
     public static ConcurrentMap<String, SuperNumber> potionEmcMap = new ConcurrentHashMap<String, SuperNumber>();
+    public static ConcurrentMap<String, SuperNumber> enchantmentEmcMap = new ConcurrentHashMap<String, SuperNumber>();
 
     // these should only ever be equal to what's in their respective jsons
     public static Map<String, SuperNumber> seedEmcMap = new HashMap<String, SuperNumber>();
     public static Map<String, SuperNumber> customEmcMap = new HashMap<String, SuperNumber>();
-
 
     public static SuperNumber getItemEmc(NbtItem item) {
         SuperNumber emc = getItemEmc(item.asItem());
@@ -88,7 +88,7 @@ public class EmcData {
         if (nbt.contains("emc"))
             emc.add(new SuperNumber(nbt.getString("emc")));
 
-        if (!ModConfig.NBT_ITEMS.hasItem(Registries.ITEM.getId(item).toString()))
+        if (!ModDataFiles.NBT_ITEMS.hasItem(Registries.ITEM.getId(item).toString()))
             return;
 
         if (item instanceof PotionItem) {
@@ -105,6 +105,13 @@ public class EmcData {
             for (int i = 0; i < enchantments.size(); i++) {
                 NbtCompound enchantmentCompound = enchantments.getCompound(i);
                 String enchantment = enchantmentCompound.getString("id");
+
+                SuperNumber enchantmentEmc;
+                Map<String, SuperNumber> map = EmcData.enchantmentEmcMap;
+                enchantmentEmc = map.containsKey(enchantment) 
+                    ? new SuperNumber(map.get(enchantment)) 
+                    : new SuperNumber(32);
+            
                 
                 int repairCost = nbt.getInt("RepairCost");
                 // anvil uses = log2(repairCost)
@@ -113,13 +120,23 @@ public class EmcData {
                 SuperNumber repairCostPenalty = new SuperNumber(anvilUses, 7);
                 repairCostPenalty.subtract(BigInteger.ONE);
                 repairCostPenalty.square();          
-
-                // TODO: Give enchantments EMC value (For now, all of them are worth 32)
-                SuperNumber enchantmentEmc = new SuperNumber(32);
+                
                 int level = enchantmentCompound.getInt("lvl");
-                enchantmentEmc.multiply(level);
+                
+                /* an enchantment level n is worth as much as
+                    2^(n-1) * cost of enchantment level 1
+                    + (2^(n-1)-1) * the cost of an enchanted book
+
+                    derived from anvil book combining. please trust me
+                */
+
+                SuperNumber enchantedBookCost = EmcData.getItemEmc(item);
+                enchantedBookCost.multiply((1 << (level - 1)) - 1);
+                
+                enchantmentEmc.multiply(1 << (level - 1));
+                enchantmentEmc.add(enchantedBookCost);
                 enchantmentEmc.multiply(repairCostPenalty);
-                enchantmentEmc.floor();
+                enchantmentEmc.ceil();
                 emc.add(enchantmentEmc);
             }
         }
@@ -164,7 +181,7 @@ public class EmcData {
     }
 
     public static void setItemEmc(Item item, SuperNumber emc, boolean seed) {
-        DataFile<Map<String, SuperNumber>> file = seed ? ModConfig.SEED_EMC_MAP_FILE : ModConfig.CUSTOM_EMC_MAP_FILE;
+        DataFile<Map<String, SuperNumber>> file = seed ? ModDataFiles.SEED_EMC_MAP : ModDataFiles.CUSTOM_EMC_MAP;
         if (item == null)
             return;
         String id = Registries.ITEM.getId(item).toString();
@@ -210,6 +227,11 @@ public class EmcData {
         for (String s : EmcData.potionEmcMap.keySet()) {
             buffer.writeString(s);
             buffer.writeString(EmcData.potionEmcMap.get(s).divisionString());
+        }
+        buffer.writeInt(EmcData.enchantmentEmcMap.keySet().size());
+        for (String s : EmcData.enchantmentEmcMap.keySet()) {
+            buffer.writeString(s);
+            buffer.writeString(EmcData.enchantmentEmcMap.get(s).divisionString());
         }
 
         ServerPlayNetworking.send(player, ModMessages.EMC_MAP_SYNC_IDENTIFIER, buffer);

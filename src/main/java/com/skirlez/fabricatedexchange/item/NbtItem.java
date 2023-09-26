@@ -1,5 +1,7 @@
 package com.skirlez.fabricatedexchange.item;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
@@ -8,6 +10,7 @@ import net.minecraft.nbt.NbtCompound;
 // A simple class that holds an item with NBT data and nothing else.
 public class NbtItem implements ItemConvertible {
     private final Item item;
+    @Nullable
     private final NbtCompound nbt;
 
     public NbtItem(Item item) {
@@ -23,7 +26,6 @@ public class NbtItem implements ItemConvertible {
 
     public NbtItem(ItemStack stack) {
         this.item = stack.getItem();
-        
         NbtCompound nbt = stack.getNbt();
         this.nbt = (nbt == null) ? null : nbt.copy();
     }
@@ -39,6 +41,7 @@ public class NbtItem implements ItemConvertible {
         return stack;
     }
 
+    @Nullable
     public NbtCompound getNbt() {
         return nbt;
     }

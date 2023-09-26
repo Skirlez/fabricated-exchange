@@ -6,12 +6,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
-import com.skirlez.fabricatedexchange.util.DataFile;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
+import com.skirlez.fabricatedexchange.util.config.lib.DataFile;
 
-public class NbtItemsFile extends DataFile<HashMap<String, List<String>>>  {
+// Technically not a list!
+public class NbtItemsList extends DataFile<HashMap<String, List<String>>>  {
 
-    public NbtItemsFile(Type type, String name) {
+    public NbtItemsList(Type type, String name) {
         super(type, name);
     }
 

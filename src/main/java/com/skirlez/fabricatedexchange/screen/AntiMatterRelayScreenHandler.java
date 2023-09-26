@@ -13,7 +13,7 @@ public class AntiMatterRelayScreenHandler extends FuelScreenHandler  {
         this(syncId, playerInventory, buf.readBlockPos(), buf.readInt(), buf);
     }
     public AntiMatterRelayScreenHandler(int syncId, PlayerInventory playerInventory, BlockPos pos, int level, PacketByteBuf buf) {
-        super(ModScreenHandlers.ANTIMATTER_RELAY_SCREEN_HANDLER, syncId, pos, level, buf);
+        super(ModScreenHandlers.ANTIMATTER_RELAY, syncId, pos, level, buf);
 
         AntiMatterRelayBlockEntity blockEntity = (AntiMatterRelayBlockEntity)playerInventory.player.getWorld().getBlockEntity(pos);
 

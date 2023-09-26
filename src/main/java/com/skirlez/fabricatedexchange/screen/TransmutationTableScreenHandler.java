@@ -50,7 +50,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
     }
     
     public TransmutationTableScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory) {
-        super(ModScreenHandlers.TRANSMUTATION_TABLE_SCREEN_HANDLER, syncId);
+        super(ModScreenHandlers.TRANSMUTATION_TABLE, syncId);
         checkSize(inventory, 19);
         this.inventory = inventory;
         this.player = playerInventory.player;

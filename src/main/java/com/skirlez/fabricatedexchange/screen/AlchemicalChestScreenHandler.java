@@ -17,7 +17,7 @@ public class AlchemicalChestScreenHandler extends ScreenHandler implements Chest
     }
 
     public AlchemicalChestScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory) {
-        super(ModScreenHandlers.ALCHEMICAL_CHEST_SCREEN_HANDLER, syncId);
+        super(ModScreenHandlers.ALCHEMICAL_CHEST, syncId);
         checkSize(inventory, 104);
         this.inventory = inventory;
         inventory.onOpen(playerInventory.player);

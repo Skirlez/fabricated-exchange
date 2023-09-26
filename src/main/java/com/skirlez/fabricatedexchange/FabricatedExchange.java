@@ -22,6 +22,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +41,7 @@ import com.skirlez.fabricatedexchange.util.ModTags;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
-import com.skirlez.fabricatedexchange.util.config.ModConfig;
+import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 
 
 public class FabricatedExchange implements ModInitializer {
@@ -76,8 +78,8 @@ public class FabricatedExchange implements ModInitializer {
         });
 
         ServerLifecycleEvents.SERVER_STARTED.register((server) -> {
-            ModConfig.fetchAll();
-            generateBlockRotationMap(ModConfig.BLOCK_TRANSMUTATION_MAP_FILE.getValue());
+            ModDataFiles.fetchAll();
+            generateBlockRotationMap(ModDataFiles.BLOCK_TRANSMUTATION_MAP.getValue());
             reloadEmcMap(server);
         });
     }
@@ -87,6 +89,7 @@ public class FabricatedExchange implements ModInitializer {
         boolean hasWarned = mapper.map();
         EmcData.emcMap = mapper.getEmcMap();
         EmcData.potionEmcMap =  mapper.getPotionEmcMap();
+        EmcData.enchantmentEmcMap = mapper.getEnchantmentEmcMap();
         List<Item> fuelItemList = new ArrayList<Item>();
  
         Iterator<RegistryEntry<Item>> iterator = Registries.ITEM.getEntryList(ModTags.FUEL).get().iterator();

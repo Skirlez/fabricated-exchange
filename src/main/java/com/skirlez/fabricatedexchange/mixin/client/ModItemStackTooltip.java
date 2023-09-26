@@ -13,7 +13,7 @@ import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreen;
 import com.skirlez.fabricatedexchange.screen.slot.transmutation.TransmutationSlot;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
-import com.skirlez.fabricatedexchange.util.config.ModConfig;
+import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -42,7 +42,7 @@ public class ModItemStackTooltip {
 
 		EmcData.considerStackDurability(itemStack, emc);
 		
-		if (ModConfig.CONFIG_FILE.showEnchantedBookRepairCost && itemStack.getItem().equals(Items.ENCHANTED_BOOK)) {
+		if (ModDataFiles.CONFIG_FILE.showEnchantedBookRepairCost && itemStack.getItem().equals(Items.ENCHANTED_BOOK)) {
 			NbtCompound nbt = itemStack.getNbt();
 			if (nbt != null) {
 				int repairCost = nbt.getInt("RepairCost");
@@ -77,7 +77,7 @@ public class ModItemStackTooltip {
 		}
 		
 		 
-		if (ModConfig.CONFIG_FILE.showItemEmcOrigin) {
+		if (ModDataFiles.CONFIG_FILE.showItemEmcOrigin) {
 			boolean seed = EmcData.isItemInSeedValues(itemStack.getItem());
 			boolean custom = EmcData.isItemInCustomValues(itemStack.getItem());
 			if (seed)

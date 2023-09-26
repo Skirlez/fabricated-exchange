@@ -3,12 +3,13 @@ package com.skirlez.fabricatedexchange.util.config;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Iterator;
-import com.skirlez.fabricatedexchange.util.DataFile;
+
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
+import com.skirlez.fabricatedexchange.util.config.lib.DataFile;
 
-public class ModifiersFile extends DataFile<HashSet<String>> {
+public class ModifiersList extends DataFile<HashSet<String>> {
 
-    public ModifiersFile(Type type, String name) {
+    public ModifiersList(Type type, String name) {
         super(type, name);
         tagModifiers = new HashSet<String>();
     }

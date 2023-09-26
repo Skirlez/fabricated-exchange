@@ -1,35 +1,47 @@
-package com.skirlez.fabricatedexchange.util;
+package com.skirlez.fabricatedexchange.util.config.lib;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.Writer;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
-import com.skirlez.fabricatedexchange.util.config.ModConfig;
+import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 
-// This class represents a JSON file.
-public class DataFile<T> {
-    private final Type type;
+/** This class represents a file with a value that can be saved to permanent storage. */
+public abstract class AbstractFile<T> {
+    
+    // The folder where the file is stored
     private final Path path;
+    // The type of the value
+    protected final Type type;
+    // The name of the file
     protected final String name;
+    // The file's value
     protected T value;
-    public DataFile(Type type, String name) {
+    
+    public AbstractFile(Type type, String name) {
         this.type = type;
         this.name = name;
-        this.path = ModConfig.CONFIG_DIR.resolve(name);
+        this.path = ModDataFiles.CONFIG_DIR.resolve(name);
     }
+
+
+    // Subclasses must override these methods to save the file
+    protected abstract T readValue(Reader reader) throws Exception;
+    protected abstract void writeValue(Writer writer, T value) throws Exception;
 
     // Read the file from disk to update the instance.
     // if unsuccessful, set to the default value
     public void fetch() {
         if (Files.exists(path)) {
             try (BufferedReader reader = Files.newBufferedReader(path)) {
-                value = ModConfig.GSON.fromJson(reader, type);
+                value = readValue(reader);
                 process();
             } 
             catch (Exception e) {
@@ -55,9 +67,9 @@ public class DataFile<T> {
     
     // Write the instance's current data to disk
     public void save() {
-        if (!Files.exists(ModConfig.CONFIG_DIR)) {
+        if (!Files.exists(ModDataFiles.CONFIG_DIR)) {
             try {
-                Files.createDirectory(ModConfig.CONFIG_DIR);
+                Files.createDirectory(ModDataFiles.CONFIG_DIR);
             }
             catch (Exception e) {
                 FabricatedExchange.LOGGER.error("Could not create config directory for " + name + "!", e);
@@ -66,7 +78,7 @@ public class DataFile<T> {
         if (value == null)
             return;
         try (BufferedWriter writer = Files.newBufferedWriter(path)) {
-            ModConfig.GSON.toJson(value, writer);
+            writeValue(writer, value);
         } 
         catch (Exception e) {
             FabricatedExchange.LOGGER.error(name + " could not be saved!", e);
@@ -86,7 +98,7 @@ public class DataFile<T> {
     public void setValueToDefault() {
         try (InputStream inputStream = FabricatedExchange.class.getClassLoader().getResourceAsStream("default_configs/" + name);
             Reader reader = new InputStreamReader(inputStream)) {
-            value = ModConfig.GSON.fromJson(reader, type);
+            value = readValue(reader);
             process();
         } catch (Exception e) {
             FabricatedExchange.LOGGER.error(name + "'s default configuration could not be read from!", e);
@@ -97,7 +109,7 @@ public class DataFile<T> {
     protected T getDefaultValue() {
         try (InputStream inputStream = FabricatedExchange.class.getClassLoader().getResourceAsStream("default_configs/" + name);
             Reader reader = new InputStreamReader(inputStream)) {
-            return ModConfig.GSON.fromJson(reader, type);
+            return readValue(reader);
         } catch (Exception e) {
             FabricatedExchange.LOGGER.error(name + "'s default configuration could not be read from!", e);
             return null;

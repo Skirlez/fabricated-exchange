@@ -22,7 +22,7 @@ public class EnergyCollectorScreenHandler extends FuelScreenHandler {
         this(syncId, playerInventory, buf.readBlockPos(), buf.readInt(), buf);
     }
     public EnergyCollectorScreenHandler(int syncId, PlayerInventory playerInventory, BlockPos pos, int level, PacketByteBuf buf) {
-        super(ModScreenHandlers.ENERGY_COLLECTOR_SCREEN_HANDLER, syncId, pos, level, buf);
+        super(ModScreenHandlers.ENERGY_COLLECTOR, syncId, pos, level, buf);
         EnergyCollectorBlockEntity blockEntity = (EnergyCollectorBlockEntity)playerInventory.player.getWorld().getBlockEntity(pos);
         if (blockEntity == null) {
             inventory = new SimpleInventory((2 + level) * 4 + 3);

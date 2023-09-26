@@ -21,9 +21,10 @@ import com.skirlez.fabricatedexchange.mixin.BrewingRecipeRegistryAccessor;
 import com.skirlez.fabricatedexchange.mixin.LegacySmithingRecipeAccessor;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
-import com.skirlez.fabricatedexchange.util.config.ModConfig;
-import com.skirlez.fabricatedexchange.util.config.ModifiersFile;
+import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
+import com.skirlez.fabricatedexchange.util.config.ModifiersList;
 
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
@@ -49,6 +50,7 @@ import net.minecraft.util.collection.DefaultedList;
 public class EmcMapper {
     private ConcurrentMap<String, SuperNumber> emcMap;
     private ConcurrentMap<String, SuperNumber> potionEmcMap;
+    private ConcurrentMap<String, SuperNumber> enchantmentEmcMap;
 
     private boolean warninged = false;
     
@@ -57,7 +59,7 @@ public class EmcMapper {
     private Map<String, Set<UnknownEquationNode>> unknownEquationMap = new HashMap<String, Set<UnknownEquationNode>>();
     
     private HashMap<String, Queue<ItemEquation>> splitQueues = new HashMap<String, Queue<ItemEquation>>();
-    private final ModifiersFile modifiers;
+    private final ModifiersList modifiers;
     
 
     public EmcMapper(DynamicRegistryManager dynamicRegistryManager, RecipeManager recipeManager) {
@@ -66,8 +68,9 @@ public class EmcMapper {
 
         emcMap = new ConcurrentHashMap<String, SuperNumber>();
         potionEmcMap = new ConcurrentHashMap<String, SuperNumber>();
+        enchantmentEmcMap = new ConcurrentHashMap<String, SuperNumber>();
 
-        modifiers = ModConfig.MODIFIERS;
+        modifiers = ModDataFiles.MODIFIERS;
     }
 
     public ConcurrentMap<String, SuperNumber> getEmcMap() {
@@ -76,12 +79,14 @@ public class EmcMapper {
     public ConcurrentMap<String, SuperNumber> getPotionEmcMap() {
         return potionEmcMap;
     }
-
+    public ConcurrentMap<String, SuperNumber> getEnchantmentEmcMap() {
+        return enchantmentEmcMap;
+    }
 
     /** Maps out all the recipes known to recipeManager + item equations given by mods. */
     public boolean map() {
 
-        Map<String, SuperNumber> seedEmcMap = ModConfig.SEED_EMC_MAP_FILE.getValue();
+        Map<String, SuperNumber> seedEmcMap = ModDataFiles.SEED_EMC_MAP.getValue();
         if (seedEmcMap != null)
             GeneralUtil.mergeMap(emcMap, seedEmcMap);
 
@@ -90,7 +95,7 @@ public class EmcMapper {
         List<CraftingRecipe> allCraftingRecipes = recipeManager.listAllOfType(RecipeType.CRAFTING);
         List<StonecuttingRecipe> allStonecuttingRecipes = recipeManager.listAllOfType(RecipeType.STONECUTTING);
         // blacklisted recipes and items
-        Map<String, HashSet<String>> blacklistedRecipes = ModConfig.BLACKLISTED_MAPPER_RECIPES_FILE.getValue();
+        Map<String, HashSet<String>> blacklistedRecipes = ModDataFiles.BLACKLISTED_MAPPER_RECIPES.getValue();
         if (blacklistedRecipes == null)
             blacklistedRecipes = new HashMap<>();
         HashSet<String> smithingRecipesBlacklist = blacklistedRecipes.getOrDefault("smithing", new HashSet<String>());
@@ -173,9 +178,26 @@ public class EmcMapper {
                 break;
         }
 
-        Map<String, SuperNumber> customEmcMap = ModConfig.CUSTOM_EMC_MAP_FILE.getValue();
+        Map<String, SuperNumber> customEmcMap = ModDataFiles.CUSTOM_EMC_MAP.getValue();
         if (customEmcMap != null)
             GeneralUtil.mergeMap(emcMap, customEmcMap);
+
+        SuperNumber constant = new SuperNumber(3260); // stupid dumb constant
+
+        for (Identifier id : Registries.ENCHANTMENT.getIds()) {
+            Enchantment enchantment = Registries.ENCHANTMENT.get(id);
+            int max = enchantment.getMaxLevel();
+            int weight = enchantment.getRarity().getWeight();
+            SuperNumber emc = new SuperNumber(constant);
+            emc.divide(weight);
+
+            if (enchantment.isTreasure())
+                emc.multiply(10);
+
+            emc.divide(1 << (max - 1));
+            enchantmentEmcMap.put(id.toString(), emc);
+        }
+
 
         boolean result = warninged;
         warninged = false;

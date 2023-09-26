@@ -24,7 +24,7 @@ public class EnergyCondenserScreenHandler extends LeveledScreenHandler implement
     }
 
     public EnergyCondenserScreenHandler(int syncId, PlayerInventory playerInventory, BlockPos pos, int level, PacketByteBuf buf) {
-        super(ModScreenHandlers.ENERGY_CONDENSER_SCREEN_HANDLER, syncId);
+        super(ModScreenHandlers.ENERGY_CONDENSER, syncId);
         EnergyCondenserBlockEntity blockEntity = (EnergyCondenserBlockEntity)playerInventory.player.getWorld().getBlockEntity(pos);
         this.pos = pos;
         this.level = level;

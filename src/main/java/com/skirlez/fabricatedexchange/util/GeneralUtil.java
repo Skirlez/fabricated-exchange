@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -23,7 +24,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public class GeneralUtil {
+public abstract class GeneralUtil {
     public static <T> void mergeMap(Map<String, T> map, Map<String, T> newMap) {
         int iterations = newMap.keySet().size();
         Iterator<String> iterator = newMap.keySet().iterator();
@@ -99,6 +100,20 @@ public class GeneralUtil {
         return array;
     } 
 
-
+    public static void nestedLoop(int loops, int max, Consumer<int[]> operation) {
+        int arr[] = new int[loops];
+        while (true) {
+            operation.accept(arr);
+            int i = 0;
+            arr[i]++;
+            while (arr[i] >= max) {
+                arr[i] = 0;
+                if (i + 1 == arr.length)
+                    return;
+                arr[i + 1]++;
+                i++;
+            }
+        }
+    }
 
 }

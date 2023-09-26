@@ -3,7 +3,7 @@ package com.skirlez.fabricatedexchange.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import com.skirlez.fabricatedexchange.util.config.ModConfig;
+import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -30,7 +30,7 @@ public class ClientCommand {
     }
 
     private static int reloadConfig(CommandContext<FabricClientCommandSource> context) {
-        ModConfig.fetchAll();
+        ModDataFiles.fetchAll();
         context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.reloademc.data_success"));
         return 1;
 

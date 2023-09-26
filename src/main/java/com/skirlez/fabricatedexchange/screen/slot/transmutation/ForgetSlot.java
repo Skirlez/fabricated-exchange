@@ -10,7 +10,7 @@ import com.skirlez.fabricatedexchange.item.NbtItem;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandler;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
-import com.skirlez.fabricatedexchange.util.config.ModConfig;
+import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
@@ -47,9 +47,9 @@ public class ForgetSlot extends Slot {
                 playerState.knowledge.remove(idName);
                 screenHandler.removeKnowledge(new NbtItem(item));
             }
-            else if (ModConfig.NBT_ITEMS.hasItem(idName)) {
+            else if (ModDataFiles.NBT_ITEMS.hasItem(idName)) {
                 NbtCompound nbt = stack.getNbt();
-                List<String> allowedKeys = ModConfig.NBT_ITEMS.getAllowedKeys(idName);
+                List<String> allowedKeys = ModDataFiles.NBT_ITEMS.getAllowedKeys(idName);
                 if (nbt == null)
                     nbt = new NbtCompound();
                 if (!nbt.isEmpty()) {

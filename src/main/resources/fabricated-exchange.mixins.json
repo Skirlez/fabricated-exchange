@@ -9,7 +9,8 @@
 		"ScreenHandlerInvoker",
 		"ModFurnaceFuels",
 		"BrewingRecipeRegistryAccessor",
-		"BrewingRecipeAccessor"
+		"BrewingRecipeAccessor",
+		"ServerPlayerInteractionManagerPreMine"
 	],
 	"injectors": {
 		"defaultRequire": 1

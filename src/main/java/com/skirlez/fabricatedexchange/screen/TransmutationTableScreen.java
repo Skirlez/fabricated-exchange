@@ -8,7 +8,7 @@ import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.mixin.client.HandledScreenAccessor;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.screen.slot.transmutation.TransmutationSlot;
-import com.skirlez.fabricatedexchange.util.config.ModConfig;
+import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -53,8 +53,8 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 
     public TransmutationTableScreen(TransmutationTableScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
-        animated = ModConfig.CONFIG_FILE.transmutationTable_animated;
-        floorButtonEnabled = ModConfig.CONFIG_FILE.transmutationTable_floorButton;
+        animated = ModDataFiles.CONFIG_FILE.transmutationTable_animated;
+        floorButtonEnabled = ModDataFiles.CONFIG_FILE.transmutationTable_floorButton;
         if (animated) 
             distanceFromCenter = 0.0;
         else 

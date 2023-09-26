@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.skirlez.fabricatedexchange.item.ChargeableItem;
+import com.skirlez.fabricatedexchange.item.ItemUtil;
 import com.skirlez.fabricatedexchange.item.ItemWithModes;
 import com.skirlez.fabricatedexchange.item.OutliningItem;
+import com.skirlez.fabricatedexchange.item.PreMiningItem;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.item.TooltipContext;
@@ -14,15 +16,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PickaxeItem;
 import net.minecraft.item.ToolMaterial;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public class DarkMatterPickaxe extends PickaxeItem implements ChargeableItem, OutliningItem, ItemWithModes {
+public class DarkMatterPickaxe extends PickaxeItem implements ChargeableItem, OutliningItem, ItemWithModes, PreMiningItem {
 
     @Override
     public int getModeAmount() {
@@ -67,27 +66,11 @@ public class DarkMatterPickaxe extends PickaxeItem implements ChargeableItem, Ou
     public DarkMatterPickaxe(ToolMaterial material, int attackDamage, float attackSpeed, Settings settings) {
         super(material, attackDamage, attackSpeed, settings);
     }
-    @Override
-    public boolean postMine(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity miner) {
-        if (isSuitableFor(state) && miner instanceof PlayerEntity player) {
-            List<BlockPos> positions = getBlocksToMine(world, stack, miner.getPos(), pos, state);
-            for (BlockPos newPos : positions)
-                world.breakBlock(newPos, true, miner);
-        }
-        return super.postMine(stack, world, state, pos, miner);
-    }
+
     @Override
     public void appendTooltip(ItemStack stack, World world, List<Text> tooltip, TooltipContext context) {
         super.appendTooltip(stack, world, tooltip, context);
-        int charge = ChargeableItem.getCharge(stack);
-        if (charge == 0) {
-            tooltip.add(Text.translatable("item.fabricated-exchange.mode_switch")                    
-                .append(" ")
-                .append(Text.translatable("item.fabricated-exchange.dark_matter_pickaxe.uncharged")
-                    .setStyle(Style.EMPTY.withColor(Formatting.DARK_GRAY))));
-        }
-        else
-            ItemWithModes.addModeToTooltip(stack, tooltip);
+        ItemUtil.addModeAndChargeToTooltip(stack, tooltip);
     }
 
 
@@ -98,29 +81,27 @@ public class DarkMatterPickaxe extends PickaxeItem implements ChargeableItem, Ou
         return true;
     }
 
-    protected List<BlockPos> getBlocksToMine(World world, ItemStack stack, Vec3d playerPos, BlockPos center, BlockState centerState) {
+    @Override
+    public void preMine(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity miner) {
+        if (isSuitableFor(state) && miner instanceof PlayerEntity player) {
+            List<BlockPos> positions = getBlocksToMine(player, stack, world, pos, state);
+            for (BlockPos newPos : positions)
+                world.breakBlock(newPos, true, miner);
+        }
+    }
+
+
+    protected List<BlockPos> getBlocksToMine(PlayerEntity player, ItemStack stack, World world, BlockPos center, BlockState centerState) {
         List<BlockPos> list = new ArrayList<BlockPos>();
         if (ChargeableItem.getCharge(stack) == 0)
             return list;
 
-        Vec3d relativePos = playerPos.subtract(center.toCenterPos());
-        double x = relativePos.getX(), z = relativePos.getZ();
-        if (Math.abs(x) > Math.abs(z)) {
-            x = 0;
-            z = Math.signum(z);
-        }
-        else {
-            z = 0;
-            x = Math.signum(x);
-        }
-        Direction dir = Direction.fromVector((int)x, 0, (int)z);
-        assert dir != null;
-
+        Direction dir = ItemUtil.getHorizontalMineDirection(player, center);
         int mode = ItemWithModes.getMode(stack);
         switch (mode) {
-            // case 0 don't do anything
+            case 0 -> dir = dir.rotateYClockwise();
             case 1 -> dir = Direction.UP;
-            case 2 -> dir = dir.rotateYClockwise();
+            // case 2 don't do anything 
         }
 
 
@@ -143,8 +124,9 @@ public class DarkMatterPickaxe extends PickaxeItem implements ChargeableItem, Ou
     @Override
     public List<BlockPos> getPositionsToOutline(PlayerEntity player, ItemStack stack, BlockPos center) {
         BlockState state = player.getWorld().getBlockState(center);
-        return getBlocksToMine(player.getWorld(), stack, player.getPos(), center, state);
+        return getBlocksToMine(player, stack, player.getWorld(), center, state);
     }
+
 
 
 }

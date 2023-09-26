@@ -1,0 +1,8 @@
+version: "0.5.3"
+showItemEmcOrigin: false
+showEnchantedBookRepairCost: true
+mapper.enabled: true
+transmutationTable.animated: true
+transmutationTable.floorButton: false
+emcInMultiplier: "1"
+emcOutMultiplier: "1"

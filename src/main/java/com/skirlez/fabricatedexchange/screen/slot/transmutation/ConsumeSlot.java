@@ -10,7 +10,7 @@ import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandler;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
-import com.skirlez.fabricatedexchange.util.config.ModConfig;
+import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
@@ -45,8 +45,8 @@ public class ConsumeSlot extends Slot {
             EmcData.addEmc((ServerPlayerEntity)player, emc);
             PlayerState playerState = ServerState.getPlayerState(player);
             String idName = Registries.ITEM.getId(item).toString();
-            if (ModConfig.NBT_ITEMS.hasItem(idName)) {
-                List<String> allowedKeys = ModConfig.NBT_ITEMS.getAllowedKeys(idName);
+            if (ModDataFiles.NBT_ITEMS.hasItem(idName)) {
+                List<String> allowedKeys = ModDataFiles.NBT_ITEMS.getAllowedKeys(idName);
                 NbtCompound nbt = stack.getNbt();
                 if (nbt == null)
                     nbt = new NbtCompound();
@@ -76,7 +76,7 @@ public class ConsumeSlot extends Slot {
                     Registries.ITEM.forEach(
                     currentItem -> {
                         String currentId = Registries.ITEM.getId(currentItem).toString();
-                        if (ModConfig.NBT_ITEMS.hasItem(currentId))
+                        if (ModDataFiles.NBT_ITEMS.hasItem(currentId))
                             return;
                         SuperNumber currentEmc = EmcData.getItemEmc(currentId);
                         if (!currentEmc.equalsZero() && !playerState.knowledge.contains(currentId)) {

@@ -13,7 +13,7 @@ import com.skirlez.fabricatedexchange.screen.EnergyCondenserScreen;
 import com.skirlez.fabricatedexchange.screen.ModScreenHandlers;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreen;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
-import com.skirlez.fabricatedexchange.util.config.ModConfig;
+import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -38,11 +38,11 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        HandledScreens.register(ModScreenHandlers.TRANSMUTATION_TABLE_SCREEN_HANDLER, TransmutationTableScreen::new);
-        HandledScreens.register(ModScreenHandlers.ENERGY_COLLECTOR_SCREEN_HANDLER, EnergyCollectorScreen::new);
-        HandledScreens.register(ModScreenHandlers.ANTIMATTER_RELAY_SCREEN_HANDLER, AntiMatterRelayScreen::new);
-        HandledScreens.register(ModScreenHandlers.ALCHEMICAL_CHEST_SCREEN_HANDLER, AlchemicalChestScreen::new);
-        HandledScreens.register(ModScreenHandlers.ENERGY_CONDENSER_SCREEN_HANDLER, EnergyCondenserScreen::new);
+        HandledScreens.register(ModScreenHandlers.TRANSMUTATION_TABLE, TransmutationTableScreen::new);
+        HandledScreens.register(ModScreenHandlers.ENERGY_COLLECTOR, EnergyCollectorScreen::new);
+        HandledScreens.register(ModScreenHandlers.ANTIMATTER_RELAY, AntiMatterRelayScreen::new);
+        HandledScreens.register(ModScreenHandlers.ALCHEMICAL_CHEST, AlchemicalChestScreen::new);
+        HandledScreens.register(ModScreenHandlers.ENERGY_CONDENSER, EnergyCondenserScreen::new);
         KeyInputHandler.register();
         ModMessages.registerS2CPackets();
         
@@ -61,7 +61,7 @@ public class FabricatedExchangeClient implements ClientModInitializer {
             -> MinecraftClient.getInstance().getBlockEntityRenderDispatcher().renderEntity(RENDER_ENERGY_CONDENSER_MK2, matrices, vertexConsumers, light, overlay));
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-            ModConfig.fetchAll();
+            ModDataFiles.fetchAll();
         });
     }
 

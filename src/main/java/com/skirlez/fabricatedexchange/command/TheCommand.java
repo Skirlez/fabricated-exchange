@@ -14,9 +14,9 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
-import com.skirlez.fabricatedexchange.util.DataFile;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
-import com.skirlez.fabricatedexchange.util.config.ModConfig;
+import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
+import com.skirlez.fabricatedexchange.util.config.lib.AbstractFile;
 
 import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.command.suggestion.SuggestionProviders;
@@ -192,26 +192,26 @@ public class TheCommand {
         Item item = stack.getItem();
         String id = Registries.ITEM.getId(item).toString();
         if (seed) {
-            Map<String, SuperNumber> map = ModConfig.SEED_EMC_MAP_FILE.getValue();
+            Map<String, SuperNumber> map = ModDataFiles.SEED_EMC_MAP.getValue();
             if (!map.containsKey(id)) {
                 context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.removeemc.seed_confused")
                     .append(" ").append(Text.translatable("commands.fabricated-exchange.zero_notice")));
                 return 0;
             }
             map.remove(id);
-            ModConfig.SEED_EMC_MAP_FILE.setValueAndSave(map);
+            ModDataFiles.SEED_EMC_MAP.setValueAndSave(map);
             context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.removeemc.seed_success")
                 .append(" ").append(Text.translatable("commands.fabricated-exchange.reload_notice")));
         }
         else {
-            Map<String, SuperNumber> map = ModConfig.CUSTOM_EMC_MAP_FILE.getValue();
+            Map<String, SuperNumber> map = ModDataFiles.CUSTOM_EMC_MAP.getValue();
             if (!map.containsKey(id)) {
                 context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.removeemc.custom_confused")
                     .append(" ").append(Text.translatable("commands.fabricated-exchange.zero_notice")));
                 return 0;
             }
             map.remove(id);
-            ModConfig.CUSTOM_EMC_MAP_FILE.setValueAndSave(map);
+            ModDataFiles.CUSTOM_EMC_MAP.setValueAndSave(map);
             EmcData.syncMap(context.getSource().getPlayer());
             context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.removeemc.custom_success")
                 .append(" ").append(Text.translatable("commands.fabricated-exchange.reload_notice")));
@@ -226,14 +226,14 @@ public class TheCommand {
             context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.recipe.ban.unsupported_type", type));
             return 0;
         }
-        Map<String, HashSet<String>> blacklisted = ModConfig.BLACKLISTED_MAPPER_RECIPES_FILE.getValue();
+        Map<String, HashSet<String>> blacklisted = ModDataFiles.BLACKLISTED_MAPPER_RECIPES.getValue();
         String name = recipe.getId().toString();
         if (blacklisted.get(type).contains(name)) {
             context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.nothing"));
             return 0;
         }
         blacklisted.get(type).add(name);
-        ModConfig.BLACKLISTED_MAPPER_RECIPES_FILE.save();
+        ModDataFiles.BLACKLISTED_MAPPER_RECIPES.save();
         context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.recipe.ban.success", type));
         return 1;
     }
@@ -244,24 +244,24 @@ public class TheCommand {
             context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.recipe.pardon.unsupported_type", type));
             return 0;
         }
-        Map<String, HashSet<String>> blacklisted = ModConfig.BLACKLISTED_MAPPER_RECIPES_FILE.getValue();
+        Map<String, HashSet<String>> blacklisted = ModDataFiles.BLACKLISTED_MAPPER_RECIPES.getValue();
         String name = recipe.getId().toString();
         if (!blacklisted.get(type).contains(name)) {
             context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.nothing"));
             return 0;
         }
         blacklisted.get(type).remove(name);
-        ModConfig.BLACKLISTED_MAPPER_RECIPES_FILE.save();
+        ModDataFiles.BLACKLISTED_MAPPER_RECIPES.save();
         context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.recipe.pardon.success", type));
         return 1;
     }
 
     private static int reload(CommandContext<ServerCommandSource> context) {
         MinecraftServer server = context.getSource().getServer();
-        ModConfig.fetchAll();
+        ModDataFiles.fetchAll();
         context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.reloademc.data_success"));
         long startTime = System.nanoTime();
-        FabricatedExchange.generateBlockRotationMap(ModConfig.BLOCK_TRANSMUTATION_MAP_FILE.getValue());
+        FabricatedExchange.generateBlockRotationMap(ModDataFiles.BLOCK_TRANSMUTATION_MAP.getValue());
         boolean hasWarned = FabricatedExchange.reloadEmcMap(server);
         FabricatedExchange.syncMaps(server);
         FabricatedExchange.syncBlockTransmutations(server);
@@ -275,10 +275,10 @@ public class TheCommand {
     }
     private static int reset(CommandContext<ServerCommandSource> context) {
         String str = context.getArgument("datafile", String.class);
-        DataFile<?> datafile = switch (str) {
-            case "config" -> ModConfig.CONFIG_FILE;
-            case "seed_emc_map" -> ModConfig.SEED_EMC_MAP_FILE;
-            case "custom_emc_map" -> ModConfig.CUSTOM_EMC_MAP_FILE;
+        AbstractFile<?> datafile = switch (str) {
+            case "config" -> ModDataFiles.CONFIG_FILE;
+            case "seed_emc_map" -> ModDataFiles.SEED_EMC_MAP;
+            case "custom_emc_map" -> ModDataFiles.CUSTOM_EMC_MAP;
             default -> null;            
         };
         if (datafile == null) {

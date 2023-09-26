@@ -45,7 +45,7 @@ All of the code in this repository is licensed under the terms of the LGPLv3. I 
 # Project Goals
 
 - Support Quilt (Even over Fabric, if it ever comes to that choice)
-- Don't use any external libraries other than the Fabric API
+- Don't use any external libraries other than SnakeYAML (I really wanted YAML) and the Fabric API
 
 # Implemented Features
 
