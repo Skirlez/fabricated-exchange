@@ -65,7 +65,6 @@ public class EmcMapper {
     public EmcMapper(DynamicRegistryManager dynamicRegistryManager, RecipeManager recipeManager) {
         this.dynamicRegistryManager = dynamicRegistryManager;
         this.recipeManager = recipeManager;
-
         emcMap = new ConcurrentHashMap<String, SuperNumber>();
         potionEmcMap = new ConcurrentHashMap<String, SuperNumber>();
         enchantmentEmcMap = new ConcurrentHashMap<String, SuperNumber>();
@@ -182,8 +181,7 @@ public class EmcMapper {
         if (customEmcMap != null)
             GeneralUtil.mergeMap(emcMap, customEmcMap);
 
-        SuperNumber constant = new SuperNumber(3260); // stupid dumb constant
-
+        SuperNumber constant = ModDataFiles.CONFIG_FILE.enchantmentEmcConstant; 
         for (Identifier id : Registries.ENCHANTMENT.getIds()) {
             Enchantment enchantment = Registries.ENCHANTMENT.get(id);
             int max = enchantment.getMaxLevel();

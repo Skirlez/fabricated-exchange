@@ -6,3 +6,4 @@ transmutationTable.animated: true
 transmutationTable.floorButton: false
 emcInMultiplier: "1"
 emcOutMultiplier: "1"
+enchantmentEmcConstant: "3260"

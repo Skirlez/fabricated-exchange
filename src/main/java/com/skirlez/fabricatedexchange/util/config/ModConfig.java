@@ -30,6 +30,8 @@ public class ModConfig extends ConfigFile<Map<String, Object>> {
         "(default: 1)");
         addComments("emcOutMultiplier", "The amount of personal EMC you need to spend will be multiplied by this number.",
         "(default: 1)");
+        addComments("enchantmentEmcConstant", "A special constant used during the calculation", "of enchantment EMC. Bigger constant -> more EMC.",
+        "(default: 3260)");
     }
 
     private static void addComments(String field, String... comments) {
@@ -47,6 +49,7 @@ public class ModConfig extends ConfigFile<Map<String, Object>> {
     public boolean transmutationTable_floorButton;
     public SuperNumber emcInMultiplier;
     public SuperNumber emcOutMultiplier;
+    public SuperNumber enchantmentEmcConstant;
 
     /* Fetch the config and compare to the default config to see if any keys
     are missing or any of them have mismatched value types. If true, set that 
@@ -84,6 +87,7 @@ public class ModConfig extends ConfigFile<Map<String, Object>> {
         transmutationTable_floorButton = (boolean)value.get("transmutationTable.floorButton");
         emcInMultiplier = new SuperNumber((String)value.get("emcInMultiplier"));
         emcOutMultiplier = new SuperNumber((String)value.get("emcOutMultiplier"));
+        enchantmentEmcConstant = new SuperNumber((String)value.get("enchantmentEmcConstant"));
     }
 }
 
