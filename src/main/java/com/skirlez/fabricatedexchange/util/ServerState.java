@@ -20,91 +20,91 @@ import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
 
 public class ServerState extends PersistentState {
-    public Map<UUID, PlayerState> players = new HashMap<UUID, PlayerState>();
+	public Map<UUID, PlayerState> players = new HashMap<UUID, PlayerState>();
 
-    @Override
-    public NbtCompound writeNbt(NbtCompound nbt) {
-        NbtCompound playersNbtCompound = new NbtCompound();
-        players.forEach((UUID, playerState) -> {
-            NbtCompound playerStateNbt = new NbtCompound();
+	@Override
+	public NbtCompound writeNbt(NbtCompound nbt) {
+		NbtCompound playersNbtCompound = new NbtCompound();
+		players.forEach((UUID, playerState) -> {
+			NbtCompound playerStateNbt = new NbtCompound();
  
-            playerStateNbt.putString("emc", playerState.emc.divisionString());
-            NbtList knowledgeList = new NbtList();
-            Iterator<String> stringIterator = playerState.knowledge.iterator();
-            while (stringIterator.hasNext())
-                knowledgeList.add(NbtString.of(stringIterator.next()));
-            
-            playerStateNbt.put("knowledge", knowledgeList);
+			playerStateNbt.putString("emc", playerState.emc.divisionString());
+			NbtList knowledgeList = new NbtList();
+			Iterator<String> stringIterator = playerState.knowledge.iterator();
+			while (stringIterator.hasNext())
+				knowledgeList.add(NbtString.of(stringIterator.next()));
+			
+			playerStateNbt.put("knowledge", knowledgeList);
 
-            NbtList specialKnowledgeItemList = new NbtList();
-            NbtList specialKnowledgeCompoundList = new NbtList();
-            Iterator<NbtItem> itemStackIterator = playerState.specialKnowledge.iterator();
-            while (itemStackIterator.hasNext()) {
-                NbtItem item = itemStackIterator.next();
-                specialKnowledgeItemList.add(NbtString.of(Registries.ITEM.getId(item.asItem()).toString()));
-                specialKnowledgeCompoundList.add(item.getNbt());
-            }
-            playerStateNbt.put("specialKnowledgeItems", specialKnowledgeItemList);
-            playerStateNbt.put("specialKnowledgeCompounds", specialKnowledgeCompoundList);
+			NbtList specialKnowledgeItemList = new NbtList();
+			NbtList specialKnowledgeCompoundList = new NbtList();
+			Iterator<NbtItem> itemStackIterator = playerState.specialKnowledge.iterator();
+			while (itemStackIterator.hasNext()) {
+				NbtItem item = itemStackIterator.next();
+				specialKnowledgeItemList.add(NbtString.of(Registries.ITEM.getId(item.asItem()).toString()));
+				specialKnowledgeCompoundList.add(item.getNbt());
+			}
+			playerStateNbt.put("specialKnowledgeItems", specialKnowledgeItemList);
+			playerStateNbt.put("specialKnowledgeCompounds", specialKnowledgeCompoundList);
 
-            playersNbtCompound.put(String.valueOf(UUID), playerStateNbt);
-        });
-        nbt.put("players", playersNbtCompound);
-        return nbt;
-    }
+			playersNbtCompound.put(String.valueOf(UUID), playerStateNbt);
+		});
+		nbt.put("players", playersNbtCompound);
+		return nbt;
+	}
 
  
-    public static ServerState createFromNbt(NbtCompound tag) {
-        ServerState serverState = new ServerState();
+	public static ServerState createFromNbt(NbtCompound tag) {
+		ServerState serverState = new ServerState();
  
-        NbtCompound playersTag = tag.getCompound("players");
-        playersTag.getKeys().forEach(key -> {
-            PlayerState playerState = new PlayerState(serverState);
+		NbtCompound playersTag = tag.getCompound("players");
+		playersTag.getKeys().forEach(key -> {
+			PlayerState playerState = new PlayerState(serverState);
  
-            playerState.emc = new SuperNumber(playersTag.getCompound(key).getString("emc"));
-            NbtList knowledgeNbtList = playersTag.getCompound(key).getList("knowledge", NbtElement.STRING_TYPE);
-            for (int i = 0; i < knowledgeNbtList.size(); i++) 
-                playerState.knowledge.add(knowledgeNbtList.getString(i));
+			playerState.emc = new SuperNumber(playersTag.getCompound(key).getString("emc"));
+			NbtList knowledgeNbtList = playersTag.getCompound(key).getList("knowledge", NbtElement.STRING_TYPE);
+			for (int i = 0; i < knowledgeNbtList.size(); i++) 
+				playerState.knowledge.add(knowledgeNbtList.getString(i));
 
-            NbtList specialKnowledgeItemList = 
-                playersTag.getCompound(key).getList("specialKnowledgeItems", NbtElement.STRING_TYPE);
-            NbtList specialKnowledgeCompoundList = 
-                playersTag.getCompound(key).getList("specialKnowledgeCompounds", NbtElement.COMPOUND_TYPE);
-            for (int i = 0; i < specialKnowledgeItemList.size(); i++) {
-                String id = specialKnowledgeItemList.getString(i);
-                NbtCompound nbt = specialKnowledgeCompoundList.getCompound(i);
-                
-                NbtItem nbtItem = new NbtItem(Registries.ITEM.get(new Identifier(id)), nbt);
-                
-                playerState.specialKnowledge.add(nbtItem);
-            }
+			NbtList specialKnowledgeItemList = 
+				playersTag.getCompound(key).getList("specialKnowledgeItems", NbtElement.STRING_TYPE);
+			NbtList specialKnowledgeCompoundList = 
+				playersTag.getCompound(key).getList("specialKnowledgeCompounds", NbtElement.COMPOUND_TYPE);
+			for (int i = 0; i < specialKnowledgeItemList.size(); i++) {
+				String id = specialKnowledgeItemList.getString(i);
+				NbtCompound nbt = specialKnowledgeCompoundList.getCompound(i);
+				
+				NbtItem nbtItem = new NbtItem(Registries.ITEM.get(new Identifier(id)), nbt);
+				
+				playerState.specialKnowledge.add(nbtItem);
+			}
 
 
 
-            UUID uuid = UUID.fromString(key);
-            serverState.players.put(uuid, playerState);
-        });
+			UUID uuid = UUID.fromString(key);
+			serverState.players.put(uuid, playerState);
+		});
  
-        return serverState;
-    }
+		return serverState;
+	}
 
-    public static ServerState getServerState(MinecraftServer server) {
-        PersistentStateManager persistentStateManager = server.getWorld(World.OVERWORLD).getPersistentStateManager();
+	public static ServerState getServerState(MinecraftServer server) {
+		PersistentStateManager persistentStateManager = server.getWorld(World.OVERWORLD).getPersistentStateManager();
  
-        ServerState serverState = persistentStateManager.getOrCreate(
-                ServerState::createFromNbt,
-                ServerState::new,
-                FabricatedExchange.MOD_ID);
+		ServerState serverState = persistentStateManager.getOrCreate(
+				ServerState::createFromNbt,
+				ServerState::new,
+				FabricatedExchange.MOD_ID);
  
-        return serverState;
-    }
+		return serverState;
+	}
  
-    public static PlayerState getPlayerState(LivingEntity player) {
-        ServerState serverState = getServerState(player.world.getServer());
-        // Either get the player by the uuid, or we don't have data for him yet, make a new player state
-        PlayerState playerState = serverState.players.computeIfAbsent(player.getUuid(), uuid -> new PlayerState(serverState));
+	public static PlayerState getPlayerState(LivingEntity player) {
+		ServerState serverState = getServerState(player.world.getServer());
+		// Either get the player by the uuid, or we don't have data for him yet, make a new player state
+		PlayerState playerState = serverState.players.computeIfAbsent(player.getUuid(), uuid -> new PlayerState(serverState));
  
-        return playerState;
-    }
+		return playerState;
+	}
 
 }

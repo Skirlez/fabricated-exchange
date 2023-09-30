@@ -10,7 +10,7 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 
 public class ModTags {
-    public static final TagKey<Item> STONE = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "stone"));
-    public static final TagKey<Item> FUEL = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "transmutation_fuel"));
-    public static final Optional<Named<Item>> FUEL_ITEMS = Registries.ITEM.getEntryList(ModTags.FUEL);
+	public static final TagKey<Item> STONE = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "stone"));
+	public static final TagKey<Item> FUEL = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "transmutation_fuel"));
+	public static final Optional<Named<Item>> FUEL_ITEMS = Registries.ITEM.getEntryList(ModTags.FUEL);
 }

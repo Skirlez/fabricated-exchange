@@ -9,30 +9,30 @@ import com.skirlez.fabricatedexchange.util.config.lib.DataFile;
 
 public class ModifiersList extends DataFile<HashSet<String>> {
 
-    public ModifiersList(Type type, String name) {
-        super(type, name);
-        tagModifiers = new HashSet<String>();
-    }
+	public ModifiersList(Type type, String name) {
+		super(type, name);
+		tagModifiers = new HashSet<String>();
+	}
 
-    private HashSet<String> tagModifiers;
+	private HashSet<String> tagModifiers;
 
-    @Override
-    protected void process() {
-        tagModifiers.clear();
-        Iterator<String> iterator = value.iterator();
-        while (iterator.hasNext()) {
-            String entry = iterator.next();
-            if (!entry.startsWith("#"))
-                continue;
-            entry = entry.substring(1);
-            String[] items = GeneralUtil.getItemStringsFromTagString(entry);
-            for (int i = 0; i < items.length; i++) {
-                tagModifiers.add(items[i]);
-            }
-        }
-    }
+	@Override
+	protected void process() {
+		tagModifiers.clear();
+		Iterator<String> iterator = value.iterator();
+		while (iterator.hasNext()) {
+			String entry = iterator.next();
+			if (!entry.startsWith("#"))
+				continue;
+			entry = entry.substring(1);
+			String[] items = GeneralUtil.getItemStringsFromTagString(entry);
+			for (int i = 0; i < items.length; i++) {
+				tagModifiers.add(items[i]);
+			}
+		}
+	}
 
-    public boolean hasItem(String item) {
-        return value.contains(item) || tagModifiers.contains(item);
-    }
+	public boolean hasItem(String item) {
+		return value.contains(item) || tagModifiers.contains(item);
+	}
 }

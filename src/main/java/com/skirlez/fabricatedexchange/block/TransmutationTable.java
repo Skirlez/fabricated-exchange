@@ -17,30 +17,30 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
 public class TransmutationTable extends Block {
-    public TransmutationTable(Settings settings) {
-        super(settings);
-    }
+	public TransmutationTable(Settings settings) {
+		super(settings);
+	}
 
-    private static final VoxelShape SHAPE = VoxelShapes.cuboid(0f, 0f, 0f, 1f, 0.25f, 1.0f);
+	private static final VoxelShape SHAPE = VoxelShapes.cuboid(0f, 0f, 0f, 1f, 0.25f, 1.0f);
 
-    @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext context) {
-        return SHAPE;
-    }
+	@Override
+	public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext context) {
+		return SHAPE;
+	}
 
-    @Override   
-    public BlockRenderType getRenderType(BlockState state) {    
-        return BlockRenderType.MODEL;
-    }
+	@Override   
+	public BlockRenderType getRenderType(BlockState state) {	
+		return BlockRenderType.MODEL;
+	}
 
-    @Override
-    public ActionResult onUse(BlockState state, World world, 
-        BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (!world.isClient) {
-            TransmutationTableScreenHandlerFactory screenHandlerFactory = new TransmutationTableScreenHandlerFactory();
-            player.openHandledScreen(screenHandlerFactory);
-        }
+	@Override
+	public ActionResult onUse(BlockState state, World world, 
+		BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+		if (!world.isClient) {
+			TransmutationTableScreenHandlerFactory screenHandlerFactory = new TransmutationTableScreenHandlerFactory();
+			player.openHandledScreen(screenHandlerFactory);
+		}
 
-        return ActionResult.SUCCESS;
-    }
+		return ActionResult.SUCCESS;
+	}
 }

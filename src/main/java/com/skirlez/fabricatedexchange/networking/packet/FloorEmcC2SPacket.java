@@ -12,16 +12,16 @@ import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class FloorEmcC2SPacket {
-    public static void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler,
-            PacketByteBuf buf, PacketSender responseSender) {   
-        if (!(player.currentScreenHandler instanceof TransmutationTableScreenHandler))
-            return;
-        PlayerState state = ServerState.getPlayerState(player);
-        if (state.emc.isWhole()) 
-            return;
-            
-        state.emc.floor();
-        state.markDirty();
-        EmcData.syncEmc(player, state.emc);
-    }
+	public static void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler,
+			PacketByteBuf buf, PacketSender responseSender) {   
+		if (!(player.currentScreenHandler instanceof TransmutationTableScreenHandler))
+			return;
+		PlayerState state = ServerState.getPlayerState(player);
+		if (state.emc.isWhole()) 
+			return;
+			
+		state.emc.floor();
+		state.markDirty();
+		EmcData.syncEmc(player, state.emc);
+	}
 }

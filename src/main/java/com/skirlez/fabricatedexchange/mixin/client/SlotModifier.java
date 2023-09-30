@@ -8,11 +8,11 @@ import net.minecraft.screen.slot.Slot;
 
 @Mixin(Slot.class)
 public interface SlotModifier {
-    @Mutable
-    @Accessor
-    void setX(int x);
+	@Mutable
+	@Accessor
+	void setX(int x);
 
-    @Mutable
-    @Accessor
-    void setY(int y);
+	@Mutable
+	@Accessor
+	void setY(int y);
 }

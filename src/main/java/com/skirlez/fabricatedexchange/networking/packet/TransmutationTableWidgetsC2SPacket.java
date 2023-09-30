@@ -9,20 +9,20 @@ import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class TransmutationTableWidgetsC2SPacket {
-    public static void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler,
-            PacketByteBuf buf, PacketSender responseSender) {   
-        if (player.currentScreenHandler instanceof TransmutationTableScreenHandler screenHandler) {
-            int type = buf.readInt();
-            if (type == 0) {
-                screenHandler.setSearchText(buf.readString());
-                screenHandler.refreshOffering();
-            }
-            else {
-                screenHandler.changeOfferingPage(buf.readInt()); 
-            }
-        }
-      
-    }
+	public static void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler,
+			PacketByteBuf buf, PacketSender responseSender) {   
+		if (player.currentScreenHandler instanceof TransmutationTableScreenHandler screenHandler) {
+			int type = buf.readInt();
+			if (type == 0) {
+				screenHandler.setSearchText(buf.readString());
+				screenHandler.refreshOffering();
+			}
+			else {
+				screenHandler.changeOfferingPage(buf.readInt()); 
+			}
+		}
+	  
+	}
 }
 
 

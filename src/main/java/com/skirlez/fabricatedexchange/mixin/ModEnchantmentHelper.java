@@ -16,12 +16,12 @@ import net.minecraft.item.SwordItem;
 
 @Mixin(EnchantmentHelper.class)
 public abstract class ModEnchantmentHelper {
-    @Inject(method = "getAttackDamage", at = @At("RETURN"), cancellable = true)
-    private static void considerChargeAttackDamage(ItemStack stack, EntityGroup group, CallbackInfoReturnable<Float> cir) {
-        Item item = stack.getItem();
-        if (item instanceof ChargeableItem && item instanceof SwordItem) {
-            cir.setReturnValue(cir.getReturnValue() + ChargeableItem.getCharge(stack));
-        }
-        
-    }
+	@Inject(method = "getAttackDamage", at = @At("RETURN"), cancellable = true)
+	private static void considerChargeAttackDamage(ItemStack stack, EntityGroup group, CallbackInfoReturnable<Float> cir) {
+		Item item = stack.getItem();
+		if (item instanceof ChargeableItem && item instanceof SwordItem) {
+			cir.setReturnValue(cir.getReturnValue() + ChargeableItem.getCharge(stack));
+		}
+		
+	}
 }

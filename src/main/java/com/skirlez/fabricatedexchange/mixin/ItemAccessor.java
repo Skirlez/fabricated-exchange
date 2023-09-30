@@ -13,13 +13,13 @@ import net.minecraft.world.World;
 
 @Mixin(Item.class)
 public interface ItemAccessor {
-    @Mutable
-    @Accessor
-    void setRecipeRemainder(Item item);
+	@Mutable
+	@Accessor
+	void setRecipeRemainder(Item item);
 
-    @Invoker
-    public static BlockHitResult invokeRaycast(World world, PlayerEntity player, RaycastContext.FluidHandling fluidHandling) {
-        return null;
-    }
+	@Invoker
+	public static BlockHitResult invokeRaycast(World world, PlayerEntity player, RaycastContext.FluidHandling fluidHandling) {
+		return null;
+	}
 
 }

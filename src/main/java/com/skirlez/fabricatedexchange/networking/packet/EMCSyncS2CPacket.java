@@ -9,6 +9,6 @@ import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 public class EMCSyncS2CPacket {
    public static void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-      FabricatedExchangeClient.clientEmc = new SuperNumber(buf.readString());
+	  FabricatedExchangeClient.clientEmc = new SuperNumber(buf.readString());
    }
 }

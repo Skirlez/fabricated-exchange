@@ -8,10 +8,10 @@ import net.minecraft.recipe.Ingredient;
 
 @Mixin(BrewingRecipeRegistry.Recipe.class)
 public interface BrewingRecipeAccessor<T>  {
-    @Accessor
-    public T getInput();
-    @Accessor
-    public Ingredient getIngredient();
-    @Accessor
-    public T getOutput();
+	@Accessor
+	public T getInput();
+	@Accessor
+	public Ingredient getIngredient();
+	@Accessor
+	public T getOutput();
 }

@@ -12,13 +12,13 @@ import net.minecraft.recipe.BrewingRecipeRegistry;
 
 @Mixin(BrewingRecipeRegistry.class)
 public interface BrewingRecipeRegistryAccessor {
-    @Accessor(value = "POTION_RECIPES")
-    public static List<BrewingRecipeRegistry.Recipe<Potion>> getPotionRecipes() {
-        return null;
-    }
-    @Accessor(value = "ITEM_RECIPES")
-    public static List<BrewingRecipeRegistry.Recipe<Item>> getItemRecipes() {
-        return null;
-    }
-    
+	@Accessor(value = "POTION_RECIPES")
+	public static List<BrewingRecipeRegistry.Recipe<Potion>> getPotionRecipes() {
+		return null;
+	}
+	@Accessor(value = "ITEM_RECIPES")
+	public static List<BrewingRecipeRegistry.Recipe<Item>> getItemRecipes() {
+		return null;
+	}
+	
 }

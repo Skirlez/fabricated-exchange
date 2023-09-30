@@ -10,17 +10,17 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
 public class TransmutationTablet extends Item {
-    public TransmutationTablet(Settings settings) {
-        super(settings);
-    }
-    @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if (!world.isClient()) {
-            TransmutationTableScreenHandlerFactory screenHandlerFactory = new TransmutationTableScreenHandlerFactory();
-            if (screenHandlerFactory != null) 
-                user.openHandledScreen(screenHandlerFactory);
-        }
-        return TypedActionResult.success(user.getStackInHand(hand), false);
-    }
+	public TransmutationTablet(Settings settings) {
+		super(settings);
+	}
+	@Override
+	public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+		if (!world.isClient()) {
+			TransmutationTableScreenHandlerFactory screenHandlerFactory = new TransmutationTableScreenHandlerFactory();
+			if (screenHandlerFactory != null) 
+				user.openHandledScreen(screenHandlerFactory);
+		}
+		return TypedActionResult.success(user.getStackInHand(hand), false);
+	}
 
 }

@@ -24,10 +24,10 @@ import net.minecraft.text.Text;
 
 @Mixin(ItemStack.class)
 public class ModItemStackTooltip {
-    @Shadow
-    int count;
-    
-    @Inject(method = "getTooltip", at = @At("RETURN"))
+	@Shadow
+	int count;
+	
+	@Inject(method = "getTooltip", at = @At("RETURN"))
 	protected void addEmcToTooltip(CallbackInfoReturnable<ArrayList<Text>> cir) {
 		ItemStack itemStack = (ItemStack)(Object)this;
 		ArrayList<Text> list = cir.getReturnValue();

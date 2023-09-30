@@ -23,71 +23,71 @@ simply generating EMC. When a fuel item is put inside of them, they are in the c
 consuming their EMC in order to transmute the fuel item to the next one. these states will be used 
 by the block entities to determine if they should spread their EMC to the surrounding block entities or not. */
 public interface ConsumerBlockEntity {
-    SuperNumber getEmc();
-    SuperNumber getOutputRate();
-    SuperNumber getMaximumEmc();
-    default SuperNumber getBonusEmc() {
-        return SuperNumber.ZERO;
-    }
-    boolean isConsuming();
+	SuperNumber getEmc();
+	SuperNumber getOutputRate();
+	SuperNumber getMaximumEmc();
+	default SuperNumber getBonusEmc() {
+		return SuperNumber.ZERO;
+	}
+	boolean isConsuming();
 
-    default void distributeEmc(List<BlockEntity> neighbors) {
-        // stores the neighbors which will be given EMC (as a gift!)
-        List<ConsumerBlockEntity> goodNeighbors = new ArrayList<ConsumerBlockEntity>(); 
-        for (int i = 0; i < neighbors.size(); i++) {
-            BlockEntity neighbor = neighbors.get(i);
-            if (neighbor instanceof ConsumerBlockEntity
-                    && ((ConsumerBlockEntity)neighbor).isConsuming()) {
+	default void distributeEmc(List<BlockEntity> neighbors) {
+		// stores the neighbors which will be given EMC (as a gift!)
+		List<ConsumerBlockEntity> goodNeighbors = new ArrayList<ConsumerBlockEntity>(); 
+		for (int i = 0; i < neighbors.size(); i++) {
+			BlockEntity neighbor = neighbors.get(i);
+			if (neighbor instanceof ConsumerBlockEntity
+					&& ((ConsumerBlockEntity)neighbor).isConsuming()) {
 
-                ConsumerBlockEntity consumerNeighbor = (ConsumerBlockEntity)neighbor;
-                SuperNumber max = consumerNeighbor.getMaximumEmc();
-                if (max.equalsZero() || consumerNeighbor.getEmc().compareTo(max) == -1)
-                    goodNeighbors.add(consumerNeighbor);
-            }
-        }
-        if (goodNeighbors.size() > 0) {
-            SuperNumber emc = getEmc();
-            SuperNumber output = new SuperNumber(SuperNumber.min(getOutputRate(), emc));
-            output.divide(goodNeighbors.size());
-            for (ConsumerBlockEntity neighbor : goodNeighbors) {
-                SuperNumber neighborEmc = neighbor.getEmc();
-                SuperNumber neighborMaximumEmc = neighbor.getMaximumEmc();
-                neighborEmc.stealFrom(emc, output);
-                SuperNumber bonusEmc = neighbor.getBonusEmc();
-                if (!bonusEmc.equalsZero()) {
-                    neighborEmc.add(bonusEmc);
+				ConsumerBlockEntity consumerNeighbor = (ConsumerBlockEntity)neighbor;
+				SuperNumber max = consumerNeighbor.getMaximumEmc();
+				if (max.equalsZero() || consumerNeighbor.getEmc().compareTo(max) == -1)
+					goodNeighbors.add(consumerNeighbor);
+			}
+		}
+		if (goodNeighbors.size() > 0) {
+			SuperNumber emc = getEmc();
+			SuperNumber output = new SuperNumber(SuperNumber.min(getOutputRate(), emc));
+			output.divide(goodNeighbors.size());
+			for (ConsumerBlockEntity neighbor : goodNeighbors) {
+				SuperNumber neighborEmc = neighbor.getEmc();
+				SuperNumber neighborMaximumEmc = neighbor.getMaximumEmc();
+				neighborEmc.stealFrom(emc, output);
+				SuperNumber bonusEmc = neighbor.getBonusEmc();
+				if (!bonusEmc.equalsZero()) {
+					neighborEmc.add(bonusEmc);
 
-                }
-                if (neighborMaximumEmc.equalsZero())
-                    continue;
-                if (neighborEmc.compareTo(neighborMaximumEmc) == 1)
-                    neighborEmc.copyValueOf(neighborMaximumEmc);
-            }
-        }
-    }
-    default void serverSync(BlockPos pos, SuperNumber emc, LinkedList<ServerPlayerEntity> list) {
-        if (list.size() == 0)
-            return;
-        PacketByteBuf data = PacketByteBufs.create();
-        data.writeBlockPos(pos);
-        data.writeString(emc.divisionString());
-        
-        Iterator<ServerPlayerEntity> iterator = list.iterator();
-        while (iterator.hasNext()) {
-            ServerPlayerEntity player = iterator.next();
-            if (player.currentScreenHandler instanceof LeveledScreenHandler screenHandler
-                    && pos.equals(screenHandler.getPos())) 
-                ServerPlayNetworking.send(player, ModMessages.CONSUMER_BLOCK_SYNC, data);
-            else
-                iterator.remove();
-        }
-    }
-    default void serverSyncPlayer(BlockPos pos, SuperNumber emc, ServerPlayerEntity player) {
-        PacketByteBuf data = PacketByteBufs.create();
-        data.writeBlockPos(pos);
-        data.writeString(emc.divisionString());
-        ServerPlayNetworking.send(player, ModMessages.CONSUMER_BLOCK_SYNC, data);
-    }
+				}
+				if (neighborMaximumEmc.equalsZero())
+					continue;
+				if (neighborEmc.compareTo(neighborMaximumEmc) == 1)
+					neighborEmc.copyValueOf(neighborMaximumEmc);
+			}
+		}
+	}
+	default void serverSync(BlockPos pos, SuperNumber emc, LinkedList<ServerPlayerEntity> list) {
+		if (list.size() == 0)
+			return;
+		PacketByteBuf data = PacketByteBufs.create();
+		data.writeBlockPos(pos);
+		data.writeString(emc.divisionString());
+		
+		Iterator<ServerPlayerEntity> iterator = list.iterator();
+		while (iterator.hasNext()) {
+			ServerPlayerEntity player = iterator.next();
+			if (player.currentScreenHandler instanceof LeveledScreenHandler screenHandler
+					&& pos.equals(screenHandler.getPos())) 
+				ServerPlayNetworking.send(player, ModMessages.CONSUMER_BLOCK_SYNC, data);
+			else
+				iterator.remove();
+		}
+	}
+	default void serverSyncPlayer(BlockPos pos, SuperNumber emc, ServerPlayerEntity player) {
+		PacketByteBuf data = PacketByteBufs.create();
+		data.writeBlockPos(pos);
+		data.writeString(emc.divisionString());
+		ServerPlayNetworking.send(player, ModMessages.CONSUMER_BLOCK_SYNC, data);
+	}
 
-    void update(SuperNumber emc);
+	void update(SuperNumber emc);
 }

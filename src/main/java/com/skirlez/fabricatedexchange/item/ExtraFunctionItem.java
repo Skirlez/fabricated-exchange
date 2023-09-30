@@ -5,9 +5,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public interface ExtraFunctionItem {
-    void doExtraFunction(ItemStack stack, ServerPlayerEntity player);
+	void doExtraFunction(ItemStack stack, ServerPlayerEntity player);
 
-    default void doExtraFunctionClient(ItemStack stack, ClientPlayerEntity player) {
+	default void doExtraFunctionClient(ItemStack stack, ClientPlayerEntity player) {
 
-    }
+	}
 }

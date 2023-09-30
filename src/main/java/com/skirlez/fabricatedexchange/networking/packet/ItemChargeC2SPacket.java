@@ -10,21 +10,21 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Hand;
 
 public class ItemChargeC2SPacket {
-    public static void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler,
-            PacketByteBuf buf, PacketSender responseSender) {   
+	public static void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler,
+			PacketByteBuf buf, PacketSender responseSender) {   
 
-        boolean hasShiftDown = buf.readBoolean();
-        ItemStack stack = player.getStackInHand(Hand.MAIN_HAND);
-        if (!(stack.getItem() instanceof ChargeableItem)) {
-            stack = player.getStackInHand(Hand.OFF_HAND);
-            if (!(stack.getItem() instanceof ChargeableItem))
-                return;
-        }
-        ChargeableItem item = (ChargeableItem)(stack.getItem());
+		boolean hasShiftDown = buf.readBoolean();
+		ItemStack stack = player.getStackInHand(Hand.MAIN_HAND);
+		if (!(stack.getItem() instanceof ChargeableItem)) {
+			stack = player.getStackInHand(Hand.OFF_HAND);
+			if (!(stack.getItem() instanceof ChargeableItem))
+				return;
+		}
+		ChargeableItem item = (ChargeableItem)(stack.getItem());
 
-        int value = (hasShiftDown) ? -1 : 1;
-        ChargeableItem.chargeStack(stack, value, 0, item.getMaxCharge(), player);   
-    }
+		int value = (hasShiftDown) ? -1 : 1;
+		ChargeableItem.chargeStack(stack, value, 0, item.getMaxCharge(), player);   
+	}
 
 }
 

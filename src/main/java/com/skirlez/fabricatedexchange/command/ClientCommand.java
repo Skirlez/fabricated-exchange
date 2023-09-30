@@ -13,28 +13,28 @@ import net.minecraft.text.Text;
 
 @Environment(EnvType.CLIENT)
 public class ClientCommand {
-        
-    public static void register(CommandDispatcher<FabricClientCommandSource> dispatcher) {
-        LiteralCommandNode<FabricClientCommandSource> mainNode = ClientCommandManager
-        .literal("feclient") 
-        .build();
-        
-        LiteralCommandNode<FabricClientCommandSource> reloadConfigNode = ClientCommandManager
-        .literal("reload") 
-        .executes(context -> reloadConfig(context))
-        .build();
+		
+	public static void register(CommandDispatcher<FabricClientCommandSource> dispatcher) {
+		LiteralCommandNode<FabricClientCommandSource> mainNode = ClientCommandManager
+		.literal("feclient") 
+		.build();
+		
+		LiteralCommandNode<FabricClientCommandSource> reloadConfigNode = ClientCommandManager
+		.literal("reload") 
+		.executes(context -> reloadConfig(context))
+		.build();
 
-        dispatcher.getRoot().addChild(mainNode);
+		dispatcher.getRoot().addChild(mainNode);
 
-        mainNode.addChild(reloadConfigNode);
-    }
+		mainNode.addChild(reloadConfigNode);
+	}
 
-    private static int reloadConfig(CommandContext<FabricClientCommandSource> context) {
-        ModDataFiles.fetchAll();
-        context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.reloademc.data_success"));
-        return 1;
+	private static int reloadConfig(CommandContext<FabricClientCommandSource> context) {
+		ModDataFiles.fetchAll();
+		context.getSource().sendFeedback(Text.translatable("commands.fabricated-exchange.reloademc.data_success"));
+		return 1;
 
-    }
+	}
 
 
 

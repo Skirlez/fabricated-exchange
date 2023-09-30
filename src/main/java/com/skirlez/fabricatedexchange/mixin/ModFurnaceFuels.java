@@ -17,23 +17,23 @@ import net.minecraft.item.ItemConvertible;
 
 @Mixin(AbstractFurnaceBlockEntity.class)
 public class ModFurnaceFuels {
-    @Shadow
-    private static void addFuel(Map<Item, Integer> fuelTimes, ItemConvertible item, int fuelTime) {
-        
-    }
-    @Inject(method = "createFuelTimeMap", at = @At("RETURN"))
-    private static void addModFuels(CallbackInfoReturnable<Map<Item, Integer>> cir) {
-        Map<Item, Integer> mappa = cir.getReturnValue();
-        // each one of these has x4 more burn time than the previous, with alchemical coal having 4x the burn time of coal
-        // i would have ideally made it something like 1.5x for each jump but it would just mean the fuels are useless since coal blocks and a hopper are cheaper and burn longer
-        addFuel(mappa, ModItems.ALCHEMICAL_COAL, 6400);
-        addFuel(mappa, ModItems.RADIANT_COAL, 25600);
-        addFuel(mappa, ModItems.MOBIUS_FUEL, 21600);
-        addFuel(mappa, ModItems.AETERNALIS_FUEL, 86400);
+	@Shadow
+	private static void addFuel(Map<Item, Integer> fuelTimes, ItemConvertible item, int fuelTime) {
+		
+	}
+	@Inject(method = "createFuelTimeMap", at = @At("RETURN"))
+	private static void addModFuels(CallbackInfoReturnable<Map<Item, Integer>> cir) {
+		Map<Item, Integer> mappa = cir.getReturnValue();
+		// each one of these has x4 more burn time than the previous, with alchemical coal having 4x the burn time of coal
+		// i would have ideally made it something like 1.5x for each jump but it would just mean the fuels are useless since coal blocks and a hopper are cheaper and burn longer
+		addFuel(mappa, ModItems.ALCHEMICAL_COAL, 6400);
+		addFuel(mappa, ModItems.RADIANT_COAL, 25600);
+		addFuel(mappa, ModItems.MOBIUS_FUEL, 21600);
+		addFuel(mappa, ModItems.AETERNALIS_FUEL, 86400);
 
-        addFuel(mappa, ModBlocks.ALCHEMICAL_COAL_BLOCK, 64000);
-        addFuel(mappa, ModBlocks.RADIANT_COAL_BLOCK, 256000);
-        addFuel(mappa, ModBlocks.MOBIUS_FUEL_BLOCK, 216000);
-        addFuel(mappa, ModBlocks.AETERNALIS_FUEL_BLOCK, 864000); // 720 hours and 20 minutes in a regular furnace btw
-    }
+		addFuel(mappa, ModBlocks.ALCHEMICAL_COAL_BLOCK, 64000);
+		addFuel(mappa, ModBlocks.RADIANT_COAL_BLOCK, 256000);
+		addFuel(mappa, ModBlocks.MOBIUS_FUEL_BLOCK, 216000);
+		addFuel(mappa, ModBlocks.AETERNALIS_FUEL_BLOCK, 864000); // 720 hours and 20 minutes in a regular furnace btw
+	}
 }

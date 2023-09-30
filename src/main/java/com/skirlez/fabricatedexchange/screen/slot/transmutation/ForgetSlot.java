@@ -22,56 +22,56 @@ import net.minecraft.screen.slot.Slot;
 
 public class ForgetSlot extends Slot {
 
-    private final PlayerEntity player;
-    private final TransmutationTableScreenHandler screenHandler;
+	private final PlayerEntity player;
+	private final TransmutationTableScreenHandler screenHandler;
 
-    public ForgetSlot(Inventory inventory, int index, int x, int y, PlayerEntity player,
-            TransmutationTableScreenHandler screenHandler) {
-        super(inventory, index, x, y);
-        this.player = player;
-        this.screenHandler = screenHandler;
-    }
-    
-    @Override
-    public void setStack(ItemStack stack) {
-        if (!player.getWorld().isClient() && !stack.isEmpty()) {
-            PlayerState playerState = ServerState.getPlayerState(player);
-            Item item = stack.getItem();
-            String idName = Registries.ITEM.getId(item).toString();
-            if (item.equals(ModItems.TOME_OF_KNOWLEDGE)) {
-                playerState.knowledge = new HashSet<String>();
-                playerState.specialKnowledge = new ArrayList<NbtItem>();
-                screenHandler.clearKnowledge();
-            }
-            else if (playerState.knowledge.contains(idName)) {
-                playerState.knowledge.remove(idName);
-                screenHandler.removeKnowledge(new NbtItem(item));
-            }
-            else if (ModDataFiles.NBT_ITEMS.hasItem(idName)) {
-                NbtCompound nbt = stack.getNbt();
-                List<String> allowedKeys = ModDataFiles.NBT_ITEMS.getAllowedKeys(idName);
-                if (nbt == null)
-                    nbt = new NbtCompound();
-                if (!nbt.isEmpty()) {
-                    Iterator<String> keyIterator = nbt.getKeys().iterator();
-                    while (keyIterator.hasNext()) {
-                        String key = keyIterator.next();
-                        if (!allowedKeys.contains(key))
-                            keyIterator.remove();
-                    }
-                }
-            
+	public ForgetSlot(Inventory inventory, int index, int x, int y, PlayerEntity player,
+			TransmutationTableScreenHandler screenHandler) {
+		super(inventory, index, x, y);
+		this.player = player;
+		this.screenHandler = screenHandler;
+	}
+	
+	@Override
+	public void setStack(ItemStack stack) {
+		if (!player.getWorld().isClient() && !stack.isEmpty()) {
+			PlayerState playerState = ServerState.getPlayerState(player);
+			Item item = stack.getItem();
+			String idName = Registries.ITEM.getId(item).toString();
+			if (item.equals(ModItems.TOME_OF_KNOWLEDGE)) {
+				playerState.knowledge = new HashSet<String>();
+				playerState.specialKnowledge = new ArrayList<NbtItem>();
+				screenHandler.clearKnowledge();
+			}
+			else if (playerState.knowledge.contains(idName)) {
+				playerState.knowledge.remove(idName);
+				screenHandler.removeKnowledge(new NbtItem(item));
+			}
+			else if (ModDataFiles.NBT_ITEMS.hasItem(idName)) {
+				NbtCompound nbt = stack.getNbt();
+				List<String> allowedKeys = ModDataFiles.NBT_ITEMS.getAllowedKeys(idName);
+				if (nbt == null)
+					nbt = new NbtCompound();
+				if (!nbt.isEmpty()) {
+					Iterator<String> keyIterator = nbt.getKeys().iterator();
+					while (keyIterator.hasNext()) {
+						String key = keyIterator.next();
+						if (!allowedKeys.contains(key))
+							keyIterator.remove();
+					}
+				}
+			
 
-                NbtItem nbtItem = new NbtItem(item, nbt);
-                playerState.specialKnowledge.removeIf((currentNbtItem) -> (currentNbtItem.equalTo(nbtItem)));
-                screenHandler.removeKnowledge(nbtItem);
-            }
-            playerState.markDirty();
-            screenHandler.refreshOffering();    
-        }
+				NbtItem nbtItem = new NbtItem(item, nbt);
+				playerState.specialKnowledge.removeIf((currentNbtItem) -> (currentNbtItem.equalTo(nbtItem)));
+				screenHandler.removeKnowledge(nbtItem);
+			}
+			playerState.markDirty();
+			screenHandler.refreshOffering();	
+		}
 
-        super.setStack(stack);
-    }
+		super.setStack(stack);
+	}
 
 
 

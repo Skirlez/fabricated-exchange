@@ -14,8 +14,8 @@ import net.minecraft.world.World;
 @Mixin(ClientWorld.class)
 public class ClientWorldAmbientDarkness {
 
-    @Inject(method = "tick", at = @At("HEAD"))
-    public void addCalculationToTick(BooleanSupplier shouldKeepTicking, CallbackInfo info) {
-        ((World)(Object)this).calculateAmbientDarkness();
-    }
+	@Inject(method = "tick", at = @At("HEAD"))
+	public void addCalculationToTick(BooleanSupplier shouldKeepTicking, CallbackInfo info) {
+		((World)(Object)this).calculateAmbientDarkness();
+	}
 }

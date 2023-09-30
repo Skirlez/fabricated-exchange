@@ -10,13 +10,13 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
 
 public class EnergyCollectorSyncS2CPacket {
-    public static void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-        BlockPos pos = buf.readBlockPos();
-        SuperNumber emc = new SuperNumber(buf.readString());
+	public static void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
+		BlockPos pos = buf.readBlockPos();
+		SuperNumber emc = new SuperNumber(buf.readString());
  
-        if (client.world.getBlockEntity(pos) instanceof EnergyCollectorBlockEntity blockEntity)
-            blockEntity.update(emc);
-        
+		if (client.world.getBlockEntity(pos) instanceof EnergyCollectorBlockEntity blockEntity)
+			blockEntity.update(emc);
+		
 
-    }
+	}
 }

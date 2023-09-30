@@ -10,20 +10,20 @@ import net.minecraft.util.Identifier;
  * most if not all vanilla and custom recipes.
  */
 public class ItemEquation {
-    public final List<Ingredient> input;
-    public final List<ItemStack> output;
+	public final List<Ingredient> input;
+	public final List<ItemStack> output;
 
-    // The EMC mapper will output this name when warning about a recipe
-    public final String name;
-    public final String origin;
+	// The EMC mapper will output this name when warning about a recipe
+	public final String name;
+	public final String origin;
 
-    public int amountUnknown;
+	public int amountUnknown;
 
-    public ItemEquation(List<Ingredient> input, List<ItemStack> output, Identifier id) {
-        this.input = input;
-        this.output = output;
-        this.name = id.getPath();
-        this.origin = id.getNamespace();
-        this.amountUnknown = 0;
-    }
+	public ItemEquation(List<Ingredient> input, List<ItemStack> output, Identifier id) {
+		this.input = input;
+		this.output = output;
+		this.name = id.getPath();
+		this.origin = id.getNamespace();
+		this.amountUnknown = 0;
+	}
 }

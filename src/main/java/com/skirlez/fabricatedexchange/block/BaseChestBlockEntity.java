@@ -32,140 +32,140 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 public abstract class BaseChestBlockEntity extends ChestBlockEntity {
-    private int viewers = 0;
-    private float angle, last;
-    private final ViewerCountManager stateManager;
-    private final ChestLidAnimator lidAnimator;
+	private int viewers = 0;
+	private float angle, last;
+	private final ViewerCountManager stateManager;
+	private final ChestLidAnimator lidAnimator;
 
-    public BaseChestBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
-        super(blockEntityType, pos, state);
-        this.setInvStackList(DefaultedList.ofSize(size(), ItemStack.EMPTY));
-        this.stateManager = new ViewerCountManager() {
-            protected void onContainerOpen(World world, BlockPos pos, BlockState state) {
-                BaseChestBlockEntity.playSound(world, pos, state, SoundEvents.BLOCK_CHEST_OPEN);
-            }
+	public BaseChestBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
+		super(blockEntityType, pos, state);
+		this.setInvStackList(DefaultedList.ofSize(size(), ItemStack.EMPTY));
+		this.stateManager = new ViewerCountManager() {
+			protected void onContainerOpen(World world, BlockPos pos, BlockState state) {
+				BaseChestBlockEntity.playSound(world, pos, state, SoundEvents.BLOCK_CHEST_OPEN);
+			}
 
-            protected void onContainerClose(World world, BlockPos pos, BlockState state) {
-                BaseChestBlockEntity.playSound(world, pos, state, SoundEvents.BLOCK_CHEST_CLOSE);
-            }
+			protected void onContainerClose(World world, BlockPos pos, BlockState state) {
+				BaseChestBlockEntity.playSound(world, pos, state, SoundEvents.BLOCK_CHEST_CLOSE);
+			}
 
-            protected void onViewerCountUpdate(World world, BlockPos pos, BlockState state, int oldViewerCount, int newViewerCount) {
-                BaseChestBlockEntity.this.onViewerCountUpdate(world, pos, state, oldViewerCount, newViewerCount);
-                viewers = newViewerCount;
-                lidAnimator.setOpen(newViewerCount > 0);
-            }
+			protected void onViewerCountUpdate(World world, BlockPos pos, BlockState state, int oldViewerCount, int newViewerCount) {
+				BaseChestBlockEntity.this.onViewerCountUpdate(world, pos, state, oldViewerCount, newViewerCount);
+				viewers = newViewerCount;
+				lidAnimator.setOpen(newViewerCount > 0);
+			}
 
-            protected boolean isPlayerViewing(PlayerEntity player) {
-                if (!(player.currentScreenHandler instanceof ChestScreenHandler handler))
-                    return false;
-                else {
-                    Inventory inventory = handler.getInventory();
-                    return inventory == BaseChestBlockEntity.this;
-                }
-            }
-        };
-        this.lidAnimator = new ChestLidAnimator();
-    }
+			protected boolean isPlayerViewing(PlayerEntity player) {
+				if (!(player.currentScreenHandler instanceof ChestScreenHandler handler))
+					return false;
+				else {
+					Inventory inventory = handler.getInventory();
+					return inventory == BaseChestBlockEntity.this;
+				}
+			}
+		};
+		this.lidAnimator = new ChestLidAnimator();
+	}
 
-    public boolean onSyncedBlockEvent(int type, int data) {
-        if (type == 1) {
-            this.lidAnimator.setOpen(data > 0);
-            return true;
-        } else {
-            return super.onSyncedBlockEvent(type, data);
-        }
-    }
+	public boolean onSyncedBlockEvent(int type, int data) {
+		if (type == 1) {
+			this.lidAnimator.setOpen(data > 0);
+			return true;
+		} else {
+			return super.onSyncedBlockEvent(type, data);
+		}
+	}
 
-    @Override
-    public Text getContainerName() {
-        return Text.translatable(getCachedState().getBlock().getTranslationKey());
-    }
+	@Override
+	public Text getContainerName() {
+		return Text.translatable(getCachedState().getBlock().getTranslationKey());
+	}
 
-    public void onOpen(PlayerEntity player) {
-        if (!this.removed && !player.isSpectator()) {
-            this.stateManager.openContainer(player, this.getWorld(), this.getPos(), this.getCachedState());
-            markDirty();
-        }
-    }
+	public void onOpen(PlayerEntity player) {
+		if (!this.removed && !player.isSpectator()) {
+			this.stateManager.openContainer(player, this.getWorld(), this.getPos(), this.getCachedState());
+			markDirty();
+		}
+	}
 
-    public void onClose(PlayerEntity player) {
-        if (!this.removed && !player.isSpectator()) {
-            this.stateManager.closeContainer(player, this.getWorld(), this.getPos(), this.getCachedState());
-            markDirty();
-        }
-    }
+	public void onClose(PlayerEntity player) {
+		if (!this.removed && !player.isSpectator()) {
+			this.stateManager.closeContainer(player, this.getWorld(), this.getPos(), this.getCachedState());
+			markDirty();
+		}
+	}
 
-    @Nullable
-    @Override
-    public Packet<ClientPlayPacketListener> toUpdatePacket() {
-        return BlockEntityUpdateS2CPacket.create(this);
-    }
+	@Nullable
+	@Override
+	public Packet<ClientPlayPacketListener> toUpdatePacket() {
+		return BlockEntityUpdateS2CPacket.create(this);
+	}
 
-    @Override
-    public NbtCompound toInitialChunkDataNbt() {
-        return this.createNbt();
-    }
-
-
-    @Override
-    public void readNbt(NbtCompound tag) {
-        super.readNbt(tag);
-        this.viewers = tag.getInt("viewers");
-    }
-
-    @Override
-    public void writeNbt(NbtCompound tag) {
-        super.writeNbt(tag);
-        tag.putInt("viewers", viewers);
-    }
-
-    @Override
-    public void markDirty() {
-        super.markDirty();
-
-        if (!this.getWorld().isClient() && this.getWorld() != null && this.getWorld() instanceof ServerWorld world) 
-            world.getChunkManager().markForUpdate(getPos());
-    }
-
-    @Environment(EnvType.CLIENT)
-    public int countViewers() {
-        return viewers;
-    }
-
-    @Override
-    @Environment(EnvType.CLIENT)
-    public float getAnimationProgress(float f) {
-        return MathHelper.lerp(f, last, angle);
-    }
-
-    @Environment(EnvType.CLIENT)
-    public void progressAnimation() {
-        last = angle;
-
-        int viewers = countViewers();
-        if (viewers == 0 && angle > 0.0F || viewers > 0 && angle < 0.89F) {
-            if (viewers > 0) 
-                angle += 0.1F;
-            else 
-                angle -= 0.1F;
-            angle = MathHelper.clamp(angle, 0, 1);
-        }
-    }
+	@Override
+	public NbtCompound toInitialChunkDataNbt() {
+		return this.createNbt();
+	}
 
 
-    private static void playSound(World world, BlockPos pos, BlockState state, SoundEvent soundEvent) {
-        ChestType chestType = state.get(ChestBlock.CHEST_TYPE);
-        if (chestType == ChestType.LEFT) {
-            return;
-        }
-        double d = (double)pos.getX() + 0.5;
-        double e = (double)pos.getY() + 0.5;
-        double f = (double)pos.getZ() + 0.5;
-        if (chestType == ChestType.RIGHT) {
-            Direction direction = ChestBlock.getFacing(state);
-            d += (double)direction.getOffsetX() * 0.5;
-            f += (double)direction.getOffsetZ() * 0.5;
-        }
-        world.playSound(null, d, e, f, soundEvent, SoundCategory.BLOCKS, 0.5f, world.random.nextFloat() * 0.1f + 0.9f);
-    }
+	@Override
+	public void readNbt(NbtCompound tag) {
+		super.readNbt(tag);
+		this.viewers = tag.getInt("viewers");
+	}
+
+	@Override
+	public void writeNbt(NbtCompound tag) {
+		super.writeNbt(tag);
+		tag.putInt("viewers", viewers);
+	}
+
+	@Override
+	public void markDirty() {
+		super.markDirty();
+
+		if (!this.getWorld().isClient() && this.getWorld() != null && this.getWorld() instanceof ServerWorld world) 
+			world.getChunkManager().markForUpdate(getPos());
+	}
+
+	@Environment(EnvType.CLIENT)
+	public int countViewers() {
+		return viewers;
+	}
+
+	@Override
+	@Environment(EnvType.CLIENT)
+	public float getAnimationProgress(float f) {
+		return MathHelper.lerp(f, last, angle);
+	}
+
+	@Environment(EnvType.CLIENT)
+	public void progressAnimation() {
+		last = angle;
+
+		int viewers = countViewers();
+		if (viewers == 0 && angle > 0.0F || viewers > 0 && angle < 0.89F) {
+			if (viewers > 0) 
+				angle += 0.1F;
+			else 
+				angle -= 0.1F;
+			angle = MathHelper.clamp(angle, 0, 1);
+		}
+	}
+
+
+	private static void playSound(World world, BlockPos pos, BlockState state, SoundEvent soundEvent) {
+		ChestType chestType = state.get(ChestBlock.CHEST_TYPE);
+		if (chestType == ChestType.LEFT) {
+			return;
+		}
+		double d = (double)pos.getX() + 0.5;
+		double e = (double)pos.getY() + 0.5;
+		double f = (double)pos.getZ() + 0.5;
+		if (chestType == ChestType.RIGHT) {
+			Direction direction = ChestBlock.getFacing(state);
+			d += (double)direction.getOffsetX() * 0.5;
+			f += (double)direction.getOffsetZ() * 0.5;
+		}
+		world.playSound(null, d, e, f, soundEvent, SoundCategory.BLOCKS, 0.5f, world.random.nextFloat() * 0.1f + 0.9f);
+	}
 }

@@ -32,208 +32,208 @@ import net.minecraft.util.Identifier;
 
 public class EmcData {
 
-    // both the server and the client can use these
-    public static ConcurrentMap<String, SuperNumber> emcMap = new ConcurrentHashMap<String, SuperNumber>();
-    public static ConcurrentMap<String, SuperNumber> potionEmcMap = new ConcurrentHashMap<String, SuperNumber>();
-    public static ConcurrentMap<String, SuperNumber> enchantmentEmcMap = new ConcurrentHashMap<String, SuperNumber>();
+	// both the server and the client can use these
+	public static ConcurrentMap<String, SuperNumber> emcMap = new ConcurrentHashMap<String, SuperNumber>();
+	public static ConcurrentMap<String, SuperNumber> potionEmcMap = new ConcurrentHashMap<String, SuperNumber>();
+	public static ConcurrentMap<String, SuperNumber> enchantmentEmcMap = new ConcurrentHashMap<String, SuperNumber>();
 
-    // these should only ever be equal to what's in their respective jsons
-    public static Map<String, SuperNumber> seedEmcMap = new HashMap<String, SuperNumber>();
-    public static Map<String, SuperNumber> customEmcMap = new HashMap<String, SuperNumber>();
+	// these should only ever be equal to what's in their respective jsons
+	public static Map<String, SuperNumber> seedEmcMap = new HashMap<String, SuperNumber>();
+	public static Map<String, SuperNumber> customEmcMap = new HashMap<String, SuperNumber>();
 
-    public static SuperNumber getItemEmc(NbtItem item) {
-        SuperNumber emc = getItemEmc(item.asItem());
-        NbtCompound nbt = item.getNbt();
-        if (nbt != null)
-            considerNbt(item.asItem(), nbt, emc);
-        return emc;
-    }
+	public static SuperNumber getItemEmc(NbtItem item) {
+		SuperNumber emc = getItemEmc(item.asItem());
+		NbtCompound nbt = item.getNbt();
+		if (nbt != null)
+			considerNbt(item.asItem(), nbt, emc);
+		return emc;
+	}
 
-    public static SuperNumber getItemEmc(Item item) {
-        if (item == null)
-            return SuperNumber.Zero(); 
-        String id = Registries.ITEM.getId(item).toString();
-        return getItemEmc(id);
-    }
-    public static SuperNumber getItemStackEmc(ItemStack itemStack) {
-        if (itemStack.isEmpty())
-            return SuperNumber.Zero(); 
-        Item item = itemStack.getItem();
-        String id = Registries.ITEM.getId(item).toString();
-        SuperNumber emc = getItemEmc(id);
-        emc.multiply(itemStack.getCount());
-        considerStackDurability(itemStack, emc);
-        considerStackNbt(itemStack, emc);
-        return emc;
-    }
-    public static SuperNumber getItemEmc(String id) {
-        if (emcMap.containsKey(id))
-            return new SuperNumber(emcMap.get(id));
-        return SuperNumber.Zero(); 
-    }
-    public static void considerStackDurability(ItemStack stack, SuperNumber emc) {
-        if (stack.getMaxDamage() != 0) {
-            emc.multiply(new SuperNumber(stack.getMaxDamage() - stack.getDamage(), stack.getMaxDamage()));
-            emc.floor();
-        }
-    }
-    public static void considerStackNbt(ItemStack stack, SuperNumber emc) {
-        NbtCompound nbt = stack.getNbt();
-        if (nbt == null)
-            return;
-        considerNbt(stack.getItem(), stack.getNbt(), emc);
-    }
+	public static SuperNumber getItemEmc(Item item) {
+		if (item == null)
+			return SuperNumber.Zero(); 
+		String id = Registries.ITEM.getId(item).toString();
+		return getItemEmc(id);
+	}
+	public static SuperNumber getItemStackEmc(ItemStack itemStack) {
+		if (itemStack.isEmpty())
+			return SuperNumber.Zero(); 
+		Item item = itemStack.getItem();
+		String id = Registries.ITEM.getId(item).toString();
+		SuperNumber emc = getItemEmc(id);
+		emc.multiply(itemStack.getCount());
+		considerStackDurability(itemStack, emc);
+		considerStackNbt(itemStack, emc);
+		return emc;
+	}
+	public static SuperNumber getItemEmc(String id) {
+		if (emcMap.containsKey(id))
+			return new SuperNumber(emcMap.get(id));
+		return SuperNumber.Zero(); 
+	}
+	public static void considerStackDurability(ItemStack stack, SuperNumber emc) {
+		if (stack.getMaxDamage() != 0) {
+			emc.multiply(new SuperNumber(stack.getMaxDamage() - stack.getDamage(), stack.getMaxDamage()));
+			emc.floor();
+		}
+	}
+	public static void considerStackNbt(ItemStack stack, SuperNumber emc) {
+		NbtCompound nbt = stack.getNbt();
+		if (nbt == null)
+			return;
+		considerNbt(stack.getItem(), stack.getNbt(), emc);
+	}
 
-    private static void considerNbt(Item item, NbtCompound nbt, SuperNumber emc) {
-        if (nbt.contains("emc"))
-            emc.add(new SuperNumber(nbt.getString("emc")));
+	private static void considerNbt(Item item, NbtCompound nbt, SuperNumber emc) {
+		if (nbt.contains("emc"))
+			emc.add(new SuperNumber(nbt.getString("emc")));
 
-        if (!ModDataFiles.NBT_ITEMS.hasItem(Registries.ITEM.getId(item).toString()))
-            return;
+		if (!ModDataFiles.NBT_ITEMS.hasItem(Registries.ITEM.getId(item).toString()))
+			return;
 
-        if (item instanceof PotionItem) {
-            String potion = nbt.getString("Potion");
-            if (!potion.isEmpty() && potionEmcMap.containsKey(potion)) {
+		if (item instanceof PotionItem) {
+			String potion = nbt.getString("Potion");
+			if (!potion.isEmpty() && potionEmcMap.containsKey(potion)) {
 
-                SuperNumber addition = potionEmcMap.get(potion);
-                if (!addition.equalsZero())
-                    emc.add(addition);
-            }   
-        }
-        else if (item == Items.ENCHANTED_BOOK) {
-            NbtList enchantments = nbt.getList("StoredEnchantments", NbtElement.COMPOUND_TYPE);
-            for (int i = 0; i < enchantments.size(); i++) {
-                NbtCompound enchantmentCompound = enchantments.getCompound(i);
-                String enchantment = enchantmentCompound.getString("id");
+				SuperNumber addition = potionEmcMap.get(potion);
+				if (!addition.equalsZero())
+					emc.add(addition);
+			}   
+		}
+		else if (item == Items.ENCHANTED_BOOK) {
+			NbtList enchantments = nbt.getList("StoredEnchantments", NbtElement.COMPOUND_TYPE);
+			for (int i = 0; i < enchantments.size(); i++) {
+				NbtCompound enchantmentCompound = enchantments.getCompound(i);
+				String enchantment = enchantmentCompound.getString("id");
 
-                SuperNumber enchantmentEmc;
-                Map<String, SuperNumber> map = EmcData.enchantmentEmcMap;
-                enchantmentEmc = map.containsKey(enchantment) 
-                    ? new SuperNumber(map.get(enchantment)) 
-                    : new SuperNumber(32);
-            
-                
-                int repairCost = nbt.getInt("RepairCost");
-                // anvil uses = log2(repairCost)
-                int anvilUses = 32 - Integer.numberOfLeadingZeros(repairCost);
-                // (x/7-1)^2
-                SuperNumber repairCostPenalty = new SuperNumber(anvilUses, 7);
-                repairCostPenalty.subtract(BigInteger.ONE);
-                repairCostPenalty.square();          
-                
-                int level = enchantmentCompound.getInt("lvl");
-                
-                /* an enchantment level n is worth as much as
-                    2^(n-1) * cost of enchantment level 1
-                    + (2^(n-1)-1) * the cost of an enchanted book
+				SuperNumber enchantmentEmc;
+				Map<String, SuperNumber> map = EmcData.enchantmentEmcMap;
+				enchantmentEmc = map.containsKey(enchantment) 
+					? new SuperNumber(map.get(enchantment)) 
+					: new SuperNumber(32);
+			
+				
+				int repairCost = nbt.getInt("RepairCost");
+				// anvil uses = log2(repairCost)
+				int anvilUses = 32 - Integer.numberOfLeadingZeros(repairCost);
+				// (x/7-1)^2
+				SuperNumber repairCostPenalty = new SuperNumber(anvilUses, 7);
+				repairCostPenalty.subtract(BigInteger.ONE);
+				repairCostPenalty.square();		  
+				
+				int level = enchantmentCompound.getInt("lvl");
+				
+				/* an enchantment level n is worth as much as
+					2^(n-1) * cost of enchantment level 1
+					+ (2^(n-1)-1) * the cost of an enchanted book
 
-                    derived from anvil book combining. please trust me
-                */
+					derived from anvil book combining. please trust me
+				*/
 
-                SuperNumber enchantedBookCost = EmcData.getItemEmc(item);
-                enchantedBookCost.multiply((1 << (level - 1)) - 1);
-                
-                enchantmentEmc.multiply(1 << (level - 1));
-                enchantmentEmc.add(enchantedBookCost);
-                enchantmentEmc.multiply(repairCostPenalty);
-                enchantmentEmc.ceil();
-                emc.add(enchantmentEmc);
-            }
-        }
-        else if (nbt.contains("BlockEntityTag")) { // shulker box
-            NbtList list = nbt.getCompound("BlockEntityTag").getList("Items", NbtElement.COMPOUND_TYPE);
-            for (int i = 0; i < list.size(); i++) {
-                NbtCompound itemCompound = list.getCompound(i);
-                String id = itemCompound.getString("id");
-                ItemStack stack = new ItemStack(Registries.ITEM.get(new Identifier(id)));
-                stack.setCount(itemCompound.getInt("Count"));
-                
-                NbtCompound extraData = itemCompound.getCompound("tag");
-                if (!extraData.isEmpty())
-                    stack.setNbt(extraData);
+				SuperNumber enchantedBookCost = EmcData.getItemEmc(item);
+				enchantedBookCost.multiply((1 << (level - 1)) - 1);
+				
+				enchantmentEmc.multiply(1 << (level - 1));
+				enchantmentEmc.add(enchantedBookCost);
+				enchantmentEmc.multiply(repairCostPenalty);
+				enchantmentEmc.ceil();
+				emc.add(enchantmentEmc);
+			}
+		}
+		else if (nbt.contains("BlockEntityTag")) { // shulker box
+			NbtList list = nbt.getCompound("BlockEntityTag").getList("Items", NbtElement.COMPOUND_TYPE);
+			for (int i = 0; i < list.size(); i++) {
+				NbtCompound itemCompound = list.getCompound(i);
+				String id = itemCompound.getString("id");
+				ItemStack stack = new ItemStack(Registries.ITEM.get(new Identifier(id)));
+				stack.setCount(itemCompound.getInt("Count"));
+				
+				NbtCompound extraData = itemCompound.getCompound("tag");
+				if (!extraData.isEmpty())
+					stack.setNbt(extraData);
 
-                SuperNumber itemEmc = EmcData.getItemStackEmc(stack);
-                if (itemEmc.equalsZero()) {
-                    emc.copyValueOf(SuperNumber.ZERO);
-                    return;
-                }
-                emc.add(itemEmc);
-            }
-        }
-                
-        
-        return; 
-    }
+				SuperNumber itemEmc = EmcData.getItemStackEmc(stack);
+				if (itemEmc.equalsZero()) {
+					emc.copyValueOf(SuperNumber.ZERO);
+					return;
+				}
+				emc.add(itemEmc);
+			}
+		}
+				
+		
+		return; 
+	}
 
 
 
-    public static boolean isItemInSeedValues(Item item) {
-        return seedEmcMap.containsKey(Registries.ITEM.getId(item).toString());
-    }
-    public static boolean isItemInCustomValues(Item item) {
-        return customEmcMap.containsKey(Registries.ITEM.getId(item).toString());
-    }
+	public static boolean isItemInSeedValues(Item item) {
+		return seedEmcMap.containsKey(Registries.ITEM.getId(item).toString());
+	}
+	public static boolean isItemInCustomValues(Item item) {
+		return customEmcMap.containsKey(Registries.ITEM.getId(item).toString());
+	}
 
-    // only the server can use these
-    public static SuperNumber getEmc(LivingEntity player) {
-        PlayerState playerState = ServerState.getPlayerState(player);
-        return playerState.emc;
-    }
+	// only the server can use these
+	public static SuperNumber getEmc(LivingEntity player) {
+		PlayerState playerState = ServerState.getPlayerState(player);
+		return playerState.emc;
+	}
 
-    public static void setItemEmc(Item item, SuperNumber emc, boolean seed) {
-        DataFile<Map<String, SuperNumber>> file = seed ? ModDataFiles.SEED_EMC_MAP : ModDataFiles.CUSTOM_EMC_MAP;
-        if (item == null)
-            return;
-        String id = Registries.ITEM.getId(item).toString();
-        Map<String, SuperNumber> newEmcMap = file.getValue();
-        if (newEmcMap == null)
-            newEmcMap = new HashMap<String, SuperNumber>();
-        newEmcMap.put(id, emc);
-        file.setValueAndSave(newEmcMap);
-        GeneralUtil.mergeMap(emcMap, newEmcMap);
-    }
+	public static void setItemEmc(Item item, SuperNumber emc, boolean seed) {
+		DataFile<Map<String, SuperNumber>> file = seed ? ModDataFiles.SEED_EMC_MAP : ModDataFiles.CUSTOM_EMC_MAP;
+		if (item == null)
+			return;
+		String id = Registries.ITEM.getId(item).toString();
+		Map<String, SuperNumber> newEmcMap = file.getValue();
+		if (newEmcMap == null)
+			newEmcMap = new HashMap<String, SuperNumber>();
+		newEmcMap.put(id, emc);
+		file.setValueAndSave(newEmcMap);
+		GeneralUtil.mergeMap(emcMap, newEmcMap);
+	}
 
-    public static void setEmc(ServerPlayerEntity player, SuperNumber amount) {
-        PlayerState playerState = ServerState.getPlayerState(player);
-        playerState.emc = amount;
-        syncEmc(player, playerState.emc);
-    }    
-    public static void addEmc(ServerPlayerEntity player, SuperNumber amount) {
-        PlayerState playerState = ServerState.getPlayerState(player);
-        playerState.emc.add(amount);
-        syncEmc(player, playerState.emc);
-    }    
-    public static void subtractEmc(ServerPlayerEntity player, SuperNumber amount) {
-        PlayerState playerState = ServerState.getPlayerState(player);
-        playerState.emc.subtract(amount);
-        syncEmc((ServerPlayerEntity) player, playerState.emc);
-    }    
-    public static void syncEmc(ServerPlayerEntity player, SuperNumber emc) {
-        PacketByteBuf buffer = PacketByteBufs.create();
-        buffer.writeString(emc.divisionString());
-        
-        ServerPlayNetworking.send(player, ModMessages.EMC_SYNC_IDENTIFIER, buffer);
-    }
+	public static void setEmc(ServerPlayerEntity player, SuperNumber amount) {
+		PlayerState playerState = ServerState.getPlayerState(player);
+		playerState.emc = amount;
+		syncEmc(player, playerState.emc);
+	}	
+	public static void addEmc(ServerPlayerEntity player, SuperNumber amount) {
+		PlayerState playerState = ServerState.getPlayerState(player);
+		playerState.emc.add(amount);
+		syncEmc(player, playerState.emc);
+	}	
+	public static void subtractEmc(ServerPlayerEntity player, SuperNumber amount) {
+		PlayerState playerState = ServerState.getPlayerState(player);
+		playerState.emc.subtract(amount);
+		syncEmc((ServerPlayerEntity) player, playerState.emc);
+	}	
+	public static void syncEmc(ServerPlayerEntity player, SuperNumber emc) {
+		PacketByteBuf buffer = PacketByteBufs.create();
+		buffer.writeString(emc.divisionString());
+		
+		ServerPlayNetworking.send(player, ModMessages.EMC_SYNC_IDENTIFIER, buffer);
+	}
 
-    public static void syncMap(ServerPlayerEntity player) {
-        // send the entire emc map
-        PacketByteBuf buffer = PacketByteBufs.create();
-        buffer.writeInt(EmcData.emcMap.keySet().size());
-        for (String s : EmcData.emcMap.keySet()) {
-            buffer.writeString(s);
-            buffer.writeString(EmcData.emcMap.get(s).divisionString());
-        }
-        buffer.writeInt(EmcData.potionEmcMap.keySet().size());
-        for (String s : EmcData.potionEmcMap.keySet()) {
-            buffer.writeString(s);
-            buffer.writeString(EmcData.potionEmcMap.get(s).divisionString());
-        }
-        buffer.writeInt(EmcData.enchantmentEmcMap.keySet().size());
-        for (String s : EmcData.enchantmentEmcMap.keySet()) {
-            buffer.writeString(s);
-            buffer.writeString(EmcData.enchantmentEmcMap.get(s).divisionString());
-        }
+	public static void syncMap(ServerPlayerEntity player) {
+		// send the entire emc map
+		PacketByteBuf buffer = PacketByteBufs.create();
+		buffer.writeInt(EmcData.emcMap.keySet().size());
+		for (String s : EmcData.emcMap.keySet()) {
+			buffer.writeString(s);
+			buffer.writeString(EmcData.emcMap.get(s).divisionString());
+		}
+		buffer.writeInt(EmcData.potionEmcMap.keySet().size());
+		for (String s : EmcData.potionEmcMap.keySet()) {
+			buffer.writeString(s);
+			buffer.writeString(EmcData.potionEmcMap.get(s).divisionString());
+		}
+		buffer.writeInt(EmcData.enchantmentEmcMap.keySet().size());
+		for (String s : EmcData.enchantmentEmcMap.keySet()) {
+			buffer.writeString(s);
+			buffer.writeString(EmcData.enchantmentEmcMap.get(s).divisionString());
+		}
 
-        ServerPlayNetworking.send(player, ModMessages.EMC_MAP_SYNC_IDENTIFIER, buffer);
-    }
+		ServerPlayNetworking.send(player, ModMessages.EMC_MAP_SYNC_IDENTIFIER, buffer);
+	}
 }

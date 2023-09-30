@@ -15,29 +15,29 @@ import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 
 public class TransmutationTableScreenHandlerFactory implements ExtendedScreenHandlerFactory, ImplementedInventory {
-    private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(19, ItemStack.EMPTY);
-    private TransmutationTableScreenHandler handler;
-    public TransmutationTableScreenHandlerFactory() {
+	private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(19, ItemStack.EMPTY);
+	private TransmutationTableScreenHandler handler;
+	public TransmutationTableScreenHandlerFactory() {
 
-    }
-    public Text getDisplayName() {
-        return Text.translatable("screen.fabricated-exchange.transmutation");
-    }
+	}
+	public Text getDisplayName() {
+		return Text.translatable("screen.fabricated-exchange.transmutation");
+	}
 
-    @Nullable
-    @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-        handler = new TransmutationTableScreenHandler(syncId, inv, this);
-        return handler;
-    }
+	@Nullable
+	@Override
+	public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
+		handler = new TransmutationTableScreenHandler(syncId, inv, this);
+		return handler;
+	}
 
-    @Override
-    public DefaultedList<ItemStack> getItems() {
-        return this.inventory;
-    }
+	@Override
+	public DefaultedList<ItemStack> getItems() {
+		return this.inventory;
+	}
 
-    @Override
-    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
-        buf.writeInt(handler == null ? 0 : handler.getLastPageNum());
-    }
+	@Override
+	public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
+		buf.writeInt(handler == null ? 0 : handler.getLastPageNum());
+	}
 }

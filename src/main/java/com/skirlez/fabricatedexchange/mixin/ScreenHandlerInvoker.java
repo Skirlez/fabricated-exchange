@@ -8,6 +8,6 @@ import net.minecraft.screen.slot.Slot;
 
 @Mixin(ScreenHandler.class)
 public interface ScreenHandlerInvoker {
-    @Invoker("addSlot")
-    public Slot invokeAddSlot(Slot slot);
+	@Invoker("addSlot")
+	public Slot invokeAddSlot(Slot slot);
 }

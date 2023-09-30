@@ -7,11 +7,11 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
 
 public class TransmutationTableMaxPageS2CPacket {
-    public static void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-        if (client.player.currentScreenHandler instanceof TransmutationTableScreenHandler screenHandler) {
-            screenHandler.setLastPageNum(buf.readInt());
-        }
-    }
+	public static void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
+		if (client.player.currentScreenHandler instanceof TransmutationTableScreenHandler screenHandler) {
+			screenHandler.setLastPageNum(buf.readInt());
+		}
+	}
 }
 
 

@@ -16,58 +16,58 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
 public class ModBlocks {
-    public static final Block ALCHEMICAL_COAL_BLOCK = registerBlock("alchemical_coal_block", 
-        new Block(FabricBlockSettings.of(Material.STONE, MapColor.RED).requiresTool().strength(5.0f, 6.0f)));
-    public static final Block RADIANT_COAL_BLOCK = registerBlock("radiant_coal_block", 
-        new Block(FabricBlockSettings.of(Material.STONE, MapColor.WHITE).requiresTool().strength(5.0f, 6.0f)));
-    public static final Block MOBIUS_FUEL_BLOCK = registerBlock("mobius_fuel_block", 
-        new Block(FabricBlockSettings.of(Material.STONE, MapColor.RED).requiresTool().strength(5.0f, 6.0f)));
-    public static final Block AETERNALIS_FUEL_BLOCK = registerBlock("aeternalis_fuel_block", 
-        new Block(FabricBlockSettings.of(Material.STONE, MapColor.WHITE).requiresTool().strength(5.0f, 6.0f)));
+	public static final Block ALCHEMICAL_COAL_BLOCK = registerBlock("alchemical_coal_block", 
+		new Block(FabricBlockSettings.of(Material.STONE, MapColor.RED).requiresTool().strength(5.0f, 6.0f)));
+	public static final Block RADIANT_COAL_BLOCK = registerBlock("radiant_coal_block", 
+		new Block(FabricBlockSettings.of(Material.STONE, MapColor.WHITE).requiresTool().strength(5.0f, 6.0f)));
+	public static final Block MOBIUS_FUEL_BLOCK = registerBlock("mobius_fuel_block", 
+		new Block(FabricBlockSettings.of(Material.STONE, MapColor.RED).requiresTool().strength(5.0f, 6.0f)));
+	public static final Block AETERNALIS_FUEL_BLOCK = registerBlock("aeternalis_fuel_block", 
+		new Block(FabricBlockSettings.of(Material.STONE, MapColor.WHITE).requiresTool().strength(5.0f, 6.0f)));
 
-    public static final Block DARK_MATTER_BLOCK = registerBlock("dark_matter_block", 
-        new Block(FabricBlockSettings.of(Material.STONE, MapColor.BLACK).requiresTool().strength(5.0f, 6.0f)));
-    public static final Block RED_MATTER_BLOCK = registerBlock("red_matter_block", 
-        new Block(FabricBlockSettings.of(Material.STONE, MapColor.RED).requiresTool().strength(5.0f, 6.0f)));
+	public static final Block DARK_MATTER_BLOCK = registerBlock("dark_matter_block", 
+		new Block(FabricBlockSettings.of(Material.STONE, MapColor.BLACK).requiresTool().strength(5.0f, 6.0f)));
+	public static final Block RED_MATTER_BLOCK = registerBlock("red_matter_block", 
+		new Block(FabricBlockSettings.of(Material.STONE, MapColor.RED).requiresTool().strength(5.0f, 6.0f)));
 
-    public static final Block TRANSMUTATION_TABLE = registerBlock("transmutation_table", 
-        new TransmutationTable(FabricBlockSettings.of(Material.STONE, MapColor.WHITE)));
+	public static final Block TRANSMUTATION_TABLE = registerBlock("transmutation_table", 
+		new TransmutationTable(FabricBlockSettings.of(Material.STONE, MapColor.WHITE)));
 
-    public static final Block ENERGY_COLLECTOR_MK1 = registerBlock("energy_collector_mk1", 
-        new EnergyCollector(FabricBlockSettings.of(Material.GLASS, MapColor.PALE_YELLOW).requiresTool().strength(5.0f, 6.0f).luminance(state -> 5), 0));
-    public static final Block ENERGY_COLLECTOR_MK2 = registerBlock("energy_collector_mk2", 
-        new EnergyCollector(FabricBlockSettings.of(Material.GLASS, MapColor.PALE_YELLOW).requiresTool().strength(5.0f, 6.0f).luminance(state -> 10), 1));
-    public static final Block ENERGY_COLLECTOR_MK3 = registerBlock("energy_collector_mk3", 
-        new EnergyCollector(FabricBlockSettings.of(Material.GLASS, MapColor.PALE_YELLOW).requiresTool().strength(5.0f, 6.0f).luminance(state -> 15), 2));
+	public static final Block ENERGY_COLLECTOR_MK1 = registerBlock("energy_collector_mk1", 
+		new EnergyCollector(FabricBlockSettings.of(Material.GLASS, MapColor.PALE_YELLOW).requiresTool().strength(5.0f, 6.0f).luminance(state -> 5), 0));
+	public static final Block ENERGY_COLLECTOR_MK2 = registerBlock("energy_collector_mk2", 
+		new EnergyCollector(FabricBlockSettings.of(Material.GLASS, MapColor.PALE_YELLOW).requiresTool().strength(5.0f, 6.0f).luminance(state -> 10), 1));
+	public static final Block ENERGY_COLLECTOR_MK3 = registerBlock("energy_collector_mk3", 
+		new EnergyCollector(FabricBlockSettings.of(Material.GLASS, MapColor.PALE_YELLOW).requiresTool().strength(5.0f, 6.0f).luminance(state -> 15), 2));
 
-    public static final Block ANTIMATTER_RELAY_MK1 = registerBlock("antimatter_relay_mk1", 
-        new AntiMatterRelay(FabricBlockSettings.of(Material.GLASS, MapColor.BLACK).requiresTool().strength(3.5f).luminance(state -> 5), 0));
-    public static final Block ANTIMATTER_RELAY_MK2 = registerBlock("antimatter_relay_mk2", 
-        new AntiMatterRelay(FabricBlockSettings.of(Material.GLASS, MapColor.BLACK).requiresTool().strength(3.5f).luminance(state -> 10), 1));
-    public static final Block ANTIMATTER_RELAY_MK3 = registerBlock("antimatter_relay_mk3", 
-        new AntiMatterRelay(FabricBlockSettings.of(Material.GLASS, MapColor.BLACK).requiresTool().strength(3.5f).luminance(state -> 15), 2));
+	public static final Block ANTIMATTER_RELAY_MK1 = registerBlock("antimatter_relay_mk1", 
+		new AntiMatterRelay(FabricBlockSettings.of(Material.GLASS, MapColor.BLACK).requiresTool().strength(3.5f).luminance(state -> 5), 0));
+	public static final Block ANTIMATTER_RELAY_MK2 = registerBlock("antimatter_relay_mk2", 
+		new AntiMatterRelay(FabricBlockSettings.of(Material.GLASS, MapColor.BLACK).requiresTool().strength(3.5f).luminance(state -> 10), 1));
+	public static final Block ANTIMATTER_RELAY_MK3 = registerBlock("antimatter_relay_mk3", 
+		new AntiMatterRelay(FabricBlockSettings.of(Material.GLASS, MapColor.BLACK).requiresTool().strength(3.5f).luminance(state -> 15), 2));
 
-    public static final Block ALCHEMICAL_CHEST = registerBlock("alchemical_chest", 
-        new AlchemicalChest(FabricBlockSettings.of(Material.STONE, MapColor.GRAY).requiresTool().strength(3.5f)));
+	public static final Block ALCHEMICAL_CHEST = registerBlock("alchemical_chest", 
+		new AlchemicalChest(FabricBlockSettings.of(Material.STONE, MapColor.GRAY).requiresTool().strength(3.5f)));
 
-    public static final Block ENERGY_CONDENSER_MK1 = registerBlock("energy_condenser_mk1", 
-        new EnergyCondenser(FabricBlockSettings.of(Material.STONE, MapColor.BLACK).requiresTool().strength(3.5f), 0));
-    public static final Block ENERGY_CONDENSER_MK2 = registerBlock("energy_condenser_mk2", 
-        new EnergyCondenser(FabricBlockSettings.of(Material.STONE, MapColor.BLACK).requiresTool().strength(3.5f), 1));
+	public static final Block ENERGY_CONDENSER_MK1 = registerBlock("energy_condenser_mk1", 
+		new EnergyCondenser(FabricBlockSettings.of(Material.STONE, MapColor.BLACK).requiresTool().strength(3.5f), 0));
+	public static final Block ENERGY_CONDENSER_MK2 = registerBlock("energy_condenser_mk2", 
+		new EnergyCondenser(FabricBlockSettings.of(Material.STONE, MapColor.BLACK).requiresTool().strength(3.5f), 1));
 
-    private static Block registerBlock(String name, Block block) {
-        registerBlockItem(name, block);
-        return Registry.register(Registries.BLOCK, new Identifier(FabricatedExchange.MOD_ID, name), block);
-    }
+	private static Block registerBlock(String name, Block block) {
+		registerBlockItem(name, block);
+		return Registry.register(Registries.BLOCK, new Identifier(FabricatedExchange.MOD_ID, name), block);
+	}
 
-    private static Item registerBlockItem(String name, Block block) {
-        Item item = Registry.register(Registries.ITEM, new Identifier(FabricatedExchange.MOD_ID, name),
-        new BlockItem(block, new FabricItemSettings()));
-        ItemGroupEvents.modifyEntriesEvent(ModItemGroups.FABRICATED_EXCHANGE).register(entries -> entries.add(item));
-        return item;
-    }
+	private static Item registerBlockItem(String name, Block block) {
+		Item item = Registry.register(Registries.ITEM, new Identifier(FabricatedExchange.MOD_ID, name),
+		new BlockItem(block, new FabricItemSettings()));
+		ItemGroupEvents.modifyEntriesEvent(ModItemGroups.FABRICATED_EXCHANGE).register(entries -> entries.add(item));
+		return item;
+	}
 
-    public static void registerModBlocks() {
+	public static void registerModBlocks() {
 
-    }
+	}
 }

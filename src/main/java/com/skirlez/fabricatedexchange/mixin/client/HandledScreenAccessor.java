@@ -8,7 +8,7 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 
 @Mixin(HandledScreen.class)
 public interface HandledScreenAccessor {
-    @Mutable
-    @Accessor
-    void setDoubleClicking(boolean doubleClicking);
+	@Mutable
+	@Accessor
+	void setDoubleClicking(boolean doubleClicking);
 }

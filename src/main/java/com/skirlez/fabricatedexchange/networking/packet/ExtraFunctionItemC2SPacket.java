@@ -10,24 +10,24 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Hand;
 
 public class ExtraFunctionItemC2SPacket {
-    public static void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler,
-            PacketByteBuf buf, PacketSender responseSender) {   
-        ItemStack stack = player.getStackInHand(Hand.MAIN_HAND);
-        if (!(stack.getItem() instanceof ExtraFunctionItem)) {
-            return;
-        }
+	public static void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler,
+			PacketByteBuf buf, PacketSender responseSender) {   
+		ItemStack stack = player.getStackInHand(Hand.MAIN_HAND);
+		if (!(stack.getItem() instanceof ExtraFunctionItem)) {
+			return;
+		}
 
-        final ItemStack theStack = stack;
-        ExtraFunctionItem item = (ExtraFunctionItem)(stack.getItem());
-        server.execute(new Runnable() {
-            @Override
-            public void run() {
-                if (player.isDisconnected())
-                    return;
-                item.doExtraFunction(theStack, player);
-            }
-        });
-    }
+		final ItemStack theStack = stack;
+		ExtraFunctionItem item = (ExtraFunctionItem)(stack.getItem());
+		server.execute(new Runnable() {
+			@Override
+			public void run() {
+				if (player.isDisconnected())
+					return;
+				item.doExtraFunction(theStack, player);
+			}
+		});
+	}
 }
 
 

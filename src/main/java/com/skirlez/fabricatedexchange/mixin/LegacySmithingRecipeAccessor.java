@@ -8,8 +8,8 @@ import net.minecraft.recipe.*;
 @SuppressWarnings("removal")
 @Mixin(LegacySmithingRecipe.class)
 public interface LegacySmithingRecipeAccessor {
-    @Accessor
-    Ingredient getAddition();
-    @Accessor
-    Ingredient getBase();
+	@Accessor
+	Ingredient getAddition();
+	@Accessor
+	Ingredient getBase();
 }

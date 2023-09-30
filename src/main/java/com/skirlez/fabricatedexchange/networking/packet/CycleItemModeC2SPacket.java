@@ -9,17 +9,17 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Hand;
 
 public class CycleItemModeC2SPacket {
-    public static void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler,
-                               PacketByteBuf buf, PacketSender responseSender) {
-        server.execute(new Runnable() {
-            @Override
-            public void run() {
-                ItemStack stack = player.getStackInHand(Hand.MAIN_HAND);
-                if (!(stack.getItem() instanceof ItemWithModes)) {
-                    return;
-                }
-                ItemWithModes.cycleModes(stack, player);
-            }
-        });
-    }
+	public static void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler,
+							   PacketByteBuf buf, PacketSender responseSender) {
+		server.execute(new Runnable() {
+			@Override
+			public void run() {
+				ItemStack stack = player.getStackInHand(Hand.MAIN_HAND);
+				if (!(stack.getItem() instanceof ItemWithModes)) {
+					return;
+				}
+				ItemWithModes.cycleModes(stack, player);
+			}
+		});
+	}
 }
