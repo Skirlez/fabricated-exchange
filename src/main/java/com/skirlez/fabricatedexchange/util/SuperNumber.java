@@ -306,6 +306,7 @@ public class SuperNumber {
     public boolean isNegative() {
         return numerator.compareTo(BigInteger.ZERO) < 0;
     }
+    
 
     /** A comparison between this and another SuperNumber. 
      * @return -1 for if this is smaller than other
@@ -491,14 +492,14 @@ public class SuperNumber {
 
     /** divides the fraction it's most simplified form. Example: (3/6) -> (1/2) */
     private void simplify() {
-        if (denominator.signum() == -1 && numerator.signum() == -1) {
+        if (denominator.signum() == -1) {
             denominator = denominator.negate();
             numerator = numerator.negate();
         }
-        if (denominator.equals(BigInteger.ONE) || numerator.equals(BigInteger.ONE))
-            return;
         if (equalsZero())
             denominator = BigInteger.ONE;
+        if (denominator.equals(BigInteger.ONE) || numerator.equals(BigInteger.ONE))
+            return;
         BigInteger gcd = numerator.gcd(denominator);
         if (!gcd.equals(BigInteger.ONE)) {
             numerator = numerator.divide(gcd);

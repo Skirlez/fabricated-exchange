@@ -4,8 +4,6 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 import com.skirlez.fabricatedexchange.item.NbtItem;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.util.DataFile;
@@ -33,8 +31,8 @@ import net.minecraft.util.registry.Registry;
 public class EmcData {
 
     // both the server and the client can use these
-    public static ConcurrentMap<String, SuperNumber> emcMap = new ConcurrentHashMap<String, SuperNumber>();
-    public static ConcurrentMap<String, SuperNumber> potionEmcMap = new ConcurrentHashMap<String, SuperNumber>();
+    public static Map<String, SuperNumber> emcMap = new ConcurrentHashMap<String, SuperNumber>();
+    public static Map<String, SuperNumber> potionEmcMap = new ConcurrentHashMap<String, SuperNumber>();
 
     // these should only ever be equal to what's in their respective jsons
     public static Map<String, SuperNumber> seedEmcMap = new HashMap<String, SuperNumber>();

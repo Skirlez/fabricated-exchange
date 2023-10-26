@@ -26,4 +26,5 @@ public class ItemEquation {
         this.origin = id.getNamespace();
         this.amountUnknown = 0;
     }
+
 }
