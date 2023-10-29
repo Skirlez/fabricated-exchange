@@ -21,6 +21,7 @@ public class SuperNumber {
     private BigInteger numerator;
     private BigInteger denominator;
 
+    public static final SuperNumber NEGATIVE_ONE = new SuperNumber(BigInteger.ONE.negate());
     public static final SuperNumber ZERO = new SuperNumber(BigInteger.ZERO);
     public static final SuperNumber ONE = new SuperNumber(BigInteger.ONE);
     public static final SuperNumber INTEGER_LIMIT = new SuperNumber(Integer.MAX_VALUE);

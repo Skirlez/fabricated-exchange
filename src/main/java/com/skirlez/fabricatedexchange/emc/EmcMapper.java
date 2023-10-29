@@ -40,8 +40,9 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.registry.Registry;
 
+// NOTE: Code is in an *incredibly* bad state due to trying out many ideas related to backtracking very quickly. Won't be fixed in this branch!
 
-/*  This class tries to infer EMC values of items through in-game recipes. It maps items to EMC values.
+/* This class tries to infer EMC values of items through in-game recipes. It maps items to EMC values.
 Here's a rough outline of how it works:
 1. Obtain all recipes from Minecraft
 2. Convert those recipes into the more abstract ItemEquation class,
@@ -51,10 +52,10 @@ and in the future, also take in ItemEquations provided by other mods
 5. Add any equation with a single unknown to be solved, and no unknowns to be verified.
 6. Once an item is given an EMC value, subtract from any relevant equation's unknown count, 
 and add it to the queue if needed.
-7. If in verification an ItemEquation gives more EMC that it inputs, if there is only 1 output,
-the mapper will update the output's worth to be equal to the input, and retroactively also update any items who's value
-is dependent on that output. Note that this process is recursive, and that any item updated in this process should
-also trigger this procedure.
+7. If in verification an ItemEquation gives more EMC that it inputs, choose an item (depending on the age, see below)
+and change its EMC to make the equation equal again, then retroactively also update any items 
+who's value is dependent on that item. This will be referred to as backtracking.
+Note that backtracking is recursive, and that any item updated in this process should also backtrack.
 
 It also infers EMC values of potion NBT data in a different simpler way.
 */
@@ -90,6 +91,11 @@ public class EmcMapper {
     // and then switches (increasing -> decreasing/decreasing -> increasing), we will stop trying to assign a value to the item.
     private Map<String, List<SuperNumber>> backtrackingMap = new HashMap<String, List<SuperNumber>>();
 
+    /* During equation verification, if the input EMC is greater than the output EMC, we must modify one of the emc values
+    of the items involved in the equation in order to equalize it. the question is, how do we choose? There is no right answer, 
+    any item can be chosen to equalize the equation. but in most cases (i found that) you'd want it to be the item that we most recently found the EMC of.
+    The age map attempts to solve this. Every time an item is given EMC, we give it the age in ageCount,
+    and increase it by one. When selecting which item to backtrack for, the mapper will choose the item with the highest age. */
     private Map<String, Integer> ageMap = new HashMap<String, Integer>();
     private int ageCount;
 
@@ -127,7 +133,7 @@ public class EmcMapper {
         List<SmeltingRecipe> allSmeltingRecipes = recipeManager.listAllOfType(RecipeType.SMELTING);
         List<CraftingRecipe> allCraftingRecipes = recipeManager.listAllOfType(RecipeType.CRAFTING);
         List<StonecuttingRecipe> allStonecuttingRecipes = recipeManager.listAllOfType(RecipeType.STONECUTTING);
-        // blacklisted recipes and items
+        
         Map<String, HashSet<String>> blacklistedRecipes = ModConfig.BLACKLISTED_MAPPER_RECIPES_FILE.getValue();
         if (blacklistedRecipes == null)
             blacklistedRecipes = new HashMap<>();
@@ -408,7 +414,6 @@ public class EmcMapper {
     }
 
     private void verify(ItemEquation equation) {
-
         SuperNumber inputEmc = SuperNumber.Zero();
         SuperNumber outputEmc = SuperNumber.Zero();
 
@@ -436,9 +441,7 @@ public class EmcMapper {
             set.add(equation);
         }
         if (inputEmc.compareTo(outputEmc) < 0) {
-            warn("started backtracking for " + equation.origin + ":" + equation.name);
-            if (equation.name.equals("copper_ingot"))
-                System.out.println("here");
+            //warn("started backtracking for " + equation.origin + ":" + equation.name);
             // find the item with the highest age and CRUSH ITS BALLS
             Item maxItemI = null;
             Item maxItemO = null;
@@ -518,16 +521,16 @@ public class EmcMapper {
         return list.get(list.size() - 1);
     }
     private void addBacktrackValue(Item item, SuperNumber newValue) {
- 
         List<SuperNumber> list = backtrackingMap.get(itemName(item));
         if (list == null) {
             list = new ArrayList<SuperNumber>();
             backtrackingMap.put(itemName(item), list);
         }
-        else {
+        if (list.size() != 0) {
             if (newValue.equalTo(list.get(list.size() -1)))
                 return;
         }
+
         list.add(newValue);
     }
 
@@ -550,8 +553,7 @@ public class EmcMapper {
 
 
     private boolean putEmcMap(Item item, SuperNumber value, ItemEquation equation) {
-        if (item == Items.IRON_INGOT)
-            System.out.println("");
+
         if (value.compareTo(SuperNumber.ZERO) <= 0) {
             warn("EMC Mapper tried assigning item " + itemName(item) 
                 + " a value lower than or equal to 0. Current recipe: " + equation.origin + ":" + equation.name);
@@ -561,7 +563,7 @@ public class EmcMapper {
         SuperNumber emc;
         if (!backtrackingMap.containsKey(itemName(item))) {
             if (!emcMapHasEntry(item)) {
-                warn("placing value " + value.divisionString() + " for " + itemName(item) + " equation " + equation.origin + ":" + equation.name);
+                //warn("placing INITIAL value " + value.divisionString() + " for " + itemName(item) + " equation " + equation.origin + ":" + equation.name);
                 String itemName = itemName(item);
                 unlock(itemName);
                 emcMap.put(itemName, new SuperNumber(value));
@@ -573,25 +575,37 @@ public class EmcMapper {
                 return false;
         }
         else {
-            if (value.equalTo(getLastBacktrackValue(item))) {
-                warn("redundant backtrack for " + itemName(item) + " remains at " + value.divisionString());
+            SuperNumber lastValue = getLastBacktrackValue(item);
+            if (lastValue == SuperNumber.NEGATIVE_ONE)
+                return false;
+            if (value.equalTo(lastValue)) {
+                //warn("redundant backtrack for " + itemName(item) + " remains at " + value.divisionString());
                 emcMap.put(itemName(item), value);
                 
                 return true;
             }
             if (checkBacktrackConflicts(item, value)) {
-                warn("item " + itemName(item) + " deemed unusable");
-                emcMap.put(itemName(item), SuperNumber.Zero());
+                String name = itemName(item);
+                List<SuperNumber> list = backtrackingMap.get(name);
+                String previousValues = "";
+                for (SuperNumber previousValue : list) {
+                    previousValues += previousValue.divisionString() + " ";
+                }
+                warn("WARNING: Item " + name + " deemed unusable. Backtracking list is not ordered: " + previousValues);
+                relock(name);
+                emcMap.remove(name);
+                addBacktrackValue(item, SuperNumber.NEGATIVE_ONE);
                 return true;
             }
         }
-        warn("placing value " + value.divisionString() + " for " + itemName(item) + " equation " + equation.origin + ":" + equation.name);
+        //warn("placing value " + value.divisionString() + " for " + itemName(item) + " equation " + equation.origin + ":" + equation.name);
         String itemName = itemName(item);
         addBacktrackValue(item, getItemEmc(item));
         emcMap.put(itemName, new SuperNumber(value));
         ageMap.put(itemName(item), ageCount++);
+        addBacktrackValue(item, getItemEmc(item));
         if (!itemInfluenceMap.containsKey(itemName)) {
-            warn("backtracking end for " + itemName(item));
+            //warn("backtracking end for " + itemName(item));
             return true;
         }
         Set<ItemEquation> relatedEquations = new HashSet<ItemEquation>(itemInfluenceMap.get(itemName));
@@ -603,17 +617,25 @@ public class EmcMapper {
             if (concludedItems == null)
                 verify(relatedEquation);
             else {
+                boolean solveable = true;
                 for (Item concludedItem : concludedItems) {
                     String name = itemName(concludedItem);
-                    addBacktrackValue(item, getItemEmc(item));
+                    if (backtrackingMap.containsKey(name)) {
+                        SuperNumber lastValue = getLastBacktrackValue(concludedItem);
+                        if (lastValue == SuperNumber.NEGATIVE_ONE) {
+                            solveable = false;
+                            break;
+                        }
+                    }
+                    addBacktrackValue(concludedItem, getItemEmc(concludedItem));
                     emcMap.remove(name);
-                    warn("cleaned " + name + " while backtracking for " + itemName(item) + " in equation " + relatedEquation.origin + ":" + relatedEquation.name);
+                    //warn("cleaned " + name + " while backtracking for " + itemName(item) + " in equation " + relatedEquation.origin + ":" + relatedEquation.name);
                 }
-                
-                solve(relatedEquation);
+                if (solveable)
+                    solve(relatedEquation);
             }
         }
-        warn("backtracking end for " + itemName(item));
+        //warn("backtracking end for " + itemName(item));
         return true;
     }
 
@@ -711,8 +733,21 @@ public class EmcMapper {
             equation.amountUnknown--;
             tryAddEquation(equation);
         }
-        unknownEquationMap.remove(itemName);
     }
+    private void relock(String itemName) {
+        if (!unknownEquationMap.containsKey(itemName))
+            return;
+        Set<UnknownEquationNode> set = unknownEquationMap.get(itemName);
+        for (UnknownEquationNode node : set) {
+            if (node.subtracted == false)
+                continue;
+
+            ItemEquation equation = node.equation;
+            equation.amountUnknown = 999;
+        }
+    }
+
+
 
     private void tryAddEquation(ItemEquation equation) {
         if (equation.amountUnknown <= 1) {
