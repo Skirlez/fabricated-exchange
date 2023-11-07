@@ -96,8 +96,12 @@ public class EnergyCondenserScreenHandler extends LeveledScreenHandler implement
 
             if (itemStack2.isEmpty())
                 slot2.setStack(ItemStack.EMPTY);
-            else
-                slot2.markDirty();
+            else {
+                itemStack.setCount(1);
+                FakeSlot fakeSlot = (FakeSlot) slots.get(0);
+                fakeSlot.setStack(itemStack);
+                return ItemStack.EMPTY;
+            }
         }
 
         return itemStack;
