@@ -17,9 +17,13 @@
     "item.fabricated-exchange.dark_matter_pickaxe.mode_1": "Wideshot",
     "item.fabricated-exchange.dark_matter_pickaxe.mode_2": "Tallshot",
     "item.fabricated-exchange.dark_matter_pickaxe.mode_3": "Longshot",
+    "item.fabricated-exchange.red_matter_pickaxe.uncharged": "Dormant",
+    "item.fabricated-exchange.red_matter_sword.mode_1": "Aggressive",
+    "item.fabricated-exchange.red_matter_sword.mode_2": "Passive",
     "item.fabricated-exchange.dark_matter_axe": "Dark Matter Axe",
     "item.fabricated-exchange.dark_matter_shovel": "Dark Matter Shovel",
     "item.fabricated-exchange.dark_matter_hoe": "Dark Matter Hoe",
+    "item.fabricated-exchange.red_matter_sword": "Red Matter Sword",
     "item.fabricated-exchange.mode_switch": "Mode:",
 
     "block.fabricated-exchange.alchemical_coal_block": "Alchemical Coal Block",

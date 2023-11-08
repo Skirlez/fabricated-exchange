@@ -1,11 +1,7 @@
 package com.skirlez.fabricatedexchange.item;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
-import com.skirlez.fabricatedexchange.item.tools.DarkMatterAxe;
-import com.skirlez.fabricatedexchange.item.tools.DarkMatterHoe;
-import com.skirlez.fabricatedexchange.item.tools.DarkMatterPickaxe;
-import com.skirlez.fabricatedexchange.item.tools.DarkMatterShovel;
-import com.skirlez.fabricatedexchange.item.tools.DarkMatterSword;
+import com.skirlez.fabricatedexchange.item.tools.*;
 
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.item.Item;
@@ -50,6 +46,8 @@ public class ModItems {
     public static final Item DARK_MATTER_HOE = 
         registerItem("dark_matter_hoe", new DarkMatterHoe(DarkMatterMaterial.INSTANCE, 5, 0.0f, new Item.Settings().fireproof().group(ModItemGroups.FABRICATED_EXCHANGE)));
 
+    public static final Item RED_MATTER_SWORD =
+            registerItem("red_matter_sword", new RedMatterSword(RedMatterMaterial.INSTANCE, 14, -2.4f, new Item.Settings().fireproof().group(ModItemGroups.FABRICATED_EXCHANGE)));
 
     private static Item registerItem(String name, Item item) {
         Registry.register(Registry.ITEM, new Identifier(FabricatedExchange.MOD_ID, name), item);

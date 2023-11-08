@@ -172,7 +172,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                 ModItems.AETERNALIS_FUEL, ModItems.LOW_COVALENCE_DUST, ModItems.MEDIUM_COVALENCE_DUST, ModItems.HIGH_COVALENCE_DUST,
                 ModItems.DARK_MATTER, ModItems.RED_MATTER, ModItems.TOME_OF_KNOWLEDGE, ModItems.TRANSMUTATION_TABLET);
             registerHandheldModels(itemModelGenerator, ModItems.DARK_MATTER_SWORD, ModItems.DARK_MATTER_PICKAXE, ModItems.DARK_MATTER_AXE, 
-                ModItems.DARK_MATTER_SHOVEL, ModItems.DARK_MATTER_HOE);
+                ModItems.DARK_MATTER_SHOVEL, ModItems.DARK_MATTER_HOE, ModItems.RED_MATTER_SWORD);
 
         }
 
@@ -473,6 +473,16 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                 .criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER),
                     FabricRecipeProvider.conditionsFromItem(ModItems.DARK_MATTER))
                 .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(ModItems.RED_MATTER_SWORD)
+                    .pattern("M")
+                    .pattern("M")
+                    .pattern("D")
+                    .input('M', ModItems.RED_MATTER)
+                    .input('D', diamond)
+                    .criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER_SWORD),
+                            FabricRecipeProvider.conditionsFromItem(ModItems.RED_MATTER))
+                    .offerTo(exporter);
 
 
         }
