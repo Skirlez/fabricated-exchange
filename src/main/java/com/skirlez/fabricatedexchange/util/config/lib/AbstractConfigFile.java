@@ -57,7 +57,13 @@ public abstract class AbstractConfigFile<T> extends AbstractFile<T> {
 	
 	@Override
 	protected T readValue(Reader reader) throws Exception {
-		return YAML.loadAs(reader, classType);
+		Type type = TypeToken.get(classType).getType();
+
+		if (type instanceof Class<?>) {
+			return YAML.loadAs(reader, (Class<T>) type);
+		} else {
+			throw new IllegalArgumentException("Type must be a Class object");
+		}
 	}
 
 	@Override
