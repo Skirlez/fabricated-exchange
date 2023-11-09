@@ -172,7 +172,8 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                 ModItems.AETERNALIS_FUEL, ModItems.LOW_COVALENCE_DUST, ModItems.MEDIUM_COVALENCE_DUST, ModItems.HIGH_COVALENCE_DUST,
                 ModItems.DARK_MATTER, ModItems.RED_MATTER, ModItems.TOME_OF_KNOWLEDGE, ModItems.TRANSMUTATION_TABLET);
             registerHandheldModels(itemModelGenerator, ModItems.DARK_MATTER_SWORD, ModItems.DARK_MATTER_PICKAXE, ModItems.DARK_MATTER_AXE, 
-                ModItems.DARK_MATTER_SHOVEL, ModItems.DARK_MATTER_HOE, ModItems.RED_MATTER_SWORD, ModItems.RED_MATTER_PICKAXE);
+                ModItems.DARK_MATTER_SHOVEL, ModItems.DARK_MATTER_HOE, ModItems.RED_MATTER_SWORD, ModItems.RED_MATTER_PICKAXE,
+                ModItems.RED_MATTER_AXE,ModItems.RED_MATTER_HOE, ModItems.RED_MATTER_SHOVEL);
 
         }
 
@@ -479,15 +480,15 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                     .pattern("M")
                     .pattern("D")
                     .input('M', ModItems.RED_MATTER)
-                    .input('D', diamond)
+                    .input('D', ModItems.DARK_MATTER_SWORD)
                     .criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER_SWORD),
                             FabricRecipeProvider.conditionsFromItem(ModItems.RED_MATTER))
                     .offerTo(exporter);
 
             ShapedRecipeJsonBuilder.create(ModItems.RED_MATTER_PICKAXE)
                     .pattern("MMM")
-                    .pattern("D")
-                    .pattern("C")
+                    .pattern(" D ")
+                    .pattern(" C ")
                     .input('M', ModItems.RED_MATTER)
                     .input('D', ModItems.DARK_MATTER_PICKAXE)
                     .input('C', ModItems.DARK_MATTER)
@@ -518,9 +519,9 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                     .offerTo(exporter);
 
             ShapedRecipeJsonBuilder.create(ModItems.RED_MATTER_SHOVEL)
-                    .pattern(" M")
-                    .pattern(" D")
-                    .pattern(" C")
+                    .pattern("M")
+                    .pattern("D")
+                    .pattern("C")
                     .input('M', ModItems.RED_MATTER)
                     .input('D', ModItems.DARK_MATTER_SHOVEL)
                     .input('C', ModItems.DARK_MATTER)

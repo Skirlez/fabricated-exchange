@@ -95,18 +95,14 @@ public class RedMatterAxe extends AxeItem implements ChargeableItem, OutliningIt
         if (!world.isClient && miner instanceof PlayerEntity && isSuitableFor(state)) {
             PlayerEntity player = (PlayerEntity) miner;
 
-            // Find the first suitable block around the initial block.
-            BlockPos firstSuitablePos = findFirstSuitableBlockAround(world, pos);
-            if (firstSuitablePos != null) {
-                // Get the positions of all connected logs from the first found suitable block.
-                List<BlockPos> positions = getPositionsToOutline(player, stack, firstSuitablePos);
-                FabricatedExchange.LOGGER.info("Connected Logs: {}", positions);
+            // Get the positions of all connected logs from the first found suitable block.
+            List<BlockPos> positions = getPositionsToOutline(player, stack, pos);
 
-                // Break all the connected logs.
-                for (BlockPos newPos : positions) {
-                    world.breakBlock(newPos, true, player);
-                }
+            // Break all the connected logs.
+            for (BlockPos newPos : positions) {
+                world.breakBlock(newPos, true, player);
             }
+
         }
 
         // Call super to handle breaking the initial block and tool damage.
@@ -142,7 +138,6 @@ public class RedMatterAxe extends AxeItem implements ChargeableItem, OutliningIt
                 World world = player.getWorld();
                 int range = ChargeableItem.getCharge(stack) * 9; // Adjust range based on charge
 
-                // Find the first suitable block around the initial block, this is done so the outlines match the actual breaking logic
                 BlockPos firstSuitablePos = findFirstSuitableBlockAround(world, center);
                 searchForLogs(world, firstSuitablePos, list, range);
             }
