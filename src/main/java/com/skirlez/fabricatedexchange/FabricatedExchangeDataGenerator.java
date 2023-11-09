@@ -172,7 +172,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                 ModItems.AETERNALIS_FUEL, ModItems.LOW_COVALENCE_DUST, ModItems.MEDIUM_COVALENCE_DUST, ModItems.HIGH_COVALENCE_DUST,
                 ModItems.DARK_MATTER, ModItems.RED_MATTER, ModItems.TOME_OF_KNOWLEDGE, ModItems.TRANSMUTATION_TABLET);
             registerHandheldModels(itemModelGenerator, ModItems.DARK_MATTER_SWORD, ModItems.DARK_MATTER_PICKAXE, ModItems.DARK_MATTER_AXE, 
-                ModItems.DARK_MATTER_SHOVEL, ModItems.DARK_MATTER_HOE, ModItems.RED_MATTER_SWORD);
+                ModItems.DARK_MATTER_SHOVEL, ModItems.DARK_MATTER_HOE, ModItems.RED_MATTER_SWORD, ModItems.RED_MATTER_PICKAXE);
 
         }
 
@@ -481,6 +481,50 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                     .input('M', ModItems.RED_MATTER)
                     .input('D', diamond)
                     .criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER_SWORD),
+                            FabricRecipeProvider.conditionsFromItem(ModItems.RED_MATTER))
+                    .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(ModItems.RED_MATTER_PICKAXE)
+                    .pattern("MMM")
+                    .pattern("D")
+                    .pattern("C")
+                    .input('M', ModItems.RED_MATTER)
+                    .input('D', ModItems.DARK_MATTER_PICKAXE)
+                    .input('C', ModItems.DARK_MATTER)
+                    .criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER_PICKAXE),
+                            FabricRecipeProvider.conditionsFromItem(ModItems.RED_MATTER))
+                    .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(ModItems.RED_MATTER_AXE)
+                    .pattern("MM")
+                    .pattern("MD")
+                    .pattern(" C")
+                    .input('M', ModItems.RED_MATTER)
+                    .input('D', ModItems.DARK_MATTER_AXE)
+                    .input('C', ModItems.DARK_MATTER)
+                    .criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER_AXE),
+                            FabricRecipeProvider.conditionsFromItem(ModItems.RED_MATTER))
+                    .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(ModItems.RED_MATTER_HOE)
+                    .pattern("MM")
+                    .pattern(" D")
+                    .pattern(" C")
+                    .input('M', ModItems.RED_MATTER)
+                    .input('D', ModItems.DARK_MATTER_HOE)
+                    .input('C', ModItems.DARK_MATTER)
+                    .criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER_HOE),
+                            FabricRecipeProvider.conditionsFromItem(ModItems.RED_MATTER))
+                    .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(ModItems.RED_MATTER_SHOVEL)
+                    .pattern(" M")
+                    .pattern(" D")
+                    .pattern(" C")
+                    .input('M', ModItems.RED_MATTER)
+                    .input('D', ModItems.DARK_MATTER_SHOVEL)
+                    .input('C', ModItems.DARK_MATTER)
+                    .criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER_SHOVEL),
                             FabricRecipeProvider.conditionsFromItem(ModItems.RED_MATTER))
                     .offerTo(exporter);
 
