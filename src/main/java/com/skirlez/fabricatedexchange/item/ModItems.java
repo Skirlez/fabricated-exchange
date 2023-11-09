@@ -52,6 +52,14 @@ public class ModItems {
     public static final Item RED_MATTER_SWORD =
             registerItem("red_matter_sword", new RedMatterSword(RedMatterMaterial.INSTANCE, 14, -2.4f, new Item.Settings().fireproof()));
 
+	public static final Item RED_MATTER_PICKAXE =
+			registerItem("red_matter_pickaxe", new RedMatterPickaxe(RedMatterMaterial.INSTANCE, 10, -2.8f, new Item.Settings().fireproof()));
+	public static final Item RED_MATTER_SHOVEL =
+			registerItem("red_matter_shovel", new RedMatterShovel(DarkMatterMaterial.INSTANCE, 7f, -3.0f, new Item.Settings().fireproof()));
+	public static final Item RED_MATTER_AXE =
+			registerItem("red_matter_axe", new RedMatterAxe(DarkMatterMaterial.INSTANCE, 12f, -3.0f, new Item.Settings().fireproof()));
+	public static final Item RED_MATTER_HOE =
+			registerItem("red_matter_hoe", new RedMatterHoe(DarkMatterMaterial.INSTANCE, 8, 0.0f, new Item.Settings().fireproof()));
 	private static Item registerItem(String name, Item item) {
 		Registry.register(Registries.ITEM, new Identifier(FabricatedExchange.MOD_ID, name), item);
 		return item;
