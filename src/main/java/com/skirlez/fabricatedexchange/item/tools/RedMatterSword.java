@@ -110,7 +110,7 @@ public class RedMatterSword extends SwordItem implements ChargeableItem, ExtraFu
         if (charge == 0) {
             tooltip.add(Text.translatable("item.fabricated-exchange.mode_switch")
                     .append(" ")
-                    .append(Text.translatable("item.fabricated-exchange.red_matter_pickaxe.uncharged")
+                    .append(Text.translatable("item.fabricated-exchange.red_matter_sword.uncharged")
                             .setStyle(Style.EMPTY.withColor(Formatting.DARK_GRAY))));
         }
         else
