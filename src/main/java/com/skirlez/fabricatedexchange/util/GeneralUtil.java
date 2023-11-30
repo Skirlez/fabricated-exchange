@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -88,16 +89,18 @@ public class GeneralUtil {
     @Nullable
     public static String[] getItemStringsFromTagString(String tagString) {
         Identifier tagId = new Identifier(tagString);
-        
         TagKey<Item> tag = Registry.ITEM.streamTags().filter((key) -> key.id().equals(tagId)).findFirst().orElse(null);
-        Named<Item> named = Registry.ITEM.getEntryList(tag).get();
+        Optional<Named<Item>> optionalNamed = Registry.ITEM.getEntryList(tag);
+        if (optionalNamed.isEmpty())
+            return new String[] {};
+        Named<Item> named = optionalNamed.get();
         String[] array = new String[named.size()];
         for (int i = 0; i < named.size(); i++)
             array[i] = Registry.ITEM.getId(named.get(i).value()).toString();
         
-        
         return array;
     } 
+    
 
 
 

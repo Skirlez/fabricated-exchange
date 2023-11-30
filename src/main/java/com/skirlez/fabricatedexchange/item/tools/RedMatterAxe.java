@@ -1,6 +1,5 @@
 package com.skirlez.fabricatedexchange.item.tools;
 
-import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.item.ChargeableItem;
 import com.skirlez.fabricatedexchange.item.FakeItemUsageContext;
 import com.skirlez.fabricatedexchange.item.ItemWithModes;

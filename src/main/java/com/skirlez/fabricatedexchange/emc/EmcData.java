@@ -4,6 +4,8 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.item.NbtItem;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.util.DataFile;
@@ -208,6 +210,12 @@ public class EmcData {
         for (String s : EmcData.potionEmcMap.keySet()) {
             buffer.writeString(s);
             buffer.writeString(EmcData.potionEmcMap.get(s).divisionString());
+        }
+        buffer.writeInt(FabricatedExchange.fuelProgressionMap.keySet().size());
+        for (Item item : FabricatedExchange.fuelProgressionMap.keySet()) {
+            buffer.writeString(Registry.ITEM.getId(item).toString());
+            Item result = FabricatedExchange.fuelProgressionMap.get(item);
+            buffer.writeString(Registry.ITEM.getId(result).toString());
         }
 
         ServerPlayNetworking.send(player, ModMessages.EMC_MAP_SYNC_IDENTIFIER, buffer);

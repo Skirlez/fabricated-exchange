@@ -1,17 +1,22 @@
 package com.skirlez.fabricatedexchange.networking.packet;
 
+import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.item.Item;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 public class EmcMapSyncS2CPacket {
     public static void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
         EmcData.emcMap.clear();
         EmcData.potionEmcMap.clear();
+        FabricatedExchange.fuelProgressionMap.clear();
         int iterations = buf.readInt();
         for (int i = 0; i < iterations; i++) {
             String s = buf.readString();
@@ -21,6 +26,12 @@ public class EmcMapSyncS2CPacket {
         for (int i = 0; i < potionIterations; i++) {
             String s = buf.readString();
             EmcData.potionEmcMap.put(s, new SuperNumber(buf.readString()));
+        }
+        int fuelProgIterations = buf.readInt();
+        for (int i = 0; i < fuelProgIterations; i++) {
+            Item item1 = Registry.ITEM.get(new Identifier(buf.readString()));
+            Item item2 = Registry.ITEM.get(new Identifier(buf.readString()));
+            FabricatedExchange.fuelProgressionMap.put(item1, item2);
         }
     }
 }

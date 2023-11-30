@@ -1,16 +1,13 @@
 package com.skirlez.fabricatedexchange.item.tools;
 
-import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.item.ChargeableItem;
 import com.skirlez.fabricatedexchange.item.ExtraFunctionItem;
 import com.skirlez.fabricatedexchange.item.ItemWithModes;
 import com.skirlez.fabricatedexchange.sound.ModSounds;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.Monster;
@@ -25,8 +22,6 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import java.util.List;

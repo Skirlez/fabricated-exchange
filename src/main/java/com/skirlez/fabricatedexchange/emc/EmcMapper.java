@@ -514,8 +514,6 @@ public class EmcMapper {
 
     }
 
-
-
     private SuperNumber getLastBacktrackValue(Item item) {
         List<SuperNumber> list = backtrackingMap.get(itemName(item));
         return list.get(list.size() - 1);
