@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +26,6 @@ import com.skirlez.fabricatedexchange.util.config.ModifiersFile;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.potion.Potion;
 import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.recipe.CraftingRecipe;
@@ -41,6 +41,8 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.registry.Registry;
 
 // NOTE: Code is in an *incredibly* bad state due to trying out many ideas related to backtracking very quickly. Won't be fixed in this branch!
+// I swear this thing is going to blow up and crash any second now.
+
 
 /* This class tries to infer EMC values of items through in-game recipes. It maps items to EMC values.
 Here's a rough outline of how it works:
@@ -71,7 +73,7 @@ public class EmcMapper {
     private boolean warninged = false;
     
     private RecipeManager recipeManager;
-
+    private List<ItemEquation> allEquations = new ArrayList<ItemEquation>();
     // This is a map between item names and equation nodes. Whenever a new item is assigned an EMC value,
     // the mapper should traverse to all the nodes in that item's set and subtract from the held node equation's unknown count.
     private Map<String, Set<UnknownEquationNode>> unknownEquationMap = new HashMap<String, Set<UnknownEquationNode>>();
@@ -100,6 +102,7 @@ public class EmcMapper {
     private int ageCount;
 
     private final ModifiersFile modifiers;
+    
 
     public EmcMapper(RecipeManager recipeManager) {
         this.recipeManager = recipeManager;
@@ -128,6 +131,8 @@ public class EmcMapper {
         for (String itemName : seedEmcMap.keySet()) {
             ageMap.put(itemName, ageCount++);
         }
+
+        
 
         List<SmithingRecipe> allSmithingRecipes = recipeManager.listAllOfType(RecipeType.SMITHING);
         List<SmeltingRecipe> allSmeltingRecipes = recipeManager.listAllOfType(RecipeType.SMELTING);
@@ -178,7 +183,7 @@ public class EmcMapper {
 
         // TODO: inject recipes provided by mods here
 
-    
+        // solving phase
         while (!queue.isEmpty()) {
             ItemEquation equation = queue.poll();
             if (equation.amountUnknown > 1)
@@ -189,7 +194,6 @@ public class EmcMapper {
             }
             solve(equation);
         }
-            
 
         // most potion recipes are even more special, so we need to take care of them separately.
         // i've decided to just copy this section from the old emc mapper, using the dumber method, 
@@ -283,7 +287,7 @@ public class EmcMapper {
     }
 
     private <T extends Recipe<?>> void convertRecipesToEquations(List<T> allRecipes, HashSet<String> blacklist, 
-    Function<T, ItemEquation> equationConvertion) {
+            Function<T, ItemEquation> equationConvertion) {
         for (int i = 0; i < allRecipes.size(); i++) {
             T recipe = allRecipes.get(i);
             if (blacklist.contains(recipe.getId().toString()))
@@ -291,8 +295,10 @@ public class EmcMapper {
             ItemEquation equation = equationConvertion.apply(recipe);
             if (equation == null)
                 continue;
-            if (!equation.input.isEmpty())
+            if (!equation.input.isEmpty()) {
                 countUnknowns(equation);
+                allEquations.add(equation);
+            }
         }
     }
 
@@ -419,7 +425,9 @@ public class EmcMapper {
 
         List<Item> itemsInvolved = new ArrayList<Item>();
         
-
+        if (equation.name.contains("transmutes1_hellish/gold"))
+            System.out.println("here");
+            
         for (ItemStack stack : equation.output) {
             outputEmc.add(getItemStackEmc(stack));
             itemsInvolved.add(stack.getItem());
@@ -440,79 +448,65 @@ public class EmcMapper {
             }
             set.add(equation);
         }
-        if (inputEmc.compareTo(outputEmc) < 0) {
+        if (inputEmc.compareTo(outputEmc) < 0 || (careAboutDownwardsInequality && inputEmc.compareTo(outputEmc) > 0)) {
             //warn("started backtracking for " + equation.origin + ":" + equation.name);
-            // find the item with the highest age and CRUSH ITS BALLS
-            Item maxItemI = null;
-            Item maxItemO = null;
-            int maxAgeI = 0;
-            int maxAgeO = 0;
 
-            int multiplierI = 1;
-            int multiplierO = 1;
+            // find the item with the highest age and CRUSH ITS BALLS
 
             SuperNumber sum = new SuperNumber(inputEmc);
             sum.add(outputEmc);
 
-            for (int i = 0; i < equation.output.size(); i++) {
-                ItemStack stack = equation.output.get(i);
-                Item item = stack.getItem();
-                int age = getItemAge(item);
-                if (age == maxAgeO) {
-                    multiplierO += stack.getCount();
-                }
-                else if (age > maxAgeO) {
-                    maxAgeO = age;
-                    maxItemO = item;
-                    multiplierO = stack.getCount();
-                }
-                
-            }
+            ItemStack maxItemO = findHighestAge(equation.output, (stack) -> stack.copy());
+            ItemStack maxItemI = findHighestAge(equation.input, (ingredient) -> { 
+                ItemStack stack = getIngredientMinimumItemStack(ingredient);
+                if (stack == null)
+                    System.out.println(equation.name);
+                return stack.copy();
+            });
 
-            for (int i = 0; i < equation.input.size(); i++) {
-                Ingredient ingredient = equation.input.get(i);
-                int age = getIngredientAge(ingredient);
-                if (age == maxAgeI) {
-                    multiplierI += getIngredientCount(ingredient);
-                }
-                if (age > maxAgeI) {
-                    maxAgeI = age;
-                    maxItemI = getIngredientMinimumItem(ingredient);
-                    multiplierI = getIngredientCount(ingredient);
-                }
-            }
+            boolean isOutput = (getItemAge(maxItemO.getItem()) >= getItemAge(maxItemI.getItem()));
+            ItemStack maxItem = isOutput ? maxItemO : maxItemI;
+            SuperNumber maxEmc = isOutput ? outputEmc : inputEmc;
+            sum.subtract(maxEmc);
 
-            boolean isOutput = (maxAgeO >= maxAgeI);
-            if (isOutput) {
-                SuperNumber emc = getItemEmc(maxItemO);
-                emc.multiply(multiplierO);
-
-                sum.subtract(outputEmc);
-                outputEmc.subtract(emc);
-                sum.subtract(outputEmc);
-                sum.divide(multiplierO);
-                putEmcMap(maxItemO, sum, equation);
-            }
-            else {
-                SuperNumber emc = getItemEmc(maxItemI);
-                emc.multiply(multiplierI);
-        
-                sum.subtract(inputEmc);
-                inputEmc.subtract(emc);
-                sum.subtract(inputEmc);
-                sum.divide(multiplierI);
-                putEmcMap(maxItemI, sum, equation);
-            }
-
-            /*
-            else {
-                warn("Recipe EMC conflict for recipe " + equation.origin + ":" + equation.name + "."
-                    + " This recipe gives more EMC than you put in! Input: " + inputEmc + ", Output: " + outputEmc + ".");
-            }
-            */
+            SuperNumber emc = getItemStackEmc(maxItem);
+            maxEmc.subtract(emc);
+            sum.subtract(maxEmc);
+            sum.divide(maxItem.getCount());
+            putEmcMap(maxItem.getItem(), sum, equation);
         }
 
     }
+
+    // This function finds the item with the highest age from a list of T things as an itemstack 
+    // with its count set to how many times it is present in the list of things.
+    // It's also given a function to convert the thing of type T to an itemstack.
+    private <T> ItemStack findHighestAge(List<T> things, Function<T, ItemStack> stackConverter) {
+        T maxItem = null;
+        int maxAge = -1;
+        int multiplier = 1;
+
+        for (int i = 0; i < things.size(); i++) {
+            T thing = things.get(i);
+            ItemStack stack = stackConverter.apply(thing);
+
+            int age = getItemAge(stack.getItem());
+            int count = stack.getCount();
+
+            if (age == maxAge)
+                multiplier += count;
+            else if (age > maxAge) {
+                maxAge = age;
+                maxItem = thing;
+                multiplier = count;
+            }
+        }
+        ItemStack returnStack = stackConverter.apply(maxItem);
+        returnStack.setCount(multiplier);
+        return returnStack;
+    }
+
+
 
     private SuperNumber getLastBacktrackValue(Item item) {
         List<SuperNumber> list = backtrackingMap.get(itemName(item));
@@ -551,7 +545,8 @@ public class EmcMapper {
 
 
     private boolean putEmcMap(Item item, SuperNumber value, ItemEquation equation) {
-
+        if (itemName(item).equals("dml-refabricated:extraterrestrial_matter"))
+            System.out.println("here");
         if (value.compareTo(SuperNumber.ZERO) <= 0) {
             warn("EMC Mapper tried assigning item " + itemName(item) 
                 + " a value lower than or equal to 0. Current recipe: " + equation.origin + ":" + equation.name);
@@ -579,7 +574,6 @@ public class EmcMapper {
             if (value.equalTo(lastValue)) {
                 //warn("redundant backtrack for " + itemName(item) + " remains at " + value.divisionString());
                 emcMap.put(itemName(item), value);
-                
                 return true;
             }
             if (checkBacktrackConflicts(item, value)) {
@@ -587,10 +581,13 @@ public class EmcMapper {
                 List<SuperNumber> list = backtrackingMap.get(name);
                 String previousValues = "";
                 for (SuperNumber previousValue : list) {
-                    previousValues += previousValue.divisionString() + " ";
+                    previousValues += (previousValue.divisionString() + " -> ");
                 }
+                previousValues += value.divisionString() + ".";
+
                 warn("WARNING: Item " + name + " deemed unusable. Backtracking list is not ordered: " + previousValues);
                 relock(name);
+
                 emcMap.remove(name);
                 addBacktrackValue(item, SuperNumber.NEGATIVE_ONE);
                 return true;
@@ -610,27 +607,18 @@ public class EmcMapper {
         for (ItemEquation relatedEquation : relatedEquations) {
             if (equation == relatedEquation)
                 continue;
-
             List<Item> concludedItems = conclusionMap.get(relatedEquation);
-            if (concludedItems == null)
-                verify(relatedEquation);
+            if (concludedItems == null) {
+                if (equation.amountUnknown == 0)
+                    verify(relatedEquation);
+            }
             else {
-                boolean solveable = true;
                 for (Item concludedItem : concludedItems) {
                     String name = itemName(concludedItem);
-                    if (backtrackingMap.containsKey(name)) {
-                        SuperNumber lastValue = getLastBacktrackValue(concludedItem);
-                        if (lastValue == SuperNumber.NEGATIVE_ONE) {
-                            solveable = false;
-                            break;
-                        }
-                    }
                     addBacktrackValue(concludedItem, getItemEmc(concludedItem));
                     emcMap.remove(name);
-                    //warn("cleaned " + name + " while backtracking for " + itemName(item) + " in equation " + relatedEquation.origin + ":" + relatedEquation.name);
                 }
-                if (solveable)
-                    solve(relatedEquation);
+                solve(relatedEquation);
             }
         }
         //warn("backtracking end for " + itemName(item));
@@ -686,18 +674,14 @@ public class EmcMapper {
         }
         return 1;
     }
-    private int getIngredientAge(Ingredient ingredient) {
-        Item item = getIngredientMinimumItem(ingredient);
-        return getItemAge(item);
-    }
     private int getItemAge(Item item) {
         return ageMap.getOrDefault(itemName(item), Integer.MAX_VALUE);
     }
 
 
-    private Item getIngredientMinimumItem(Ingredient ingredient) {
+    private ItemStack getIngredientMinimumItemStack(Ingredient ingredient) {
         SuperNumber minEmc = null;
-        Item item = null;
+        ItemStack minStack = null;
         for (int i = 0; i < ingredient.getMatchingStacks().length; i++) {
             ItemStack stack = ingredient.getMatchingStacks()[i];
             SuperNumber emc = getItemStackEmc(stack);
@@ -706,10 +690,16 @@ public class EmcMapper {
             }
             else if (minEmc == null || emc.compareTo(minEmc) == -1) {
                 minEmc = emc;
-                item = stack.getItem();
+                minStack = stack;
             }
         }
-        return item;
+        if (minStack == null)
+            System.out.println("here");
+        return minStack;
+    }
+
+    private Item getIngredientMinimumItem(Ingredient ingredient) {
+        return getIngredientMinimumItemStack(ingredient).getItem();
     }
 
 
@@ -728,8 +718,10 @@ public class EmcMapper {
                 continue;
             node.subtracted = true;
             ItemEquation equation = node.equation;
-            equation.amountUnknown--;
-            tryAddEquation(equation);
+            if (equation.amountUnknown != -1) {
+                equation.amountUnknown--;
+                tryAddEquation(equation);
+            }
         }
     }
     private void relock(String itemName) {
@@ -739,18 +731,16 @@ public class EmcMapper {
         for (UnknownEquationNode node : set) {
             if (node.subtracted == false)
                 continue;
-
             ItemEquation equation = node.equation;
-            equation.amountUnknown = 999;
+            equation.amountUnknown = -1;
         }
     }
 
 
 
     private void tryAddEquation(ItemEquation equation) {
-        if (equation.amountUnknown <= 1) {
+        if (equation.amountUnknown == 0 || equation.amountUnknown == 1)
             queue.add(equation);
-        }
     }
 
     private boolean iteratePotionRecipe(BrewingRecipeAccessor<Potion> recipe) {
