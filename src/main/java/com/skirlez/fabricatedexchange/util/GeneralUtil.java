@@ -86,17 +86,43 @@ public class GeneralUtil {
             pos.getX() + size, pos.getY() + size, pos.getZ() + size);
     }
 
+
+
     @Nullable
-    public static String[] getItemStringsFromTagString(String tagString) {
-        Identifier tagId = new Identifier(tagString);
-        TagKey<Item> tag = Registry.ITEM.streamTags().filter((key) -> key.id().equals(tagId)).findFirst().orElse(null);
+    public static Item getAnyItemFromTag(TagKey<Item> tag) {
         Optional<Named<Item>> optionalNamed = Registry.ITEM.getEntryList(tag);
         if (optionalNamed.isEmpty())
-            return new String[] {};
+            return null;
         Named<Item> named = optionalNamed.get();
-        String[] array = new String[named.size()];
+        if (named.size() == 0)
+            return null;
+        return named.get(0).value();
+    } 
+    
+
+    @Nullable
+    public static Item[] getItemsFromTag(TagKey<Item> tag) {
+        Optional<Named<Item>> optionalNamed = Registry.ITEM.getEntryList(tag);
+        if (optionalNamed.isEmpty())
+            return null;
+        Named<Item> named = optionalNamed.get();
+        Item[] array = new Item[named.size()];
         for (int i = 0; i < named.size(); i++)
-            array[i] = Registry.ITEM.getId(named.get(i).value()).toString();
+            array[i] = named.get(i).value();
+        return array;
+    } 
+    @Nullable
+    public static Item[] getItemsFromTagString(String tagString) {
+        Identifier tagId = new Identifier(tagString);
+        TagKey<Item> tag = Registry.ITEM.streamTags().filter((key) -> key.id().equals(tagId)).findFirst().orElse(null);
+        return getItemsFromTag(tag);
+    } 
+    @Nullable
+    public static String[] getItemStringsFromTagString(String tagString) {
+        Item[] items = getItemsFromTagString(tagString);
+        String[] array = new String[items.length];
+        for (int i = 0; i < items.length; i++)
+            array[i] = Registry.ITEM.getId(items[i]).toString();
         
         return array;
     } 

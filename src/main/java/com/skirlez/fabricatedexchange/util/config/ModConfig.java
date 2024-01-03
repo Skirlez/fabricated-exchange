@@ -22,6 +22,7 @@ import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 
 
@@ -59,8 +60,11 @@ public class ModConfig {
     public static final ModifiersFile MODIFIERS
         = new ModifiersFile(stringSetType, "modifiers.json");
 
-    public static final NbtItemsFile NBT_ITEMS = 
-        new NbtItemsFile(nbtItemsType, "nbt_items.json");
+    public static final EqualTagsFile EQUAL_TAGS
+        = new EqualTagsFile(stringSetType, "equal_tags.json");
+
+    public static final NbtItemsFile NBT_ITEMS 
+        = new NbtItemsFile(nbtItemsType, "nbt_items.json");
 
     public static final DataFile<Map<String, HashSet<String>>> BLACKLISTED_MAPPER_RECIPES_FILE
         = new DataFile<Map<String, HashSet<String>>>(recipeBlacklistType,
@@ -75,6 +79,7 @@ public class ModConfig {
         CONFIG_FILE.fetch();
         SEED_EMC_MAP_FILE.fetch();
         CUSTOM_EMC_MAP_FILE.fetch();
+        EQUAL_TAGS.fetch();
         MODIFIERS.fetch();
         NBT_ITEMS.fetch();
         BLACKLISTED_MAPPER_RECIPES_FILE.fetch();

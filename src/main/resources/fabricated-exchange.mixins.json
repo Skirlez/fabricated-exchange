@@ -9,7 +9,9 @@
 		"ScreenHandlerInvoker",
 		"ModFurnaceFuels",
 		"BrewingRecipeRegistryAccessor",
-		"BrewingRecipeAccessor"
+		"BrewingRecipeAccessor",
+		"IngredientAccessor",
+		"TagEntryAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1
