@@ -6,8 +6,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.util.Identifier;
 
-/** This class represents an equality of items: an amount of input ingredients equals a list of outputs. It should be able to represent
- * most if not all vanilla and custom recipes.
+/** This class represents an equation of items: an amount of input ingredients equals a list of outputs. 
+ * It is made to be generic so it could represent as many modded recipe types as possible.
  */
 public class ItemEquation {
     public final List<Ingredient> input;
@@ -17,14 +17,10 @@ public class ItemEquation {
     public final String name;
     public final String origin;
 
-    public int amountUnknown;
-
     public ItemEquation(List<Ingredient> input, List<ItemStack> output, Identifier id) {
         this.input = input;
         this.output = output;
         this.name = id.getPath();
         this.origin = id.getNamespace();
-        this.amountUnknown = 0;
     }
-
 }

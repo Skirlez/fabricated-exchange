@@ -13,6 +13,7 @@ import com.skirlez.fabricatedexchange.util.GeneralUtil;
 
 import net.minecraft.item.Item;
 import net.minecraft.tag.TagKey;
+import net.minecraft.util.registry.Registry;
 
 public class EqualTagsFile extends DataFile<HashSet<String>> {
 
@@ -37,7 +38,7 @@ public class EqualTagsFile extends DataFile<HashSet<String>> {
             if (!entry.contains(":"))
                 continue;
             Item[] items = GeneralUtil.getItemsFromTagString(entry);
-            if (items == null) {
+            if (items.length == 0) {
                 FabricatedExchange.LOGGER.warn("Item-less tag provided in equal_tags.json: " + entry + ". Ignoring...");
                 continue;
             }
@@ -52,7 +53,7 @@ public class EqualTagsFile extends DataFile<HashSet<String>> {
     }
 
     public boolean hasTag(TagKey<Item> tag) {
-        Item[] items = GeneralUtil.getItemsFromTag(tag);
+        Item[] items = GeneralUtil.getItemsFromTag(tag, Registry.ITEM);
         boolean hasFirst = tagGroups.containsKey(items[0]);
         if (items.length == 0 || hasFirst == false)
             return hasFirst;

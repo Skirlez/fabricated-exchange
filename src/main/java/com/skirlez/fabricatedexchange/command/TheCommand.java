@@ -98,6 +98,11 @@ public class TheCommand {
         .executes(context -> reload(context))
         .build();
 
+        LiteralCommandNode<ServerCommandSource> printMissing = CommandManager
+        .literal("printmissing")
+        .executes(context -> printMissing(context))
+        .build();
+
         LiteralCommandNode<ServerCommandSource> resetNode = CommandManager
         .literal("reset")
         .requires(source -> source.hasPermissionLevel(2))
@@ -132,6 +137,7 @@ public class TheCommand {
         recipeNode.addChild(pardonRecipeNode);
 
         mainNode.addChild(reloadNode);
+        mainNode.addChild(printMissing);
 
         mainNode.addChild(resetNode);
 
@@ -302,8 +308,23 @@ public class TheCommand {
         return 1;
     }
 
-
-
+    private static int printMissing(CommandContext<ServerCommandSource> context) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Item item : Registry.ITEM) {
+            if (EmcData.getItemEmc(item).equalsZero()) {
+                stringBuilder.append('\n');
+                stringBuilder.append(Registry.ITEM.getId(item));
+            }
+        }
+        if (stringBuilder.isEmpty()) {
+            context.getSource().sendMessage(Text.of("Every item has an EMC value!"));
+        }
+        else {
+            stringBuilder.delete(0, 1); // remove newline at the start
+            context.getSource().sendMessage(Text.of(stringBuilder.toString()));
+        }
+        return 1;    
+    }
 
     private static boolean isRecipeTypeSupported(String type) {
         switch (type) {
@@ -316,8 +337,6 @@ public class TheCommand {
                 return false;
         }
     }
-
-
 
 
 

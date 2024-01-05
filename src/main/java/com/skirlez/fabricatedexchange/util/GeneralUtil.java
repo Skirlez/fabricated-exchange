@@ -10,9 +10,11 @@ import org.jetbrains.annotations.Nullable;
 
 import com.skirlez.fabricatedexchange.mixin.ScreenHandlerInvoker;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemConvertible;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.tag.TagKey;
@@ -20,7 +22,9 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.DefaultedRegistry;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.util.registry.RegistryEntryList.Named;
 import net.minecraft.world.World;
 
@@ -86,10 +90,8 @@ public class GeneralUtil {
             pos.getX() + size, pos.getY() + size, pos.getZ() + size);
     }
 
-
-
     @Nullable
-    public static Item getAnyItemFromTag(TagKey<Item> tag) {
+    public static Item getAnyItemFromItemTag(TagKey<Item> tag) {
         Optional<Named<Item>> optionalNamed = Registry.ITEM.getEntryList(tag);
         if (optionalNamed.isEmpty())
             return null;
@@ -99,25 +101,30 @@ public class GeneralUtil {
         return named.get(0).value();
     } 
     
+    private static Item[] emptyArr = new Item[0];
 
-    @Nullable
-    public static Item[] getItemsFromTag(TagKey<Item> tag) {
-        Optional<Named<Item>> optionalNamed = Registry.ITEM.getEntryList(tag);
+
+    public static <T extends ItemConvertible> Item[] getItemsFromTag(TagKey<T> tag, DefaultedRegistry<T> registry) {
+        Optional<Named<T>> optionalNamed = registry.getEntryList(tag);
         if (optionalNamed.isEmpty())
-            return null;
-        Named<Item> named = optionalNamed.get();
+            return emptyArr;
+        Named<T> named = optionalNamed.get();
         Item[] array = new Item[named.size()];
         for (int i = 0; i < named.size(); i++)
-            array[i] = named.get(i).value();
+            array[i] = named.get(i).value().asItem();
         return array;
     } 
-    @Nullable
     public static Item[] getItemsFromTagString(String tagString) {
         Identifier tagId = new Identifier(tagString);
+
         TagKey<Item> tag = Registry.ITEM.streamTags().filter((key) -> key.id().equals(tagId)).findFirst().orElse(null);
-        return getItemsFromTag(tag);
+        if (tag != null)
+            return getItemsFromTag(tag, Registry.ITEM);
+
+        TagKey<Block> blockTag = Registry.BLOCK.streamTags().filter((key) -> key.id().equals(tagId)).findFirst().orElse(null);
+        return getItemsFromTag(blockTag, Registry.BLOCK);
+        
     } 
-    @Nullable
     public static String[] getItemStringsFromTagString(String tagString) {
         Item[] items = getItemsFromTagString(tagString);
         String[] array = new String[items.length];
@@ -125,9 +132,5 @@ public class GeneralUtil {
             array[i] = Registry.ITEM.getId(items[i]).toString();
         
         return array;
-    } 
-    
-
-
-
+    }
 }

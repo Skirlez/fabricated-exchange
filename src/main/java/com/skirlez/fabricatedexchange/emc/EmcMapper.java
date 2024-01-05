@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,6 +30,7 @@ import com.skirlez.fabricatedexchange.util.config.ModifiersFile;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.potion.Potion;
 import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.recipe.CraftingRecipe;
@@ -48,6 +51,7 @@ import net.minecraft.util.registry.Registry;
 
 // In areas of code where a possible rare case is not considered, 
 // a comment prefixed with "UNCONSIDERED:" should be left
+
 public class EmcMapper {
     private ConcurrentMap<String, SuperNumber> emcMap;
     private ConcurrentMap<String, SuperNumber> potionEmcMap;
@@ -55,8 +59,11 @@ public class EmcMapper {
     private boolean warninged = false;
     
     private RecipeManager recipeManager;
-    private Map<Item, Set<ItemEquation>> unknownEquationMap = new HashMap<Item, Set<ItemEquation>>();
-    private HashMap<String, Queue<ItemEquation>> splitQueues = new HashMap<String, Queue<ItemEquation>>();
+    private Map<Item, Set<MapperAction>> unknownEquationMap = new HashMap<Item, Set<MapperAction>>();
+    private PriorityQueue<MapperAction> queue = new PriorityQueue<MapperAction>();
+
+    private Set<MapperAction> queuedActionsSet = new HashSet<MapperAction>();
+
     private final ModifiersFile modifiers;
     private final EqualTagsFile equalTags;
     public EmcMapper(RecipeManager recipeManager) {
@@ -99,15 +106,11 @@ public class EmcMapper {
         HashSet<String> stonecuttingRecipesBlacklist = blacklistedRecipes.getOrDefault("stonecutting", new HashSet<String>());
         // we must split the item equations between their origin mod. 
         // minecraft item equations should evaluate first, and then we don't actually care about the order.
-        HashSet<String> namespaces = new HashSet<String>();
 
-        namespaces.add("minecraft");
-
-        convertRecipesToEquations(allStonecuttingRecipes, namespaces, stonecuttingRecipesBlacklist, this::createEquation);
-        convertRecipesToEquations(allSmithingRecipes, namespaces, smithingRecipesBlacklist, this::createEquation);
-        convertRecipesToEquations(allSmeltingRecipes, namespaces, smeltingRecipesBlacklist, this::createEquation);
-        convertRecipesToEquations(allCraftingRecipes, namespaces, craftingRecipesBlacklist, this::createEquation);
-
+        convertRecipesToEquations(allSmithingRecipes, smithingRecipesBlacklist, this::createEquation);
+        convertRecipesToEquations(allSmeltingRecipes, smeltingRecipesBlacklist, this::createEquation);
+        convertRecipesToEquations(allCraftingRecipes, craftingRecipesBlacklist, this::createEquation);
+        convertRecipesToEquations(allStonecuttingRecipes, stonecuttingRecipesBlacklist, this::createEquation);
 
         // potion recipes are special recipes, and don't inherit from the Recipe interface. So we treat them in a special way.
         List<BrewingRecipeRegistry.Recipe<Item>> itemPotionRecipes = BrewingRecipeRegistryAccessor.getItemRecipes();
@@ -137,27 +140,24 @@ public class EmcMapper {
 
         // TODO: inject recipes provided by mods here
 
-        namespaces.remove("minecraft");
-        List<String> mods = new ArrayList<String>(namespaces.size() + 1);
-        mods.add("minecraft");
-        mods.addAll(namespaces);
-        
-        for (int m = 0; m < mods.size(); m++) {
-            String mod = mods.get(m);
-            Queue<ItemEquation> queue = splitQueues.get(mod);
-            if (queue == null)
-                continue;
-            while (!queue.isEmpty()) {
-                ItemEquation equation = queue.poll();
-                if (equation.amountUnknown > 1)
-                    continue;   
-                if (equation.amountUnknown == 0) {
-                    verify(equation);
-                    continue;
-                }
-                solve(equation);
+    
+
+        List<List<Item>> itemGroups = equalTags.getItemGroups(); 
+        for (List<Item> list : itemGroups) {
+            MapperAction action = new EqualizeTagAction(list);
+            for (Item item : list) {
+                registerAction(item, action);
             }
         }
+
+
+        while (!queue.isEmpty()) {
+            MapperAction action = queue.poll();
+            action.perform();
+        }
+        
+
+        
 
 
         // most potion recipes are very very special, so we need to take care of them separately.
@@ -179,22 +179,7 @@ public class EmcMapper {
             GeneralUtil.mergeMap(emcMap, customEmcMap);
 
 
-        List<List<Item>> itemGroups = equalTags.getItemGroups(); 
-        for (List<Item> items : itemGroups) {
-            SuperNumber emc = SuperNumber.ZERO;
-            for (Item item : items) {
-                if (emcMapHasEntry(item)) {
-                    emc = getItemEmc(item);
-                    break;
-                }
-            }
-            if (emc.equalsZero())
-                continue;
-            for (Item item : items) {
-                if (!emcMapHasEntry(item))
-                    putEmcMap(item, emc, null);
-            }
-        }
+
         
         
         boolean result = warninged;
@@ -251,9 +236,6 @@ public class EmcMapper {
 
     @Nullable
     private ItemEquation createEquation(SmithingRecipe recipe) {
-        if (!(recipe instanceof SmithingRecipe))
-            return null;
-
         LegacySmithingRecipeAccessor recipeAccessor = (LegacySmithingRecipeAccessor) recipe;
         return new ItemEquation(
             Arrays.asList(recipeAccessor.getBase(), recipeAccessor.getAddition()),
@@ -263,7 +245,6 @@ public class EmcMapper {
 
 
     private ItemEquation createEquation(StonecuttingRecipe recipe) {
-        
         return new ItemEquation(
             recipe.getIngredients(),
             Arrays.asList(recipe.getOutput()),
@@ -272,18 +253,15 @@ public class EmcMapper {
 
 
 
-    private <T extends Recipe<?>> void convertRecipesToEquations(List<T> allRecipes, HashSet<String> namespaces, 
-            HashSet<String> blacklist, Function<T, ItemEquation> equationConvertion) {
+    private <T extends Recipe<?>> void convertRecipesToEquations(List<T> allRecipes, HashSet<String> blacklist, 
+            Function<T, ItemEquation> equationConvertion) {
         for (int i = 0; i < allRecipes.size(); i++) {
             T recipe = allRecipes.get(i);
             if (blacklist.contains(recipe.getId().toString()))
                 continue;
-            String namespace = recipe.getId().getNamespace();
             ItemEquation equation = equationConvertion.apply(recipe);
             if (equation == null)
                 continue;
-            if (!namespaces.contains(namespace))
-                namespaces.add(namespace);
             processEquation(equation);
         }
     }
@@ -293,22 +271,12 @@ public class EmcMapper {
         return emcMap.containsKey(itemName(item));
     }
 
-
     private String itemName(Item item) {
         return Registry.ITEM.getId(item).toString();
     }
 
-    private void registerUnknownEquation(Item item, ItemEquation equation) {
-        if (!unknownEquationMap.containsKey(item)) {
-            Set<ItemEquation> set = new HashSet<ItemEquation>();
-            unknownEquationMap.put(item, set);
-        }
-        unknownEquationMap.get(item).add(equation);
-    }
-
     // Counts the unknowns of the equation and also simplifies it down if it has ingredients with a tag marked as an equal tag.
-    public int processEquation(ItemEquation equation) {
-        int amountUnknown = 0;
+    public void processEquation(ItemEquation equation) {
         Set<Item> unknownItems = new HashSet<Item>();
         for (int i = 0; i < equation.input.size(); i++) {
             Ingredient ingredient = equation.input.get(i);
@@ -318,7 +286,7 @@ public class EmcMapper {
                     continue;
                 TagKey<Item> tag = ((TagEntryAccessor)(Object)entry).getTag();
                 if (equalTags.hasTag(tag)) {
-                    Item item = GeneralUtil.getAnyItemFromTag(tag);
+                    Item item = GeneralUtil.getAnyItemFromItemTag(tag);
                     ItemStack stack = new ItemStack(item, getIngredientCount(ingredient));
                     ingredient = Ingredient.ofStacks(stack);
                     equation.input.set(i, ingredient);
@@ -335,30 +303,51 @@ public class EmcMapper {
             if (!emcMapHasEntry(stack.getItem()))
                 unknownItems.add(stack.getItem());
         }   
-        equation.amountUnknown = unknownItems.size();
-        if (equation.amountUnknown > 0) {
-            if (equation.amountUnknown == 1) {
-                if (splitQueues.containsKey(equation.origin))
-                    splitQueues.get(equation.origin).add(equation);
-                else {
-                    Queue<ItemEquation> modQueue = new LinkedList<ItemEquation>();
-                    modQueue.add(equation);
-                    splitQueues.put(equation.origin, modQueue);
-                }
-            }
-            for (Item item : unknownItems)
-                registerUnknownEquation(item, equation);
-     
+        int amountUnknown = unknownItems.size();
+        MapperAction action = new SolveEquationAction(equation, amountUnknown);
+        for (Item item : unknownItems)
+            registerAction(item, action);
+        if (amountUnknown <= 1) {
+            queue.add(action);
+            queuedActionsSet.add(action);
         }
+        
+
 
         
-        return amountUnknown;
-
+     
+        
     }
+
+    private void registerAction(Item item, MapperAction action) {
+        if (!unknownEquationMap.containsKey(item)) {
+            Set<MapperAction> set = new HashSet<MapperAction>();
+            unknownEquationMap.put(item, set);
+        }
+        unknownEquationMap.get(item).add(action);
+    }
+
+    private void equalizeList(List<Item> items) {
+        SuperNumber emc = SuperNumber.ZERO;
+        for (Item item : items) {
+            if (emcMapHasEntry(item)) {
+                emc = getItemEmc(item);
+                break;
+            }
+        }
+        if (emc.equalsZero()) {
+            FabricatedExchange.LOGGER.warn("Attempted to equalize tag without any items that have EMC! Skipping...");
+            return;
+        }
+        for (Item item : items) {
+            if (!emcMapHasEntry(item))
+                putEmcMap(item, emc, null);
+        }
+    }
+
 
     private void solve(ItemEquation equation) {
         SuperNumber sum = SuperNumber.Zero();
-
         HashSet<Item> unknownItems = new HashSet<Item>();
         int unknownMult = 0;
 
@@ -396,8 +385,6 @@ public class EmcMapper {
     }
 
     private void verify(ItemEquation equation) {
-
-
         SuperNumber inputEmc = SuperNumber.Zero();
         SuperNumber outputEmc = SuperNumber.Zero();
 
@@ -489,17 +476,12 @@ public class EmcMapper {
     private void unlock(Item item) {
         if (!unknownEquationMap.containsKey(item))
             return;
-        Set<ItemEquation> set = unknownEquationMap.get(item);
-        for (ItemEquation equation : set) {
-            equation.amountUnknown--;
-            if (equation.amountUnknown == 1) {
-                if (splitQueues.containsKey(equation.origin))
-                    splitQueues.get(equation.origin).add(equation);
-                else {
-                    Queue<ItemEquation> modQueue = new LinkedList<ItemEquation>();
-                    modQueue.add(equation);
-                    splitQueues.put(equation.origin, modQueue);
-                }
+        Set<MapperAction> set = unknownEquationMap.get(item);
+        for (MapperAction action : set) {
+            boolean add = action.feed(item);
+            if (add && !queuedActionsSet.contains(action)) {
+                queue.add(action);
+                queuedActionsSet.add(action);
             }
         }
         unknownEquationMap.remove(item);
@@ -562,4 +544,81 @@ public class EmcMapper {
         return SuperNumber.NegativeOne(); 
     }
 
+    // TODO: Return higher int for equations that will find inputs and not outputs
+    private int getEquationPriority(ItemEquation equation) {
+        return equation.origin.equals("minecraft") ? 0 : 1;
+    }
+
+    /** This class represents an action the mapper is queued to do. 
+    Some actions have a higher (lower value) priority than others. */
+    abstract class MapperAction implements Comparable<MapperAction> {
+        private int priority;
+
+        public MapperAction(int priority) {
+            this.priority = priority;
+        }
+
+        /** When an item relevant to this action is given EMC, this action will be notified.
+        // returning true means add to the queue. */
+        public abstract boolean feed(Item item);
+
+        public abstract void perform();
+
+        @Override
+        public int compareTo(MapperAction other) {
+            return Integer.compare(this.priority, other.priority);
+        }
+    }
+
+    class SolveEquationAction extends MapperAction {
+        private int amountUnknown;
+        private ItemEquation equation;
+        public SolveEquationAction(ItemEquation equation, int amountUnknown) {
+            super(getEquationPriority(equation));
+            this.equation = equation;
+            this.amountUnknown = amountUnknown;
+        }
+        
+        @Override
+        public boolean feed(Item item) {
+            amountUnknown--;
+            return amountUnknown == 1 || amountUnknown == 0;
+        }
+
+        @Override
+        public void perform() {
+            if (amountUnknown <= 0) {
+                verify(equation);
+                return;
+            }
+            solve(equation);
+        }
+    }
+    class EqualizeTagAction extends MapperAction {
+        private List<Item> tagItems;
+        boolean doAnyItemsHaveEmc = false;
+        public EqualizeTagAction(List<Item> tagItems) {
+            super(3);
+            this.tagItems = tagItems;
+        }
+
+        @Override
+        public boolean feed(Item item) {
+            return true;
+        }
+
+        @Override
+        public void perform() {
+            equalizeList(tagItems);
+        }
+        @Override
+        public int compareTo(MapperAction other) {
+            return super.compareTo(other);
+        }
+    }
 }
+
+
+
+
+

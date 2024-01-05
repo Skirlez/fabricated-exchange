@@ -22,7 +22,6 @@ import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 
 
