@@ -89,7 +89,7 @@ public class EmcMapper {
         List<SmeltingRecipe> allSmeltingRecipes = recipeManager.listAllOfType(RecipeType.SMELTING);
         List<CraftingRecipe> allCraftingRecipes = recipeManager.listAllOfType(RecipeType.CRAFTING);
         List<StonecuttingRecipe> allStonecuttingRecipes = recipeManager.listAllOfType(RecipeType.STONECUTTING);
-
+        List<BrewingRecipeRegistry.Recipe<Item>> allBrewingRecipes = BrewingRecipeRegistryAccessor.getItemRecipes();
         // blacklisted recipes and items
         Map<String, HashSet<String>> blacklistedRecipes = ModConfig.BLACKLISTED_MAPPER_RECIPES_FILE.getValue();
         if (blacklistedRecipes == null)
@@ -98,39 +98,15 @@ public class EmcMapper {
         HashSet<String> smeltingRecipesBlacklist = blacklistedRecipes.getOrDefault("smelting", new HashSet<String>());
         HashSet<String> craftingRecipesBlacklist = blacklistedRecipes.getOrDefault("crafting", new HashSet<String>());
         HashSet<String> stonecuttingRecipesBlacklist = blacklistedRecipes.getOrDefault("stonecutting", new HashSet<String>());
+        HashSet<String> brewingRecipesBlacklist = blacklistedRecipes.getOrDefault("brewing", new HashSet<String>());
         // we must split the item equations between their origin mod. 
         // minecraft item equations should evaluate first, and then we don't actually care about the order.
 
-        convertRecipesToEquations(allSmithingRecipes, smithingRecipesBlacklist, this::createEquation);
-        convertRecipesToEquations(allSmeltingRecipes, smeltingRecipesBlacklist, this::createEquation);
-        convertRecipesToEquations(allCraftingRecipes, craftingRecipesBlacklist, this::createEquation);
-        convertRecipesToEquations(allStonecuttingRecipes, stonecuttingRecipesBlacklist, this::createEquation);
-
-        // potion recipes are special recipes, and don't inherit from the Recipe interface. So we treat them in a special way.
-        List<BrewingRecipeRegistry.Recipe<Item>> itemPotionRecipes = BrewingRecipeRegistryAccessor.getItemRecipes();
-        for (BrewingRecipeRegistry.Recipe<Item> recipe : itemPotionRecipes) {
-            BrewingRecipeAccessor<Item> recipeAccessor = (BrewingRecipeAccessor<Item>)recipe;
-            Item input = recipeAccessor.getInput();
-            Ingredient ingredient = recipeAccessor.getIngredient();
-            Item output = recipeAccessor.getOutput();
-
-            DefaultedList<Ingredient> ingredientList = DefaultedList.of();
-            ingredientList.add(ingredient);
-            ingredientList.add(Ingredient.ofItems(input));
-            ingredientList.add(Ingredient.ofItems(input));
-            ingredientList.add(Ingredient.ofItems(input));
-
-            String name = "minecraft:" + Registry.ITEM.getId(input).getPath() + "_to_" + 
-                Registry.ITEM.getId(output).getPath() + "_using_" + 
-                Registry.ITEM.getId(ingredient.getMatchingStacks()[0].getItem()).getPath();
-
-            ItemEquation equation = new ItemEquation(
-                ingredientList, 
-                Arrays.asList(new ItemStack(output, 3)), 
-                new Identifier(name));
-                
-            processEquation(equation);
-        }
+        convertRecipesToEquations(allSmithingRecipes, smithingRecipesBlacklist, this::createSmithingEquation, this::getRecipeName);
+        convertRecipesToEquations(allSmeltingRecipes, smeltingRecipesBlacklist, this::createSmeltingEquation, this::getRecipeName);
+        convertRecipesToEquations(allCraftingRecipes, craftingRecipesBlacklist, this::createCraftingEquation, this::getRecipeName);
+        convertRecipesToEquations(allStonecuttingRecipes, stonecuttingRecipesBlacklist, this::createStonecuttingEquation, this::getRecipeName);
+        convertRecipesToEquations(allBrewingRecipes, brewingRecipesBlacklist, this::createBrewingEquation, this::getBrewingRecipeName);
 
         // TODO: inject recipes provided by mods here
 
@@ -139,9 +115,8 @@ public class EmcMapper {
         List<List<Item>> itemGroups = equalTags.getItemGroups(); 
         for (List<Item> list : itemGroups) {
             MapperAction action = new EqualizeTagAction(list);
-            for (Item item : list) {
+            for (Item item : list)
                 registerAction(item, action);
-            }
         }
 
 
@@ -151,8 +126,7 @@ public class EmcMapper {
         }
         
 
-        
-
+    
 
         // most potion recipes are very very special, so we need to take care of them separately.
         // i've decided to just copy this section from the old emc mapper, using the dumber method, 
@@ -181,7 +155,20 @@ public class EmcMapper {
     }
 
 
-    private ItemEquation createEquation(CraftingRecipe recipe) {
+    private String getRecipeName(Recipe<?> recipe) {
+        return recipe.getId().toString();
+    }
+    private String getBrewingRecipeName(BrewingRecipeRegistry.Recipe<Item> recipe) {
+        BrewingRecipeAccessor<Item> accessor = (BrewingRecipeAccessor<Item>)recipe;
+        return "brewing:" + Registry.ITEM.getId(accessor.getInput()).getPath() + "_to_" + 
+            Registry.ITEM.getId(accessor.getOutput()).getPath() + "_using_" + 
+            Registry.ITEM.getId(accessor.getIngredient().getMatchingStacks()[0].getItem()).getPath();
+    }
+    private String getEquationName(ItemEquation equation) {
+        return (equation == null) ? "none" : (equation.origin + ":" + equation.name);
+    }
+
+    private ItemEquation createCraftingEquation(CraftingRecipe recipe) {
         List<Ingredient> ingredients = recipe.getIngredients();
         List<ItemStack> output = new ArrayList<ItemStack>(1);
         output.add(recipe.getOutput());
@@ -218,16 +205,14 @@ public class EmcMapper {
         return new ItemEquation(filteredIngredients, output, recipe.getId());
     }
 
-    private ItemEquation createEquation(SmeltingRecipe recipe) {
+    private ItemEquation createSmeltingEquation(SmeltingRecipe recipe) {
         return new ItemEquation(
             Arrays.asList(recipe.getIngredients().get(0)),
             Arrays.asList(recipe.getOutput()),
             recipe.getId());
     }
 
-
-    @Nullable
-    private ItemEquation createEquation(SmithingRecipe recipe) {
+    private ItemEquation createSmithingEquation(SmithingRecipe recipe) {
         LegacySmithingRecipeAccessor recipeAccessor = (LegacySmithingRecipeAccessor) recipe;
         return new ItemEquation(
             Arrays.asList(recipeAccessor.getBase(), recipeAccessor.getAddition()),
@@ -235,25 +220,41 @@ public class EmcMapper {
             recipe.getId());
     }
 
-
-    private ItemEquation createEquation(StonecuttingRecipe recipe) {
+    private ItemEquation createStonecuttingEquation(StonecuttingRecipe recipe) {
         return new ItemEquation(
             recipe.getIngredients(),
             Arrays.asList(recipe.getOutput()),
             recipe.getId());
     }
 
+    private ItemEquation createBrewingEquation(BrewingRecipeRegistry.Recipe<Item> recipe) {
+        BrewingRecipeAccessor<Item> accessor = (BrewingRecipeAccessor<Item>)recipe;
+        Item input = accessor.getInput();
 
+        DefaultedList<Ingredient> ingredientList = DefaultedList.of();
+        ingredientList.add(accessor.getIngredient());
+        ingredientList.add(Ingredient.ofItems(input));
+        ingredientList.add(Ingredient.ofItems(input));
+        ingredientList.add(Ingredient.ofItems(input));
 
-    private <T extends Recipe<?>> void convertRecipesToEquations(List<T> allRecipes, HashSet<String> blacklist, 
-            Function<T, ItemEquation> equationConvertion) {
+        String name = getBrewingRecipeName(recipe);
 
-      
+        ItemEquation equation = new ItemEquation(
+            ingredientList, 
+            Arrays.asList(new ItemStack(accessor.getOutput(), 3)), 
+            new Identifier(name));
+                
+        return equation;
+    }
+
+    private <T> void convertRecipesToEquations(List<T> allRecipes, HashSet<String> blacklist, 
+            Function<T, ItemEquation> equationConverter, Function<T, String> stringConverter) {
+
         for (int i = 0; i < allRecipes.size(); i++) {
             T recipe = allRecipes.get(i);
-            if (blacklist.contains(recipe.getId().toString()))
+            if (blacklist.contains(stringConverter.apply(recipe)))
                 continue;
-            ItemEquation equation = equationConvertion.apply(recipe);
+            ItemEquation equation = equationConverter.apply(recipe);
             if (equation == null)
                 continue;
             processEquation(equation);
@@ -365,7 +366,7 @@ public class EmcMapper {
         }
 
         if (unknownMult == 0) {
-            warn("Could not solve weird recipe: " + equationName(equation));
+            warn("Could not solve weird recipe: " + getEquationName(equation));
             return;
         }
 
@@ -387,20 +388,18 @@ public class EmcMapper {
             inputEmc.add(getIngredientEmc(ingredient));
         
         if (inputEmc.compareTo(outputEmc) < 0) {
-            warn("Recipe EMC conflict for recipe: " + equationName(equation)
+            warn("Recipe EMC conflict for recipe: " + getEquationName(equation)
                 + " recipe gives more EMC than you put in! Input: " + inputEmc + " Output: " + outputEmc);
         }
 
     }
 
-    private String equationName(ItemEquation equation) {
-        return (equation == null) ? "none" : (equation.origin + ":" + equation.name);
-    }
+
 
     private boolean putEmcMap(Item item, SuperNumber value, ItemEquation equation) {
         if (value.compareTo(SuperNumber.ZERO) <= 0) {
             warn("EMC Mapper tried assigning item " + itemName(item) 
-                + " a value lower or equal to 0. Current recipe: " + equationName(equation));
+                + " a value lower or equal to 0. Current recipe: " + getEquationName(equation));
                 return false;
         }
         if (!emcMapHasEntry(item)) {
@@ -413,7 +412,7 @@ public class EmcMapper {
             return false;
         warn("Item EMC conflict for item " + itemName(item) 
             + ", EMC Mapper tried assigning two different values! Original value: " + emc + ", new value: " + value
-            + ", current recipe: " + equationName(equation));
+            + ", current recipe: " + getEquationName(equation));
         return false;
     }
 
@@ -578,6 +577,8 @@ public class EmcMapper {
             solve(equation);
         }
     }
+
+
     private class EqualizeTagAction implements MapperAction {
         private List<Item> tagItems;
         public EqualizeTagAction(List<Item> tagItems) {
