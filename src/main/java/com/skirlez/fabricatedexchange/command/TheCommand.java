@@ -287,7 +287,7 @@ public class TheCommand {
             : Text.translatable("commands.fabricated-exchange.reloademc.good").getString();
 
         context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.reloademc.success",
-        String.valueOf((System.nanoTime() - startTime) / 1000000)).append("\n").append(add));
+            String.valueOf((System.nanoTime() - startTime) / 1000000)).append("\n").append(add));
         return 1;
     }
     private static int reset(CommandContext<ServerCommandSource> context) {

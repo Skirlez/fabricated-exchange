@@ -4,12 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -30,7 +26,6 @@ import com.skirlez.fabricatedexchange.util.config.ModifiersFile;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.potion.Potion;
 import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.recipe.CraftingRecipe;
@@ -57,10 +52,10 @@ public class EmcMapper {
     private ConcurrentMap<String, SuperNumber> potionEmcMap;
 
     private boolean warninged = false;
-    
+    private StringBuilder warning = new StringBuilder();
     private RecipeManager recipeManager;
     private Map<Item, Set<MapperAction>> unknownEquationMap = new HashMap<Item, Set<MapperAction>>();
-    private PriorityQueue<MapperAction> queue = new PriorityQueue<MapperAction>();
+    private LayeredQueue<MapperAction> queue = new LayeredQueue<MapperAction>(4);
 
     private Set<MapperAction> queuedActionsSet = new HashSet<MapperAction>();
 
@@ -82,7 +77,6 @@ public class EmcMapper {
     public ConcurrentMap<String, SuperNumber> getPotionEmcMap() {
         return potionEmcMap;
     }
-
 
     /** Maps out all the recipes known to recipeManager + item equations given by mods. */
     public boolean map() {
@@ -178,14 +172,12 @@ public class EmcMapper {
         if (customEmcMap != null)
             GeneralUtil.mergeMap(emcMap, customEmcMap);
 
-
-
-        
-        
+        if (warninged) {
+            FabricatedExchange.LOGGER.warn(warning.toString());
+        }
         boolean result = warninged;
         warninged = false;
         return result;
-        // we're done!!!!!!!!!!!!!
     }
 
 
@@ -255,6 +247,8 @@ public class EmcMapper {
 
     private <T extends Recipe<?>> void convertRecipesToEquations(List<T> allRecipes, HashSet<String> blacklist, 
             Function<T, ItemEquation> equationConvertion) {
+
+      
         for (int i = 0; i < allRecipes.size(); i++) {
             T recipe = allRecipes.get(i);
             if (blacklist.contains(recipe.getId().toString()))
@@ -307,16 +301,13 @@ public class EmcMapper {
         MapperAction action = new SolveEquationAction(equation, amountUnknown);
         for (Item item : unknownItems)
             registerAction(item, action);
-        if (amountUnknown <= 1) {
-            queue.add(action);
-            queuedActionsSet.add(action);
-        }
-        
+        if (amountUnknown <= 1)
+            addActionToQueue(action);
+    }
 
-
-        
-     
-        
+    private void addActionToQueue(MapperAction action) {
+        queue.add(action, action.getPriority());
+        queuedActionsSet.add(action);
     }
 
     private void registerAction(Item item, MapperAction action) {
@@ -336,7 +327,7 @@ public class EmcMapper {
             }
         }
         if (emc.equalsZero()) {
-            FabricatedExchange.LOGGER.warn("Attempted to equalize tag without any items that have EMC! Skipping...");
+            warn("Attempted to equalize tag without any items that have EMC! Skipping...");
             return;
         }
         for (Item item : items) {
@@ -347,6 +338,7 @@ public class EmcMapper {
 
 
     private void solve(ItemEquation equation) {
+
         SuperNumber sum = SuperNumber.Zero();
         HashSet<Item> unknownItems = new HashSet<Item>();
         int unknownMult = 0;
@@ -448,17 +440,20 @@ public class EmcMapper {
 
 
     private SuperNumber getIngredientEmc(Ingredient ingredient) {
+        
+        SuperNumber minEmc = SuperNumber.Zero();
+        
         ItemStack[] arr = ingredient.getMatchingStacks();
         if (arr.length == 0)
-            return SuperNumber.Zero();
-
-        SuperNumber emc = SuperNumber.ZERO;
-        for (ItemStack stack : ingredient.getMatchingStacks()) {
-            emc = getItemStackEmc(stack);
+            return minEmc;
+        minEmc = getItemStackEmc(arr[0]);
+        for (int i = 1; i < arr.length; i++) {
+            SuperNumber emc = getItemStackEmc(arr[i]);
+            minEmc = SuperNumber.min(minEmc, emc);
             if (emc.equalsZero())
                 return SuperNumber.Zero();
         }
-        return emc;
+        return minEmc;
         
     }
     private int getIngredientCount(Ingredient ingredient) {
@@ -469,7 +464,7 @@ public class EmcMapper {
     }
 
     private void warn(String input) {
-        FabricatedExchange.LOGGER.warn(input);
+        warning.append(input).append('\n');
         warninged = true;
     }
 
@@ -479,10 +474,8 @@ public class EmcMapper {
         Set<MapperAction> set = unknownEquationMap.get(item);
         for (MapperAction action : set) {
             boolean add = action.feed(item);
-            if (add && !queuedActionsSet.contains(action)) {
-                queue.add(action);
-                queuedActionsSet.add(action);
-            }
+            if (add && !queuedActionsSet.contains(action))
+                addActionToQueue(action);
         }
         unknownEquationMap.remove(item);
     }
@@ -544,39 +537,30 @@ public class EmcMapper {
         return SuperNumber.NegativeOne(); 
     }
 
-    // TODO: Return higher int for equations that will find inputs and not outputs
-    private int getEquationPriority(ItemEquation equation) {
-        return equation.origin.equals("minecraft") ? 0 : 1;
-    }
 
-    /** This class represents an action the mapper is queued to do. 
-    Some actions have a higher (lower value) priority than others. */
-    abstract class MapperAction implements Comparable<MapperAction> {
-        private int priority;
 
-        public MapperAction(int priority) {
-            this.priority = priority;
-        }
+    /** This class represents an action the mapper is queued to do. */
+    private interface MapperAction {
 
         /** When an item relevant to this action is given EMC, this action will be notified.
         // returning true means add to the queue. */
-        public abstract boolean feed(Item item);
+        boolean feed(Item item);
 
-        public abstract void perform();
+        void perform();
+        int getPriority();
 
-        @Override
-        public int compareTo(MapperAction other) {
-            return Integer.compare(this.priority, other.priority);
-        }
     }
 
-    class SolveEquationAction extends MapperAction {
+    private class SolveEquationAction implements MapperAction {
         private int amountUnknown;
         private ItemEquation equation;
         public SolveEquationAction(ItemEquation equation, int amountUnknown) {
-            super(getEquationPriority(equation));
             this.equation = equation;
             this.amountUnknown = amountUnknown;
+        }
+
+        public int getPriority() {
+            return equation.origin.equals("minecraft") ? 0 : 1;
         }
         
         @Override
@@ -594,11 +578,9 @@ public class EmcMapper {
             solve(equation);
         }
     }
-    class EqualizeTagAction extends MapperAction {
+    private class EqualizeTagAction implements MapperAction {
         private List<Item> tagItems;
-        boolean doAnyItemsHaveEmc = false;
         public EqualizeTagAction(List<Item> tagItems) {
-            super(3);
             this.tagItems = tagItems;
         }
 
@@ -611,10 +593,12 @@ public class EmcMapper {
         public void perform() {
             equalizeList(tagItems);
         }
+
         @Override
-        public int compareTo(MapperAction other) {
-            return super.compareTo(other);
+        public int getPriority() {
+            return 3;
         }
+
     }
 }
 
