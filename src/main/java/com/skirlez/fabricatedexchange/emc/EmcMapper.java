@@ -55,7 +55,7 @@ public class EmcMapper {
     private StringBuilder warning = new StringBuilder();
     private RecipeManager recipeManager;
     private Map<Item, Set<MapperAction>> unknownEquationMap = new HashMap<Item, Set<MapperAction>>();
-    private LayeredQueue<MapperAction> queue = new LayeredQueue<MapperAction>(4);
+    private LayeredQueue<MapperAction> queue = new LayeredQueue<MapperAction>(5);
 
     private Set<MapperAction> queuedActionsSet = new HashSet<MapperAction>();
 
@@ -109,14 +109,16 @@ public class EmcMapper {
         convertRecipesToEquations(allBrewingRecipes, brewingRecipesBlacklist, this::createBrewingEquation, this::getBrewingRecipeName);
 
         // TODO: inject recipes provided by mods here
-
-    
-
         List<List<Item>> itemGroups = equalTags.getItemGroups(); 
         for (List<Item> list : itemGroups) {
             MapperAction action = new EqualizeTagAction(list);
-            for (Item item : list)
+            for (Item item : list) {
                 registerAction(item, action);
+                if (emcMapHasEntry(item))
+                    action.feed(item);
+            }
+            if (action.shouldAdd())
+                addActionToQueue(action);
         }
 
 
@@ -272,6 +274,7 @@ public class EmcMapper {
 
     // Counts the unknowns of the equation and also simplifies it down if it has ingredients with a tag marked as an equal tag.
     public void processEquation(ItemEquation equation) {
+        Set<Item> knownItems = new HashSet<Item>();
         Set<Item> unknownItems = new HashSet<Item>();
         for (int i = 0; i < equation.input.size(); i++) {
             Ingredient ingredient = equation.input.get(i);
@@ -288,26 +291,34 @@ public class EmcMapper {
                 }
             }
 
-            SuperNumber value = getIngredientEmc(ingredient);
-            if (value.equalsZero()) {
-                for (ItemStack stack : ingredient.getMatchingStacks())
+
+            for (ItemStack stack : ingredient.getMatchingStacks()) {
+                if (!emcMapHasEntry(stack.getItem()))
                     unknownItems.add(stack.getItem());
+                else
+                    knownItems.add(stack.getItem());
             }
         }
         for (ItemStack stack : equation.output) {
             if (!emcMapHasEntry(stack.getItem()))
                 unknownItems.add(stack.getItem());
+            else
+                knownItems.add(stack.getItem());
         }   
-        int amountUnknown = unknownItems.size();
-        MapperAction action = new SolveEquationAction(equation, amountUnknown);
-        for (Item item : unknownItems)
+        int amount = unknownItems.size() + knownItems.size();
+        MapperAction action = new SolveEquationAction(equation, amount);
+        for (Item item : unknownItems) {
             registerAction(item, action);
-        if (amountUnknown <= 1)
+        }
+        for (Item item : knownItems)
+            action.feed(item);
+
+        if (action.shouldAdd())
             addActionToQueue(action);
     }
 
     private void addActionToQueue(MapperAction action) {
-        queue.add(action, action.getPriority());
+        queue.add(action, action.getLayer());
         queuedActionsSet.add(action);
     }
 
@@ -386,15 +397,26 @@ public class EmcMapper {
 
         for (Ingredient ingredient : equation.input)
             inputEmc.add(getIngredientEmc(ingredient));
-        
+
         if (inputEmc.compareTo(outputEmc) < 0) {
+            if (equation.output.size() == 1) {
+                changeEmcMap(equation.output.get(0).getItem(), inputEmc);
+                return;
+            }
             warn("Recipe EMC conflict for recipe: " + getEquationName(equation)
-                + " recipe gives more EMC than you put in! Input: " + inputEmc + " Output: " + outputEmc);
+                + " recipe gives more EMC than you put in! Input: " + inputEmc + " Output: " + outputEmc
+                + ". please blacklist it or the other recipe(s) that gave these items value.");
+            warn("Normally the items would be given new values to equalize the input and output, but the mapper"
+                + "cannot do that in this case because there is more than one output item.");
         }
 
     }
 
 
+    // Should only be called to change a value that already exists.
+    private void changeEmcMap(Item item, SuperNumber value) {
+        emcMap.put(itemName(item), value);
+    }
 
     private boolean putEmcMap(Item item, SuperNumber value, ItemEquation equation) {
         if (value.compareTo(SuperNumber.ZERO) <= 0) {
@@ -438,8 +460,8 @@ public class EmcMapper {
 
 
 
+
     private SuperNumber getIngredientEmc(Ingredient ingredient) {
-        
         SuperNumber minEmc = SuperNumber.Zero();
         
         ItemStack[] arr = ingredient.getMatchingStacks();
@@ -453,7 +475,6 @@ public class EmcMapper {
                 return SuperNumber.Zero();
         }
         return minEmc;
-        
     }
     private int getIngredientCount(Ingredient ingredient) {
         // UNCONSIDERED: Ingredients with matching itemstacks of different counts
@@ -472,8 +493,8 @@ public class EmcMapper {
             return;
         Set<MapperAction> set = unknownEquationMap.get(item);
         for (MapperAction action : set) {
-            boolean add = action.feed(item);
-            if (add && !queuedActionsSet.contains(action))
+            action.feed(item);
+            if (!queuedActionsSet.contains(action) && action.shouldAdd())
                 addActionToQueue(action);
         }
         unknownEquationMap.remove(item);
@@ -538,34 +559,50 @@ public class EmcMapper {
 
 
 
+
     /** This class represents an action the mapper is queued to do. */
     private interface MapperAction {
 
-        /** When an item relevant to this action is given EMC, this action will be notified.
-        // returning true means add to the queue. */
-        boolean feed(Item item);
-
+        /** When an item relevant to this action is given EMC, this action will be notified. */
+        void feed(Item item);
+        // Returns true if the action should be added to the queue
+        boolean shouldAdd();
         void perform();
-        int getPriority();
-
+        int getLayer();
     }
 
     private class SolveEquationAction implements MapperAction {
         private int amountUnknown;
         private ItemEquation equation;
+        private boolean isOutputUnknown;
         public SolveEquationAction(ItemEquation equation, int amountUnknown) {
             this.equation = equation;
             this.amountUnknown = amountUnknown;
         }
 
-        public int getPriority() {
-            return equation.origin.equals("minecraft") ? 0 : 1;
+
+        private boolean isEquationOutputUnknown(ItemEquation equation) {
+            for (ItemStack stack : equation.output) {
+                if (!emcMapHasEntry(stack.getItem()))
+                    return true;
+            }
+            return false;
         }
-        
         @Override
-        public boolean feed(Item item) {
+        public int getLayer() {
+            int fromMinecraft = equation.origin.equals("minecraft") ? 0 : 1;
+            int safe = isOutputUnknown ? 0 : 2;
+            return fromMinecraft + safe;
+        }
+        @Override
+        public void feed(Item item) {
             amountUnknown--;
-            return amountUnknown == 1 || amountUnknown == 0;
+            if (amountUnknown == 1)
+                isOutputUnknown = isEquationOutputUnknown(equation);
+        }
+        @Override
+        public boolean shouldAdd() {
+            return amountUnknown <= 1;
         }
 
         @Override
@@ -581,23 +618,27 @@ public class EmcMapper {
 
     private class EqualizeTagAction implements MapperAction {
         private List<Item> tagItems;
+        boolean hasBeenFed;
         public EqualizeTagAction(List<Item> tagItems) {
             this.tagItems = tagItems;
+            this.hasBeenFed = false;
         }
 
         @Override
-        public boolean feed(Item item) {
-            return true;
+        public void feed(Item item) {
+            hasBeenFed = true;
         }
-
+        @Override
+        public boolean shouldAdd() {
+            return hasBeenFed;
+        }
         @Override
         public void perform() {
             equalizeList(tagItems);
         }
-
         @Override
-        public int getPriority() {
-            return 3;
+        public int getLayer() {
+            return 4;
         }
 
     }

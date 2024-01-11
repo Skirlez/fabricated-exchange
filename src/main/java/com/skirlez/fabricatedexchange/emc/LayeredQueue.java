@@ -52,7 +52,6 @@ public class LayeredQueue<T> {
 	
 	/** Incredibly simple queue. Always use isEmpty() before polling. */
 	private class SimpleQueue<E> {
-
 		private Node<E> start = null;
 		private Node<E> end = null;
 
