@@ -72,21 +72,22 @@ public class ConsumeSlot extends Slot {
 				}
 			}
 			else {
-				if (item.equals(ModItems.TOME_OF_KNOWLEDGE)) {
+				if (item.equals(ModItems.TOME_OF_KNOWLEDGE)) {	
 					Registries.ITEM.forEach(
 					currentItem -> {
 						String currentId = Registries.ITEM.getId(currentItem).toString();
 						if (ModDataFiles.NBT_ITEMS.hasItem(currentId))
 							return;
-						SuperNumber currentEmc = EmcData.getItemEmc(currentId);
-						if (!currentEmc.equalsZero() && !playerState.knowledge.contains(currentId)) {
-							playerState.knowledge.add(currentId);
+						SuperNumber currentEmc = EmcData.getItemEmc(currentItem);
+						if (!currentEmc.equalsZero() && !playerState.knowledge.contains(currentItem)) {
+							playerState.knowledge.add(currentItem);
 							screenHandler.addKnowledge(new NbtItem(currentItem));
 						}
 					});
+					
 				}
-				else if (!playerState.knowledge.contains(idName)) {
-					playerState.knowledge.add(idName);
+				else if (!playerState.knowledge.contains(item)) {
+					playerState.knowledge.add(item);
 					screenHandler.addKnowledge(new NbtItem(item));
 				}
 			}

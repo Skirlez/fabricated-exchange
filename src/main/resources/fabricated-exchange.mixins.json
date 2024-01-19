@@ -10,7 +10,9 @@
 		"ModFurnaceFuels",
 		"BrewingRecipeRegistryAccessor",
 		"BrewingRecipeAccessor",
-		"ServerPlayerInteractionManagerPreMine"
+		"ServerPlayerInteractionManagerPreMine",
+		"IngredientAccessor",
+		"TagEntryAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1

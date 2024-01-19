@@ -17,6 +17,7 @@ import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 import com.skirlez.fabricatedexchange.util.config.lib.AbstractFile;
+import com.skirlez.fabricatedexchange.util.config.lib.DataFile;
 
 import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.command.suggestion.SuggestionProviders;
@@ -24,7 +25,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
-import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -35,7 +35,7 @@ import net.minecraft.util.Hand;
 public class TheCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
 		LiteralCommandNode<ServerCommandSource> mainNode = CommandManager
-		// consider "/fabex" if /fe is taken
+		// consider "/fabex", "/fabrex" if /fe is taken
 		// if it's taken after this mod releases i'm standing my ground (:
 		// (why do commands not have namespaces?)
 		.literal("fe") 
@@ -190,32 +190,24 @@ public class TheCommand {
 		}
 		
 		Item item = stack.getItem();
-		String id = Registries.ITEM.getId(item).toString();
-		if (seed) {
-			Map<String, SuperNumber> map = ModDataFiles.SEED_EMC_MAP.getValue();
-			if (!map.containsKey(id)) {
-				context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.removeemc.seed_confused")
-					.append(" ").append(Text.translatable("commands.fabricated-exchange.zero_notice")));
-				return 0;
-			}
-			map.remove(id);
-			ModDataFiles.SEED_EMC_MAP.setValueAndSave(map);
-			context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.removeemc.seed_success")
-				.append(" ").append(Text.translatable("commands.fabricated-exchange.reload_notice")));
+		
+		String confuseMessage = (seed) ? "commands.fabricated-exchange.removeemc.seed_confused" : "commands.fabricated-exchange.removeemc.custom_confused";
+		String successMessage = (seed) ? "commands.fabricated-exchange.removeemc.seed_success" : "commands.fabricated-exchange.removeemc.custom_success";
+		DataFile<Map<Item, SuperNumber>> file = (seed) ? ModDataFiles.SEED_EMC_MAP : ModDataFiles.CUSTOM_EMC_MAP;
+		
+		Map<Item, SuperNumber> map = file.getValue();
+		if (!map.containsKey(item)) {
+			context.getSource().sendMessage(Text.translatable(confuseMessage)
+				.append(" ").append(Text.translatable("commands.fabricated-exchange.zero_notice")));
+			return 0;
 		}
-		else {
-			Map<String, SuperNumber> map = ModDataFiles.CUSTOM_EMC_MAP.getValue();
-			if (!map.containsKey(id)) {
-				context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.removeemc.custom_confused")
-					.append(" ").append(Text.translatable("commands.fabricated-exchange.zero_notice")));
-				return 0;
-			}
-			map.remove(id);
-			ModDataFiles.CUSTOM_EMC_MAP.setValueAndSave(map);
-			EmcData.syncMap(context.getSource().getPlayer());
-			context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.removeemc.custom_success")
-				.append(" ").append(Text.translatable("commands.fabricated-exchange.reload_notice")));
+		synchronized (map) {
+			map.remove(item);
 		}
+		file.setValueAndSave(map);
+		context.getSource().sendMessage(Text.translatable(successMessage)
+			.append(" ").append(Text.translatable("commands.fabricated-exchange.reload_notice")));
+
 
 		return 1;
 	}

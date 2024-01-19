@@ -3,9 +3,6 @@ package com.skirlez.fabricatedexchange.emc;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 import com.skirlez.fabricatedexchange.item.NbtItem;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
@@ -17,6 +14,7 @@ import com.skirlez.fabricatedexchange.util.config.lib.DataFile;
 
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -26,6 +24,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.potion.Potion;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
@@ -33,9 +32,10 @@ import net.minecraft.util.Identifier;
 public class EmcData {
 
 	// both the server and the client can use these
-	public static ConcurrentMap<String, SuperNumber> emcMap = new ConcurrentHashMap<String, SuperNumber>();
-	public static ConcurrentMap<String, SuperNumber> potionEmcMap = new ConcurrentHashMap<String, SuperNumber>();
-	public static ConcurrentMap<String, SuperNumber> enchantmentEmcMap = new ConcurrentHashMap<String, SuperNumber>();
+	public static volatile Map<Item, SuperNumber> emcMap = new HashMap<Item, SuperNumber>();
+	
+	public static Map<Potion, SuperNumber> potionEmcMap = new HashMap<Potion, SuperNumber>();
+	public static Map<Enchantment, SuperNumber> enchantmentEmcMap = new HashMap<Enchantment, SuperNumber>();
 
 	// these should only ever be equal to what's in their respective jsons
 	public static Map<String, SuperNumber> seedEmcMap = new HashMap<String, SuperNumber>();
@@ -52,24 +52,19 @@ public class EmcData {
 	public static SuperNumber getItemEmc(Item item) {
 		if (item == null)
 			return SuperNumber.Zero(); 
-		String id = Registries.ITEM.getId(item).toString();
-		return getItemEmc(id);
+		if (emcMap.containsKey(item))
+			return new SuperNumber(emcMap.get(item));
+		return SuperNumber.Zero(); 
 	}
 	public static SuperNumber getItemStackEmc(ItemStack itemStack) {
 		if (itemStack.isEmpty())
 			return SuperNumber.Zero(); 
 		Item item = itemStack.getItem();
-		String id = Registries.ITEM.getId(item).toString();
-		SuperNumber emc = getItemEmc(id);
+		SuperNumber emc = getItemEmc(item);
 		emc.multiply(itemStack.getCount());
 		considerStackDurability(itemStack, emc);
 		considerStackNbt(itemStack, emc);
 		return emc;
-	}
-	public static SuperNumber getItemEmc(String id) {
-		if (emcMap.containsKey(id))
-			return new SuperNumber(emcMap.get(id));
-		return SuperNumber.Zero(); 
 	}
 	public static void considerStackDurability(ItemStack stack, SuperNumber emc) {
 		if (stack.getMaxDamage() != 0) {
@@ -92,8 +87,9 @@ public class EmcData {
 			return;
 
 		if (item instanceof PotionItem) {
-			String potion = nbt.getString("Potion");
-			if (!potion.isEmpty() && potionEmcMap.containsKey(potion)) {
+			String potionName = nbt.getString("Potion");
+			Potion potion = Registries.POTION.get(new Identifier(potionName));
+			if (potionEmcMap.containsKey(potion)) {
 
 				SuperNumber addition = potionEmcMap.get(potion);
 				if (!addition.equalsZero())
@@ -104,12 +100,14 @@ public class EmcData {
 			NbtList enchantments = nbt.getList("StoredEnchantments", NbtElement.COMPOUND_TYPE);
 			for (int i = 0; i < enchantments.size(); i++) {
 				NbtCompound enchantmentCompound = enchantments.getCompound(i);
-				String enchantment = enchantmentCompound.getString("id");
-
+				String enchantmentId = enchantmentCompound.getString("id");
+				Enchantment enchantment = Registries.ENCHANTMENT.get(new Identifier(enchantmentId));
+				if (enchantment == null)
+					continue;
+				
 				SuperNumber enchantmentEmc;
-				Map<String, SuperNumber> map = EmcData.enchantmentEmcMap;
-				enchantmentEmc = map.containsKey(enchantment) 
-					? new SuperNumber(map.get(enchantment)) 
+				enchantmentEmc = enchantmentEmcMap.containsKey(enchantment) 
+					? new SuperNumber(enchantmentEmcMap.get(enchantment)) 
 					: new SuperNumber(32);
 			
 				
@@ -181,16 +179,21 @@ public class EmcData {
 	}
 
 	public static void setItemEmc(Item item, SuperNumber emc, boolean seed) {
-		DataFile<Map<String, SuperNumber>> file = seed ? ModDataFiles.SEED_EMC_MAP : ModDataFiles.CUSTOM_EMC_MAP;
 		if (item == null)
 			return;
-		String id = Registries.ITEM.getId(item).toString();
-		Map<String, SuperNumber> newEmcMap = file.getValue();
+		DataFile<Map<Item, SuperNumber>> file = seed ? ModDataFiles.SEED_EMC_MAP : ModDataFiles.CUSTOM_EMC_MAP;
+
+		//String id = Registries.ITEM.getId(item).toString();
+		Map<Item, SuperNumber> newEmcMap = file.getValue();
 		if (newEmcMap == null)
-			newEmcMap = new HashMap<String, SuperNumber>();
-		newEmcMap.put(id, emc);
+			newEmcMap = new HashMap<Item, SuperNumber>();
+		newEmcMap.put(item, emc);
 		file.setValueAndSave(newEmcMap);
-		GeneralUtil.mergeMap(emcMap, newEmcMap);
+		
+		synchronized (emcMap) {
+			GeneralUtil.mergeMap(emcMap, newEmcMap);
+		}
+		
 	}
 
 	public static void setEmc(ServerPlayerEntity player, SuperNumber amount) {
@@ -216,21 +219,21 @@ public class EmcData {
 	}
 
 	public static void syncMap(ServerPlayerEntity player) {
-		// send the entire emc map
+		// send all the maps over
 		PacketByteBuf buffer = PacketByteBufs.create();
 		buffer.writeInt(EmcData.emcMap.keySet().size());
-		for (String s : EmcData.emcMap.keySet()) {
-			buffer.writeString(s);
+		for (Item s : EmcData.emcMap.keySet()) {
+			buffer.writeIdentifier(Registries.ITEM.getId(s));
 			buffer.writeString(EmcData.emcMap.get(s).divisionString());
 		}
 		buffer.writeInt(EmcData.potionEmcMap.keySet().size());
-		for (String s : EmcData.potionEmcMap.keySet()) {
-			buffer.writeString(s);
+		for (Potion s : EmcData.potionEmcMap.keySet()) {
+			buffer.writeIdentifier(Registries.POTION.getId(s));
 			buffer.writeString(EmcData.potionEmcMap.get(s).divisionString());
 		}
 		buffer.writeInt(EmcData.enchantmentEmcMap.keySet().size());
-		for (String s : EmcData.enchantmentEmcMap.keySet()) {
-			buffer.writeString(s);
+		for (Enchantment s : EmcData.enchantmentEmcMap.keySet()) {
+			buffer.writeIdentifier(Registries.ENCHANTMENT.getId(s));
 			buffer.writeString(EmcData.enchantmentEmcMap.get(s).divisionString());
 		}
 

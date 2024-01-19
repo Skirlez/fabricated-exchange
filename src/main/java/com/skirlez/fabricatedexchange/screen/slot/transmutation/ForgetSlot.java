@@ -1,7 +1,5 @@
 package com.skirlez.fabricatedexchange.screen.slot.transmutation;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -39,12 +37,14 @@ public class ForgetSlot extends Slot {
 			Item item = stack.getItem();
 			String idName = Registries.ITEM.getId(item).toString();
 			if (item.equals(ModItems.TOME_OF_KNOWLEDGE)) {
-				playerState.knowledge = new HashSet<String>();
-				playerState.specialKnowledge = new ArrayList<NbtItem>();
+				playerState.knowledge.clear();
+				playerState.specialKnowledge.clear();
+				
 				screenHandler.clearKnowledge();
 			}
-			else if (playerState.knowledge.contains(idName)) {
-				playerState.knowledge.remove(idName);
+			else if (playerState.knowledge.contains(item)) {
+				playerState.knowledge.remove(item);
+				
 				screenHandler.removeKnowledge(new NbtItem(item));
 			}
 			else if (ModDataFiles.NBT_ITEMS.hasItem(idName)) {

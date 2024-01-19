@@ -28,11 +28,9 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 
 public class TransmutationTableScreenHandler extends ScreenHandler {
@@ -84,10 +82,9 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 		if (!player.getWorld().isClient()) {
 			PlayerState playerState = ServerState.getPlayerState(player);
 
-			for (String location : playerState.knowledge) {
-				Item item = Registries.ITEM.get(new Identifier(location));
+			for (Item item : playerState.knowledge)
 				addKnowledge(new NbtItem(item));
-			}
+			
 
 			for (NbtItem item : playerState.specialKnowledge)
 				addKnowledge(item);

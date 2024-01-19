@@ -8,6 +8,7 @@ import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.item.NbtItem;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
@@ -27,12 +28,11 @@ public class ServerState extends PersistentState {
 		NbtCompound playersNbtCompound = new NbtCompound();
 		players.forEach((UUID, playerState) -> {
 			NbtCompound playerStateNbt = new NbtCompound();
- 
 			playerStateNbt.putString("emc", playerState.emc.divisionString());
 			NbtList knowledgeList = new NbtList();
-			Iterator<String> stringIterator = playerState.knowledge.iterator();
-			while (stringIterator.hasNext())
-				knowledgeList.add(NbtString.of(stringIterator.next()));
+
+			for (Item item : playerState.knowledge)
+				knowledgeList.add(NbtString.of(Registries.ITEM.getId(item).toString()));
 			
 			playerStateNbt.put("knowledge", knowledgeList);
 
@@ -63,8 +63,17 @@ public class ServerState extends PersistentState {
  
 			playerState.emc = new SuperNumber(playersTag.getCompound(key).getString("emc"));
 			NbtList knowledgeNbtList = playersTag.getCompound(key).getList("knowledge", NbtElement.STRING_TYPE);
-			for (int i = 0; i < knowledgeNbtList.size(); i++) 
-				playerState.knowledge.add(knowledgeNbtList.getString(i));
+			
+			for (int i = 0; i < knowledgeNbtList.size(); i++) {
+				String id = knowledgeNbtList.getString(i);
+				Item item = Registries.ITEM.get(new Identifier(id));
+				if (item == null) {
+					knowledgeNbtList.remove(i);
+					i--;
+					continue;
+				}
+				playerState.knowledge.add(item);
+			}
 
 			NbtList specialKnowledgeItemList = 
 				playersTag.getCompound(key).getList("specialKnowledgeItems", NbtElement.STRING_TYPE);
@@ -72,10 +81,14 @@ public class ServerState extends PersistentState {
 				playersTag.getCompound(key).getList("specialKnowledgeCompounds", NbtElement.COMPOUND_TYPE);
 			for (int i = 0; i < specialKnowledgeItemList.size(); i++) {
 				String id = specialKnowledgeItemList.getString(i);
+				Item item = Registries.ITEM.get(new Identifier(id));
+				if (item == null) {
+					specialKnowledgeItemList.remove(i);
+					i--;
+					continue;
+				}
 				NbtCompound nbt = specialKnowledgeCompoundList.getCompound(i);
-				
 				NbtItem nbtItem = new NbtItem(Registries.ITEM.get(new Identifier(id)), nbt);
-				
 				playerState.specialKnowledge.add(nbtItem);
 			}
 

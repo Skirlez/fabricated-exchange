@@ -30,6 +30,10 @@ public class NbtItemsList extends DataFile<HashMap<String, List<String>>>  {
 			key = key.substring(1);
 			// tag found
 			String[] items = GeneralUtil.getItemStringsFromTagString(key);
+            if (items.length == 0) {
+                FabricatedExchange.LOGGER.warn("Item-less tag provided in nbt_items.json: " + key + ". Ignoring...");
+                continue;
+            }
 			for (int i = 0; i < items.length; i++) {
 				itemsToTag.put(items[i], key);
 			}

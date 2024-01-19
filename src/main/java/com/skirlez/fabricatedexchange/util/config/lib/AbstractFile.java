@@ -96,7 +96,7 @@ public abstract class AbstractFile<T> {
 	}
 
 	public void setValueToDefault() {
-		try (InputStream inputStream = FabricatedExchange.class.getClassLoader().getResourceAsStream("default_configs/" + name);
+		try (InputStream inputStream = FabricatedExchange.class.getClassLoader().getResourceAsStream("fe_default_configs/" + name);
 			Reader reader = new InputStreamReader(inputStream)) {
 			value = readValue(reader);
 			process();
@@ -107,7 +107,7 @@ public abstract class AbstractFile<T> {
 	}
 	
 	protected T getDefaultValue() {
-		try (InputStream inputStream = FabricatedExchange.class.getClassLoader().getResourceAsStream("default_configs/" + name);
+		try (InputStream inputStream = FabricatedExchange.class.getClassLoader().getResourceAsStream("fe_default_configs/" + name);
 			Reader reader = new InputStreamReader(inputStream)) {
 			return readValue(reader);
 		} catch (Exception e) {

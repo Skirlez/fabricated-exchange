@@ -4,6 +4,7 @@ import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.config.lib.DataFile;
 
@@ -26,6 +27,10 @@ public class ModifiersList extends DataFile<HashSet<String>> {
 				continue;
 			entry = entry.substring(1);
 			String[] items = GeneralUtil.getItemStringsFromTagString(entry);
+            if (items.length == 0) {
+                FabricatedExchange.LOGGER.warn("Item-less tag provided in modifiers.json: " + entry + ". Ignoring...");
+                continue;
+            }
 			for (int i = 0; i < items.length; i++) {
 				tagModifiers.add(items[i]);
 			}

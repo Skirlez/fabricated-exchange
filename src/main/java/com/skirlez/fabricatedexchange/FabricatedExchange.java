@@ -84,7 +84,8 @@ public class FabricatedExchange implements ModInitializer {
 	}
 
 	public static boolean reloadEmcMap(MinecraftServer server) {
-		EmcMapper mapper = new EmcMapper(server.getRegistryManager(), server.getOverworld().getRecipeManager());
+		EmcMapper mapper = new EmcMapper(server.getOverworld().getRecipeManager(), server.getRegistryManager());
+		
 		boolean hasWarned = mapper.map();
 		EmcData.emcMap = mapper.getEmcMap();
 		EmcData.potionEmcMap =  mapper.getPotionEmcMap();

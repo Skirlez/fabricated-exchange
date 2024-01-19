@@ -4,15 +4,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
-
-import org.jetbrains.annotations.Nullable;
 
 import com.skirlez.fabricatedexchange.mixin.ScreenHandlerInvoker;
 
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemConvertible;
+import net.minecraft.registry.DefaultedRegistry;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntryList.Named;
 import net.minecraft.registry.tag.TagKey;
@@ -25,11 +26,13 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public abstract class GeneralUtil {
-	public static <T> void mergeMap(Map<String, T> map, Map<String, T> newMap) {
+	
+	
+	public static <T, E> void mergeMap(Map<E, T> map, Map<E, T> newMap) {
 		int iterations = newMap.keySet().size();
-		Iterator<String> iterator = newMap.keySet().iterator();
+		Iterator<E> iterator = newMap.keySet().iterator();
 		for (int i = 0; i < iterations; i++) {
-			String s = iterator.next();
+			E s = iterator.next();
 			map.put(s, newMap.get(s));
 		}
 	}
@@ -86,19 +89,6 @@ public abstract class GeneralUtil {
 			pos.getX() + size, pos.getY() + size, pos.getZ() + size);
 	}
 
-	@Nullable
-	public static String[] getItemStringsFromTagString(String tagString) {
-		Identifier tagId = new Identifier(tagString);
-		
-		TagKey<Item> tag = Registries.ITEM.streamTags().filter((key) -> key.id().equals(tagId)).findFirst().orElse(null);
-		Named<Item> named = Registries.ITEM.getEntryList(tag).get();
-		String[] array = new String[named.size()];
-		for (int i = 0; i < named.size(); i++)
-			array[i] = Registries.ITEM.getId(named.get(i).value()).toString();
-		
-		
-		return array;
-	} 
 
 	public static void nestedLoop(int loops, int max, Consumer<int[]> operation) {
 		int arr[] = new int[loops];
@@ -115,5 +105,47 @@ public abstract class GeneralUtil {
 			}
 		}
 	}
-
+	
+	
+    public static Optional<Item> getAnyItemFromItemTag(TagKey<Item> tag) {
+        Optional<Named<Item>> optionalNamed = Registries.ITEM.getEntryList(tag);
+        if (optionalNamed.isEmpty())
+            return Optional.empty();
+        Named<Item> named = optionalNamed.get();
+        if (named.size() == 0)
+            return Optional.empty();
+        return Optional.of(named.get(0).value());
+    }
+    
+    private static Item[] emptyArr = new Item[0];
+    
+    public static <T extends ItemConvertible> Item[] getItemsFromTag(TagKey<T> tag, DefaultedRegistry<T> registry) {
+        Optional<Named<T>> optionalNamed = registry.getEntryList(tag);
+        if (optionalNamed.isEmpty())
+            return emptyArr;
+        Named<T> named = optionalNamed.get();
+        Item[] array = new Item[named.size()];
+        for (int i = 0; i < named.size(); i++)
+            array[i] = named.get(i).value().asItem();
+        return array;
+    }
+    
+    public static Item[] getItemsFromTagString(String tagString) {
+        Identifier tagId = new Identifier(tagString);
+        TagKey<Item> tag = Registries.ITEM.streamTags().filter((key) -> key.id().equals(tagId)).findFirst().orElse(null);
+        if (tag != null)
+            return getItemsFromTag(tag, Registries.ITEM);
+        return emptyArr;
+    } 
+    public static String[] getItemStringsFromTagString(String tagString) {
+        Item[] items = getItemsFromTagString(tagString);
+        String[] array = new String[items.length];
+        for (int i = 0; i < items.length; i++)
+            array[i] = Registries.ITEM.getId(items[i]).toString();
+        
+        return array;
+    }
 }
+	
+
+
