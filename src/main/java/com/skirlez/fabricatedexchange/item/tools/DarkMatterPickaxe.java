@@ -71,6 +71,7 @@ public class DarkMatterPickaxe extends PickaxeItem implements ChargeableItem, Ou
 	public void appendTooltip(ItemStack stack, World world, List<Text> tooltip, TooltipContext context) {
 		super.appendTooltip(stack, world, tooltip, context);
 		ItemUtil.addModeAndChargeToTooltip(stack, tooltip);
+		
 	}
 
 
@@ -104,17 +105,15 @@ public class DarkMatterPickaxe extends PickaxeItem implements ChargeableItem, Ou
 			// case 2 don't do anything 
 		}
 
-
-
 		BlockPos pos1 = center.offset(dir);
 		BlockState state1 = world.getBlockState(pos1);
-		if (isSuitableFor(state1) && state1.getHardness(null, null) <= (centerState.getHardness(null, null) + 1.5f))
+		if (isSuitableFor(state1) && state1.getHardness(world, pos1) <= (centerState.getHardness(world, center) + 1.5f))
 			list.add(pos1);
 
 
 		BlockPos pos2 = center.offset(dir.getOpposite());
 		BlockState state2 = world.getBlockState(pos2);
-		if (isSuitableFor(state2) && state2.getHardness(null, null) <= (centerState.getHardness(null, null) + 1.5f))
+		if (isSuitableFor(state2) && state2.getHardness(world, pos2) <= (centerState.getHardness(world, center) + 1.5f))
 			list.add(pos2);
 
 		return list;

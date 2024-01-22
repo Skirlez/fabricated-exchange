@@ -54,7 +54,6 @@ public class EmcMapper {
     private HashMap<Potion, SuperNumber> potionEmcMap;
     private HashMap<Enchantment, SuperNumber> enchantmentEmcMap;
     
-    private boolean warninged = false;
     private StringBuilder warning = new StringBuilder();
     
     private RecipeManager recipeManager;
@@ -89,9 +88,9 @@ public class EmcMapper {
 	public Map<Enchantment, SuperNumber> getEnchantmentEmcMap() {
 		return enchantmentEmcMap;
 	}
+	
     /** Maps out all the recipes known to recipeManager + item equations given by mods. */
     public boolean map() {
-
         Map<Item, SuperNumber> seedEmcMap = ModDataFiles.SEED_EMC_MAP.getValue();
         if (seedEmcMap != null)
             GeneralUtil.mergeMap(emcMap, seedEmcMap);
@@ -139,8 +138,6 @@ public class EmcMapper {
         }
         
 
-    
-
         // most potion recipes are very very special, so we need to take care of them separately.
         // i've decided to just copy this section from the old emc mapper, using the dumber method, 
         // because there are not that many potion recipes.
@@ -158,7 +155,7 @@ public class EmcMapper {
         if (customEmcMap != null)
             GeneralUtil.mergeMap(emcMap, customEmcMap);
 
-		SuperNumber constant = ModDataFiles.CONFIG_FILE.enchantmentEmcConstant; 
+		SuperNumber constant = ModDataFiles.MAIN_CONFIG_FILE.enchantmentEmcConstant; 
 		for (Identifier id : Registries.ENCHANTMENT.getIds()) {
 			Enchantment enchantment = Registries.ENCHANTMENT.get(id);
 			int max = enchantment.getMaxLevel();
@@ -174,12 +171,8 @@ public class EmcMapper {
 		}
         
         
-        if (warninged) {
-            FabricatedExchange.LOGGER.warn(warning.toString());
-        }
-        boolean result = warninged;
-        warninged = false;
-        return result;
+        FabricatedExchange.LOGGER.warn(warning.toString());
+        return (!warning.isEmpty());
     }
 
 
@@ -513,7 +506,6 @@ public class EmcMapper {
 
     private void warn(String input) {
         warning.append(input).append('\n');
-        warninged = true;
     }
 
     private void unlock(Item item) {

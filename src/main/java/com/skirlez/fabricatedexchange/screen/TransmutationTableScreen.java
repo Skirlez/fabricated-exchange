@@ -53,8 +53,8 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 
 	public TransmutationTableScreen(TransmutationTableScreenHandler handler, PlayerInventory inventory, Text title) {
 		super(handler, inventory, title);
-		animated = ModDataFiles.CONFIG_FILE.transmutationTable_animated;
-		floorButtonEnabled = ModDataFiles.CONFIG_FILE.transmutationTable_floorButton;
+		animated = ModDataFiles.MAIN_CONFIG_FILE.transmutationTable_animated;
+		floorButtonEnabled = ModDataFiles.MAIN_CONFIG_FILE.transmutationTable_floorButton;
 		if (animated) 
 			distanceFromCenter = 0.0;
 		else 

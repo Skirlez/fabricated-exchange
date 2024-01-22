@@ -18,7 +18,8 @@ public class ModifiersList extends DataFile<HashSet<String>> {
 	private HashSet<String> tagModifiers;
 
 	@Override
-	protected void process() {
+	protected void constProcess() {
+		super.constProcess();
 		tagModifiers.clear();
 		Iterator<String> iterator = value.iterator();
 		while (iterator.hasNext()) {

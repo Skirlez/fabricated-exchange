@@ -42,7 +42,7 @@ public class ModItemStackTooltip {
 
 		EmcData.considerStackDurability(itemStack, emc);
 		
-		if (ModDataFiles.CONFIG_FILE.showEnchantedBookRepairCost && itemStack.getItem().equals(Items.ENCHANTED_BOOK)) {
+		if (ModDataFiles.MAIN_CONFIG_FILE.showEnchantedBookRepairCost && itemStack.getItem().equals(Items.ENCHANTED_BOOK)) {
 			NbtCompound nbt = itemStack.getNbt();
 			if (nbt != null) {
 				int repairCost = nbt.getInt("RepairCost");
@@ -77,7 +77,7 @@ public class ModItemStackTooltip {
 		}
 		
 		 
-		if (ModDataFiles.CONFIG_FILE.showItemEmcOrigin) {
+		if (ModDataFiles.MAIN_CONFIG_FILE.showItemEmcOrigin) {
 			boolean seed = EmcData.isItemInSeedValues(itemStack.getItem());
 			boolean custom = EmcData.isItemInCustomValues(itemStack.getItem());
 			if (seed)

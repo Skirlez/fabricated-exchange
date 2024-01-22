@@ -49,6 +49,7 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
 			ClientCommand.register(dispatcher);
 		});
+		
 		// we can use the vanilla renderers due to the texture mixin, see ModTexturedRenderLayers
 		BlockEntityRendererFactories.register(ModBlockEntities.ALCHEMICAL_CHEST, ChestBlockEntityRenderer::new);
 		BlockEntityRendererFactories.register(ModBlockEntities.ENERGY_CONDENSER, ChestBlockEntityRenderer::new);
@@ -60,8 +61,10 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.ENERGY_CONDENSER_MK2.asItem(), (stack, mode, matrices, vertexConsumers, light, overlay) 
 			-> MinecraftClient.getInstance().getBlockEntityRenderDispatcher().renderEntity(RENDER_ENERGY_CONDENSER_MK2, matrices, vertexConsumers, light, overlay));
 
+		
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-			ModDataFiles.fetchAll();
+			if (!MinecraftClient.getInstance().isIntegratedServerRunning())
+				ModDataFiles.fetchAll();
 		});
 	}
 

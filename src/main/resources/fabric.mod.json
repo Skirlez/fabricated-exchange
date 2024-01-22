@@ -23,7 +23,10 @@
 		],
 		"fabric-datagen": [
 			"com.skirlez.fabricatedexchange.FabricatedExchangeDataGenerator"
-		]
+		],
+		"modmenu": [ 
+			"com.skirlez.fabricatedexchange.util.config.ModMenuSettings"
+	 	]
 	},
 	"mixins": [
 		"fabricated-exchange.mixins.json",
@@ -37,5 +40,8 @@
 		"minecraft": "~1.19.4",
 		"java": ">=17",
 		"fabric-api": "*"
+	},
+	"suggests": {
+		"modmenu": "*"
 	}
 }

@@ -268,7 +268,7 @@ public class TheCommand {
 	private static int reset(CommandContext<ServerCommandSource> context) {
 		String str = context.getArgument("datafile", String.class);
 		AbstractFile<?> datafile = switch (str) {
-			case "config" -> ModDataFiles.CONFIG_FILE;
+			case "config" -> ModDataFiles.MAIN_CONFIG_FILE;
 			case "seed_emc_map" -> ModDataFiles.SEED_EMC_MAP;
 			case "custom_emc_map" -> ModDataFiles.CUSTOM_EMC_MAP;
 			default -> null;			

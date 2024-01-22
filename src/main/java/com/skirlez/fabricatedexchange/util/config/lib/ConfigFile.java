@@ -4,6 +4,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -31,18 +32,25 @@ public abstract class ConfigFile<T> extends AbstractFile<T> {
 	}
 
 	private final Map<String, String[]> commentsMap;
-	public ConfigFile(Type type, String name, Map<String, String[]> commentsMap) {
+	public ConfigFile(Type type, String name) {
 		super(type, name);
-		this.commentsMap = commentsMap;
+		this.commentsMap = new HashMap<String, String[]>();
 	}
 
+	protected void addComments(String field, String... comments) {
+		commentsMap.put(field, comments);
+	}
+	
+	public Map<String, String[]> getComments() {
+		return commentsMap;
+	}
+	
 	@Override
 	protected T readValue(Reader reader) throws Exception {
-		if (type instanceof Class<?>) {
-			return YAML.loadAs(reader, (Class<T>) type);
-		} else {
+		if (type instanceof Class<?> valueClass)
+			return YAML.loadAs(reader, valueClass);
+		else
 			throw new IllegalArgumentException("Type must be a Class object");
-		}
 	}
 
 	@Override

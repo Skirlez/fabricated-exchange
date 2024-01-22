@@ -20,7 +20,8 @@ public class NbtItemsList extends DataFile<HashMap<String, List<String>>>  {
 
 
 	@Override
-	protected void process() {
+	protected void constProcess() {
+		super.constProcess();
 		itemsToTag.clear();
 		Iterator<String> iterator = value.keySet().iterator();
 		while (iterator.hasNext()) {

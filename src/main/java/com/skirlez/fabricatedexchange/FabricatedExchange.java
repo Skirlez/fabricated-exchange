@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.network.PacketByteBuf;
@@ -63,6 +64,8 @@ public class FabricatedExchange implements ModInitializer {
 		ModScreenHandlers.registerAllScreenHandlers();
 		ModMessages.registerC2SPackets();
 
+		ModDataFiles.MAIN_CONFIG_FILE.fetch();
+		
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			TheCommand.register(dispatcher);
 		});

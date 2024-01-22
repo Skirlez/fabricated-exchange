@@ -27,7 +27,8 @@ public class EqualTagsFile extends DataFile<HashSet<String>> {
 
 
     @Override
-    protected void process() {
+    protected void constProcess() {
+    	super.constProcess();
         tagGroups.clear();
         Iterator<String> iterator = value.iterator();
         while (iterator.hasNext()) {
