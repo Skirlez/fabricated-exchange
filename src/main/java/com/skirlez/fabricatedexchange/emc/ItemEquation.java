@@ -17,13 +17,10 @@ public class ItemEquation {
 	public final String name;
 	public final String origin;
 
-	public int amountUnknown;
-
 	public ItemEquation(List<Ingredient> input, List<ItemStack> output, Identifier id) {
 		this.input = input;
 		this.output = output;
 		this.name = id.getPath();
 		this.origin = id.getNamespace();
-		this.amountUnknown = 0;
 	}
 }

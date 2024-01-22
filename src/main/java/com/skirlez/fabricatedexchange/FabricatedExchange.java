@@ -6,7 +6,6 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.network.PacketByteBuf;
@@ -81,6 +80,8 @@ public class FabricatedExchange implements ModInitializer {
 
 		ServerLifecycleEvents.SERVER_STARTED.register((server) -> {
 			ModDataFiles.fetchAll();
+			EmcData.seedEmcMap = ModDataFiles.SEED_EMC_MAP.getValue();
+			EmcData.customEmcMap = ModDataFiles.CUSTOM_EMC_MAP.getValue();
 			generateBlockRotationMap(ModDataFiles.BLOCK_TRANSMUTATION_MAP.getValue());
 			reloadEmcMap(server);
 		});
@@ -95,9 +96,8 @@ public class FabricatedExchange implements ModInitializer {
 		EmcData.enchantmentEmcMap = mapper.getEnchantmentEmcMap();
 		List<Item> fuelItemList = new ArrayList<Item>();
  
-		Iterator<RegistryEntry<Item>> iterator = Registries.ITEM.getEntryList(ModTags.FUEL).get().iterator();
-		while (iterator.hasNext()) {
-			Item item = iterator.next().value();
+		for (RegistryEntry<Item> entry : Registries.ITEM.getEntryList(ModTags.FUEL).get()) { 
+			Item item = entry.value();
 
 			int index = Collections.binarySearch(fuelItemList, item, 
 				(item1, item2) -> 
@@ -109,7 +109,6 @@ public class FabricatedExchange implements ModInitializer {
 				index = -index - 1;
 
 			fuelItemList.add(index, item);
-			//GeneralUtil.addSortedEmcList(fuelItemList, item, false);
 		}
 		Map<Item, Item> newFuelProgressionMap = new HashMap<Item, Item>();
 		for (int i = 0; i < fuelItemList.size(); i++) {

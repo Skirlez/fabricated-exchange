@@ -1,7 +1,6 @@
 package com.skirlez.fabricatedexchange.util.config;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;

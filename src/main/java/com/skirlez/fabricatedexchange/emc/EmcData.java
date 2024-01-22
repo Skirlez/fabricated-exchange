@@ -38,8 +38,8 @@ public class EmcData {
 	public static Map<Enchantment, SuperNumber> enchantmentEmcMap = new HashMap<Enchantment, SuperNumber>();
 
 	// these should only ever be equal to what's in their respective jsons
-	public static Map<String, SuperNumber> seedEmcMap = new HashMap<String, SuperNumber>();
-	public static Map<String, SuperNumber> customEmcMap = new HashMap<String, SuperNumber>();
+	public static Map<Item, SuperNumber> seedEmcMap = new HashMap<Item, SuperNumber>();
+	public static Map<Item, SuperNumber> customEmcMap = new HashMap<Item, SuperNumber>();
 
 	public static SuperNumber getItemEmc(NbtItem item) {
 		SuperNumber emc = getItemEmc(item.asItem());
@@ -166,10 +166,10 @@ public class EmcData {
 
 
 	public static boolean isItemInSeedValues(Item item) {
-		return seedEmcMap.containsKey(Registries.ITEM.getId(item).toString());
+		return seedEmcMap.containsKey(item);
 	}
 	public static boolean isItemInCustomValues(Item item) {
-		return customEmcMap.containsKey(Registries.ITEM.getId(item).toString());
+		return customEmcMap.containsKey(item);
 	}
 
 	// only the server can use these
@@ -184,7 +184,7 @@ public class EmcData {
 		DataFile<Map<Item, SuperNumber>> file = seed ? ModDataFiles.SEED_EMC_MAP : ModDataFiles.CUSTOM_EMC_MAP;
 
 		//String id = Registries.ITEM.getId(item).toString();
-		Map<Item, SuperNumber> newEmcMap = file.getValue();
+		Map<Item, SuperNumber> newEmcMap = file.getCopy();
 		if (newEmcMap == null)
 			newEmcMap = new HashMap<Item, SuperNumber>();
 		newEmcMap.put(item, emc);

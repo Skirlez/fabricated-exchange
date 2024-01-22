@@ -2,7 +2,6 @@ package com.skirlez.fabricatedexchange.util.config.lib;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -123,8 +122,9 @@ public abstract class AbstractFile<T> {
 	public void setValueToDefault() {
 		try (InputStream inputStream = FabricatedExchange.class.getClassLoader().getResourceAsStream("fe_default_configs/" + name);
 			Reader reader = new InputStreamReader(inputStream)) {
+			
 			file = readAsString(reader);
-			value = process(readValue(reader));
+			value = process(readValue(new StringReader(file)));
 			constProcess();
 		} catch (Exception e) {
 			FabricatedExchange.LOGGER.error(name + "'s default configuration could not be read from!", e);

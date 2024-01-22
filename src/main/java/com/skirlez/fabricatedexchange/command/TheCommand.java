@@ -195,15 +195,13 @@ public class TheCommand {
 		String successMessage = (seed) ? "commands.fabricated-exchange.removeemc.seed_success" : "commands.fabricated-exchange.removeemc.custom_success";
 		DataFile<Map<Item, SuperNumber>> file = (seed) ? ModDataFiles.SEED_EMC_MAP : ModDataFiles.CUSTOM_EMC_MAP;
 		
-		Map<Item, SuperNumber> map = file.getValue();
+		Map<Item, SuperNumber> map = file.getCopy();
 		if (!map.containsKey(item)) {
 			context.getSource().sendMessage(Text.translatable(confuseMessage)
 				.append(" ").append(Text.translatable("commands.fabricated-exchange.zero_notice")));
 			return 0;
 		}
-		synchronized (map) {
-			map.remove(item);
-		}
+		map.remove(item);
 		file.setValueAndSave(map);
 		context.getSource().sendMessage(Text.translatable(successMessage)
 			.append(" ").append(Text.translatable("commands.fabricated-exchange.reload_notice")));
@@ -218,14 +216,14 @@ public class TheCommand {
 			context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.recipe.ban.unsupported_type", type));
 			return 0;
 		}
-		Map<String, HashSet<String>> blacklisted = ModDataFiles.BLACKLISTED_MAPPER_RECIPES.getValue();
+		Map<String, HashSet<String>> blacklisted = ModDataFiles.BLACKLISTED_MAPPER_RECIPES.getCopy();
 		String name = recipe.getId().toString();
 		if (blacklisted.get(type).contains(name)) {
 			context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.nothing"));
 			return 0;
 		}
 		blacklisted.get(type).add(name);
-		ModDataFiles.BLACKLISTED_MAPPER_RECIPES.save();
+		ModDataFiles.BLACKLISTED_MAPPER_RECIPES.setValueAndSave(blacklisted);
 		context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.recipe.ban.success", type));
 		return 1;
 	}
@@ -251,6 +249,8 @@ public class TheCommand {
 	private static int reload(CommandContext<ServerCommandSource> context) {
 		MinecraftServer server = context.getSource().getServer();
 		ModDataFiles.fetchAll();
+		EmcData.seedEmcMap = ModDataFiles.SEED_EMC_MAP.getValue();
+		EmcData.customEmcMap = ModDataFiles.CUSTOM_EMC_MAP.getValue();
 		context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.reloademc.data_success"));
 		long startTime = System.nanoTime();
 		FabricatedExchange.generateBlockRotationMap(ModDataFiles.BLOCK_TRANSMUTATION_MAP.getValue());
