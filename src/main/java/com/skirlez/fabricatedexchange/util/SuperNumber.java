@@ -510,6 +510,22 @@ public class SuperNumber {
 	public static SuperNumber min(SuperNumber a, SuperNumber b) {
 		return (a.compareTo(b) == -1) ? a : b;
 	}
+	/** @return true if the number is valid for use in SuperNumber(String divisionString) 
+	 * @see SuperNumber#SuperNumber(String divisionString) */
+	public static boolean isValidNumberString(String number) {
+		int slashPos = -1;
+		for (int i = 0; i < number.length(); i++) {
+			char c = number.charAt(i);
+			if (c == '/') {
+				if (slashPos != -1)
+					return false;
+				slashPos = i;
+			}
+			else if (!Character.isDigit(c))
+				return false;
+		}
+		return slashPos != 0 && slashPos != number.length() - 1;
+	}
 }
 
 

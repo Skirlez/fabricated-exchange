@@ -13,7 +13,7 @@ import com.skirlez.fabricatedexchange.util.config.lib.ConfigFile;
 /** The central config file of the mod. It will compare itself to the default config to make sure the config file is not broken, and "repairs" itself if necessary. */
 public class MainConfig extends ConfigFile<Map<String, Object>> {
 	
-	private final Map<String, Object> defaultValue = getDefaultValue();
+	private final Map<String, Object> defaultValue = copyDefaultValue();
 	
 	MainConfig(Type type, String name) {
 		super(type, name);
@@ -22,18 +22,19 @@ public class MainConfig extends ConfigFile<Map<String, Object>> {
 		"(default: false)");
 		addComments("showEnchantedBookRepairCost", "Show the hidden repair cost attribute for Enchanted Books.", 
 		"(default: true)");
+		addComments("enchantmentEmcConstant", "A special constant used during the calculation of enchantment EMC.", "Bigger constant -> more EMC.",
+		"(default: 3260)");
+		addComments("emcInMultiplier", "The amount of personal EMC you gain be multiplied by this number.",
+		"(default: 1)");
+		addComments("emcOutMultiplier", "The amount of personal EMC you need to spend will be multiplied by this number.",
+		"(default: 1)");
 		addComments("mapper.enabled", "Whether or not the EMC mapper is enabled.",
 		"(default: true)");
 		addComments("transmutationTable.animated", "When disabled, the Transmutation Table will look boring.",
 		"(default: true)");
 		addComments("transmutationTable.floorButton", "When enabled, a button to round down your EMC will appear", "in the transmutation table when your EMC is not a whole number.",
 		"(default: true)");
-		addComments("emcInMultiplier", "The amount of personal EMC you gain be multiplied by this number.",
-		"(default: 1)");
-		addComments("emcOutMultiplier", "The amount of personal EMC you need to spend will be multiplied by this number.",
-		"(default: 1)");
-		addComments("enchantmentEmcConstant", "A special constant used during the calculation", "of enchantment EMC. Bigger constant -> more EMC.",
-		"(default: 3260)");
+
 	}
 
 	public boolean showItemEmcOrigin;

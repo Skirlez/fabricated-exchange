@@ -122,7 +122,6 @@ public abstract class AbstractFile<T> {
 	public void setValueToDefault() {
 		try (InputStream inputStream = FabricatedExchange.class.getClassLoader().getResourceAsStream("fe_default_configs/" + name);
 			Reader reader = new InputStreamReader(inputStream)) {
-			
 			file = readAsString(reader);
 			value = process(readValue(new StringReader(file)));
 			constProcess();
@@ -132,7 +131,7 @@ public abstract class AbstractFile<T> {
 		}
 	}
 	
-	protected T getDefaultValue() {
+	public T copyDefaultValue() {
 		try (InputStream inputStream = FabricatedExchange.class.getClassLoader().getResourceAsStream("fe_default_configs/" + name);
 			Reader reader = new InputStreamReader(inputStream)) {
 			return process(readValue(reader));

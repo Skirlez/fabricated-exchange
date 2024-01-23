@@ -151,7 +151,7 @@ public class TheCommand {
 		PlayerEntity p = context.getSource().getPlayer();
 		String str = context.getArgument("number", String.class);
 
-		if (!str.matches("[\\d/]+")) {
+		if (SuperNumber.isValidNumberString(str)) {
 			context.getSource().sendMessage(MutableText.of(Text.of(str).getContent()).append(Text.translatable("commands.fabricated-exchange.setemc.not_valid_number")));
 			return 0;
 		}
