@@ -3,8 +3,11 @@ package com.skirlez.fabricatedexchange.screen;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
+import org.joml.Math;
 import org.joml.Quaternionf;
+import org.joml.Vector2d;
 
 import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
@@ -18,6 +21,7 @@ import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -32,6 +36,11 @@ public class SettingsScreen extends GameOptionsScreen {
 	private int distFromRight;
 	private int distFromBottom;
 	private int currentPage;
+	private long prevRenderTime;
+	
+	
+	private final List<Ball> balls;
+	
 	private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 	public SettingsScreen(Screen previous) {
 		super(previous, CLIENT.options, Text.of("Fabricated Exchange"));
@@ -39,6 +48,10 @@ public class SettingsScreen extends GameOptionsScreen {
 		COMMENTS = ModDataFiles.MAIN_CONFIG_FILE.getComments();
 		pages = new ArrayList<List<ClickableWidget>>();
 		currentPage = 0;
+		prevRenderTime = System.nanoTime();
+		
+		balls = new ArrayList<Ball>();
+		
 	}
 
 	@Override
@@ -48,6 +61,13 @@ public class SettingsScreen extends GameOptionsScreen {
 		this.distFromLeft = 30;
 		this.distFromRight = width - 30;
 		this.distFromBottom = 30;
+		this.balls.clear();
+		
+		for (int i = 0; i < 8; i++) { 
+			balls.add(new Ball(
+					new Vector2d(this.width / 2 + 50 + Math.random() * 50d - 25d, this.height / 2 + Math.random() * 50d - 25d), 
+					new Vector2d(Math.random() * 2d - 1d, Math.random() * 2d - 1d)));
+		}
 		this.pages.clear();
 		pages.add(new ArrayList<ClickableWidget>());
 		if (this.client.world == null || MinecraftClient.getInstance().isIntegratedServerRunning()) {
@@ -227,8 +247,74 @@ public class SettingsScreen extends GameOptionsScreen {
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		renderBackground(matrices);
+		
 		super.render(matrices, mouseX, mouseY, delta);
-		GameOptionsScreen.drawCenteredTextWithShadow(matrices, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
 		itemRenderer.renderGuiItemIcon(matrices, new ItemStack(ModItems.DARK_MATTER_HOE), mouseX - 8, mouseY - 8);
+		GameOptionsScreen.drawCenteredTextWithShadow(matrices, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
+		drawBalls(matrices, mouseX, mouseY);
+
+	}
+	
+	private void drawBalls(MatrixStack matrices, int mouseX, int mouseY) {
+		long currentTime = System.nanoTime();
+		
+		double dotX = this.width / 2 + 50;
+		double dotY = this.height / 2; //+ Math.sin(currentTime / 1000000000.0) * 10;
+		
+		double dt = (currentTime - prevRenderTime) / 10000000.0;
+		for (Ball ball : balls) {
+			itemRenderer.renderGuiItemIcon(matrices, new ItemStack(ball.item), (int)ball.pos.x - 8, (int)ball.pos.y - 8);
+
+			
+			
+			ball.addVelocity(new Vector2d(
+					dotX - ball.pos.x, 
+					dotY - ball.pos.y)
+					.div(2000d)
+					.mul(Math.random() / 2 + 1).mul(dt));
+			
+			double dx = (ball.pos.x - mouseX);
+			double dy = (ball.pos.y - mouseY);
+			double distToMouse = Math.sqrt(dx * dx + dy * dy);
+			double maxDist = 40d;
+			if (distToMouse < maxDist) {
+				ball.addVelocity(new Vector2d(
+						mouseX - ball.pos.x, 
+						mouseY - ball.pos.y)
+						.div(1000d)
+						.mul((maxDist - distToMouse) / maxDist * 30d)
+						.mul(dt)
+						.negate());
+			}
+			ball.tick(dt);
+		}
+		prevRenderTime = currentTime;
+	}
+	
+	private static class Ball {
+		private Vector2d pos;
+		private Vector2d vel;
+		private Item item;
+		public Ball(Vector2d pos, Vector2d vel) {
+			this.pos = pos;
+			this.vel = vel;
+			this.item = choose(ModItems.PHILOSOPHERS_STONE, ModItems.DARK_MATTER, ModItems.RED_MATTER);
+		}
+		
+		private Item choose(Item... items) {
+			return items[new Random().nextInt(items.length)];
+		}
+		
+		public void addVelocity(Vector2d vel) {
+			this.vel.add(vel);
+		}
+		
+		public void tick(double dt) {
+			System.out.println(dt);
+			if (vel.length() > 2)
+				vel.fma(-0.1 * dt, vel.normalize(new Vector2d()));
+			pos.add(new Vector2d(vel).mul(dt));
+			
+		}
 	}
 }
