@@ -18,21 +18,40 @@ public class MainConfig extends ConfigFile<Map<String, Object>> {
 	MainConfig(Type type, String name) {
 		super(type, name);
 		addComments("version", "Do not modify this string!");
-		addComments("showItemEmcOrigin", "Show how the mod decided this item's EMC value.", "Will not be accurate on multiplayer servers. Useful when manually setting EMC values!",
+		
+		addComments("showItemEmcOrigin", 
+		"Show how the mod decided this item's EMC value.", 
+		"Will not be accurate on multiplayer servers. Useful when manually setting EMC values!",
 		"(default: false)");
-		addComments("showEnchantedBookRepairCost", "Show the hidden repair cost attribute for Enchanted Books.", 
+		
+		addComments("showEnchantedBookRepairCost", 
+		"Show the hidden repair cost attribute for Enchanted Books.", 
 		"(default: true)");
-		addComments("enchantmentEmcConstant", "A special constant used during the calculation of enchantment EMC.", "Bigger constant -> more EMC.",
+		
+		addComments("enchantmentEmcConstant", 
+		"A special constant used during the calculation of enchantment EMC.", 
+		"Bigger constant -> higher EMC.",
 		"(default: 3260)");
-		addComments("emcInMultiplier", "The amount of personal EMC you gain be multiplied by this number.",
+		
+		addComments("emcInMultiplier", 
+		"The amount of personal EMC you gain be multiplied by this number.",
 		"(default: 1)");
-		addComments("emcOutMultiplier", "The amount of personal EMC you need to spend will be multiplied by this number.",
+		
+		addComments("emcOutMultiplier", 
+		"The amount of personal EMC you need to spend will be multiplied by this number.",
 		"(default: 1)");
-		addComments("mapper.enabled", "Whether or not the EMC mapper is enabled.",
+		
+		addComments("mapper.enabled", 
+		"Whether or not the EMC mapper is enabled.",
 		"(default: true)");
-		addComments("transmutationTable.animated", "When disabled, the Transmutation Table will look boring.",
+		
+		addComments("transmutationTable.animated", 
+		"When disabled, the Transmutation Table will look boring.",
 		"(default: true)");
-		addComments("transmutationTable.floorButton", "When enabled, a button to round down your EMC will appear", "in the transmutation table when your EMC is not a whole number.",
+		
+		addComments("transmutationTable.floorButton", 
+		"When enabled, a button to round down your EMC will appear", 
+		"in the Transmutation Table when your EMC is not a whole number.",
 		"(default: true)");
 
 	}
@@ -74,6 +93,13 @@ public class MainConfig extends ConfigFile<Map<String, Object>> {
 					changed = true;
 			}
 		}
+		
+		if (!value.get("version").equals(FabricatedExchange.VERSION)) {
+			// any version migration code would go here
+			value.put("version", FabricatedExchange.VERSION);
+			changed = true;
+		}
+		
 		if (changed)
 			save();
 

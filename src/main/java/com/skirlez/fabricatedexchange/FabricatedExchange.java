@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.network.PacketByteBuf;
@@ -52,6 +53,8 @@ public class FabricatedExchange implements ModInitializer {
 	// (e.g. in vanilla, coal (32 emc) will have a key value pair with redstone (64 emc), the next item with the fuel tag that has more emc than it.)
 	public static Map<Item, Item> fuelProgressionMap = new HashMap<Item, Item>();
 
+	public static final String VERSION = FabricLoader.getInstance().getModContainer(MOD_ID).get()
+			.getMetadata().getVersion().getFriendlyString();
 	
 	@Override
 	public void onInitialize() {
@@ -62,7 +65,7 @@ public class FabricatedExchange implements ModInitializer {
 		ModBlockEntities.registerBlockEntities();
 		ModScreenHandlers.registerAllScreenHandlers();
 		ModMessages.registerC2SPackets();
-
+		
 		ModDataFiles.MAIN_CONFIG_FILE.fetch();
 		
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {

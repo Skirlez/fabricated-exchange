@@ -1,5 +1,7 @@
 package com.skirlez.fabricatedexchange.screen;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.joml.Quaternionf;
@@ -12,6 +14,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.GameOptionsScreen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.util.math.MatrixStack;
@@ -22,13 +25,20 @@ import net.minecraft.text.Text;
 public class SettingsScreen extends GameOptionsScreen {
 	private Map<String, Object> CONFIG;
 	private final Map<String, String[]> COMMENTS;
+	
+	private final List<List<ClickableWidget>> pages;
 	private int lastY;
 	private int distFromLeft;
+	private int distFromRight;
+	private int distFromBottom;
+	private int currentPage;
 	private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 	public SettingsScreen(Screen previous) {
 		super(previous, CLIENT.options, Text.of("Fabricated Exchange"));
 		CONFIG = ModDataFiles.MAIN_CONFIG_FILE.getCopy();
 		COMMENTS = ModDataFiles.MAIN_CONFIG_FILE.getComments();
+		pages = new ArrayList<List<ClickableWidget>>();
+		currentPage = 0;
 	}
 
 	@Override
@@ -36,20 +46,23 @@ public class SettingsScreen extends GameOptionsScreen {
 		super.init();
 		this.lastY = 35;
 		this.distFromLeft = 30;
+		this.distFromRight = width - 30;
+		this.distFromBottom = 30;
+		this.pages.clear();
+		pages.add(new ArrayList<ClickableWidget>());
 		if (this.client.world == null || MinecraftClient.getInstance().isIntegratedServerRunning()) {
-			
 			Text resetToDefaultText = Text.of("Reset To Default");
 			ButtonWidget resetToDefault = new ButtonWidget.Builder(resetToDefaultText, (widget) -> {
 				CONFIG = ModDataFiles.MAIN_CONFIG_FILE.copyDefaultValue();
 				clearAndInit();
-			}).dimensions(distFromLeft, this.height - 30, textRenderer.getWidth(resetToDefaultText) + 20, 20).build();
+			}).dimensions(distFromLeft, height - distFromBottom, textRenderer.getWidth(resetToDefaultText) + 20, 20).build();
 			
 			addDrawableChild(resetToDefault);
 			
 			Text closeWithoutSavingText = Text.of("Close Without Saving");
 			ButtonWidget closeWithoutSaving = new ButtonWidget.Builder(closeWithoutSavingText, (widget) -> {
 				close();
-			}).dimensions(distFromLeft + resetToDefault.getWidth() + 10, this.height - 30, textRenderer.getWidth(closeWithoutSavingText) + 20, 20).build();
+			}).dimensions(distFromLeft + resetToDefault.getWidth() + 11, height - distFromBottom, textRenderer.getWidth(closeWithoutSavingText) + 20, 20).build();
 			
 			addDrawableChild(closeWithoutSaving);
 			
@@ -57,7 +70,7 @@ public class SettingsScreen extends GameOptionsScreen {
 			ButtonWidget done = new ButtonWidget.Builder(doneText, (widget) -> {
 				ModDataFiles.MAIN_CONFIG_FILE.setValueAndSave(CONFIG);
 				close();
-			}).dimensions(distFromLeft + resetToDefault.getWidth() + closeWithoutSaving.getWidth() + 20, this.height - 30, closeWithoutSaving.getWidth(), 20).build();
+			}).dimensions(distFromLeft + resetToDefault.getWidth() + closeWithoutSaving.getWidth() + 22, height - distFromBottom, closeWithoutSaving.getWidth(), 20).build();
 			
 			addDrawableChild(done);
 			
@@ -74,8 +87,48 @@ public class SettingsScreen extends GameOptionsScreen {
 		addBooleanValue("transmutationTable.animated");
 		addBooleanValue("transmutationTable.floorButton");
 		
+		if (pages.get(pages.size() - 1).isEmpty())
+			pages.remove(pages.size() - 1);
+		if (pages.size() > 1) {
+			final TextWidget pageTextWidget = new TextWidget(
+					distFromRight - 40, this.height / 2 - distFromBottom, 
+					13, 13, Text.of(Integer.toString(currentPage)), textRenderer);
+			addDrawable(pageTextWidget);
+			
+			addDrawableChild(ButtonWidget.builder(
+				Text.of("<"), button -> switchPage(currentPage - 1, pageTextWidget))
+				.dimensions(distFromRight - 60, this.height / 2 - distFromBottom, 13, 13)
+				.build());
+	
+			addDrawableChild(ButtonWidget.builder(
+				Text.of(">"), button -> switchPage(currentPage + 1, pageTextWidget))
+				.dimensions(distFromRight - 20, this.height / 2 - distFromBottom, 13, 13)
+				.build());
+			
+			if (currentPage != 0) {
+				int remember = currentPage;
+				currentPage = 0;
+				switchPage(remember, pageTextWidget);
+			}
+		}
+
 	}
 
+	private void switchPage(int page, TextWidget pageTextWidget) {
+		if ((page <= -1) || (page >= pages.size()))
+			return;
+		for (ClickableWidget widget : pages.get(currentPage)) {
+			widget.active = false;
+			widget.visible = false;
+		}
+		currentPage = page;
+		for (ClickableWidget widget : pages.get(currentPage)) {
+			widget.active = true;
+			widget.visible = true;
+		}
+		pageTextWidget.setMessage(Text.of(Integer.toString(currentPage)));
+	}
+	
 	@Override
 	public void removed() {
 		
@@ -98,8 +151,10 @@ public class SettingsScreen extends GameOptionsScreen {
 		int height = 12;
 		TextWidget nameWidget = new TextWidget(distFromLeft, lastY + height / 2, width, height, nameText, textRenderer);
 		nameWidget.setTooltip(Tooltip.of(commentsText));
+		nameWidget.active = (pages.size() == 1);
+		nameWidget.visible = (pages.size() == 1);
 		addDrawableChild(nameWidget);
-		
+		pages.get(pages.size() - 1).add(nameWidget);
 	
 
 		
@@ -107,20 +162,28 @@ public class SettingsScreen extends GameOptionsScreen {
 
 		Text invalidText = Text.of("Invalid number!!");
 		int invalidWidth = textRenderer.getWidth(invalidText);
-		TextWidget invalidTextWidget = new TextWidget(distFromLeft + nameWidget.getWidth() + field.getWidth() + 20, lastY + height / 2, invalidWidth, height, invalidText, textRenderer);
+		TextWidget invalidTextWidget = new TextWidget(
+				distFromLeft + nameWidget.getWidth() + field.getWidth() + 20, 
+				lastY + height / 2, invalidWidth, height, 
+				Text.empty(), textRenderer);
+		
 		addDrawable(invalidTextWidget);
 		
+		pages.get(pages.size() - 1).add(invalidTextWidget);
 		
 		field.setChangedListener((str) -> {
 			boolean isNumberValid = SuperNumber.isValidNumberString(str);
-			invalidTextWidget.visible = !isNumberValid;
+			invalidTextWidget.setMessage(isNumberValid ? Text.empty() : invalidText);
 			if (isNumberValid)
 				CONFIG.put(key, str);
 		});
 		field.setText((String)CONFIG.get(key));
+		field.active = (pages.size() == 1);
+		field.visible = (pages.size() == 1);
 		addDrawableChild(field);
+		pages.get(pages.size() - 1).add(field);
 		
-		lastY += 25;
+		increaseY();
 	}
 	
 	
@@ -138,13 +201,26 @@ public class SettingsScreen extends GameOptionsScreen {
 		int width = textRenderer.getWidth(f) + 15;
 		//TextWidget value = new TextWidget(distFromLeft + width + 20, lastY + 10, 0, 0, (boolean)CONFIG.get(key) ? t : f, textRenderer);
 		//addDrawable(value);
-		addDrawableChild(new ButtonWidget.Builder((boolean)CONFIG.get(key) ? t : f, (widget) -> {
+		ButtonWidget button = new ButtonWidget.Builder((boolean)CONFIG.get(key) ? t : f, (widget) -> {
 			boolean newValue = !(boolean)CONFIG.get(key);
 			CONFIG.put(key, newValue);
 			widget.setMessage(newValue ? t : f);
-		}).dimensions(distFromLeft, lastY, width, 20).tooltip(Tooltip.of(commentsText)).build());
+		}).dimensions(distFromLeft, lastY, width, 20).tooltip(Tooltip.of(commentsText)).build();
+		button.active = (pages.size() == 1);
+		button.visible = (pages.size() == 1);
 		
+		addDrawableChild(button);
+		pages.get(pages.size() - 1).add(button);
+		
+		increaseY();
+	}
+	
+	private void increaseY() {
 		lastY += 25;
+		if (height - 60 < lastY) {
+			lastY = 35;
+			pages.add(new ArrayList<ClickableWidget>());
+		}
 	}
 	
 	

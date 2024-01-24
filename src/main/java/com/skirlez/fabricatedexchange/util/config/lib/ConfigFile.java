@@ -45,10 +45,12 @@ public abstract class ConfigFile<T> extends AbstractFile<T> {
 		return commentsMap;
 	}
 	
+	
 	@Override
+	@SuppressWarnings("unchecked")
 	protected T readValue(Reader reader) throws Exception {
-		if (type instanceof Class<?> valueClass)
-			return YAML.loadAs(reader, valueClass);
+		if (type instanceof Class<?> classType)
+			return (T)YAML.loadAs(reader, classType);
 		else
 			throw new IllegalArgumentException("Type must be a Class object");
 	}
