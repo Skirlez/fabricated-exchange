@@ -17,7 +17,7 @@ public class FloorEmcC2SPacket {
 		if (!(player.currentScreenHandler instanceof TransmutationTableScreenHandler))
 			return;
 		PlayerState state = ServerState.getPlayerState(player);
-		if (state.emc.isWhole()) 
+		if (state.emc.isRound()) 
 			return;
 			
 		state.emc.floor();

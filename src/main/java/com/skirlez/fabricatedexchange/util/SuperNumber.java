@@ -92,15 +92,13 @@ public class SuperNumber {
 	public static SuperNumber One() {
 		return new SuperNumber(BigInteger.ONE);
 	}
-
 	public boolean equalsZero() {
 		return numerator.equals(BigInteger.ZERO);
 	}
 	public boolean equalsOne() {
 		return numerator.equals(BigInteger.ONE) && denominator.equals(BigInteger.ONE);
 	}
-
-	public boolean isWhole() {
+	public boolean isRound() {
 		return denominator.equals(BigInteger.ONE);
 	}
 
@@ -323,6 +321,7 @@ public class SuperNumber {
 	}
 
 	/** @return a representation of the number as a String, formatted with commas and a point */
+	// TODO: This function is stupidily written and slow
 	public String toString() {
 		if (equalsZero())
 			return "0";
@@ -404,6 +403,8 @@ public class SuperNumber {
 		return newStr.toString();
 	}
 
+	
+	// TODO: this function isn't general enough to be justified to be here
 	/** @return a representation of the number as a String, guaranteed to be <=16 in length. either formatted with commas and a point,
 	 * with SI (metric) prefixes, or in scientific notation, depending on the size of the number.
 	 */
@@ -489,7 +490,7 @@ public class SuperNumber {
 	}
 
 
-	/** divides the fraction it's most simplified form. Example: (3/6) -> (1/2) */
+	/** Simplifies the fraction to its most simplified form. Example: (3/6) -> (1/2) */
 	private void simplify() {
 		if (denominator.signum() == -1 && numerator.signum() == -1) {
 			denominator = denominator.negate();

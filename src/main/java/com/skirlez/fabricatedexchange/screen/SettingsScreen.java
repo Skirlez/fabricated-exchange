@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.Random;
 
 import org.joml.Math;
-import org.joml.Quaternionf;
 import org.joml.Vector2d;
+import org.lwjgl.glfw.GLFW;
 
 import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
@@ -25,12 +25,14 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.MathHelper;
 
 public class SettingsScreen extends GameOptionsScreen {
 	private Map<String, Object> CONFIG;
 	private final Map<String, String[]> COMMENTS;
 	
 	private final List<List<ClickableWidget>> pages;
+	private int startY;
 	private int lastY;
 	private int distFromLeft;
 	private int distFromRight;
@@ -53,51 +55,60 @@ public class SettingsScreen extends GameOptionsScreen {
 		balls = new ArrayList<Ball>();
 		
 	}
+	
+
 
 	@Override
 	protected void init() {
+		
+		
 		super.init();
-		this.lastY = 35;
+		if (this.client.world == null || MinecraftClient.getInstance().isIntegratedServerRunning())
+			this.startY = 35;
+		else {
+			// multiplayer
+			Text serverWarning = Text.of("Warning! You are adjusting your client's own config, not the current server's!");
+			TextWidget serverWarningWidget = new TextWidget(this.width / 2, 36, 0, 0, serverWarning, textRenderer);
+			serverWarningWidget.setTextColor(MathHelper.packRgb(1, 0, 0));
+			addDrawable(serverWarningWidget);
+			this.startY = 45;
+		}
+		
+		this.lastY = this.startY;
 		this.distFromLeft = 30;
 		this.distFromRight = width - 30;
 		this.distFromBottom = 30;
 		this.balls.clear();
 		
-		for (int i = 0; i < 8; i++) { 
-			balls.add(new Ball(
-					new Vector2d(this.width / 2 + 50 + Math.random() * 50d - 25d, this.height / 2 + Math.random() * 50d - 25d), 
-					new Vector2d(Math.random() * 2d - 1d, Math.random() * 2d - 1d)));
+		for (int i = 0; i < 9; i++) { 
+			balls.add(Ball.randomBall(this.width / 2 + 50 + Math.random() * 50d - 25d, this.height / 2 + Math.random() * 50d - 25d));
 		}
 		this.pages.clear();
 		pages.add(new ArrayList<ClickableWidget>());
-		if (this.client.world == null || MinecraftClient.getInstance().isIntegratedServerRunning()) {
-			Text resetToDefaultText = Text.of("Reset To Default");
-			ButtonWidget resetToDefault = new ButtonWidget.Builder(resetToDefaultText, (widget) -> {
-				CONFIG = ModDataFiles.MAIN_CONFIG_FILE.copyDefaultValue();
-				clearAndInit();
-			}).dimensions(distFromLeft, height - distFromBottom, textRenderer.getWidth(resetToDefaultText) + 20, 20).build();
-			
-			addDrawableChild(resetToDefault);
-			
-			Text closeWithoutSavingText = Text.of("Close Without Saving");
-			ButtonWidget closeWithoutSaving = new ButtonWidget.Builder(closeWithoutSavingText, (widget) -> {
-				close();
-			}).dimensions(distFromLeft + resetToDefault.getWidth() + 11, height - distFromBottom, textRenderer.getWidth(closeWithoutSavingText) + 20, 20).build();
-			
-			addDrawableChild(closeWithoutSaving);
-			
-			Text doneText = Text.of("Done");
-			ButtonWidget done = new ButtonWidget.Builder(doneText, (widget) -> {
-				ModDataFiles.MAIN_CONFIG_FILE.setValueAndSave(CONFIG);
-				close();
-			}).dimensions(distFromLeft + resetToDefault.getWidth() + closeWithoutSaving.getWidth() + 22, height - distFromBottom, closeWithoutSaving.getWidth(), 20).build();
-			
-			addDrawableChild(done);
-			
-			
-
-		}
+		Text resetToDefaultText = Text.of("Reset To Default");
+		ButtonWidget resetToDefault = new ButtonWidget.Builder(resetToDefaultText, (widget) -> {
+			CONFIG = ModDataFiles.MAIN_CONFIG_FILE.copyDefaultValue();
+			clearAndInit();
+		}).dimensions(distFromLeft, height - distFromBottom, textRenderer.getWidth(resetToDefaultText) + 20, 20).build();
 		
+		addDrawableChild(resetToDefault);
+		
+		Text closeWithoutSavingText = Text.of("Close Without Saving");
+		ButtonWidget closeWithoutSaving = new ButtonWidget.Builder(closeWithoutSavingText, (widget) -> {
+			super.close();
+		}).dimensions(distFromLeft + resetToDefault.getWidth() + 11, height - distFromBottom, textRenderer.getWidth(closeWithoutSavingText) + 20, 20).build();
+		
+		addDrawableChild(closeWithoutSaving);
+		
+		Text doneText = Text.of("Done");
+		ButtonWidget done = new ButtonWidget.Builder(doneText, (widget) -> {
+			ModDataFiles.MAIN_CONFIG_FILE.setValueAndSave(CONFIG);
+			super.close();
+		}).dimensions(distFromLeft + resetToDefault.getWidth() + closeWithoutSaving.getWidth() + 22, height - distFromBottom, closeWithoutSaving.getWidth(), 20).build();
+		
+		addDrawableChild(done);
+		
+
 		addBooleanValue("showItemEmcOrigin");
 		addBooleanValue("showEnchantedBookRepairCost");
 		addSuperNumberValue("enchantmentEmcConstant");
@@ -109,10 +120,13 @@ public class SettingsScreen extends GameOptionsScreen {
 		
 		if (pages.get(pages.size() - 1).isEmpty())
 			pages.remove(pages.size() - 1);
+		
+		final TextWidget pageTextWidget = new TextWidget(
+				distFromRight - 40, this.height / 2 - distFromBottom + 1, 
+				13, 13, Text.of(Integer.toString(currentPage)), textRenderer);
+		
 		if (pages.size() > 1) {
-			final TextWidget pageTextWidget = new TextWidget(
-					distFromRight - 40, this.height / 2 - distFromBottom, 
-					13, 13, Text.of(Integer.toString(currentPage)), textRenderer);
+
 			addDrawable(pageTextWidget);
 			
 			addDrawableChild(ButtonWidget.builder(
@@ -125,13 +139,10 @@ public class SettingsScreen extends GameOptionsScreen {
 				.dimensions(distFromRight - 20, this.height / 2 - distFromBottom, 13, 13)
 				.build());
 			
-			if (currentPage != 0) {
-				int remember = currentPage;
-				currentPage = 0;
-				switchPage(remember, pageTextWidget);
-			}
+				
 		}
-
+		// No widgets are active yet, open currentPage which is 0 or whatever it was before pressing reset to default
+		switchPage(currentPage, pageTextWidget);
 	}
 
 	private void switchPage(int page, TextWidget pageTextWidget) {
@@ -171,8 +182,8 @@ public class SettingsScreen extends GameOptionsScreen {
 		int height = 12;
 		TextWidget nameWidget = new TextWidget(distFromLeft, lastY + height / 2, width, height, nameText, textRenderer);
 		nameWidget.setTooltip(Tooltip.of(commentsText));
-		nameWidget.active = (pages.size() == 1);
-		nameWidget.visible = (pages.size() == 1);
+		nameWidget.active = false;
+		nameWidget.visible = false;
 		addDrawableChild(nameWidget);
 		pages.get(pages.size() - 1).add(nameWidget);
 	
@@ -198,14 +209,20 @@ public class SettingsScreen extends GameOptionsScreen {
 				CONFIG.put(key, str);
 		});
 		field.setText((String)CONFIG.get(key));
-		field.active = (pages.size() == 1);
-		field.visible = (pages.size() == 1);
+		field.active = false;
+		field.visible = false;
 		addDrawableChild(field);
 		pages.get(pages.size() - 1).add(field);
 		
 		increaseY();
 	}
 	
+	// this is set up to only be called when closing with esc, so we should save here
+	@Override
+	public void close() {
+		ModDataFiles.MAIN_CONFIG_FILE.setValueAndSave(CONFIG);
+		super.close();
+	}
 	
 	private void addBooleanValue(String key) {
 		String[] comments = COMMENTS.get(key);
@@ -226,8 +243,8 @@ public class SettingsScreen extends GameOptionsScreen {
 			CONFIG.put(key, newValue);
 			widget.setMessage(newValue ? t : f);
 		}).dimensions(distFromLeft, lastY, width, 20).tooltip(Tooltip.of(commentsText)).build();
-		button.active = (pages.size() == 1);
-		button.visible = (pages.size() == 1);
+		button.active = false;
+		button.visible = false;
 		
 		addDrawableChild(button);
 		pages.get(pages.size() - 1).add(button);
@@ -238,7 +255,7 @@ public class SettingsScreen extends GameOptionsScreen {
 	private void increaseY() {
 		lastY += 25;
 		if (height - 60 < lastY) {
-			lastY = 35;
+			lastY = startY;
 			pages.add(new ArrayList<ClickableWidget>());
 		}
 	}
@@ -263,16 +280,35 @@ public class SettingsScreen extends GameOptionsScreen {
 		
 		double dt = (currentTime - prevRenderTime) / 10000000.0;
 		for (Ball ball : balls) {
-			itemRenderer.renderGuiItemIcon(matrices, new ItemStack(ball.item), (int)ball.pos.x - 8, (int)ball.pos.y - 8);
-
 			
 			
+			// accelerate towards point
 			ball.addVelocity(new Vector2d(
 					dotX - ball.pos.x, 
 					dotY - ball.pos.y)
 					.div(2000d)
 					.mul(Math.random() / 2 + 1).mul(dt));
 			
+			// bounce
+			if (ball.pos.x < 8) {
+				ball.pos.x = 8;
+				ball.vel.x *= -1;
+			}
+			else if (ball.pos.x > width - 8) {
+				ball.pos.x = width - 8;
+				ball.vel.x *= -1;
+			}
+			if (ball.pos.y < 8) {
+				ball.pos.y = 8;
+				ball.vel.y *= -1;
+			}
+			else if (ball.pos.y > height - 8) {
+				ball.pos.y = height - 8;
+				ball.vel.y *= -1;
+			}
+			
+			
+			// move away from mouse
 			double dx = (ball.pos.x - mouseX);
 			double dy = (ball.pos.y - mouseY);
 			double distToMouse = Math.sqrt(dx * dx + dy * dy);
@@ -282,26 +318,47 @@ public class SettingsScreen extends GameOptionsScreen {
 						mouseX - ball.pos.x, 
 						mouseY - ball.pos.y)
 						.div(1000d)
-						.mul((maxDist - distToMouse) / maxDist * 30d)
+						.mul((maxDist - distToMouse) / maxDist * 40d)
 						.mul(dt)
 						.negate());
 			}
+			
+			
 			ball.tick(dt);
+			itemRenderer.renderGuiItemIcon(matrices, new ItemStack(ball.item), (int)ball.pos.x - 8, (int)ball.pos.y - 8);
 		}
 		prevRenderTime = currentTime;
+	}
+	
+	@Override
+	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+		// Too many
+		
+		//if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT)
+		//	balls.add(Ball.randomBall(mouseX, mouseY));
+		return super.mouseClicked(mouseX, mouseY, button);
 	}
 	
 	private static class Ball {
 		private Vector2d pos;
 		private Vector2d vel;
 		private Item item;
-		public Ball(Vector2d pos, Vector2d vel) {
+		
+		
+		public Ball(Item item, Vector2d pos, Vector2d vel) {
+			this.item = item;
 			this.pos = pos;
-			this.vel = vel;
-			this.item = choose(ModItems.PHILOSOPHERS_STONE, ModItems.DARK_MATTER, ModItems.RED_MATTER);
+			this.vel = vel;	
 		}
 		
-		private Item choose(Item... items) {
+		public static Ball randomBall(double x, double y) {
+			return new Ball(choose(ModItems.PHILOSOPHERS_STONE, ModItems.DARK_MATTER, ModItems.RED_MATTER),
+					new Vector2d(x, y), 
+					new Vector2d(Math.random() * 2d - 1d, Math.random() * 2d - 1d));
+		}
+
+
+		private static Item choose(Item... items) {
 			return items[new Random().nextInt(items.length)];
 		}
 		
@@ -310,9 +367,8 @@ public class SettingsScreen extends GameOptionsScreen {
 		}
 		
 		public void tick(double dt) {
-			System.out.println(dt);
 			if (vel.length() > 2)
-				vel.fma(-0.1 * dt, vel.normalize(new Vector2d()));
+				vel.fma(-0.03 * dt, vel.normalize(new Vector2d()));
 			pos.add(new Vector2d(vel).mul(dt));
 			
 		}

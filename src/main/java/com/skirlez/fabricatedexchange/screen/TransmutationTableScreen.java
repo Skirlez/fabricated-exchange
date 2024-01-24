@@ -168,7 +168,7 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 		textRenderer.draw(matrices, Text.literal(emc), 5, 106, 0x404040);
 
 		if (floorButtonEnabled) {
-			if (FabricatedExchangeClient.clientEmc.isWhole()) {
+			if (FabricatedExchangeClient.clientEmc.isRound()) {
 				if (floorButton.active) {
 					floorButton.active = false;
 				}
