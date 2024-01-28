@@ -7,7 +7,6 @@ import java.util.Random;
 
 import org.joml.Math;
 import org.joml.Vector2d;
-import org.lwjgl.glfw.GLFW;
 
 import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
@@ -57,6 +56,10 @@ public class SettingsScreen extends GameOptionsScreen {
 	}
 	
 
+	private static Item choose(Item... items) {
+		return items[new Random().nextInt(items.length)];
+	}
+	
 
 	@Override
 	protected void init() {
@@ -80,9 +83,9 @@ public class SettingsScreen extends GameOptionsScreen {
 		this.distFromBottom = 30;
 		this.balls.clear();
 		
-		for (int i = 0; i < 9; i++) { 
-			balls.add(Ball.randomBall(this.width / 2 + 50 + Math.random() * 50d - 25d, this.height / 2 + Math.random() * 50d - 25d));
-		}
+		balls.add(Ball.randomVelocityBall(ModItems.PHILOSOPHERS_STONE, this.width / 2 + 50 + Math.random() * 50d - 25d, this.height / 2 + Math.random() * 50d - 25d));
+		for (int i = 0; i < 7; i++) 
+			balls.add(Ball.randomVelocityBall(choose(ModItems.DARK_MATTER, ModItems.RED_MATTER), this.width / 2 + 50 + Math.random() * 50d - 25d, this.height / 2 + Math.random() * 50d - 25d));
 		this.pages.clear();
 		pages.add(new ArrayList<ClickableWidget>());
 		Text resetToDefaultText = Text.of("Reset To Default");
@@ -287,25 +290,10 @@ public class SettingsScreen extends GameOptionsScreen {
 					dotX - ball.pos.x, 
 					dotY - ball.pos.y)
 					.div(2000d)
-					.mul(Math.random() / 2 + 1).mul(dt));
+					.mul(Math.random() / 2 + 1)
+					.mul(dt));
 			
-			// bounce
-			if (ball.pos.x < 8) {
-				ball.pos.x = 8;
-				ball.vel.x *= -1;
-			}
-			else if (ball.pos.x > width - 8) {
-				ball.pos.x = width - 8;
-				ball.vel.x *= -1;
-			}
-			if (ball.pos.y < 8) {
-				ball.pos.y = 8;
-				ball.vel.y *= -1;
-			}
-			else if (ball.pos.y > height - 8) {
-				ball.pos.y = height - 8;
-				ball.vel.y *= -1;
-			}
+	
 			
 			
 			// move away from mouse
@@ -325,6 +313,29 @@ public class SettingsScreen extends GameOptionsScreen {
 			
 			
 			ball.tick(dt);
+			// bounce
+			if (ball.pos.x < 8) {
+				ball.pos.x = 8;
+				if (ball.vel.x < 0)
+					ball.vel.x *= -1;
+			}
+			else if (ball.pos.x > width - 8) {
+				ball.pos.x = width - 8;
+				if (ball.vel.x > 0)
+					ball.vel.x *= -1;
+			}
+			if (ball.pos.y < 8) {
+				ball.pos.y = 8;
+				if (ball.vel.y < 0)
+					ball.vel.y *= -1;
+			}
+			else if (ball.pos.y > height - 8) {
+				ball.pos.y = height - 8;
+				if (ball.vel.y > 0)
+					ball.vel.y *= -1;
+			}
+			
+			
 			itemRenderer.renderGuiItemIcon(matrices, new ItemStack(ball.item), (int)ball.pos.x - 8, (int)ball.pos.y - 8);
 		}
 		prevRenderTime = currentTime;
@@ -335,7 +346,7 @@ public class SettingsScreen extends GameOptionsScreen {
 		// Too many
 		
 		//if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT)
-		//	balls.add(Ball.randomBall(mouseX, mouseY));
+		//	balls.add(Ball.randomVelocityBall(choose(ModItems.PHILOSOPHERS_STONE, ModItems.DARK_MATTER, ModItems.RED_MATTER), mouseX, mouseY));
 		return super.mouseClicked(mouseX, mouseY, button);
 	}
 	
@@ -351,24 +362,20 @@ public class SettingsScreen extends GameOptionsScreen {
 			this.vel = vel;	
 		}
 		
-		public static Ball randomBall(double x, double y) {
-			return new Ball(choose(ModItems.PHILOSOPHERS_STONE, ModItems.DARK_MATTER, ModItems.RED_MATTER),
+		public static Ball randomVelocityBall(Item item, double x, double y) {
+			return new Ball(item,
 					new Vector2d(x, y), 
 					new Vector2d(Math.random() * 2d - 1d, Math.random() * 2d - 1d));
 		}
 
 
-		private static Item choose(Item... items) {
-			return items[new Random().nextInt(items.length)];
-		}
-		
 		public void addVelocity(Vector2d vel) {
 			this.vel.add(vel);
 		}
 		
 		public void tick(double dt) {
-			if (vel.length() > 2)
-				vel.fma(-0.03 * dt, vel.normalize(new Vector2d()));
+			if (vel.length() > 1d)
+				vel.fma(-0.025 * dt, vel.normalize(new Vector2d()));
 			pos.add(new Vector2d(vel).mul(dt));
 			
 		}

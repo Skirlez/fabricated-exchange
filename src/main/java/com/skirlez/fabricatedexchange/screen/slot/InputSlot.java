@@ -6,8 +6,7 @@ import net.minecraft.screen.slot.Slot;
 
 
 // Input slots should attempt to move their contents to the fuel slot when they can.
-// This class differs from InputSlot, because fuelSlot also tries to move it's contents to the input slots,
-// and that requires special consideration.
+
 public class InputSlot extends Slot {
 	private final FuelSlot fuelSlot;
 	private final SlotCondition slotCondition;

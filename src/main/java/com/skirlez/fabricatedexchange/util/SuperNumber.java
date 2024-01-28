@@ -492,7 +492,7 @@ public class SuperNumber {
 
 	/** Simplifies the fraction to its most simplified form. Example: (3/6) -> (1/2) */
 	private void simplify() {
-		if (denominator.signum() == -1 && numerator.signum() == -1) {
+		if (denominator.signum() == -1) {
 			denominator = denominator.negate();
 			numerator = numerator.negate();
 		}

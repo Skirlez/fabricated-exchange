@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -21,11 +22,13 @@ import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import com.skirlez.fabricatedexchange.util.config.EqualTagsFile;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
-import com.skirlez.fabricatedexchange.util.config.ModifiersList;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
 import net.minecraft.recipe.BrewingRecipeRegistry;
@@ -64,7 +67,6 @@ public class EmcMapper {
 
     private Set<MapperAction> queuedActionsSet = new HashSet<MapperAction>();
 
-    private final ModifiersList modifiers;
     private final EqualTagsFile equalTags;
     
     public EmcMapper(RecipeManager recipeManager, DynamicRegistryManager dynamicRegistryManager) {
@@ -75,7 +77,6 @@ public class EmcMapper {
         potionEmcMap = new HashMap<Potion, SuperNumber>();
         enchantmentEmcMap = new HashMap<Enchantment, SuperNumber>();
         		
-        modifiers = ModDataFiles.MODIFIERS;
         equalTags = ModDataFiles.EQUAL_TAGS;
     }
 
@@ -95,81 +96,83 @@ public class EmcMapper {
         if (seedEmcMap != null)
             GeneralUtil.mergeMap(emcMap, seedEmcMap);
 
-        List<SmithingRecipe> allSmithingRecipes = recipeManager.listAllOfType(RecipeType.SMITHING);
-        List<SmeltingRecipe> allSmeltingRecipes = recipeManager.listAllOfType(RecipeType.SMELTING);
-        List<CraftingRecipe> allCraftingRecipes = recipeManager.listAllOfType(RecipeType.CRAFTING);
-        List<StonecuttingRecipe> allStonecuttingRecipes = recipeManager.listAllOfType(RecipeType.STONECUTTING);
-        List<BrewingRecipeRegistry.Recipe<Item>> allBrewingRecipes = BrewingRecipeRegistryAccessor.getItemRecipes();
-        // blacklisted recipes and items
-        Map<String, HashSet<String>> blacklistedRecipes = ModDataFiles.BLACKLISTED_MAPPER_RECIPES.getValue();
-        if (blacklistedRecipes == null)
-            blacklistedRecipes = new HashMap<>();
-        HashSet<String> smithingRecipesBlacklist = blacklistedRecipes.getOrDefault("smithing", new HashSet<String>());
-        HashSet<String> smeltingRecipesBlacklist = blacklistedRecipes.getOrDefault("smelting", new HashSet<String>());
-        HashSet<String> craftingRecipesBlacklist = blacklistedRecipes.getOrDefault("crafting", new HashSet<String>());
-        HashSet<String> stonecuttingRecipesBlacklist = blacklistedRecipes.getOrDefault("stonecutting", new HashSet<String>());
-        HashSet<String> brewingRecipesBlacklist = blacklistedRecipes.getOrDefault("brewing", new HashSet<String>());
-        // we must split the item equations between their origin mod. 
-        // minecraft item equations should evaluate first, and then we don't actually care about the order.
+        
+        if (ModDataFiles.MAIN_CONFIG_FILE.mapper_enabled) {
+	        List<SmithingRecipe> allSmithingRecipes = recipeManager.listAllOfType(RecipeType.SMITHING);
+	        List<SmeltingRecipe> allSmeltingRecipes = recipeManager.listAllOfType(RecipeType.SMELTING);
+	        List<CraftingRecipe> allCraftingRecipes = recipeManager.listAllOfType(RecipeType.CRAFTING);
+	        List<StonecuttingRecipe> allStonecuttingRecipes = recipeManager.listAllOfType(RecipeType.STONECUTTING);
+	        List<BrewingRecipeRegistry.Recipe<Item>> allBrewingRecipes = BrewingRecipeRegistryAccessor.getItemRecipes();
+	        // blacklisted recipes and items
+	        Map<String, HashSet<String>> blacklistedRecipes = ModDataFiles.BLACKLISTED_MAPPER_RECIPES.getValue();
+	        if (blacklistedRecipes == null)
+	            blacklistedRecipes = new HashMap<>();
+	        Set<String> smithingRecipesBlacklist = blacklistedRecipes.getOrDefault("smithing", new HashSet<String>());
+	        Set<String> smeltingRecipesBlacklist = blacklistedRecipes.getOrDefault("smelting", new HashSet<String>());
+	        Set<String> craftingRecipesBlacklist = blacklistedRecipes.getOrDefault("crafting", new HashSet<String>());
+	        Set<String> stonecuttingRecipesBlacklist = blacklistedRecipes.getOrDefault("stonecutting", new HashSet<String>());
+	        Set<String> brewingRecipesBlacklist = blacklistedRecipes.getOrDefault("brewing", new HashSet<String>());
 
-        convertRecipesToEquations(allSmithingRecipes, smithingRecipesBlacklist, this::createSmithingEquation, this::getRecipeName);
-        convertRecipesToEquations(allSmeltingRecipes, smeltingRecipesBlacklist, this::createSmeltingEquation, this::getRecipeName);
-        convertRecipesToEquations(allCraftingRecipes, craftingRecipesBlacklist, this::createCraftingEquation, this::getRecipeName);
-        convertRecipesToEquations(allStonecuttingRecipes, stonecuttingRecipesBlacklist, this::createStonecuttingEquation, this::getRecipeName);
-        convertRecipesToEquations(allBrewingRecipes, brewingRecipesBlacklist, this::createBrewingEquation, this::getBrewingRecipeName);
-
-        // TODO: inject recipes provided by mods here
-        List<List<Item>> itemGroups = equalTags.getItemGroups(); 
-        for (List<Item> list : itemGroups) {
-            MapperAction action = new EqualizeTagAction(list);
-            for (Item item : list) {
-                registerAction(item, action);
-                if (emcMapHasEntry(item))
-                    action.feed(item);
-            }
-            if (action.shouldAdd())
-                addActionToQueue(action);
-        }
-
-
-        while (!queue.isEmpty()) {
-            MapperAction action = queue.poll();
-            action.perform();
+	        convertRecipesToEquations(allSmithingRecipes, smithingRecipesBlacklist, this::createSmithingEquation, this::getRecipeName);
+	        convertRecipesToEquations(allSmeltingRecipes, smeltingRecipesBlacklist, this::createSmeltingEquation, this::getRecipeName);
+	        convertRecipesToEquations(allCraftingRecipes, craftingRecipesBlacklist, this::createCraftingEquation, this::getRecipeName);
+	        convertRecipesToEquations(allStonecuttingRecipes, stonecuttingRecipesBlacklist, this::createStonecuttingEquation, this::getRecipeName);
+	        convertRecipesToEquations(allBrewingRecipes, brewingRecipesBlacklist, this::createBrewingEquation, this::getBrewingRecipeName);
+	
+	        createAllWorldInteractionEquations();
+	        
+	        // TODO: inject recipes provided by mods here
+	        List<List<Item>> itemGroups = equalTags.getItemGroups(); 
+	        for (List<Item> list : itemGroups) {
+	            MapperAction action = new EqualizeTagAction(list);
+	            for (Item item : list) {
+	                registerAction(item, action);
+	                if (emcMapHasEntry(item))
+	                    action.feed(item);
+	            }
+	            if (action.shouldAdd())
+	                addActionToQueue(action);
+	        }
+	
+	
+	        while (!queue.isEmpty()) {
+	            MapperAction action = queue.poll();
+	            action.perform();
+	        }
+	        
+	
+	        // most potion recipes are very very special, so we need to take care of them separately.
+	        // i've decided to just copy this section from the old emc mapper, using the dumber method, 
+	        // because there are not that many potion recipes.
+	        potionEmcMap.put(Potions.WATER, new SuperNumber(0));
+	        List<BrewingRecipeRegistry.Recipe<Potion>> potionRecipes = BrewingRecipeRegistryAccessor.getPotionRecipes();
+	        for (int i = 0; i < 100; i++) {
+	            boolean newInfo = false;
+	            for (BrewingRecipeRegistry.Recipe<Potion> recipe : potionRecipes)
+	                newInfo = iteratePotionRecipe((BrewingRecipeAccessor<Potion>)recipe) || newInfo;
+	            if (!newInfo)
+	                break;
+	        }
+	
+			SuperNumber constant = ModDataFiles.MAIN_CONFIG_FILE.enchantmentEmcConstant; 
+			for (Identifier id : Registries.ENCHANTMENT.getIds()) {
+				Enchantment enchantment = Registries.ENCHANTMENT.get(id);
+				int max = enchantment.getMaxLevel();
+				int weight = enchantment.getRarity().getWeight();
+				SuperNumber emc = new SuperNumber(constant);
+				emc.divide(weight);
+	
+				if (enchantment.isTreasure())
+					emc.multiply(10);
+	
+				emc.divide(1 << (max - 1));
+				enchantmentEmcMap.put(enchantment, emc);
+			}
         }
         
-
-        // most potion recipes are very very special, so we need to take care of them separately.
-        // i've decided to just copy this section from the old emc mapper, using the dumber method, 
-        // because there are not that many potion recipes.
-        potionEmcMap.put(Potions.WATER, new SuperNumber(0));
-        List<BrewingRecipeRegistry.Recipe<Potion>> potionRecipes = BrewingRecipeRegistryAccessor.getPotionRecipes();
-        for (int i = 0; i < 100; i++) {
-            boolean newInfo = false;
-            for (BrewingRecipeRegistry.Recipe<Potion> recipe : potionRecipes)
-                newInfo = iteratePotionRecipe((BrewingRecipeAccessor<Potion>)recipe) || newInfo;
-            if (!newInfo)
-                break;
-        }
-
         Map<Item, SuperNumber> customEmcMap = ModDataFiles.CUSTOM_EMC_MAP.getValue();
         if (customEmcMap != null)
             GeneralUtil.mergeMap(emcMap, customEmcMap);
-
-		SuperNumber constant = ModDataFiles.MAIN_CONFIG_FILE.enchantmentEmcConstant; 
-		for (Identifier id : Registries.ENCHANTMENT.getIds()) {
-			Enchantment enchantment = Registries.ENCHANTMENT.get(id);
-			int max = enchantment.getMaxLevel();
-			int weight = enchantment.getRarity().getWeight();
-			SuperNumber emc = new SuperNumber(constant);
-			emc.divide(weight);
-
-			if (enchantment.isTreasure())
-				emc.multiply(10);
-
-			emc.divide(1 << (max - 1));
-			enchantmentEmcMap.put(enchantment, emc);
-		}
-        
         
         FabricatedExchange.LOGGER.warn(warning.toString());
         return (!warning.isEmpty());
@@ -190,42 +193,44 @@ public class EmcMapper {
     }
 
     private ItemEquation createCraftingEquation(CraftingRecipe recipe) {
+   
+    	
         List<Ingredient> ingredients = recipe.getIngredients();
         List<ItemStack> output = new ArrayList<ItemStack>(1);
         output.add(recipe.getOutput(this.dynamicRegistryManager));
         List<Ingredient> filteredIngredients = new ArrayList<Ingredient>(ingredients.size());
-
-        for (int i = 0; i < ingredients.size(); i++) {
-            Ingredient ingredient = ingredients.get(i);
-            // UNCONSIDERED: ingredients with itemstacks that have different recipe remainders
-            // UNCONSIDERED: ingredients with some itemstacks being modifiers and some not
-            // UNCONSIDERED: ingredients with multiple itemstacks having different recipe remainders
-            ItemStack addRemainder = null;
-            boolean add = false;
-            for (ItemStack stack : ingredient.getMatchingStacks()) {
-                if (stack.isEmpty())
-                    break;
-                if (modifiers.hasItem(Registries.ITEM.getId(stack.getItem()).toString()) && ingredients.size() != 1)
-                    break;
-
-                ItemStack remainder = stack.getRecipeRemainder();
-                if (!remainder.isEmpty()) {
-                    if (!ItemStack.areEqual(stack, remainder)) {
-                        addRemainder = remainder;
-                        add = true;
-                    }
-                }
-                else
-                    add = true;
-            }
-            if (addRemainder != null)
-                output.add(addRemainder);
-            if (add)
-                filteredIngredients.add(ingredient);
+        for (Ingredient ingredient : ingredients) {
+            if (ingredient.getMatchingStacks().length == 0)
+            	continue;
+            ItemStack firstStack = ingredient.getMatchingStacks()[0];
+            if (isIngredientRemainderItself(ingredient))
+            	continue;
+            
+            ItemStack remainder = firstStack.getRecipeRemainder();
+            if (!remainder.isEmpty())
+            	output.add(remainder);
+            filteredIngredients.add(ingredient);
         }
         return new ItemEquation(filteredIngredients, output, recipe.getId());
     }
 
+    private boolean isIngredientRemainderItself(Ingredient ingredient) {
+    
+    	// UNCONSIDERED: ingredients with multiple itemstacks having different recipe remainders
+    	// (we are only analyzing the first itemstack)
+    	
+    	ItemStack[] stacks = ingredient.getMatchingStacks();
+    	ItemStack remainder = stacks[0].getRecipeRemainder();
+        if (remainder.isEmpty())
+        	return false;
+        
+    	for (ItemStack other : stacks) {
+    		if (ItemStack.areEqual(remainder, other))
+    			return true;
+    	}
+    	return false;
+    }
+    
     private ItemEquation createSmeltingEquation(SmeltingRecipe recipe) {
         return new ItemEquation(
             Arrays.asList(recipe.getIngredients().get(0)),
@@ -271,7 +276,7 @@ public class EmcMapper {
         return equation;
     }
 
-    private <T> void convertRecipesToEquations(List<T> allRecipes, HashSet<String> blacklist, 
+    private <T> void convertRecipesToEquations(List<T> allRecipes, Set<String> blacklist, 
             Function<T, ItemEquation> equationConverter, Function<T, String> stringConverter) {
 
         for (int i = 0; i < allRecipes.size(); i++) {
@@ -283,6 +288,30 @@ public class EmcMapper {
                 continue;
             processEquation(equation);
         }
+    }
+    
+    private void createAllWorldInteractionEquations() {
+    	createWorldInteractionEquation(Blocks.WHITE_CONCRETE_POWDER, Blocks.WHITE_CONCRETE);
+    	createWorldInteractionEquation(Blocks.LIGHT_GRAY_CONCRETE_POWDER, Blocks.LIGHT_GRAY_CONCRETE);
+    	createWorldInteractionEquation(Blocks.GRAY_CONCRETE_POWDER, Blocks.GRAY_CONCRETE);
+    	// you are crazy if you think i'm typing all of that up
+    }
+    
+    private void createWorldInteractionEquation(Block input, Block output) {
+    	createWorldInteractionEquation(input, output, Optional.empty());
+    }
+    private void createWorldInteractionEquation(Block input, Block output, Optional<Item> using) {
+		String inputName = Registries.BLOCK.getId(input).getPath();
+		String outputName = Registries.BLOCK.getId(output).getPath();
+		
+		List<Ingredient> inputList = new ArrayList<Ingredient>();
+		inputList.add(Ingredient.ofItems(input));
+		if (using.isPresent())
+			inputList.add(Ingredient.ofItems(using.get()));
+		ItemEquation equation = new ItemEquation(inputList, Arrays.asList(new ItemStack(output)), 
+			new Identifier("world-interaction", inputName + "_to_" + outputName));
+		
+		processEquation(equation);
     }
 
 
@@ -296,6 +325,7 @@ public class EmcMapper {
 
     // Counts the unknowns of the equation and also simplifies it down if it has ingredients with a tag marked as an equal tag.
     public void processEquation(ItemEquation equation) {
+
         Set<Item> knownItems = new HashSet<Item>();
         Set<Item> unknownItems = new HashSet<Item>();
         for (int i = 0; i < equation.input.size(); i++) {
@@ -328,10 +358,10 @@ public class EmcMapper {
                 knownItems.add(stack.getItem());
         }   
         int amount = unknownItems.size() + knownItems.size();
+        
         MapperAction action = new SolveEquationAction(equation, amount);
-        for (Item item : unknownItems) {
+        for (Item item : unknownItems)
             registerAction(item, action);
-        }
         for (Item item : knownItems)
             action.feed(item);
 
@@ -372,9 +402,8 @@ public class EmcMapper {
 
 
     private void solve(ItemEquation equation) {
-
         SuperNumber sum = SuperNumber.Zero();
-        HashSet<Item> unknownItems = new HashSet<Item>();
+        Set<Item> unknownItems = new HashSet<Item>();
         int unknownMult = 0;
 
   
@@ -399,6 +428,7 @@ public class EmcMapper {
         }
 
         if (unknownMult == 0) {
+        	
             warn("Could not solve weird recipe: " + getEquationName(equation));
             return;
         }
@@ -448,6 +478,8 @@ public class EmcMapper {
         }
         if (!emcMapHasEntry(item)) {
             unlock(item);
+            if (item == Items.HONEYCOMB)
+            	FabricatedExchange.LOGGER.info(value.divisionString());
             emcMap.put(item, value);
             return true;
         }
@@ -580,7 +612,6 @@ public class EmcMapper {
 
     /** This class represents an action the mapper is queued to do. */
     private interface MapperAction {
-
         /** When an item relevant to this action is given EMC, this action will be notified. */
         void feed(Item item);
         // Returns true if the action should be added to the queue
@@ -658,8 +689,10 @@ public class EmcMapper {
         public int getLayer() {
             return 4;
         }
-
     }
+    
+    
+
 
 }
 

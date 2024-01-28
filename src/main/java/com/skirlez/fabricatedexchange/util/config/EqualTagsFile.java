@@ -12,6 +12,7 @@ import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.config.lib.DataFile;
 
 import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.TagKey;
 
@@ -30,9 +31,10 @@ public class EqualTagsFile extends DataFile<HashSet<String>> {
     protected void constProcess() {
     	super.constProcess();
         tagGroups.clear();
-        Iterator<String> iterator = value.iterator();
-        while (iterator.hasNext()) {
-            String entry = iterator.next();
+        for (String entry : value) {
+
+            if (entry == null)
+            	continue;
             if (!entry.contains(":"))
                 continue;
             Item[] items = GeneralUtil.getItemsFromTagString(entry);
@@ -40,8 +42,9 @@ public class EqualTagsFile extends DataFile<HashSet<String>> {
                 FabricatedExchange.LOGGER.warn("Item-less tag provided in equal_tags.json: " + entry + ". Ignoring...");
                 continue;
             }
-            for (Item item : items)
+            for (Item item : items) {
                 tagGroups.put(item, groupAmount);
+            }
             groupAmount++;
         }
     }

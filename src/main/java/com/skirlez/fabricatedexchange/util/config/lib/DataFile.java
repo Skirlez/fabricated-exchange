@@ -35,6 +35,7 @@ public class DataFile<T> extends AbstractFile<T> {
 		.registerTypeAdapter(Enchantment.class, (JsonDeserializer<Enchantment>) (jsonElement, type, jsonDeserializationContext) 
 		-> Registries.ENCHANTMENT.get(new Identifier(jsonElement.getAsString())))
 		
+		.setLenient()
 		.setPrettyPrinting() // we do want these to be editable by users
 		.create();
 

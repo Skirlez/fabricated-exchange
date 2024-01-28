@@ -2,15 +2,18 @@ package com.skirlez.fabricatedexchange.util.config;
 
 import java.lang.reflect.Type;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.google.gson.reflect.TypeToken;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
+import com.skirlez.fabricatedexchange.util.config.lib.AbstractFile;
 import com.skirlez.fabricatedexchange.util.config.lib.DataFile;
 
 import net.fabricmc.loader.api.FabricLoader;
@@ -54,9 +57,6 @@ public class ModDataFiles {
 
     public static final EqualTagsFile EQUAL_TAGS
         = new EqualTagsFile(stringSetType, "equal_tags.json");
-		
-	public static final ModifiersList MODIFIERS
-		= new ModifiersList(stringSetType, "modifiers.json");
 
 	public static final NbtItemsList NBT_ITEMS = 
 		new NbtItemsList(nbtItemsType, "nbt_items.json");
@@ -65,16 +65,22 @@ public class ModDataFiles {
 		= new DataFile<Map<String, HashSet<String>>>(recipeBlacklistType,
 		"blacklisted_mapper_recipes.json");
 
+	public static final List<AbstractFile<?>> ALL_FILES = Arrays.asList(
+			MAIN_CONFIG_FILE, SEED_EMC_MAP, CUSTOM_EMC_MAP,
+			BLOCK_TRANSMUTATION_MAP, EQUAL_TAGS,
+			NBT_ITEMS, BLACKLISTED_MAPPER_RECIPES);
+	
 	public static void fetchAll() {
-		MAIN_CONFIG_FILE.fetch();
-		SEED_EMC_MAP.fetch();
-		CUSTOM_EMC_MAP.fetch();
-		//ENCHANTMENT_EMC_MAP.fetch();
-		BLOCK_TRANSMUTATION_MAP.fetch();
-		MODIFIERS.fetch();
-		NBT_ITEMS.fetch();
-		EQUAL_TAGS.fetch();
-		BLACKLISTED_MAPPER_RECIPES.fetch();
+		for (AbstractFile<?> file : ALL_FILES)
+			file.fetch();
+	}
+
+	public static Optional<AbstractFile<?>> getFileByName(String name) {
+		for (AbstractFile<?> file : ALL_FILES) {
+			if (file.getName().equals(name))
+				return Optional.of(file);
+		}
+		return Optional.empty();
 	}
 }
 

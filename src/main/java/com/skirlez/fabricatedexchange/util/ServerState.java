@@ -38,9 +38,7 @@ public class ServerState extends PersistentState {
 
 			NbtList specialKnowledgeItemList = new NbtList();
 			NbtList specialKnowledgeCompoundList = new NbtList();
-			Iterator<NbtItem> itemStackIterator = playerState.specialKnowledge.iterator();
-			while (itemStackIterator.hasNext()) {
-				NbtItem item = itemStackIterator.next();
+			for (NbtItem item : playerState.specialKnowledge) {
 				specialKnowledgeItemList.add(NbtString.of(Registries.ITEM.getId(item.asItem()).toString()));
 				specialKnowledgeCompoundList.add(item.getNbt());
 			}
@@ -79,6 +77,7 @@ public class ServerState extends PersistentState {
 				playersTag.getCompound(key).getList("specialKnowledgeItems", NbtElement.STRING_TYPE);
 			NbtList specialKnowledgeCompoundList = 
 				playersTag.getCompound(key).getList("specialKnowledgeCompounds", NbtElement.COMPOUND_TYPE);
+			
 			for (int i = 0; i < specialKnowledgeItemList.size(); i++) {
 				String id = specialKnowledgeItemList.getString(i);
 				Item item = Registries.ITEM.get(new Identifier(id));
@@ -91,8 +90,6 @@ public class ServerState extends PersistentState {
 				NbtItem nbtItem = new NbtItem(Registries.ITEM.get(new Identifier(id)), nbt);
 				playerState.specialKnowledge.add(nbtItem);
 			}
-
-
 
 			UUID uuid = UUID.fromString(key);
 			serverState.players.put(uuid, playerState);

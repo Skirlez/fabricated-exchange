@@ -82,15 +82,20 @@ public class FabricatedExchange implements ModInitializer {
 		});
 
 		ServerLifecycleEvents.SERVER_STARTED.register((server) -> {
-			ModDataFiles.fetchAll();
-			EmcData.seedEmcMap = ModDataFiles.SEED_EMC_MAP.getValue();
-			EmcData.customEmcMap = ModDataFiles.CUSTOM_EMC_MAP.getValue();
-			generateBlockRotationMap(ModDataFiles.BLOCK_TRANSMUTATION_MAP.getValue());
-			reloadEmcMap(server);
+			reload();
+			calculateEmcMap(server);
 		});
 	}
 
-	public static boolean reloadEmcMap(MinecraftServer server) {
+	public static void reload() {
+		ModDataFiles.fetchAll();
+		EmcData.seedEmcMap = ModDataFiles.SEED_EMC_MAP.getValue();
+		EmcData.customEmcMap = ModDataFiles.CUSTOM_EMC_MAP.getValue();
+		generateBlockRotationMap(ModDataFiles.BLOCK_TRANSMUTATION_MAP.getValue());
+		
+	}
+	
+	public static boolean calculateEmcMap(MinecraftServer server) {
 		EmcMapper mapper = new EmcMapper(server.getOverworld().getRecipeManager(), server.getRegistryManager());
 		
 		boolean hasWarned = mapper.map();
@@ -98,10 +103,8 @@ public class FabricatedExchange implements ModInitializer {
 		EmcData.potionEmcMap =  mapper.getPotionEmcMap();
 		EmcData.enchantmentEmcMap = mapper.getEnchantmentEmcMap();
 		List<Item> fuelItemList = new ArrayList<Item>();
- 
 		for (RegistryEntry<Item> entry : Registries.ITEM.getEntryList(ModTags.FUEL).get()) { 
 			Item item = entry.value();
-
 			int index = Collections.binarySearch(fuelItemList, item, 
 				(item1, item2) -> 
 					EmcData.getItemEmc(item1)
@@ -113,6 +116,7 @@ public class FabricatedExchange implements ModInitializer {
 
 			fuelItemList.add(index, item);
 		}
+		
 		Map<Item, Item> newFuelProgressionMap = new HashMap<Item, Item>();
 		for (int i = 0; i < fuelItemList.size(); i++) {
 			Item item = fuelItemList.get(i);

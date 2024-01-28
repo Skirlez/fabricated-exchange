@@ -70,7 +70,7 @@
     "commands.fabricated-exchange.recipe.pardon.unsupported_type": "Cannot pardon this recipe because its type (%s) is unsupported. You couldn't ban it if you wanted to.",
     "commands.fabricated-exchange.recipe.pardon.success": "Done! The recipe will now be evaluated by the EMC mapper!",
     "commands.fabricated-exchange.reset.success": "Done! %s has been reset to its default state.",
-    "commands.fabricated-exchange.reset.no_file": "%s is not a valid data file!",
+    "commands.fabricated-exchange.reset.no_file": "%s is not one of the mod's data files!",
     "commands.fabricated-exchange.nothing": "Nothing has changed.",
 
     "key.category.fabricated-exchange": "Fabricated Exchange",

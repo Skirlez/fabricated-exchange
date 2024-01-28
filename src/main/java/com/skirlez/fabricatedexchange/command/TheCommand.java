@@ -2,6 +2,7 @@ package com.skirlez.fabricatedexchange.command;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import com.mojang.brigadier.CommandDispatcher;
@@ -25,6 +26,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -97,6 +99,11 @@ public class TheCommand {
 		.requires(source -> source.hasPermissionLevel(2))
 		.executes(context -> reload(context))
 		.build();
+		
+        LiteralCommandNode<ServerCommandSource> printMissingNode = CommandManager
+        .literal("printmissing")
+        .executes(context -> printMissing(context))
+        .build();
 
 		LiteralCommandNode<ServerCommandSource> resetNode = CommandManager
 		.literal("reset")
@@ -105,9 +112,8 @@ public class TheCommand {
 			@Override
 			public CompletableFuture<Suggestions> getSuggestions(CommandContext<ServerCommandSource> context,
 					SuggestionsBuilder builder) throws CommandSyntaxException {
-				builder.suggest("config");
-				builder.suggest("seed_emc_map");
-				builder.suggest("custom_emc_map");
+				for (AbstractFile<?> file : ModDataFiles.ALL_FILES)
+					builder.suggest(file.getName());
 				return builder.buildFuture();
 			}
 			
@@ -132,14 +138,12 @@ public class TheCommand {
 		recipeNode.addChild(pardonRecipeNode);
 
 		mainNode.addChild(reloadNode);
+		
+		mainNode.addChild(printMissingNode);
 
 		mainNode.addChild(resetNode);
 
 	}
-
-
-
-
 
 
 	private static int help(CommandContext<ServerCommandSource> context) {
@@ -151,7 +155,7 @@ public class TheCommand {
 		PlayerEntity p = context.getSource().getPlayer();
 		String str = context.getArgument("number", String.class);
 
-		if (SuperNumber.isValidNumberString(str)) {
+		if (!SuperNumber.isValidNumberString(str)) {
 			context.getSource().sendMessage(MutableText.of(Text.of(str).getContent()).append(Text.translatable("commands.fabricated-exchange.setemc.not_valid_number")));
 			return 0;
 		}
@@ -248,42 +252,56 @@ public class TheCommand {
 
 	private static int reload(CommandContext<ServerCommandSource> context) {
 		MinecraftServer server = context.getSource().getServer();
-		ModDataFiles.fetchAll();
-		EmcData.seedEmcMap = ModDataFiles.SEED_EMC_MAP.getValue();
-		EmcData.customEmcMap = ModDataFiles.CUSTOM_EMC_MAP.getValue();
+		FabricatedExchange.reload();
+		
+		
 		context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.reloademc.data_success"));
 		long startTime = System.nanoTime();
-		FabricatedExchange.generateBlockRotationMap(ModDataFiles.BLOCK_TRANSMUTATION_MAP.getValue());
-		boolean hasWarned = FabricatedExchange.reloadEmcMap(server);
-		FabricatedExchange.syncMaps(server);
-		FabricatedExchange.syncBlockTransmutations(server);
+		boolean hasWarned = FabricatedExchange.calculateEmcMap(server);
+
 		String add = (hasWarned)
 			? Text.translatable("commands.fabricated-exchange.reloademc.bad").getString()
 			: Text.translatable("commands.fabricated-exchange.reloademc.good").getString();
-
+		
+		FabricatedExchange.syncMaps(server);
+		FabricatedExchange.syncBlockTransmutations(server);
+		
 		context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.reloademc.success",
 		String.valueOf((System.nanoTime() - startTime) / 1000000)).append("\n").append(add));
+		
 		return 1;
 	}
 	private static int reset(CommandContext<ServerCommandSource> context) {
 		String str = context.getArgument("datafile", String.class);
-		AbstractFile<?> datafile = switch (str) {
-			case "config" -> ModDataFiles.MAIN_CONFIG_FILE;
-			case "seed_emc_map" -> ModDataFiles.SEED_EMC_MAP;
-			case "custom_emc_map" -> ModDataFiles.CUSTOM_EMC_MAP;
-			default -> null;			
-		};
-		if (datafile == null) {
+		Optional<AbstractFile<?>> maybeDatafile = ModDataFiles.getFileByName(str);
+		if (maybeDatafile.isEmpty()) {
 			context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.reset.no_file", str));
 			return -1;
 		}
+		AbstractFile<?> datafile = maybeDatafile.get();
 		datafile.setValueToDefault();
 		datafile.save();
 		context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.reset.success", str));
 		return 1;
 	}
 
-
+    private static int printMissing(CommandContext<ServerCommandSource> context) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Item item : Registries.ITEM) {
+            if (EmcData.getItemEmc(item).equalsZero()) {
+                stringBuilder.append('\n');
+                stringBuilder.append(Registries.ITEM.getId(item));
+            }
+        }
+        if (stringBuilder.isEmpty()) {
+            context.getSource().sendMessage(Text.of("Every item has an EMC value!"));
+        }
+        else {
+            stringBuilder.delete(0, 1); // remove newline at the start
+            context.getSource().sendMessage(Text.of(stringBuilder.toString()));
+        }
+        return 1;    
+    }
 
 
 	private static boolean isRecipeTypeSupported(String type) {

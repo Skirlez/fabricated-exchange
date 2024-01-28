@@ -67,6 +67,10 @@ public abstract class AbstractFile<T> {
 		}
 	}
 	
+	public String getName() {
+		return name;
+	}
+	
 	/** Gets a copy of the value of the file as it was when last fetched or saved. */
 	public T getCopy() {
 		try {
