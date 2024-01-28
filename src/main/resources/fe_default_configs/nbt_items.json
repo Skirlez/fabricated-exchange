@@ -6,6 +6,18 @@
     "minecraft:potion": [
         "Potion"
     ],
+    "minecraft:tipped_arrow": [
+        "Potion"
+    ],
+	"minecraft:writable_book": [
+		"pages",
+	],
+	"minecraft:written_book": [
+		"author",
+		"filtered_title",
+		"pages",
+		"title"
+	],
     "minecraft:splash_potion": [
         "Potion"
     ],

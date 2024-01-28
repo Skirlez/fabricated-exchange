@@ -16,7 +16,6 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
@@ -111,7 +110,7 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 
 	@Override
 	public boolean isValid(int slot, ItemStack stack) {
-		return (level == 0) ? false : (slot < 43 && slot > 0 && !EmcData.getItemEmc(stack.getItem()).equalsZero());
+		return (level == 0) ? false : (slot < 43 && slot > 0 && !EmcData.getItemStackEmc(stack).equalsZero());
 	}
 	@Override
 	public boolean canTransferTo(Inventory hopperInventory, int slot, ItemStack stack) {
@@ -148,8 +147,8 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 	@Override
 	public SuperNumber getMaximumEmc() {
 		Inventory inv = (Inventory)this;
-		Item target = inv.getStack(0).getItem();
-		return EmcData.getItemEmc(target);
+		ItemStack target = inv.getStack(0);
+		return EmcData.getItemStackEmc(target);
 	}
 
 	@Override

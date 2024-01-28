@@ -20,6 +20,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.PotionItem;
+import net.minecraft.item.TippedArrowItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
@@ -82,19 +83,26 @@ public class EmcData {
 	private static void considerNbt(Item item, NbtCompound nbt, SuperNumber emc) {
 		if (nbt.contains("emc"))
 			emc.add(new SuperNumber(nbt.getString("emc")));
-
+	
 		if (!ModDataFiles.NBT_ITEMS.hasItem(Registries.ITEM.getId(item).toString()))
 			return;
-
+		
 		if (item instanceof PotionItem) {
 			String potionName = nbt.getString("Potion");
 			Potion potion = Registries.POTION.get(new Identifier(potionName));
 			if (potionEmcMap.containsKey(potion)) {
-
 				SuperNumber addition = potionEmcMap.get(potion);
-				if (!addition.equalsZero())
-					emc.add(addition);
-			}   
+				emc.add(addition);
+			}
+		}
+		else if (item instanceof TippedArrowItem) {
+			String potionName = nbt.getString("Potion");
+			Potion potion = Registries.POTION.get(new Identifier(potionName));
+			if (potionEmcMap.containsKey(potion)) {
+				SuperNumber addition = new SuperNumber(potionEmcMap.get(potion));
+				addition.divide(8);
+				emc.add(addition);
+			}
 		}
 		else if (item == Items.ENCHANTED_BOOK) {
 			NbtList enchantments = nbt.getList("StoredEnchantments", NbtElement.COMPOUND_TYPE);
