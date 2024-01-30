@@ -22,7 +22,7 @@ import org.yaml.snakeyaml.nodes.Tag;
 
 
 /** A file that uses YAML to save and supports comments. */
-public abstract class ConfigFile<T> extends AbstractFile<T> {
+public abstract class AbstractConfigFile<T> extends AbstractFile<T> {
 	private static final Yaml YAML;
 	static {
 		DumperOptions dumperOptions = new DumperOptions(); 
@@ -32,7 +32,7 @@ public abstract class ConfigFile<T> extends AbstractFile<T> {
 	}
 
 	private final Map<String, String[]> commentsMap;
-	public ConfigFile(Type type, String name) {
+	public AbstractConfigFile(Type type, String name) {
 		super(type, name);
 		this.commentsMap = new HashMap<String, String[]>();
 	}

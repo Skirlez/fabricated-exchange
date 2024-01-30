@@ -19,6 +19,8 @@ import net.minecraft.registry.entry.RegistryEntryList.Named;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -144,6 +146,33 @@ public abstract class GeneralUtil {
             array[i] = Registries.ITEM.getId(items[i]).toString();
         
         return array;
+    }
+    
+    public static List<Text> translatableList(String baseKey) {
+    	List<Text> textList = new ArrayList<Text>();
+    	baseKey += "_";
+    	int num = 1;
+    	
+    	while (true) {
+    		Text text = Text.translatableWithFallback(baseKey + num, "");
+    		if (text.getString().isEmpty())
+				break;
+    		textList.add(text);
+    		num++;
+    	}
+    	
+    	return textList;
+    }
+    public static Text combineTextList(List<Text> textList, String combiner) {
+    	MutableText newText = Text.empty();
+    	if (textList.size() == 0)
+			return newText;
+    	for (int i = 0; i < textList.size() - 1; i++) {
+    		newText.append(textList.get(i));
+    		newText.append(combiner);
+    	}
+    	newText.append(textList.get(textList.size() - 1));
+    	return newText;
     }
 }
 	

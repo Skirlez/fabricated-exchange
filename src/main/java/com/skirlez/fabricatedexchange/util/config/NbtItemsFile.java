@@ -9,10 +9,9 @@ import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.config.lib.DataFile;
 
-// Technically not a list!
-public class NbtItemsList extends DataFile<HashMap<String, List<String>>>  {
+public class NbtItemsFile extends DataFile<HashMap<String, List<String>>>  {
 
-	public NbtItemsList(Type type, String name) {
+	public NbtItemsFile(Type type, String name) {
 		super(type, name);
 	}
 

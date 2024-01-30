@@ -7,11 +7,11 @@ import java.util.Optional;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
-import com.skirlez.fabricatedexchange.util.config.lib.ConfigFile;
+import com.skirlez.fabricatedexchange.util.config.lib.AbstractConfigFile;
 
 
 /** The central config file of the mod. It will compare itself to the default config to make sure the config file is not broken, and "repairs" itself if necessary. */
-public class MainConfig extends ConfigFile<Map<String, Object>> {
+public class MainConfig extends AbstractConfigFile<Map<String, Object>> {
 	
 	private final Map<String, Object> defaultValue = copyDefaultValue();
 	
@@ -94,12 +94,14 @@ public class MainConfig extends ConfigFile<Map<String, Object>> {
 			}
 		}
 		
-		if (!value.get("version").equals(FabricatedExchange.VERSION)) {
-			// any version migration code would go here
-			value.put("version", FabricatedExchange.VERSION);
-			changed = true;
+		if (!FabricatedExchange.VERSION.equals("${version}")) { // dev env check
+			if (!value.get("version").equals(FabricatedExchange.VERSION)) {
+				// any version migration code would go here
+				value.put("version", FabricatedExchange.VERSION);
+				changed = true;
+			}
 		}
-		
+			
 		if (changed)
 			save();
 

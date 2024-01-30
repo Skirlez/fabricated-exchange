@@ -5,13 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 import com.skirlez.fabricatedexchange.item.NbtItem;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
-import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
+import com.skirlez.fabricatedexchange.util.config.EmcMapFile;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
-import com.skirlez.fabricatedexchange.util.config.lib.DataFile;
-
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.enchantment.Enchantment;
@@ -32,15 +30,10 @@ import net.minecraft.util.Identifier;
 
 public class EmcData {
 
-	// both the server and the client can use these
+	// All 3 of these maps should be immutable
 	public static volatile Map<Item, SuperNumber> emcMap = new HashMap<Item, SuperNumber>();
-	
-	public static Map<Potion, SuperNumber> potionEmcMap = new HashMap<Potion, SuperNumber>();
-	public static Map<Enchantment, SuperNumber> enchantmentEmcMap = new HashMap<Enchantment, SuperNumber>();
-
-	// these should only ever be equal to what's in their respective jsons
-	public static Map<Item, SuperNumber> seedEmcMap = new HashMap<Item, SuperNumber>();
-	public static Map<Item, SuperNumber> customEmcMap = new HashMap<Item, SuperNumber>();
+	public static volatile Map<Potion, SuperNumber> potionEmcMap = new HashMap<Potion, SuperNumber>();
+	public static volatile Map<Enchantment, SuperNumber> enchantmentEmcMap = new HashMap<Enchantment, SuperNumber>();
 
 	public static SuperNumber getItemEmc(NbtItem item) {
 		SuperNumber emc = getItemEmc(item.asItem());
@@ -174,10 +167,10 @@ public class EmcData {
 
 
 	public static boolean isItemInSeedValues(Item item) {
-		return seedEmcMap.containsKey(item);
+		return ModDataFiles.SEED_EMC_MAP.hasItem(item);
 	}
 	public static boolean isItemInCustomValues(Item item) {
-		return customEmcMap.containsKey(item);
+		return ModDataFiles.CUSTOM_EMC_MAP.hasItem(item);
 	}
 
 	// only the server can use these
@@ -187,23 +180,27 @@ public class EmcData {
 	}
 
 	public static void setItemEmc(Item item, SuperNumber emc, boolean seed) {
-		if (item == null)
-			return;
-		DataFile<Map<Item, SuperNumber>> file = seed ? ModDataFiles.SEED_EMC_MAP : ModDataFiles.CUSTOM_EMC_MAP;
+		EmcMapFile file = seed ? ModDataFiles.SEED_EMC_MAP : ModDataFiles.CUSTOM_EMC_MAP;
 
-		//String id = Registries.ITEM.getId(item).toString();
-		Map<Item, SuperNumber> newEmcMap = file.getCopy();
-		if (newEmcMap == null)
-			newEmcMap = new HashMap<Item, SuperNumber>();
-		newEmcMap.put(item, emc);
+		Map<String, String> newEmcMap = file.getCopy();
+		newEmcMap.put(Registries.ITEM.getId(item).toString(), emc.divisionString());
 		file.setValueAndSave(newEmcMap);
 		
-		synchronized (emcMap) {
-			GeneralUtil.mergeMap(emcMap, newEmcMap);
-		}
-		
+		Map<Item, SuperNumber> copy = copyEmcMap(emcMap);
+		copy.put(item, emc);
+		emcMap = copy;
+	}
+	
+	public static void removeItemEmc(Item item, boolean seed) {
+		EmcMapFile file = seed ? ModDataFiles.SEED_EMC_MAP : ModDataFiles.CUSTOM_EMC_MAP;
+
+		Map<String, String> newEmcMap = file.getCopy();
+		newEmcMap.remove(Registries.ITEM.getId(item).toString());
+		file.setValueAndSave(newEmcMap);
 	}
 
+	
+	
 	public static void setEmc(ServerPlayerEntity player, SuperNumber amount) {
 		PlayerState playerState = ServerState.getPlayerState(player);
 		playerState.emc = amount;
@@ -246,5 +243,14 @@ public class EmcData {
 		}
 
 		ServerPlayNetworking.send(player, ModMessages.EMC_MAP_SYNC_IDENTIFIER, buffer);
+	}
+	
+	
+	private static Map<Item, SuperNumber> copyEmcMap(Map<Item, SuperNumber> map) {
+		Map<Item, SuperNumber> newMap = new HashMap<Item, SuperNumber>();
+		for (Map.Entry<Item, SuperNumber> entry : map.entrySet()) {
+			newMap.put(entry.getKey(), new SuperNumber(entry.getValue()));
+		}
+		return map;
 	}
 }

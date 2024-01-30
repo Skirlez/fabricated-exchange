@@ -89,8 +89,6 @@ public class FabricatedExchange implements ModInitializer {
 
 	public static void reload() {
 		ModDataFiles.fetchAll();
-		EmcData.seedEmcMap = ModDataFiles.SEED_EMC_MAP.getValue();
-		EmcData.customEmcMap = ModDataFiles.CUSTOM_EMC_MAP.getValue();
 		generateBlockRotationMap(ModDataFiles.BLOCK_TRANSMUTATION_MAP.getValue());
 		
 	}
@@ -99,9 +97,9 @@ public class FabricatedExchange implements ModInitializer {
 		EmcMapper mapper = new EmcMapper(server.getOverworld().getRecipeManager(), server.getRegistryManager());
 		
 		boolean hasWarned = mapper.map();
-		EmcData.emcMap = mapper.getEmcMap();
-		EmcData.potionEmcMap =  mapper.getPotionEmcMap();
-		EmcData.enchantmentEmcMap = mapper.getEnchantmentEmcMap();
+		EmcData.emcMap = Collections.unmodifiableMap(mapper.getEmcMap());
+		EmcData.potionEmcMap =  Collections.unmodifiableMap(mapper.getPotionEmcMap());
+		EmcData.enchantmentEmcMap = Collections.unmodifiableMap(mapper.getEnchantmentEmcMap());
 		List<Item> fuelItemList = new ArrayList<Item>();
 		for (RegistryEntry<Item> entry : Registries.ITEM.getEntryList(ModTags.FUEL).get()) { 
 			Item item = entry.value();

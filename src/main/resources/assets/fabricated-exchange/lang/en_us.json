@@ -49,9 +49,14 @@
     "sounds.fabricated-exchange.item_charge": "Item charged",
     "sounds.fabricated-exchange.item_discharge": "Item discharged",
 
-    "commands.fabricated-exchange.help": "/fe set (seed/custom) <number> - Set the currently held item's seed or custom EMC value\n/fe remove (seed/custom) - Remove the currently held item's seed or custom EMC value\n/fe recipe (ban/pardon) <recipe> - Ban/Unban a recipe from being considered by the EMC mapper\n/fe reload - Reload all config files and regenerate all EMC values using the the EMC mapper\n/fe reset <datafile> - Resets a datafile to its default state\n/fe help - I don't know what this one does\n",
+    "commands.fabricated-exchange.help_1": "/fe set (seed/custom) <number> - Set the currently held item's seed or custom EMC value",
+    "commands.fabricated-exchange.help_2": "/fe remove (seed/custom) - Remove the currently held item's seed or custom EMC value",
+    "commands.fabricated-exchange.help_3": "/fe recipe (ban/pardon) <recipe> - Ban/Unban a recipe from being considered by the EMC mapper",
+    "commands.fabricated-exchange.help_4": "/fe reload - Reload all config files and regenerate all EMC values using the the EMC mapper",
+    "commands.fabricated-exchange.help_5": "/fe reset <datafile> - Resets a datafile to its default state",
+   	"commands.fabricated-exchange.help_6": "/fe help - I don't know what this one does",
     
-    "commands.fabricated-exchange.reload_notice": "Run '/fe reload' to regenerate the EMC values.",
+    "commands.fabricated-exchange.reload_notice": "Run '/fe reload' to recalculate the EMC values.",
     "commands.fabricated-exchange.zero_notice": "If you want this specific item to not have EMC, run '/fe set custom 0'.",
     "commands.fabricated-exchange.no_item": "Air cannot have EMC! Hold an item and then run the command.",
     "commands.fabricated-exchange.setemc.not_valid_number": " isn't a valid number string!",
@@ -77,6 +82,14 @@
     "key.fabricated-exchange.charge": "Item Charge/Discharge",
     "key.fabricated-exchange.mode": "Item Mode",
     "key.fabricated-exchange.extra": "Item Extra Function",
-
+    
+    "config.fabricated-exchange.version_1": "Do not modify this version string!",
+    "config.fabricated-exchange.showItemEmcOrigin_1": "Show how the mod decided this item's EMC value.",
+    "config.fabricated-exchange.showItemEmcOrigin_2": "Will not be accurate on multiplayer servers. Useful when manually setting EMC values!",
+    "config.fabricated-exchange.showItemEmcOrigin_3": "(default: false)",
+    "config.fabricated-exchange.showEnchantedBookRepairCost_1": "Show the hidden repair cost attribute for Enchanted Books.",
+    "config.fabricated-exchange.showEnchantedBookRepairCost_2": "(default: true)",
+    
+    
     "tag.item.c.transmutation_fuel": "Transmutation Fuel"
 }

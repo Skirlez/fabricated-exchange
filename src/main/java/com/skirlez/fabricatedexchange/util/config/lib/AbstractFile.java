@@ -21,7 +21,14 @@ import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
  * This abstract class only leaves readValue and writeValue to be implemented by subclasses, and optionally process().
  * 
  * Would use Optional when returning values in case reading failed instead of null, but since it reads the default value as a failsafe 
- * it should only return null in case that fails too, and I don't believe it's possible unless there's something wrong with the file itself. */
+ * it should only return null in case that fails too, and I don't believe it's possible unless there's something wrong with the file itself. 
+ * 
+ * The type T should be some sort of data structure which stores Strings. I don't like parsers automatically
+ * converting a String to a different type because then you're leaving error handling to it, and in some cases you want 
+ * to decide what should be silently ignored and when to throw an Exception.
+ * */
+
+
 public abstract class AbstractFile<T> {
 	
 	// The folder where the file is stored

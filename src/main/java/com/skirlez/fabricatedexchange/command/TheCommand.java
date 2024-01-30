@@ -1,5 +1,6 @@
 package com.skirlez.fabricatedexchange.command;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -15,7 +16,9 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
+import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
+import com.skirlez.fabricatedexchange.util.config.EmcMapFile;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 import com.skirlez.fabricatedexchange.util.config.lib.AbstractFile;
 import com.skirlez.fabricatedexchange.util.config.lib.DataFile;
@@ -147,7 +150,7 @@ public class TheCommand {
 
 
 	private static int help(CommandContext<ServerCommandSource> context) {
-		context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.help"));
+		context.getSource().sendMessage((GeneralUtil.combineTextList(GeneralUtil.translatableList("commands.fabricated-exchange.help"), "\n")));
 		return 1;	
 	}
 
@@ -177,7 +180,7 @@ public class TheCommand {
 			FabricatedExchange.syncMaps(context.getSource().getServer());
 			context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.setemc.custom_success"));
 		}
-
+		
 		return 1;
 	}
 
@@ -197,16 +200,14 @@ public class TheCommand {
 		
 		String confuseMessage = (seed) ? "commands.fabricated-exchange.removeemc.seed_confused" : "commands.fabricated-exchange.removeemc.custom_confused";
 		String successMessage = (seed) ? "commands.fabricated-exchange.removeemc.seed_success" : "commands.fabricated-exchange.removeemc.custom_success";
-		DataFile<Map<Item, SuperNumber>> file = (seed) ? ModDataFiles.SEED_EMC_MAP : ModDataFiles.CUSTOM_EMC_MAP;
+		EmcMapFile file = (seed) ? ModDataFiles.SEED_EMC_MAP : ModDataFiles.CUSTOM_EMC_MAP;
 		
-		Map<Item, SuperNumber> map = file.getCopy();
-		if (!map.containsKey(item)) {
+		if (!file.hasItem(item)) {
 			context.getSource().sendMessage(Text.translatable(confuseMessage)
 				.append(" ").append(Text.translatable("commands.fabricated-exchange.zero_notice")));
 			return 0;
 		}
-		map.remove(item);
-		file.setValueAndSave(map);
+		EmcData.removeItemEmc(item, seed);
 		context.getSource().sendMessage(Text.translatable(successMessage)
 			.append(" ").append(Text.translatable("commands.fabricated-exchange.reload_notice")));
 
@@ -251,11 +252,15 @@ public class TheCommand {
 	}
 
 	private static int reload(CommandContext<ServerCommandSource> context) {
-		MinecraftServer server = context.getSource().getServer();
 		FabricatedExchange.reload();
 		
-		
 		context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.reloademc.data_success"));
+		
+		return reloadEmcMap(context);
+	}
+	
+	private static int reloadEmcMap(CommandContext<ServerCommandSource> context) {
+		MinecraftServer server = context.getSource().getServer();
 		long startTime = System.nanoTime();
 		boolean hasWarned = FabricatedExchange.calculateEmcMap(server);
 
@@ -268,9 +273,10 @@ public class TheCommand {
 		
 		context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.reloademc.success",
 		String.valueOf((System.nanoTime() - startTime) / 1000000)).append("\n").append(add));
-		
-		return 1;
+		return 1;	
 	}
+	
+	
 	private static int reset(CommandContext<ServerCommandSource> context) {
 		String str = context.getArgument("datafile", String.class);
 		Optional<AbstractFile<?>> maybeDatafile = ModDataFiles.getFileByName(str);
@@ -309,6 +315,7 @@ public class TheCommand {
 			case "crafting":
 			case "smelting":
 			case "smithing":
+			case "stonecutting":
 				return true;
 			default:
 				return false;

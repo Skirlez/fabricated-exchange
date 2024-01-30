@@ -92,11 +92,10 @@ public class EmcMapper {
 	
     /** Maps out all the recipes known to recipeManager + item equations given by mods. */
     public boolean map() {
-        Map<Item, SuperNumber> seedEmcMap = ModDataFiles.SEED_EMC_MAP.getValue();
+        Map<Item, SuperNumber> seedEmcMap = ModDataFiles.SEED_EMC_MAP.getEmcMap();
         if (seedEmcMap != null)
             GeneralUtil.mergeMap(emcMap, seedEmcMap);
 
-        
         if (ModDataFiles.MAIN_CONFIG_FILE.mapper_enabled) {
 	        List<SmithingRecipe> allSmithingRecipes = recipeManager.listAllOfType(RecipeType.SMITHING);
 	        List<SmeltingRecipe> allSmeltingRecipes = recipeManager.listAllOfType(RecipeType.SMELTING);
@@ -155,10 +154,10 @@ public class EmcMapper {
 	        }
 	
 			SuperNumber constant = ModDataFiles.MAIN_CONFIG_FILE.enchantmentEmcConstant; 
-			for (Identifier id : Registries.ENCHANTMENT.getIds()) {
-				Enchantment enchantment = Registries.ENCHANTMENT.get(id);
+			for (Enchantment enchantment : Registries.ENCHANTMENT) {
 				int max = enchantment.getMaxLevel();
 				int weight = enchantment.getRarity().getWeight();
+				
 				SuperNumber emc = new SuperNumber(constant);
 				emc.divide(weight);
 	
@@ -170,7 +169,7 @@ public class EmcMapper {
 			}
         }
         
-        Map<Item, SuperNumber> customEmcMap = ModDataFiles.CUSTOM_EMC_MAP.getValue();
+        Map<Item, SuperNumber> customEmcMap = ModDataFiles.CUSTOM_EMC_MAP.getEmcMap();
         if (customEmcMap != null)
             GeneralUtil.mergeMap(emcMap, customEmcMap);
         

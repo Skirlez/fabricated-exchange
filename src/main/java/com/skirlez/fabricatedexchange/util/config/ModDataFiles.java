@@ -12,12 +12,10 @@ import java.util.Optional;
 
 import com.google.gson.reflect.TypeToken;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
-import com.skirlez.fabricatedexchange.util.SuperNumber;
 import com.skirlez.fabricatedexchange.util.config.lib.AbstractFile;
 import com.skirlez.fabricatedexchange.util.config.lib.DataFile;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.item.Item;
 
 
 public class ModDataFiles {
@@ -32,7 +30,7 @@ public class ModDataFiles {
 	@SuppressWarnings("unchecked")
 	private static final Type jsonType = (Class<LinkedHashMap<String, Object>>)(Class<?>)LinkedHashMap.class;
 	
-	private static final Type emcMapType = new TypeToken<HashMap<Item, SuperNumber>>() {}.getType();
+	private static final Type mapType = new TypeToken<HashMap<String, String>>() {}.getType();
 	
 	private static final Type stringSetType = new TypeToken<HashSet<String>>() {}.getType();
 	private static final Type nbtItemsType = new TypeToken<HashMap<String, List<String>>>() {}.getType();
@@ -42,11 +40,11 @@ public class ModDataFiles {
 	public static final MainConfig MAIN_CONFIG_FILE = 
 		new MainConfig(jsonType, "config.yaml");
 		
-	public static final DataFile<Map<Item, SuperNumber>> SEED_EMC_MAP 
-		= new DataFile<Map<Item, SuperNumber>>(emcMapType, "seed_emc_map.json");
+	public static final EmcMapFile SEED_EMC_MAP 
+		= new EmcMapFile(mapType, "seed_emc_map.json");
 
-	public static final DataFile<Map<Item, SuperNumber>> CUSTOM_EMC_MAP
-		= new DataFile<Map<Item, SuperNumber>>(emcMapType, "custom_emc_map.json");
+	public static final EmcMapFile CUSTOM_EMC_MAP
+		= new EmcMapFile(mapType, "custom_emc_map.json");
 
 	//public static final DataFile<Map<Enchantment, SuperNumber>> ENCHANTMENT_EMC_MAP
 	//	= new DataFile<Map<Enchantment, SuperNumber>>(emcMapType, "enchantment_emc_map.json");
@@ -58,8 +56,8 @@ public class ModDataFiles {
     public static final EqualTagsFile EQUAL_TAGS
         = new EqualTagsFile(stringSetType, "equal_tags.json");
 
-	public static final NbtItemsList NBT_ITEMS = 
-		new NbtItemsList(nbtItemsType, "nbt_items.json");
+	public static final NbtItemsFile NBT_ITEMS = 
+		new NbtItemsFile(nbtItemsType, "nbt_items.json");
 
 	public static final DataFile<Map<String, HashSet<String>>> BLACKLISTED_MAPPER_RECIPES
 		= new DataFile<Map<String, HashSet<String>>>(recipeBlacklistType,
