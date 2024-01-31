@@ -2,68 +2,39 @@ package com.skirlez.fabricatedexchange.util.config;
 
 import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
+import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import com.skirlez.fabricatedexchange.util.config.lib.AbstractConfigFile;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.text.Text;
 
 
 /** The central config file of the mod. It will compare itself to the default config to make sure the config file is not broken, and "repairs" itself if necessary. */
 public class MainConfig extends AbstractConfigFile<Map<String, Object>> {
 	
-	private final Map<String, Object> defaultValue = copyDefaultValue();
+	private final Map<String, Object> defaultValue;
 	
 	MainConfig(Type type, String name) {
 		super(type, name);
-		addComments("version", "Do not modify this string!");
-		
-		addComments("showItemEmcOrigin", 
-		"Show how the mod decided this item's EMC value.", 
-		"Will not be accurate on multiplayer servers. Useful when manually setting EMC values!",
-		"(default: false)");
-		
-		addComments("showEnchantedBookRepairCost", 
-		"Show the hidden repair cost attribute for Enchanted Books.", 
-		"(default: true)");
-		
-		addComments("enchantmentEmcConstant", 
-		"A special constant used during the calculation of enchantment EMC.", 
-		"Bigger constant -> higher EMC.",
-		"(default: 3260)");
-		
-		addComments("emcInMultiplier", 
-		"The amount of personal EMC you gain be multiplied by this number.",
-		"(default: 1)");
-		
-		addComments("emcOutMultiplier", 
-		"The amount of personal EMC you need to spend will be multiplied by this number.",
-		"(default: 1)");
-		
-		addComments("mapper.enabled", 
-		"Whether or not the EMC mapper is enabled.",
-		"(default: true)");
-		
-		addComments("transmutationTable.animated", 
-		"When disabled, the Transmutation Table will look boring.",
-		"(default: true)");
-		
-		addComments("transmutationTable.floorButton", 
-		"When enabled, a button to round down your EMC will appear", 
-		"in the Transmutation Table when your EMC is not a whole number.",
-		"(default: true)");
-
+		defaultValue = copyDefaultValue();
 	}
 
 	public boolean showItemEmcOrigin;
 	public boolean showEnchantedBookRepairCost;
+	public SuperNumber enchantmentEmcConstant;
+	public SuperNumber emcInMultiplier;
+	public SuperNumber emcOutMultiplier;
 	public boolean mapper_enabled;
 	public boolean transmutationTable_animated;
 	public boolean transmutationTable_floorButton;
-	public SuperNumber emcInMultiplier;
-	public SuperNumber emcOutMultiplier;
-	public SuperNumber enchantmentEmcConstant;
+
 
 	/* Fetch the config and compare to the default config to see if any keys
 	are missing or any of them have mismatched value types. If true, set that 
@@ -118,6 +89,20 @@ public class MainConfig extends AbstractConfigFile<Map<String, Object>> {
 		mapper_enabled = (boolean)value.get("mapper.enabled");
 		transmutationTable_animated = (boolean)value.get("transmutationTable.animated");
 		transmutationTable_floorButton = (boolean)value.get("transmutationTable.floorButton");
+		
+	}
+	
+	@Environment(EnvType.CLIENT)
+	public void updateComments() {
+		clearComments();
+		for (String key : defaultValue.keySet()) {
+			List<Text> comments = GeneralUtil.translatableList("config.fabricated-exchange." + key);
+			String[] arr = new String[comments.size()];
+			for (int i = 0; i < arr.length; i++) {
+				arr[i] = comments.get(i).getString();
+			}
+			addComments(key, arr);
+		}	
 	}
 	
 	public Optional<Class<?>> getKeyClass(String key) {

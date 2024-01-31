@@ -36,9 +36,10 @@ public class ModDataFiles {
 	private static final Type nbtItemsType = new TypeToken<HashMap<String, List<String>>>() {}.getType();
 	private static final Type recipeBlacklistType = new TypeToken<HashMap<String, HashSet<String>>>() {}.getType();
 	private static final Type blockTransmutationMapType = new TypeToken<String[][]>() {}.getType();
+	
 
-	public static final MainConfig MAIN_CONFIG_FILE = 
-		new MainConfig(jsonType, "config.yaml");
+	
+	public static final MainConfig MAIN_CONFIG_FILE = new MainConfig(jsonType, "config.yaml");
 		
 	public static final EmcMapFile SEED_EMC_MAP 
 		= new EmcMapFile(mapType, "seed_emc_map.json");
@@ -63,6 +64,7 @@ public class ModDataFiles {
 		= new DataFile<Map<String, HashSet<String>>>(recipeBlacklistType,
 		"blacklisted_mapper_recipes.json");
 
+	
 	public static final List<AbstractFile<?>> ALL_FILES = Arrays.asList(
 			MAIN_CONFIG_FILE, SEED_EMC_MAP, CUSTOM_EMC_MAP,
 			BLOCK_TRANSMUTATION_MAP, EQUAL_TAGS,

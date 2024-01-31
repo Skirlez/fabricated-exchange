@@ -9,6 +9,7 @@ import org.joml.Math;
 import org.joml.Vector2d;
 
 import com.skirlez.fabricatedexchange.item.ModItems;
+import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 import net.minecraft.client.MinecraftClient;
@@ -64,19 +65,21 @@ public class SettingsScreen extends GameOptionsScreen {
 	@Override
 	protected void init() {
 		
-		
+		this.startY = 35;
 		super.init();
-		if (this.client.world == null || MinecraftClient.getInstance().isIntegratedServerRunning())
-			this.startY = 35;
-		else {
+		if (this.client.world != null && !MinecraftClient.getInstance().isIntegratedServerRunning()) {
 			// multiplayer
-			Text serverWarning = Text.of("Warning! You are adjusting your client's own config, not the current server's!");
-			TextWidget serverWarningWidget = new TextWidget(this.width / 2, 36, 0, 0, serverWarning, textRenderer);
-			serverWarningWidget.setTextColor(MathHelper.packRgb(1, 0, 0));
-			addDrawable(serverWarningWidget);
-			this.startY = 45;
+			List<Text> warningTexts = GeneralUtil.translatableList("screen.fabricated-exchange.settings.client_warning");
+			for (Text text : warningTexts) {
+				TextWidget serverWarningWidget = new TextWidget(this.width / 2, startY, 0, 0, text, textRenderer);
+				serverWarningWidget.setTextColor(MathHelper.packRgb(1, 0, 0));
+				addDrawable(serverWarningWidget);
+				this.startY += 10;
+			}
+
 		}
-		
+
+	
 		this.lastY = this.startY;
 		this.distFromLeft = 30;
 		this.distFromRight = width - 30;
@@ -86,9 +89,10 @@ public class SettingsScreen extends GameOptionsScreen {
 		balls.add(Ball.randomVelocityBall(ModItems.PHILOSOPHERS_STONE, this.width / 2 + 50 + Math.random() * 50d - 25d, this.height / 2 + Math.random() * 50d - 25d));
 		for (int i = 0; i < 7; i++) 
 			balls.add(Ball.randomVelocityBall(choose(ModItems.DARK_MATTER, ModItems.RED_MATTER), this.width / 2 + 50 + Math.random() * 50d - 25d, this.height / 2 + Math.random() * 50d - 25d));
+		
 		this.pages.clear();
 		pages.add(new ArrayList<ClickableWidget>());
-		Text resetToDefaultText = Text.of("Reset To Default");
+		Text resetToDefaultText = Text.translatable("screen.fabricated-exchange.settings.reset");
 		ButtonWidget resetToDefault = new ButtonWidget.Builder(resetToDefaultText, (widget) -> {
 			CONFIG = ModDataFiles.MAIN_CONFIG_FILE.copyDefaultValue();
 			clearAndInit();
@@ -96,14 +100,14 @@ public class SettingsScreen extends GameOptionsScreen {
 		
 		addDrawableChild(resetToDefault);
 		
-		Text closeWithoutSavingText = Text.of("Close Without Saving");
+		Text closeWithoutSavingText = Text.translatable("screen.fabricated-exchange.settings.close");
 		ButtonWidget closeWithoutSaving = new ButtonWidget.Builder(closeWithoutSavingText, (widget) -> {
 			super.close();
 		}).dimensions(distFromLeft + resetToDefault.getWidth() + 11, height - distFromBottom, textRenderer.getWidth(closeWithoutSavingText) + 20, 20).build();
 		
 		addDrawableChild(closeWithoutSaving);
 		
-		Text doneText = Text.of("Done");
+		Text doneText = Text.translatable("gui.done");
 		ButtonWidget done = new ButtonWidget.Builder(doneText, (widget) -> {
 			ModDataFiles.MAIN_CONFIG_FILE.setValueAndSave(CONFIG);
 			super.close();

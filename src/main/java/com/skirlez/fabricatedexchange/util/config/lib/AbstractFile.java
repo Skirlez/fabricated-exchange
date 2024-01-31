@@ -16,21 +16,34 @@ import java.util.stream.Collectors;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 
-/** This class represents a file with a value that can be saved to permanent storage.
- * Files are first fetched, then getValue() can be called and modified, then setValue() and save().
- * This abstract class only leaves readValue and writeValue to be implemented by subclasses, and optionally process().
+/**
+ * This class represents a file with a value that can be saved to permanent
+ * storage. Files are first fetched, then getValue() can be called and modified,
+ * then setValue() and save(). This abstract class only leaves readValue and
+ * writeValue to be implemented by subclasses, and optionally process().
  * 
- * Would use Optional when returning values in case reading failed instead of null, but since it reads the default value as a failsafe 
- * it should only return null in case that fails too, and I don't believe it's possible unless there's something wrong with the file itself. 
+ * <p>
+ * Would use Optional when returning values in case reading failed instead of
+ * null, but since it reads the default value as a failsafe it should only
+ * return null in case that fails too, and I don't believe it's possible unless
+ * there's something wrong with the file itself. (in which case, the error will
+ * not escape the development environment)
  * 
- * The type T should be some sort of data structure which stores Strings. I don't like parsers automatically
- * converting a String to a different type because then you're leaving error handling to it, and in some cases you want 
- * to decide what should be silently ignored and when to throw an Exception.
- * */
-
+ * <p>
+ * The type T should be a type representing the JSON. It should be important to
+ * note that if for example, the file represents a list of Item, the type T
+ * should actually be String[], and not Item[], even if the parser knows how to
+ * convert the JSON strings to Item automatically. this is because specifically
+ * for Modded Minecraft, invalid entries might be left over from other mods, and
+ * we don't want to error on those. but in general, if the JSON type used to
+ * represent the custom class can be invalid, the Java equivalent of the JSON
+ * type should be used instead, and the conversion should be done manually in
+ * constProcess() using a new member, where it can have proper Exception
+ * handling.
+ */
 
 public abstract class AbstractFile<T> {
-	
+
 	// The folder where the file is stored
 	private final Path path;
 	// The type of the value
@@ -41,53 +54,56 @@ public abstract class AbstractFile<T> {
 	protected T value;
 	// The file's actual character information.
 	protected String file;
-	
+
 	public AbstractFile(Type type, String name) {
 		this.type = type;
 		this.name = name;
 		this.path = ModDataFiles.CONFIG_DIR.resolve(name);
-	}
 
+	}
 
 	// Subclasses must override these methods to save the file
 	protected abstract T readValue(Reader reader) throws Exception;
+
 	protected abstract void writeValue(Writer writer, T value) throws Exception;
 
-	/** Read the file from disk to update the instance.
- 	 * if unsuccessful, set to the default value */
+	/**
+	 * Read the file from disk to update the instance. if unsuccessful, set to the
+	 * default value
+	 */
 	public void fetch() {
 		if (Files.exists(path)) {
 			try (Reader reader = Files.newBufferedReader(path)) {
 				file = readAsString(reader);
 				value = process(readValue(new StringReader(file)));
 				constProcess();
-			} 
-			catch (Exception e) {
+			} catch (Exception e) {
 				FabricatedExchange.LOGGER.error(name + " exists but could not be read!", e);
 				setValueToDefault();
 			}
-		}
-		else {
+		} else {
 			FabricatedExchange.LOGGER.info("Data file " + name + " doesn't exist, creating it...");
 			setValueToDefault();
 			save();
 		}
 	}
-	
+
 	public String getName() {
 		return name;
 	}
-	
-	/** Gets a copy of the value of the file as it was when last fetched or saved. */
+
+	/**
+	 * Gets a copy of the value of the file as it was when last fetched or saved.
+	 */
 	public T getCopy() {
 		try {
 			return process(readValue(new StringReader(file)));
-		}
-		catch (Exception e) { 
+		} catch (Exception e) {
 			FabricatedExchange.LOGGER.error(name + " could not be parsed!", e);
 		}
 		return value;
 	}
+
 	public T getValue() {
 		return value;
 	}
@@ -96,26 +112,23 @@ public abstract class AbstractFile<T> {
 		fetch();
 		return getValue();
 	}
-	
+
 	// Write the instance's current data to disk
 	public void save() {
 		if (!Files.exists(ModDataFiles.CONFIG_DIR)) {
 			try {
 				Files.createDirectory(ModDataFiles.CONFIG_DIR);
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				FabricatedExchange.LOGGER.error("Could not create config directory for " + name + "!", e);
 			}
 		}
 		if (value == null)
 			return;
-		try (BufferedWriter writer = Files.newBufferedWriter(path);
-			StringWriter stringWriter = new StringWriter()) {
+		try (BufferedWriter writer = Files.newBufferedWriter(path); StringWriter stringWriter = new StringWriter()) {
 			writeValue(writer, value);
 			writeValue(stringWriter, value);
 			file = stringWriter.toString();
-		} 
-		catch (Exception e) {
+		} catch (Exception e) {
 			FabricatedExchange.LOGGER.error(name + " could not be saved!", e);
 		}
 	}
@@ -131,8 +144,9 @@ public abstract class AbstractFile<T> {
 	}
 
 	public void setValueToDefault() {
-		try (InputStream inputStream = FabricatedExchange.class.getClassLoader().getResourceAsStream("fe_default_configs/" + name);
-			Reader reader = new InputStreamReader(inputStream)) {
+		try (InputStream inputStream = FabricatedExchange.class.getClassLoader()
+				.getResourceAsStream("fe_default_configs/" + name);
+				Reader reader = new InputStreamReader(inputStream)) {
 			file = readAsString(reader);
 			value = process(readValue(new StringReader(file)));
 			constProcess();
@@ -141,10 +155,11 @@ public abstract class AbstractFile<T> {
 			value = null;
 		}
 	}
-	
+
 	public T copyDefaultValue() {
-		try (InputStream inputStream = FabricatedExchange.class.getClassLoader().getResourceAsStream("fe_default_configs/" + name);
-			Reader reader = new InputStreamReader(inputStream)) {
+		try (InputStream inputStream = FabricatedExchange.class.getClassLoader()
+				.getResourceAsStream("fe_default_configs/" + name);
+				Reader reader = new InputStreamReader(inputStream)) {
 			return process(readValue(reader));
 		} catch (Exception e) {
 			FabricatedExchange.LOGGER.error(name + "'s default configuration could not be read from!", e);
@@ -152,19 +167,25 @@ public abstract class AbstractFile<T> {
 		}
 	}
 
-    public static String readAsString(Reader reader) {
-    	BufferedReader bufferedReader = new BufferedReader(reader);
-        return bufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
-    }
-	
-	/** This method will allow subclasses that override it to perform additional operations on the data that was fetched/set 
-	 * The value given is NOT equal to this.value when this is called, this.value still holds the previous value. */
+	public static String readAsString(Reader reader) {
+		BufferedReader bufferedReader = new BufferedReader(reader);
+		return bufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
+	}
+
+	/**
+	 * This method will allow subclasses that override it to perform additional
+	 * operations on the data that was fetched/set The value given is NOT equal to
+	 * this.value when this is called, this.value still holds the previous value.
+	 */
 	protected T process(T value) {
 		return value;
 	}
-	
-	/** This method will allow subclasses that override it to read from this.value and then do whatever (modify other class members etc..)  */
+
+	/**
+	 * This method will allow subclasses that override it to read from this.value
+	 * and then do whatever (modify other class members etc..)
+	 */
 	protected void constProcess() {
-		
+
 	}
 }

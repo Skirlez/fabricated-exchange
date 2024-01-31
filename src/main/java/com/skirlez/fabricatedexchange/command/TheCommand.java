@@ -1,6 +1,5 @@
 package com.skirlez.fabricatedexchange.command;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -21,8 +20,6 @@ import com.skirlez.fabricatedexchange.util.SuperNumber;
 import com.skirlez.fabricatedexchange.util.config.EmcMapFile;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 import com.skirlez.fabricatedexchange.util.config.lib.AbstractFile;
-import com.skirlez.fabricatedexchange.util.config.lib.DataFile;
-
 import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.command.suggestion.SuggestionProviders;
 import net.minecraft.entity.player.PlayerEntity;

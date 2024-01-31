@@ -47,7 +47,9 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 
-// This class tries to infer EMC values of items through in-game recipes.
+/** This class tries to infer EMC values of items, potions and enchantments through in-game recipes. 
+ * You create it, giving it a RecipeManager and DynamicRegistryManager,
+ * call .map(), and then get the results using getEmcMap(), getPotionEmcMap() and getEnchantmentEmcMap() */
 
 // In areas of code where a possible rare case is not considered, 
 // a comment prefixed with "UNCONSIDERED:" should be left
@@ -80,13 +82,13 @@ public class EmcMapper {
         equalTags = ModDataFiles.EQUAL_TAGS;
     }
 
-    public Map<Item, SuperNumber> getEmcMap() {
+    public HashMap<Item, SuperNumber> getEmcMap() {
         return emcMap;
     }
-    public Map<Potion, SuperNumber> getPotionEmcMap() {
+    public HashMap<Potion, SuperNumber> getPotionEmcMap() {
         return potionEmcMap;
     }
-	public Map<Enchantment, SuperNumber> getEnchantmentEmcMap() {
+	public HashMap<Enchantment, SuperNumber> getEnchantmentEmcMap() {
 		return enchantmentEmcMap;
 	}
 	
@@ -173,7 +175,8 @@ public class EmcMapper {
         if (customEmcMap != null)
             GeneralUtil.mergeMap(emcMap, customEmcMap);
         
-        FabricatedExchange.LOGGER.warn(warning.toString());
+        if (!warning.isEmpty())
+        	FabricatedExchange.LOGGER.warn(warning.toString());
         return (!warning.isEmpty());
     }
 

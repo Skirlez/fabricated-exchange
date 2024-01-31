@@ -27,6 +27,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableMap;
 import com.skirlez.fabricatedexchange.block.ModBlockEntities;
 import com.skirlez.fabricatedexchange.block.ModBlocks;
 import com.skirlez.fabricatedexchange.command.TheCommand;
@@ -97,9 +98,9 @@ public class FabricatedExchange implements ModInitializer {
 		EmcMapper mapper = new EmcMapper(server.getOverworld().getRecipeManager(), server.getRegistryManager());
 		
 		boolean hasWarned = mapper.map();
-		EmcData.emcMap = Collections.unmodifiableMap(mapper.getEmcMap());
-		EmcData.potionEmcMap =  Collections.unmodifiableMap(mapper.getPotionEmcMap());
-		EmcData.enchantmentEmcMap = Collections.unmodifiableMap(mapper.getEnchantmentEmcMap());
+		EmcData.emcMap = ImmutableMap.copyOf(mapper.getEmcMap());
+		EmcData.potionEmcMap = ImmutableMap.copyOf(mapper.getPotionEmcMap());
+		EmcData.enchantmentEmcMap = ImmutableMap.copyOf(mapper.getEnchantmentEmcMap());
 		List<Item> fuelItemList = new ArrayList<Item>();
 		for (RegistryEntry<Item> entry : Registries.ITEM.getEntryList(ModTags.FUEL).get()) { 
 			Item item = entry.value();

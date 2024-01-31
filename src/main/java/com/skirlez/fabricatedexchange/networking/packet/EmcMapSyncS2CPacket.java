@@ -3,6 +3,7 @@ package com.skirlez.fabricatedexchange.networking.packet;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
@@ -36,9 +37,9 @@ public class EmcMapSyncS2CPacket {
 			Identifier id = buf.readIdentifier();
 			enchantmentEmcMap.put(Registries.ENCHANTMENT.get(id), new SuperNumber(buf.readString()));
 		}
-		EmcData.emcMap = emcMap;
-		EmcData.potionEmcMap = potionEmcMap;
-		EmcData.enchantmentEmcMap = enchantmentEmcMap;
+		EmcData.emcMap = ImmutableMap.copyOf(emcMap);
+		EmcData.potionEmcMap = ImmutableMap.copyOf(potionEmcMap);
+		EmcData.enchantmentEmcMap = ImmutableMap.copyOf(enchantmentEmcMap);
 	}
 }
 

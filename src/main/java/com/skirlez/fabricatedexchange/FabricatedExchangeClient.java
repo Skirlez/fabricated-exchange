@@ -19,11 +19,16 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.render.block.entity.ChestBlockEntityRenderer;
+import net.minecraft.resource.ResourceManager;
+import net.minecraft.resource.ResourceType;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 public class FabricatedExchangeClient implements ClientModInitializer {
 	
@@ -66,8 +71,17 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 			if (!MinecraftClient.getInstance().isIntegratedServerRunning())
 				ModDataFiles.fetchAll();
 		});
+		
+		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
+				@Override
+				public Identifier getFabricId() {
+					return new Identifier(FabricatedExchange.MOD_ID, "update_config_comments");
+				}
+				@Override
+				public void reload(ResourceManager resourceManager) {
+					ModDataFiles.MAIN_CONFIG_FILE.updateComments();
+				}
+			});
+
 	}
-
-
-
 }

@@ -41,8 +41,7 @@
     "block.fabricated-exchange.alchemical_chest": "Alchemical Chest",
     "block.fabricated-exchange.energy_condenser_mk1": "Energy Condenser MK1",
     "block.fabricated-exchange.energy_condenser_mk2": "Energy Condenser MK2",
-    "screen.fabricated-exchange.transmutation": "Transmutation",
-    "screen.fabricated-exchange.emc_collection": "EMC Collection",
+    
     "itemgroup.fabricated-exchange": "Fabricated Exchange", 
 
     "sounds.fabricated-exchange.philosophers_stone_use": "Blocks transmuted",
@@ -54,7 +53,8 @@
     "commands.fabricated-exchange.help_3": "/fe recipe (ban/pardon) <recipe> - Ban/Unban a recipe from being considered by the EMC mapper",
     "commands.fabricated-exchange.help_4": "/fe reload - Reload all config files and regenerate all EMC values using the the EMC mapper",
     "commands.fabricated-exchange.help_5": "/fe reset <datafile> - Resets a datafile to its default state",
-   	"commands.fabricated-exchange.help_6": "/fe help - I don't know what this one does",
+    "commands.fabricated-exchange.help_6": "/fe printmissing - Prints to the chat all the items without an EMC value.",
+   	"commands.fabricated-exchange.help_7": "/fe help - I don't know what this one does",
     
     "commands.fabricated-exchange.reload_notice": "Run '/fe reload' to recalculate the EMC values.",
     "commands.fabricated-exchange.zero_notice": "If you want this specific item to not have EMC, run '/fe set custom 0'.",
@@ -83,12 +83,34 @@
     "key.fabricated-exchange.mode": "Item Mode",
     "key.fabricated-exchange.extra": "Item Extra Function",
     
+    "screen.fabricated-exchange.transmutation": "Transmutation",
+    "screen.fabricated-exchange.emc_collection": "EMC Collection",
+    
+    "screen.fabricated-exchange.settings.reset": "Reset To Default",
+    "screen.fabricated-exchange.settings.close": "Close Without Saving",
+    
+    "screen.fabricated-exchange.settings.client_warning_1": "Warning! You are adjusting your client's own config, not the current server's!",
+    
     "config.fabricated-exchange.version_1": "Do not modify this version string!",
     "config.fabricated-exchange.showItemEmcOrigin_1": "Show how the mod decided this item's EMC value.",
     "config.fabricated-exchange.showItemEmcOrigin_2": "Will not be accurate on multiplayer servers. Useful when manually setting EMC values!",
     "config.fabricated-exchange.showItemEmcOrigin_3": "(default: false)",
     "config.fabricated-exchange.showEnchantedBookRepairCost_1": "Show the hidden repair cost attribute for Enchanted Books.",
     "config.fabricated-exchange.showEnchantedBookRepairCost_2": "(default: true)",
+    "config.fabricated-exchange.enchantmentEmcConstant_1": "A special constant used during the calculation of enchantment EMC.",
+    "config.fabricated-exchange.enchantmentEmcConstant_2": "Bigger constant -> higher EMC.",
+    "config.fabricated-exchange.enchantmentEmcConstant_3": "(default: 3260)",
+  	"config.fabricated-exchange.emcInMultiplier_1": "The amount of personal EMC you gain from be multiplied by this number.",
+    "config.fabricated-exchange.emcInMultiplier_2": "(default: 1)",
+  	"config.fabricated-exchange.emcOutMultiplier_1": "The amount of personal EMC you need to spend will be multiplied by this number.",
+    "config.fabricated-exchange.emcOutMultiplier_2": "(default: 1)",
+    "config.fabricated-exchange.mapper.enabled_1": "Whether or not the EMC mapper is enabled.",
+    "config.fabricated-exchange.mapper.enabled_2": "(default: true)",
+    "config.fabricated-exchange.transmutationTable.animated_1": "When disabled, the Transmutation Table will look boring.",
+ 	"config.fabricated-exchange.transmutationTable.animated_2": "(default: true)",
+    "config.fabricated-exchange.transmutationTable.floorButton_1": "When enabled, a button to round down your EMC will appear in the Transmutation Table when your EMC is not a whole number.",
+    "config.fabricated-exchange.transmutationTable.floorButton_2": "(default: true)",
+    
     
     
     "tag.item.c.transmutation_fuel": "Transmutation Fuel"

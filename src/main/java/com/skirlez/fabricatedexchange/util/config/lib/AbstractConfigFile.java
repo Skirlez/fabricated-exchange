@@ -4,9 +4,9 @@ import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import org.yaml.snakeyaml.DumperOptions;
@@ -34,17 +34,21 @@ public abstract class AbstractConfigFile<T> extends AbstractFile<T> {
 	private final Map<String, String[]> commentsMap;
 	public AbstractConfigFile(Type type, String name) {
 		super(type, name);
-		this.commentsMap = new HashMap<String, String[]>();
+		this.commentsMap = new ConcurrentHashMap<String, String[]>();
 	}
 
-	protected void addComments(String field, String... comments) {
+	protected void clearComments() {
+		commentsMap.clear();
+	}
+	
+	protected void addComments(String field, String[] comments) {
 		commentsMap.put(field, comments);
 	}
 	
 	public Map<String, String[]> getComments() {
 		return commentsMap;
 	}
-	
+
 	
 	@Override
 	@SuppressWarnings("unchecked")
@@ -72,7 +76,7 @@ public abstract class AbstractConfigFile<T> extends AbstractFile<T> {
 					String[] commentStrings = commentsMap.get(key);
 					List<CommentLine> comments = new ArrayList<CommentLine>(commentStrings.length);
 					for (int i = 0; i < commentStrings.length; i++)
-						comments.add(new CommentLine(null, null, commentStrings[i], CommentType.BLOCK));
+						comments.add(new CommentLine(null, null, " " + commentStrings[i], CommentType.BLOCK));
 					
 					keyNode.setBlockComments(comments);
 				}

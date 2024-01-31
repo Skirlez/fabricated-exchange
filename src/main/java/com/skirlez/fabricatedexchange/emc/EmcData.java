@@ -1,8 +1,9 @@
 package com.skirlez.fabricatedexchange.emc;
 
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
 import com.skirlez.fabricatedexchange.item.NbtItem;
 import com.skirlez.fabricatedexchange.networking.ModMessages;
 import com.skirlez.fabricatedexchange.util.PlayerState;
@@ -31,9 +32,9 @@ import net.minecraft.util.Identifier;
 public class EmcData {
 
 	// All 3 of these maps should be immutable
-	public static volatile Map<Item, SuperNumber> emcMap = new HashMap<Item, SuperNumber>();
-	public static volatile Map<Potion, SuperNumber> potionEmcMap = new HashMap<Potion, SuperNumber>();
-	public static volatile Map<Enchantment, SuperNumber> enchantmentEmcMap = new HashMap<Enchantment, SuperNumber>();
+	public static volatile ImmutableMap<Item, SuperNumber> emcMap = ImmutableMap.of();
+	public static volatile ImmutableMap<Potion, SuperNumber> potionEmcMap = ImmutableMap.of();
+	public static volatile ImmutableMap<Enchantment, SuperNumber> enchantmentEmcMap = ImmutableMap.of();
 
 	public static SuperNumber getItemEmc(NbtItem item) {
 		SuperNumber emc = getItemEmc(item.asItem());
@@ -185,10 +186,8 @@ public class EmcData {
 		Map<String, String> newEmcMap = file.getCopy();
 		newEmcMap.put(Registries.ITEM.getId(item).toString(), emc.divisionString());
 		file.setValueAndSave(newEmcMap);
-		
-		Map<Item, SuperNumber> copy = copyEmcMap(emcMap);
-		copy.put(item, emc);
-		emcMap = copy;
+	
+		emcMap = new ImmutableMap.Builder<Item, SuperNumber>().putAll(emcMap).put(item, emc).build();
 	}
 	
 	public static void removeItemEmc(Item item, boolean seed) {
@@ -243,14 +242,5 @@ public class EmcData {
 		}
 
 		ServerPlayNetworking.send(player, ModMessages.EMC_MAP_SYNC_IDENTIFIER, buffer);
-	}
-	
-	
-	private static Map<Item, SuperNumber> copyEmcMap(Map<Item, SuperNumber> map) {
-		Map<Item, SuperNumber> newMap = new HashMap<Item, SuperNumber>();
-		for (Map.Entry<Item, SuperNumber> entry : map.entrySet()) {
-			newMap.put(entry.getKey(), new SuperNumber(entry.getValue()));
-		}
-		return map;
 	}
 }

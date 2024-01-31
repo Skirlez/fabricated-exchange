@@ -9,7 +9,10 @@ import java.util.function.Consumer;
 
 import com.skirlez.fabricatedexchange.mixin.ScreenHandlerInvoker;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
@@ -148,21 +151,24 @@ public abstract class GeneralUtil {
         return array;
     }
     
+    
+    @Environment(EnvType.CLIENT)
     public static List<Text> translatableList(String baseKey) {
     	List<Text> textList = new ArrayList<Text>();
     	baseKey += "_";
     	int num = 1;
     	
     	while (true) {
-    		Text text = Text.translatableWithFallback(baseKey + num, "");
-    		if (text.getString().isEmpty())
+    		String key = baseKey + num;
+     		if (!I18n.hasTranslation(key))
 				break;
-    		textList.add(text);
+    		textList.add(Text.translatable(key));
     		num++;
     	}
     	
     	return textList;
     }
+    
     public static Text combineTextList(List<Text> textList, String combiner) {
     	MutableText newText = Text.empty();
     	if (textList.size() == 0)
