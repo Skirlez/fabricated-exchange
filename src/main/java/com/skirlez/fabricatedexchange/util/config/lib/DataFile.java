@@ -10,7 +10,6 @@ import com.google.gson.GsonBuilder;
 public class DataFile<T> extends AbstractFile<T> {
 	
 	private static final Gson GSON = new GsonBuilder()
-		.setLenient()
 		.setPrettyPrinting() // we do want these to be editable by users
 		.create();
 

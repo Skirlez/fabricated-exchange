@@ -72,6 +72,7 @@ public class FabricatedExchange implements ModInitializer {
 			ModServerToClientPackets.UPDATE_PLAYER_EMC.send(player, playerState.emc);
 			ModServerToClientPackets.UPDATE_EMC_MAPS.send(player);
 			ModServerToClientPackets.UPDATE_BLOCK_TRANSMUTATION_MAP.send(player);
+			ModServerToClientPackets.UPDATE_NBT_ITEMS.send(player);
 		});
 
 		ServerLifecycleEvents.SERVER_STARTED.register((server) -> {

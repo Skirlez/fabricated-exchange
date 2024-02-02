@@ -39,7 +39,6 @@ public class NbtItemsFile extends DataFile<HashMap<String, List<String>>>  {
 			}
 		}
 	}
-
 	public boolean hasItem(String idName) {
 		if (value.containsKey(idName))
 			return true;

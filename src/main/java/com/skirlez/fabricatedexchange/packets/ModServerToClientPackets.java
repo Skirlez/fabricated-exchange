@@ -14,12 +14,14 @@ public abstract class ModServerToClientPackets {
 		= new UpdateEmcMaps("update_emc_maps");
 	public static final UpdateBlockTransmutationMap UPDATE_BLOCK_TRANSMUTATION_MAP
 		= new UpdateBlockTransmutationMap("update_block_transmutation_map");
-	
+	public static final UpdateNbtItems UPDATE_NBT_ITEMS
+		= new UpdateNbtItems("update_nbt_items");
 	
 	public static final ServerToClientPacket[] PACKETS = {
 			UPDATE_CONSUMER_BLOCK, 
 			UPDATE_TRANSMUTATION_LAST_PAGE, UPDATE_PLAYER_EMC,
-			UPDATE_EMC_MAPS, UPDATE_BLOCK_TRANSMUTATION_MAP};
+			UPDATE_EMC_MAPS, UPDATE_BLOCK_TRANSMUTATION_MAP, 
+			UPDATE_NBT_ITEMS};
 
 	public static void register() {
 		for (ServerToClientPacket packet : PACKETS) {

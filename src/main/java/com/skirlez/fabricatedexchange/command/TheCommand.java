@@ -236,14 +236,14 @@ public class TheCommand {
 			context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.recipe.pardon.unsupported_type", type));
 			return 0;
 		}
-		Map<String, HashSet<String>> blacklisted = ModDataFiles.BLACKLISTED_MAPPER_RECIPES.getValue();
+		Map<String, HashSet<String>> blacklisted = ModDataFiles.BLACKLISTED_MAPPER_RECIPES.getCopy();
 		String name = recipe.getId().toString();
 		if (!blacklisted.get(type).contains(name)) {
 			context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.nothing"));
 			return 0;
 		}
 		blacklisted.get(type).remove(name);
-		ModDataFiles.BLACKLISTED_MAPPER_RECIPES.save();
+		ModDataFiles.BLACKLISTED_MAPPER_RECIPES.setValueAndSave(blacklisted);
 		context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.recipe.pardon.success", type));
 		return 1;
 	}
