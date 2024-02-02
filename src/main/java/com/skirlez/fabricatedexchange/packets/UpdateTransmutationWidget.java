@@ -1,7 +1,5 @@
 package com.skirlez.fabricatedexchange.packets;
 
-import java.util.Optional;
-
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandler;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;

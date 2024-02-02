@@ -1,8 +1,5 @@
 package com.skirlez.fabricatedexchange.packets;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.google.common.collect.ImmutableMap;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
@@ -46,27 +43,27 @@ public class UpdateEmcMaps extends ServerToClientPacket {
 		ServerPlayNetworking.send(player, id, buffer);	
 	}
 	public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-		Map<Item, SuperNumber> emcMap = new HashMap<Item, SuperNumber>();
-		Map<Potion, SuperNumber> potionEmcMap = new HashMap<Potion, SuperNumber>();
-		Map<Enchantment, SuperNumber> enchantmentEmcMap = new HashMap<Enchantment, SuperNumber>();
+		ImmutableMap.Builder<Item, SuperNumber> emcMapBuilder = ImmutableMap.builder();
+		ImmutableMap.Builder<Potion, SuperNumber> potionEmcMapBuilder = ImmutableMap.builder();
+		ImmutableMap.Builder<Enchantment, SuperNumber> enchantmentEmcMapBuilder = ImmutableMap.builder();
 		int iterations = buf.readInt();
 		for (int i = 0; i < iterations; i++) {
 			Identifier id = buf.readIdentifier();
-			emcMap.put(Registries.ITEM.get(id), new SuperNumber(buf.readString()));
+			emcMapBuilder.put(Registries.ITEM.get(id), new SuperNumber(buf.readString()));
 		}
 		int potionIterations = buf.readInt();
 		for (int i = 0; i < potionIterations; i++) {
 			Identifier id = buf.readIdentifier();
-			potionEmcMap.put(Registries.POTION.get(id), new SuperNumber(buf.readString()));
+			potionEmcMapBuilder.put(Registries.POTION.get(id), new SuperNumber(buf.readString()));
 		}
 		int enchantmentIterations = buf.readInt();
 		for (int i = 0; i < enchantmentIterations; i++) {
 			Identifier id = buf.readIdentifier();
-			enchantmentEmcMap.put(Registries.ENCHANTMENT.get(id), new SuperNumber(buf.readString()));
+			enchantmentEmcMapBuilder.put(Registries.ENCHANTMENT.get(id), new SuperNumber(buf.readString()));
 		}
-		EmcData.emcMap = ImmutableMap.copyOf(emcMap);
-		EmcData.potionEmcMap = ImmutableMap.copyOf(potionEmcMap);
-		EmcData.enchantmentEmcMap = ImmutableMap.copyOf(enchantmentEmcMap);
+		EmcData.emcMap = emcMapBuilder.build();
+		EmcData.potionEmcMap = potionEmcMapBuilder.build();
+		EmcData.enchantmentEmcMap = enchantmentEmcMapBuilder.build();
 	}
 }
 

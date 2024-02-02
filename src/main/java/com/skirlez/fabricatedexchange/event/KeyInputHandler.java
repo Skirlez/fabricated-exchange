@@ -18,7 +18,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 
-public class KeyInputHandler {
+public abstract class KeyInputHandler {
 	public static final String KEY_CATEGORY = "key.category.fabricated-exchange";
 	public static final String KEY_CHARGE_ITEM = "key.fabricated-exchange.charge";
 	public static final String KEY_MODE_ITEM = "key.fabricated-exchange.mode";

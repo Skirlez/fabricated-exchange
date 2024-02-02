@@ -4,7 +4,7 @@ import com.skirlez.fabricatedexchange.FabricatedExchange;
 
 import net.minecraft.util.Identifier;
 
-class Identifiable {
+abstract class Identifiable {
 	protected final Identifier id;
 	public Identifiable(String name) {
 		id = new Identifier(FabricatedExchange.MOD_ID, name);

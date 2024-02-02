@@ -15,7 +15,6 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
 
 public class UpdateBlockTransmutationMap extends ServerToClientPacket {
 	public UpdateBlockTransmutationMap(String name) {
@@ -29,8 +28,8 @@ public class UpdateBlockTransmutationMap extends ServerToClientPacket {
 		Iterator<Block> iterator = keySet.iterator();
 		while (iterator.hasNext()) {
 			Block block = iterator.next();
-			buf.writeString(Registries.BLOCK.getId(block).toString());
-			buf.writeString(Registries.BLOCK.getId(BlockTransmutation.blockTransmutationMap.get(block)).toString());
+			buf.writeIdentifier(Registries.BLOCK.getId(block));
+			buf.writeIdentifier(Registries.BLOCK.getId(BlockTransmutation.blockTransmutationMap.get(block)));
 		}
 		ServerPlayNetworking.send(player, id, buf);
 	}
@@ -39,10 +38,13 @@ public class UpdateBlockTransmutationMap extends ServerToClientPacket {
 		int iterations = buf.readInt();
 		ImmutableMap.Builder<Block, Block> builder = ImmutableMap.builder();
 		for (int i = 0; i < iterations; i++) {
-			String block1 = buf.readString();
-			String block2 = buf.readString();
-			builder.put(Registries.BLOCK.get(new Identifier(block1)), Registries.BLOCK.get(new Identifier(block2)));
+			Block block1 = Registries.BLOCK.get(buf.readIdentifier());
+			Block block2 = Registries.BLOCK.get(buf.readIdentifier());
+			if (block1 == null || block2 == null)
+				continue;
+			builder.put(block1, block2);
 		}
 		BlockTransmutation.blockTransmutationMap = builder.build();
 	}
+	
 }

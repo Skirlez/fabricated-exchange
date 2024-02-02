@@ -1,7 +1,5 @@
 package com.skirlez.fabricatedexchange;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import com.google.common.collect.ImmutableMap;

@@ -12,4 +12,5 @@ public abstract class ClientToServerPacket extends Identifiable {
 	}
 	public abstract void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler,
 			PacketByteBuf buf, PacketSender responseSender);
+	
 }

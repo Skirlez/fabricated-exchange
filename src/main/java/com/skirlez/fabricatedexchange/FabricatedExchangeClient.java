@@ -3,27 +3,19 @@ import com.skirlez.fabricatedexchange.block.AlchemicalChestBlockEntity;
 import com.skirlez.fabricatedexchange.block.EnergyCondenserBlockEntity;
 import com.skirlez.fabricatedexchange.block.ModBlockEntities;
 import com.skirlez.fabricatedexchange.block.ModBlocks;
-import com.skirlez.fabricatedexchange.command.ClientCommand;
 import com.skirlez.fabricatedexchange.event.KeyInputHandler;
 import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
-import com.skirlez.fabricatedexchange.screen.AlchemicalChestScreen;
-import com.skirlez.fabricatedexchange.screen.AntiMatterRelayScreen;
-import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreen;
-import com.skirlez.fabricatedexchange.screen.EnergyCondenserScreen;
-import com.skirlez.fabricatedexchange.screen.ModScreenHandlers;
-import com.skirlez.fabricatedexchange.screen.TransmutationTableScreen;
+import com.skirlez.fabricatedexchange.screen.ModScreens;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.render.block.entity.ChestBlockEntityRenderer;
 import net.minecraft.resource.ResourceManager;
@@ -43,17 +35,9 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
-		HandledScreens.register(ModScreenHandlers.TRANSMUTATION_TABLE, TransmutationTableScreen::new);
-		HandledScreens.register(ModScreenHandlers.ENERGY_COLLECTOR, EnergyCollectorScreen::new);
-		HandledScreens.register(ModScreenHandlers.ANTIMATTER_RELAY, AntiMatterRelayScreen::new);
-		HandledScreens.register(ModScreenHandlers.ALCHEMICAL_CHEST, AlchemicalChestScreen::new);
-		HandledScreens.register(ModScreenHandlers.ENERGY_CONDENSER, EnergyCondenserScreen::new);
+		ModScreens.register();
 		KeyInputHandler.register();
 		ModServerToClientPackets.register();
-		
-		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-			ClientCommand.register(dispatcher);
-		});
 		
 		// we can use the vanilla renderers due to the texture mixin, see ModTexturedRenderLayers
 		BlockEntityRendererFactories.register(ModBlockEntities.ALCHEMICAL_CHEST, ChestBlockEntityRenderer::new);

@@ -6,7 +6,6 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 import com.skirlez.fabricatedexchange.BlockTransmutation;
-import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.mixin.ItemAccessor;
 import com.skirlez.fabricatedexchange.screen.BlocklessCraftingScreenHandler;
 import com.skirlez.fabricatedexchange.sound.ModSounds;

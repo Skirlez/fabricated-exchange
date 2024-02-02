@@ -27,7 +27,6 @@ public class UpdateConsumerBlock extends ServerToClientPacket {
 	public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
 		BlockPos pos = buf.readBlockPos();
 		SuperNumber emc = new SuperNumber(buf.readString());
-		
 		if (client.world.getBlockEntity(pos) instanceof ConsumerBlockEntity blockEntity)
 			blockEntity.update(emc);
 	}
