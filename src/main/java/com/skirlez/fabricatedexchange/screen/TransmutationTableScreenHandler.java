@@ -9,7 +9,7 @@ import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.item.NbtItem;
-import com.skirlez.fabricatedexchange.networking.ModMessages;
+import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
 import com.skirlez.fabricatedexchange.screen.slot.transmutation.ConsumeSlot;
 import com.skirlez.fabricatedexchange.screen.slot.transmutation.ForgetSlot;
 import com.skirlez.fabricatedexchange.screen.slot.transmutation.MidSlot;
@@ -19,8 +19,6 @@ import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -166,10 +164,10 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 	public void setLastPageNum(int lastOfferingPage) {
 		this.lastOfferingPage = lastOfferingPage;
 	}
-
+	
 	public void refreshOffering() {
-		SuperNumber emc = ServerState.getPlayerState(this.player).emc;
-		SuperNumber midItemEmc = EmcData.getItemStackEmc(this.slots.get(0).getStack());
+		SuperNumber emc = ServerState.getPlayerState(player).emc;
+		SuperNumber midItemEmc = EmcData.getItemStackEmc(slots.get(0).getStack());
 		if (!midItemEmc.equalsZero())
 			emc = SuperNumber.min(emc, midItemEmc);
 		
@@ -216,14 +214,8 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 				offeringPageNum = 0;
 		}
 		
-		if (((ServerPlayerEntity)player).currentScreenHandler instanceof TransmutationTableScreenHandler) {
-			PacketByteBuf buf = PacketByteBufs.create();
-			buf.writeInt(lastOfferingPage);
-			ServerPlayNetworking.send((ServerPlayerEntity)player, ModMessages.TRANSMUTATION_TABLE_MAX_PAGE, buf);
-		}
-
-
-
+		ModServerToClientPackets.UPDATE_TRANSMUTATION_LAST_PAGE.send((ServerPlayerEntity)player, lastOfferingPage);
+		
 		// clear all the transmutation slots
 		for (int i = 0; i < transmutationSlots.size(); i++)
 			transmutationSlots.get(i).setStack(ItemStack.EMPTY);

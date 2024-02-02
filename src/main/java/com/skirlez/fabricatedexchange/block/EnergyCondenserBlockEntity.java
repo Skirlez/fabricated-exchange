@@ -3,6 +3,7 @@ package com.skirlez.fabricatedexchange.block;
 import java.util.LinkedList;
 
 import com.skirlez.fabricatedexchange.emc.EmcData;
+import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
 import com.skirlez.fabricatedexchange.screen.EnergyCondenserScreen;
 import com.skirlez.fabricatedexchange.screen.EnergyCondenserScreenHandler;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
@@ -125,7 +126,7 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 	@Override
 	public ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
 		ServerPlayerEntity player = (ServerPlayerEntity)playerInventory.player;
-		serverSyncPlayer(pos, emc, player);
+		ModServerToClientPackets.UPDATE_CONSUMER_BLOCK.send(player, pos, emc);
 		players.add(player);
 		return new EnergyCondenserScreenHandler(syncId, playerInventory, pos, level, null);
 	}

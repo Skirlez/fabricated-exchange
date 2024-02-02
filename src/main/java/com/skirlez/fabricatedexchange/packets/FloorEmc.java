@@ -1,6 +1,5 @@
-package com.skirlez.fabricatedexchange.networking.packet;
+package com.skirlez.fabricatedexchange.packets;
 
-import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandler;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
@@ -11,8 +10,16 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-public class FloorEmcC2SPacket {
-	public static void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler,
+public class FloorEmc extends ClientToServerPacket {
+	public FloorEmc(String name) {
+		super(name);
+	}
+
+	public void send() {
+		
+	}
+	
+	public void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler,
 			PacketByteBuf buf, PacketSender responseSender) {   
 		if (!(player.currentScreenHandler instanceof TransmutationTableScreenHandler))
 			return;
@@ -22,6 +29,6 @@ public class FloorEmcC2SPacket {
 			
 		state.emc.floor();
 		state.markDirty();
-		EmcData.syncEmc(player, state.emc);
+		ModServerToClientPackets.UPDATE_PLAYER_EMC.send(player, state.emc);
 	}
 }

@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.interfaces.ImplementedInventory;
+import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
 import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreen;
 import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreenHandler;
 import com.skirlez.fabricatedexchange.screen.slot.FakeSlot;
@@ -201,7 +202,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 
 	@Override
 	public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-		serverSyncPlayer(pos, emc, (ServerPlayerEntity)player);
+		ModServerToClientPackets.UPDATE_CONSUMER_BLOCK.send((ServerPlayerEntity)player, pos, emc);
 		players.add((ServerPlayerEntity)player);
 		return new EnergyCollectorScreenHandler(syncId, inv, pos, level, null);
 	}

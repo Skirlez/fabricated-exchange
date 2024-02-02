@@ -1,21 +1,19 @@
 package com.skirlez.fabricatedexchange.event;
 
 import com.skirlez.fabricatedexchange.item.ItemWithModes;
+import com.skirlez.fabricatedexchange.packets.ModClientToServerPackets;
+
 import org.lwjgl.glfw.GLFW;
 
 import com.skirlez.fabricatedexchange.item.ChargeableItem;
 import com.skirlez.fabricatedexchange.item.ExtraFunctionItem;
-import com.skirlez.fabricatedexchange.networking.ModMessages;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
@@ -43,10 +41,9 @@ public class KeyInputHandler {
 						return;
 				}
 
-				PacketByteBuf buffer = PacketByteBufs.create();
-				buffer.writeBoolean(Screen.hasShiftDown());
-				ClientPlayNetworking.send(ModMessages.ITEM_CHARGE_IDENTIFIER, buffer);
-	
+
+				ModClientToServerPackets.CHARGE_ITEM.send();
+				
 				ChargeableItem item = (ChargeableItem)stack.getItem();
 				int value = (Screen.hasShiftDown()) ? -1 : 1;
 				ChargeableItem.chargeStack(stack, value, 0, item.getMaxCharge(), client.player);   
@@ -56,11 +53,11 @@ public class KeyInputHandler {
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			if (extraFunctionKey.isPressed()) {
 				ItemStack stack = client.player.getStackInHand(Hand.MAIN_HAND);
-				if (!(stack.getItem() instanceof ExtraFunctionItem)) {
+				if (!(stack.getItem() instanceof ExtraFunctionItem item)) {
 					return;
 				}
-				ClientPlayNetworking.send(ModMessages.EXTRA_FUNCTION_IDENTIFIER, PacketByteBufs.create());
-				((ExtraFunctionItem)stack.getItem()).doExtraFunctionClient(stack, client.player);
+				ModClientToServerPackets.DO_ITEM_EXTRA_FUNCTION.send();
+				item.doExtraFunctionClient(stack, client.player);
 			}
 		});
 
@@ -72,7 +69,7 @@ public class KeyInputHandler {
 					return;
 			
 				if (item.modeSwitchCondition(stack)) {
-					ClientPlayNetworking.send(ModMessages.CYCLE_ITEM_MODE_IDENTIFIER, PacketByteBufs.create());
+					ModClientToServerPackets.CYCLE_ITEM_MODE.send();
 					ItemWithModes.cycleModes(stack, null);
 					client.player.playSound(SoundEvents.BLOCK_STONE_BREAK, SoundCategory.PLAYERS, 1f, 1.4f);
 				}

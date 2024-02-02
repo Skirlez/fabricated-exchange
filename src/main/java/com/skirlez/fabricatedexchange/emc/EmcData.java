@@ -5,14 +5,12 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 import com.skirlez.fabricatedexchange.item.NbtItem;
-import com.skirlez.fabricatedexchange.networking.ModMessages;
+import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import com.skirlez.fabricatedexchange.util.config.EmcMapFile;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
@@ -23,7 +21,6 @@ import net.minecraft.item.TippedArrowItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.potion.Potion;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -203,44 +200,18 @@ public class EmcData {
 	public static void setEmc(ServerPlayerEntity player, SuperNumber amount) {
 		PlayerState playerState = ServerState.getPlayerState(player);
 		playerState.emc = amount;
-		syncEmc(player, playerState.emc);
+		ModServerToClientPackets.UPDATE_PLAYER_EMC.send(player, playerState.emc);
 	}	
 	public static void addEmc(ServerPlayerEntity player, SuperNumber amount) {
 		PlayerState playerState = ServerState.getPlayerState(player);
 		playerState.emc.add(amount);
-		syncEmc(player, playerState.emc);
+		ModServerToClientPackets.UPDATE_PLAYER_EMC.send(player, playerState.emc);
 	}	
 	public static void subtractEmc(ServerPlayerEntity player, SuperNumber amount) {
 		PlayerState playerState = ServerState.getPlayerState(player);
 		playerState.emc.subtract(amount);
-		syncEmc((ServerPlayerEntity) player, playerState.emc);
+		ModServerToClientPackets.UPDATE_PLAYER_EMC.send((ServerPlayerEntity)player, playerState.emc);
 	}	
-	public static void syncEmc(ServerPlayerEntity player, SuperNumber emc) {
-		PacketByteBuf buffer = PacketByteBufs.create();
-		buffer.writeString(emc.divisionString());
-		
-		ServerPlayNetworking.send(player, ModMessages.EMC_SYNC_IDENTIFIER, buffer);
-	}
 
-	public static void syncMap(ServerPlayerEntity player) {
-		// send all the maps over
-		PacketByteBuf buffer = PacketByteBufs.create();
-		buffer.writeInt(EmcData.emcMap.keySet().size());
-		for (Item s : EmcData.emcMap.keySet()) {
-			buffer.writeIdentifier(Registries.ITEM.getId(s));
-			buffer.writeString(EmcData.emcMap.get(s).divisionString());
-		}
-		buffer.writeInt(EmcData.potionEmcMap.keySet().size());
-		for (Potion s : EmcData.potionEmcMap.keySet()) {
-			buffer.writeIdentifier(Registries.POTION.getId(s));
-			buffer.writeString(EmcData.potionEmcMap.get(s).divisionString());
-		}
-		buffer.writeInt(EmcData.enchantmentEmcMap.keySet().size());
-		for (Enchantment s : EmcData.enchantmentEmcMap.keySet()) {
-			buffer.writeIdentifier(Registries.ENCHANTMENT.getId(s));
-			buffer.writeString(EmcData.enchantmentEmcMap.get(s).divisionString());
-		}
 
-		ServerPlayNetworking.send(player, ModMessages.EMC_MAP_SYNC_IDENTIFIER, buffer);
-	}
 }

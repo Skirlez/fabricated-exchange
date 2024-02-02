@@ -6,11 +6,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.mixin.client.HandledScreenAccessor;
-import com.skirlez.fabricatedexchange.networking.ModMessages;
+import com.skirlez.fabricatedexchange.packets.ModClientToServerPackets;
 import com.skirlez.fabricatedexchange.screen.slot.transmutation.TransmutationSlot;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -124,7 +123,7 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 		if (floorButtonEnabled) {
 			this.floorButton = ButtonWidget.builder(
 				Text.of("Floor"),
-				button -> floorEmc())
+				button -> floorEmcPress())
 				.dimensions(x + 4, y + 116, 31, 12)
 				.build();
 			
@@ -278,15 +277,12 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 		resetAngleTime(0.4);
 		offeringPageNum = 0;
 		oldSearchText = searchText;
-		PacketByteBuf buffer = PacketByteBufs.create();
-		buffer.writeInt(0);
-		buffer.writeString(searchText);
-		
-		ClientPlayNetworking.send(ModMessages.TRANSMUTATION_TABLE_WIDGETS, buffer);
+		ModClientToServerPackets.UPDATE_TRANSMUTATION_WIDGET.sendSearch(searchText);
 	}
 	private void updatePage(boolean dir) {
 		PacketByteBuf buffer = PacketByteBufs.create();
-		buffer.writeInt(1);
+		
+		
 		boolean changedPage = false;
 		if (dir == false) { // left 
 			offeringPageNum--;
@@ -319,12 +315,12 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 				declineStartTime = System.currentTimeMillis();
 			}
 		}
-
-		ClientPlayNetworking.send(ModMessages.TRANSMUTATION_TABLE_WIDGETS, buffer);
+		ModClientToServerPackets.UPDATE_TRANSMUTATION_WIDGET.sendPage(offeringPageNum);
+		//ClientPlayNetworking.send(ModMessages.TRANSMUTATION_TABLE_WIDGETS, buffer);
 	}
 
-	private void floorEmc() {
-		ClientPlayNetworking.send(ModMessages.FLOOR_EMC_IDENTIFIER, PacketByteBufs.create());
+	private void floorEmcPress() {
+		ModClientToServerPackets.FLOOR_EMC.send();
 	}
 
 	public Slot getFocusedSlot() {

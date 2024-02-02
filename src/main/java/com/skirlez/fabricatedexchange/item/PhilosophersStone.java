@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
 
+import com.skirlez.fabricatedexchange.BlockTransmutation;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.mixin.ItemAccessor;
 import com.skirlez.fabricatedexchange.screen.BlocklessCraftingScreenHandler;
@@ -28,7 +29,7 @@ import net.minecraft.world.World;
 
 
 // The philosopher's stone implements nearly all the special item interfaces. A good example item, I'd say.
-public class PhilosophersStone extends Item 
+public class PhilosophersStone extends Item
 		implements ChargeableItem, ExtraFunctionItem, OutliningItem, ItemWithModes {
 	
 	public PhilosophersStone(Settings settings) {
@@ -58,7 +59,7 @@ public class PhilosophersStone extends Item
 		BlockPos pos = context.getBlockPos();
 		World world = context.getWorld();
 		Block block = world.getBlockState(pos).getBlock();
-		boolean valid = FabricatedExchange.blockTransmutationMap.containsKey(block);
+		boolean valid = BlockTransmutation.blockTransmutationMap.containsKey(block);
 		if (valid) {
 			context.getPlayer().playSound(ModSounds.PS_USE, 1f, 1f);
 			if (world.isClient()) {
@@ -72,11 +73,11 @@ public class PhilosophersStone extends Item
 				ItemStack stack = context.getStack();
 				int charge = ChargeableItem.getCharge(stack);
 				if (charge == 0) 
-					world.setBlockState(pos, FabricatedExchange.blockTransmutationMap.get(block).getDefaultState());
+					world.setBlockState(pos, BlockTransmutation.blockTransmutationMap.get(block).getDefaultState());
 				else {
 					List<BlockPos> positions = getPositionsToOutline(context.getPlayer(), stack, pos);
 					for (BlockPos newPos : positions)
-						world.setBlockState(newPos, FabricatedExchange.blockTransmutationMap.get(block).getDefaultState());
+						world.setBlockState(newPos, BlockTransmutation.blockTransmutationMap.get(block).getDefaultState());
 				}
 				
 			}
@@ -94,7 +95,7 @@ public class PhilosophersStone extends Item
 
 	@Override
 	public boolean outlineEntryCondition(BlockState state) {
-		return FabricatedExchange.blockTransmutationMap.containsKey(state.getBlock());
+		return BlockTransmutation.blockTransmutationMap.containsKey(state.getBlock());
 	}
 
 	@Override

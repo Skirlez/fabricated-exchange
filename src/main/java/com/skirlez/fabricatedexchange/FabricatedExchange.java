@@ -3,27 +3,18 @@ package com.skirlez.fabricatedexchange;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.block.Block;
 import net.minecraft.item.Item;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +26,8 @@ import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.emc.EmcMapper;
 import com.skirlez.fabricatedexchange.item.ModItemGroups;
 import com.skirlez.fabricatedexchange.item.ModItems;
-import com.skirlez.fabricatedexchange.networking.ModMessages;
+import com.skirlez.fabricatedexchange.packets.ModClientToServerPackets;
+import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
 import com.skirlez.fabricatedexchange.screen.ModScreenHandlers;
 import com.skirlez.fabricatedexchange.sound.ModSounds;
 import com.skirlez.fabricatedexchange.util.ModTags;
@@ -49,7 +41,7 @@ public class FabricatedExchange implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger("fabricated-exchange");
 	public static final String MOD_ID = "fabricated-exchange";
 	// this map tells the philosopher's stone what block to transform when right clicked
-	public static Map<Block, Block> blockTransmutationMap = new HashMap<Block, Block>();
+	
 	// this map will be filled with all the items that have the transmutation_fuel tag, and each key value pair will represent a jump in progression between the fuel items
 	// (e.g. in vanilla, coal (32 emc) will have a key value pair with redstone (64 emc), the next item with the fuel tag that has more emc than it.)
 	public static Map<Item, Item> fuelProgressionMap = new HashMap<Item, Item>();
@@ -65,7 +57,7 @@ public class FabricatedExchange implements ModInitializer {
 		ModBlocks.registerModBlocks();
 		ModBlockEntities.registerBlockEntities();
 		ModScreenHandlers.registerAllScreenHandlers();
-		ModMessages.registerC2SPackets();
+		ModClientToServerPackets.register();
 		
 		ModDataFiles.MAIN_CONFIG_FILE.fetch();
 		
@@ -77,9 +69,9 @@ public class FabricatedExchange implements ModInitializer {
 			// send the player's own emc value
 			ServerPlayerEntity player = handler.player;
 			PlayerState playerState = ServerState.getPlayerState(player);
-			EmcData.syncEmc(player, playerState.emc);
-			EmcData.syncMap(player);
-			syncBlockTransmutation(player);
+			ModServerToClientPackets.UPDATE_PLAYER_EMC.send(player, playerState.emc);
+			ModServerToClientPackets.UPDATE_EMC_MAPS.send(player);
+			ModServerToClientPackets.UPDATE_BLOCK_TRANSMUTATION_MAP.send(player);
 		});
 
 		ServerLifecycleEvents.SERVER_STARTED.register((server) -> {
@@ -90,7 +82,7 @@ public class FabricatedExchange implements ModInitializer {
 
 	public static void reload() {
 		ModDataFiles.fetchAll();
-		generateBlockRotationMap(ModDataFiles.BLOCK_TRANSMUTATION_MAP.getValue());
+		BlockTransmutation.generateBlockRotationMap(ModDataFiles.BLOCK_TRANSMUTATION_MAP.getValue());
 		
 	}
 	
@@ -131,71 +123,17 @@ public class FabricatedExchange implements ModInitializer {
 		}
 		fuelProgressionMap = newFuelProgressionMap;
 
-
 		return hasWarned;
 	}
 
 	public static void syncMaps(MinecraftServer server) {
-		for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-			EmcData.syncMap(player);
-		}
+		for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList())
+			ModServerToClientPackets.UPDATE_EMC_MAPS.send(player);
 	}
 	public static void syncBlockTransmutations(MinecraftServer server) {
-		for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-			syncBlockTransmutation(player);
-		}
+		for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList())
+			ModServerToClientPackets.UPDATE_BLOCK_TRANSMUTATION_MAP.send(player);
 	}
 
-	private static void syncBlockTransmutation(ServerPlayerEntity player) {
-		PacketByteBuf buf = PacketByteBufs.create();
-		Set<Block> keySet = blockTransmutationMap.keySet();
-		buf.writeInt(keySet.size());
-		Iterator<Block> iterator = keySet.iterator();
-		while (iterator.hasNext()) {
-			Block block = iterator.next();
-			buf.writeString(Registries.BLOCK.getId(block).toString());
-			buf.writeString(Registries.BLOCK.getId(blockTransmutationMap.get(block)).toString());
-		}
-		ServerPlayNetworking.send(player, ModMessages.BLOCK_TRANSMUTATION_SYNC_IDENTIFIER, buf);
-	}
 
-	public static void generateBlockRotationMap(String[][] blockTransmutationData) {
-		if (blockTransmutationData == null)
-			return;
-		blockTransmutationMap.clear();
-		for (int i = 0; i < blockTransmutationData.length; i++) {
-			int j = 0;
-			// GSON just packages the String[][] with a FREE (100% off) NULL™ for no reason so i guess we have to check for it
-			if (blockTransmutationData[i] == null) 
-				continue;
-			int len = blockTransmutationData[i].length;
-			if (len == 0)
-				continue;
-			if (len == 1) {
-				String str = blockTransmutationData[i][j];
-				String[] parts = str.split("#");
-				addBlockRelation(parts[0], parts[1]); 
-				continue;
-			}
-			while (j < len - 1) {
-				addBlockRelation(blockTransmutationData[i][j], blockTransmutationData[i][j + 1]); 
-				j++;
-			}
-			addBlockRelation(blockTransmutationData[i][j], blockTransmutationData[i][0]); 
-		}
-	}
-
-	private static void addBlockRelation(String str1, String str2) {
-		Block b1 = Registries.BLOCK.get(new Identifier(str1));
-		Block b2 = Registries.BLOCK.get(new Identifier(str2));
-		if (b1 == null || b2 == null) {
-			FabricatedExchange.LOGGER.error("Invalid block(s) found in block_transmutation_map.json! Block 1: " + str1 + " -> Block 2: " + str2);
-			return;
-		}
-		if (blockTransmutationMap.containsKey(b1)) {
-			FabricatedExchange.LOGGER.error("Duplicate block transmutation in block_transmutation_map.json! Block 1: " + str1 + " -> Block 2: " + str2);
-			return;
-		}
-		blockTransmutationMap.put(b1, b2);
-	};
 }

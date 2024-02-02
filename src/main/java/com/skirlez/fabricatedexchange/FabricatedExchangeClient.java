@@ -5,7 +5,7 @@ import com.skirlez.fabricatedexchange.block.ModBlockEntities;
 import com.skirlez.fabricatedexchange.block.ModBlocks;
 import com.skirlez.fabricatedexchange.command.ClientCommand;
 import com.skirlez.fabricatedexchange.event.KeyInputHandler;
-import com.skirlez.fabricatedexchange.networking.ModMessages;
+import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
 import com.skirlez.fabricatedexchange.screen.AlchemicalChestScreen;
 import com.skirlez.fabricatedexchange.screen.AntiMatterRelayScreen;
 import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreen;
@@ -49,7 +49,7 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 		HandledScreens.register(ModScreenHandlers.ALCHEMICAL_CHEST, AlchemicalChestScreen::new);
 		HandledScreens.register(ModScreenHandlers.ENERGY_CONDENSER, EnergyCondenserScreen::new);
 		KeyInputHandler.register();
-		ModMessages.registerS2CPackets();
+		ModServerToClientPackets.register();
 		
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
 			ClientCommand.register(dispatcher);

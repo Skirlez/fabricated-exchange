@@ -5,18 +5,15 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.skirlez.fabricatedexchange.networking.ModMessages;
+import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
 import com.skirlez.fabricatedexchange.screen.LeveledScreenHandler;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 
-/* This interface is used by block entities that can share and take EMC from other block entities. 
+/** This interface is used by block entities that can share and take EMC from other block entities. 
 the block entites can be in one of two states: an idle state and a consuming state.
 For example: When the Energy Collectors have no fuel items in them, They are in the idle state,
 simply generating EMC. When a fuel item is put inside of them, they are in the consuming state,
@@ -68,25 +65,15 @@ public interface ConsumerBlockEntity {
 	default void serverSync(BlockPos pos, SuperNumber emc, LinkedList<ServerPlayerEntity> list) {
 		if (list.size() == 0)
 			return;
-		PacketByteBuf data = PacketByteBufs.create();
-		data.writeBlockPos(pos);
-		data.writeString(emc.divisionString());
-		
 		Iterator<ServerPlayerEntity> iterator = list.iterator();
 		while (iterator.hasNext()) {
 			ServerPlayerEntity player = iterator.next();
 			if (player.currentScreenHandler instanceof LeveledScreenHandler screenHandler
 					&& pos.equals(screenHandler.getPos())) 
-				ServerPlayNetworking.send(player, ModMessages.CONSUMER_BLOCK_SYNC, data);
+				ModServerToClientPackets.UPDATE_CONSUMER_BLOCK.send(player, pos, emc);
 			else
 				iterator.remove();
 		}
-	}
-	default void serverSyncPlayer(BlockPos pos, SuperNumber emc, ServerPlayerEntity player) {
-		PacketByteBuf data = PacketByteBufs.create();
-		data.writeBlockPos(pos);
-		data.writeString(emc.divisionString());
-		ServerPlayNetworking.send(player, ModMessages.CONSUMER_BLOCK_SYNC, data);
 	}
 
 	void update(SuperNumber emc);

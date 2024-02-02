@@ -36,6 +36,7 @@ public class TransmutationTable extends Block {
 	@Override
 	public ActionResult onUse(BlockState state, World world, 
 		BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+		
 		if (!world.isClient) {
 			TransmutationTableScreenHandlerFactory screenHandlerFactory = new TransmutationTableScreenHandlerFactory();
 			player.openHandledScreen(screenHandlerFactory);
