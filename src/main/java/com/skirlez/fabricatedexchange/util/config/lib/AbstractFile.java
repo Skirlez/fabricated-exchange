@@ -8,11 +8,11 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 
+import com.google.gson.reflect.TypeToken;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 
@@ -33,8 +33,8 @@ import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
  * The type T should be a type representing the JSON. It should be important to
  * note that if for example, the file represents a list of Item, the type T
  * should actually be String[], and not Item[], even if the parser knows how to
- * convert the JSON strings to Item automatically. this is because specifically
- * for Modded Minecraft, invalid entries might be left over from other mods, and
+ * convert the JSON strings to Item automatically. This is because specifically
+ * for modded Minecraft, items from previous, now removed mods might be in that file, and
  * we don't want to error on those. but in general, if the JSON type used to
  * represent the custom class can be invalid, the Java equivalent of the JSON
  * type should be used instead, and the conversion should be done manually in
@@ -47,16 +47,13 @@ public abstract class AbstractFile<T> {
 	// The folder where the file is stored
 	private final Path path;
 	// The type of the value
-	protected final Type type;
 	// The name of the file
 	protected final String name;
 	// The file's value
 	protected T value;
 	// The file's actual character information.
 	protected String file;
-
-	public AbstractFile(Type type, String name) {
-		this.type = type;
+	public AbstractFile(String name) {
 		this.name = name;
 		this.path = ModDataFiles.CONFIG_DIR.resolve(name);
 

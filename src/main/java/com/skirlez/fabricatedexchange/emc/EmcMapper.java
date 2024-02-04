@@ -105,20 +105,13 @@ public class EmcMapper {
 	        List<StonecuttingRecipe> allStonecuttingRecipes = recipeManager.listAllOfType(RecipeType.STONECUTTING);
 	        List<BrewingRecipeRegistry.Recipe<Item>> allBrewingRecipes = BrewingRecipeRegistryAccessor.getItemRecipes();
 	        // blacklisted recipes and items
-	        Map<String, HashSet<String>> blacklistedRecipes = ModDataFiles.BLACKLISTED_MAPPER_RECIPES.getValue();
-	        if (blacklistedRecipes == null)
-	            blacklistedRecipes = new HashMap<>();
-	        Set<String> smithingRecipesBlacklist = blacklistedRecipes.getOrDefault("smithing", new HashSet<String>());
-	        Set<String> smeltingRecipesBlacklist = blacklistedRecipes.getOrDefault("smelting", new HashSet<String>());
-	        Set<String> craftingRecipesBlacklist = blacklistedRecipes.getOrDefault("crafting", new HashSet<String>());
-	        Set<String> stonecuttingRecipesBlacklist = blacklistedRecipes.getOrDefault("stonecutting", new HashSet<String>());
-	        Set<String> brewingRecipesBlacklist = blacklistedRecipes.getOrDefault("brewing", new HashSet<String>());
 
-	        convertRecipesToEquations(allSmithingRecipes, smithingRecipesBlacklist, this::createSmithingEquation, this::getRecipeName);
-	        convertRecipesToEquations(allSmeltingRecipes, smeltingRecipesBlacklist, this::createSmeltingEquation, this::getRecipeName);
-	        convertRecipesToEquations(allCraftingRecipes, craftingRecipesBlacklist, this::createCraftingEquation, this::getRecipeName);
-	        convertRecipesToEquations(allStonecuttingRecipes, stonecuttingRecipesBlacklist, this::createStonecuttingEquation, this::getRecipeName);
-	        convertRecipesToEquations(allBrewingRecipes, brewingRecipesBlacklist, this::createBrewingEquation, this::getBrewingRecipeName);
+
+	        convertRecipesToEquations(allSmithingRecipes, "smithing", this::createSmithingEquation, this::getRecipeName);
+	        convertRecipesToEquations(allSmeltingRecipes, "smelting", this::createSmeltingEquation, this::getRecipeName);
+	        convertRecipesToEquations(allCraftingRecipes, "crafting", this::createCraftingEquation, this::getRecipeName);
+	        convertRecipesToEquations(allStonecuttingRecipes, "stonecutting", this::createStonecuttingEquation, this::getRecipeName);
+	        convertRecipesToEquations(allBrewingRecipes, "brewing", this::createBrewingEquation, this::getBrewingRecipeName);
 	
 	        createAllWorldInteractionEquations();
 	        
@@ -278,12 +271,12 @@ public class EmcMapper {
         return equation;
     }
 
-    private <T> void convertRecipesToEquations(List<T> allRecipes, Set<String> blacklist, 
-            Function<T, ItemEquation> equationConverter, Function<T, String> stringConverter) {
+    private <T> void convertRecipesToEquations(List<T> allRecipes, String type, 
+            Function<T, ItemEquation> equationConverter, Function<T, String> nameFunction) {
 
         for (int i = 0; i < allRecipes.size(); i++) {
             T recipe = allRecipes.get(i);
-            if (blacklist.contains(stringConverter.apply(recipe)))
+            if (ModDataFiles.BLACKLISTED_MAPPER_RECIPES.isRecipeBlacklisted(nameFunction.apply(recipe), type))
                 continue;
             ItemEquation equation = equationConverter.apply(recipe);
             if (equation == null)

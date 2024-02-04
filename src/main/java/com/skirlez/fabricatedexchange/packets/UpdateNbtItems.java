@@ -14,7 +14,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
 
 public class UpdateNbtItems extends ServerToClientPacket {
 
@@ -29,11 +28,11 @@ public class UpdateNbtItems extends ServerToClientPacket {
 		int totalItems = nbtItems.size();
 		buf.writeInt(totalItems);
 		for (Map.Entry<String, List<String>> entry : nbtItems.entrySet()) {
-			Identifier id = new Identifier(entry.getKey());
+			String id = entry.getKey();
 			List<String> nbtKeys = entry.getValue();
 			int size = nbtKeys.size();
 			
-			buf.writeIdentifier(id);
+			buf.writeString(id);
 			buf.writeInt(size);
 			for (String nbtKey : nbtKeys) {
 				buf.writeString(nbtKey);
@@ -47,7 +46,7 @@ public class UpdateNbtItems extends ServerToClientPacket {
 		int totalItems = buf.readInt();
 		HashMap<String, List<String>> nbtItems = new HashMap<String, List<String>>(totalItems);
 		for (int i = 0; i < totalItems; i++) {
-			String id = buf.readIdentifier().toString();
+			String id = buf.readString();
 			
 			int size = buf.readInt();
 			List<String> nbtKeys = new ArrayList<String>(size);

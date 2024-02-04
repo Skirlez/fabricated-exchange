@@ -21,8 +21,8 @@ public class MainConfig extends AbstractConfigFile<Map<String, Object>> {
 	
 	private final Map<String, Object> defaultValue;
 	
-	MainConfig(Type type, String name) {
-		super(type, name);
+	MainConfig(String name) {
+		super(name);
 		defaultValue = copyDefaultValue();
 	}
 

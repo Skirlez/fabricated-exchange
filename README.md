@@ -45,7 +45,7 @@ All of the code in this repository is licensed under the terms of the LGPLv3. I 
 # Project Goals
 
 - Support Quilt (Even over Fabric, if it ever comes to that choice)
-- Don't use any external libraries other than SnakeYAML (I really wanted YAML) and the Fabric API
+- Don't require any external dependency jars except for the Fabric API
 
 # Implemented Features
 
@@ -68,6 +68,7 @@ All of the code in this repository is licensed under the terms of the LGPLv3. I 
 - Infinitely precise EMC fractions (No more slabs without EMC values!)
 - Configurable support for items with NBT data in the Transmutation Table
 - Fancy animated Transmutation Table (Toggleable)
+- Config screen that can be opened with Mod Menu
  
 # Screenshot
 ![image](https://github.com/Skirlez/fabricated-exchange/assets/17904548/615b45d2-cbe0-4206-a2ed-d0192c6d8885)

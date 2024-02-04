@@ -1,6 +1,8 @@
 package com.skirlez.fabricatedexchange.command;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -218,7 +220,7 @@ public class TheCommand {
 			context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.recipe.ban.unsupported_type", type));
 			return 0;
 		}
-		Map<String, HashSet<String>> blacklisted = ModDataFiles.BLACKLISTED_MAPPER_RECIPES.getCopy();
+		Map<String, List<String>> blacklisted = ModDataFiles.BLACKLISTED_MAPPER_RECIPES.getCopy();
 		String name = recipe.getId().toString();
 		if (blacklisted.get(type).contains(name)) {
 			context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.nothing"));
@@ -236,7 +238,7 @@ public class TheCommand {
 			context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.recipe.pardon.unsupported_type", type));
 			return 0;
 		}
-		Map<String, HashSet<String>> blacklisted = ModDataFiles.BLACKLISTED_MAPPER_RECIPES.getCopy();
+		Map<String, List<String>> blacklisted = ModDataFiles.BLACKLISTED_MAPPER_RECIPES.getCopy();
 		String name = recipe.getId().toString();
 		if (!blacklisted.get(type).contains(name)) {
 			context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.nothing"));

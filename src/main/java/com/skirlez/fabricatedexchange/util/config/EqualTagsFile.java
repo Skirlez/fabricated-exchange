@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.gson.reflect.TypeToken;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.config.lib.DataFile;
@@ -18,8 +21,8 @@ public class EqualTagsFile extends DataFile<HashSet<String>> {
 
     private HashMap<Item, Integer> tagGroups;
     private int groupAmount;
-    public EqualTagsFile(Type type, String name) {
-        super(type, name);
+    public EqualTagsFile(String name) {
+        super(new TypeToken<HashSet<String>>() {}, name);
         tagGroups = new HashMap<Item, Integer>();
         groupAmount = 0;
     }

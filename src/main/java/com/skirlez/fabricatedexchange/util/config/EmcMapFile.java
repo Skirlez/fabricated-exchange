@@ -1,11 +1,12 @@
 package com.skirlez.fabricatedexchange.util.config;
 
-import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+
+import com.google.gson.reflect.TypeToken;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import com.skirlez.fabricatedexchange.util.config.lib.DataFile;
@@ -17,8 +18,8 @@ import net.minecraft.util.Identifier;
 public class EmcMapFile extends DataFile<Map<String, String>> {
 	private Map<Item, SuperNumber> emcMap;
 	
-	public EmcMapFile(Type type, String name) {
-		super(type, name);
+	public EmcMapFile(String name) {
+		super(new TypeToken<Map<String, String>>() {}, name);
 		emcMap = null;
 	}
 	@Override

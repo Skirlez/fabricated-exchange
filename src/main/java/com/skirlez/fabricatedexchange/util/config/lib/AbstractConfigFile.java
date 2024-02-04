@@ -20,6 +20,8 @@ import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.Tag;
 
+import com.google.gson.reflect.TypeToken;
+
 
 /** A file that uses YAML to save and supports comments. */
 public abstract class AbstractConfigFile<T> extends AbstractFile<T> {
@@ -31,10 +33,14 @@ public abstract class AbstractConfigFile<T> extends AbstractFile<T> {
 		YAML = new Yaml(dumperOptions);
 	}
 
+	private final Class<T> classType;
 	private final Map<String, String[]> commentsMap;
-	public AbstractConfigFile(Type type, String name) {
-		super(type, name);
+	
+	@SuppressWarnings("unchecked")
+	public AbstractConfigFile(String name) {
+		super(name);
 		this.commentsMap = new ConcurrentHashMap<String, String[]>();
+		this.classType = (Class<T>)new TypeToken<T>() {}.getRawType();
 	}
 
 	protected void clearComments() {
@@ -51,12 +57,8 @@ public abstract class AbstractConfigFile<T> extends AbstractFile<T> {
 
 	
 	@Override
-	@SuppressWarnings("unchecked")
 	protected T readValue(Reader reader) throws Exception {
-		if (type instanceof Class<?> classType)
-			return (T)YAML.loadAs(reader, classType);
-		else
-			throw new IllegalArgumentException("Type must be a Class object");
+		return YAML.loadAs(reader, classType);
 	}
 
 	@Override

@@ -58,7 +58,7 @@ public class PhilosophersStone extends Item
 		BlockPos pos = context.getBlockPos();
 		World world = context.getWorld();
 		Block block = world.getBlockState(pos).getBlock();
-		boolean valid = BlockTransmutation.blockTransmutationMap.containsKey(block);
+		boolean valid = BlockTransmutation.canTransmuteBlock(block);
 		if (valid) {
 			context.getPlayer().playSound(ModSounds.PS_USE, 1f, 1f);
 			if (world.isClient()) {
@@ -71,12 +71,13 @@ public class PhilosophersStone extends Item
 			else {
 				ItemStack stack = context.getStack();
 				int charge = ChargeableItem.getCharge(stack);
+				BlockState state = BlockTransmutation.getBlockToTransmute(block).get().getDefaultState();
 				if (charge == 0) 
-					world.setBlockState(pos, BlockTransmutation.blockTransmutationMap.get(block).getDefaultState());
+					world.setBlockState(pos, state);
 				else {
 					List<BlockPos> positions = getPositionsToOutline(context.getPlayer(), stack, pos);
 					for (BlockPos newPos : positions)
-						world.setBlockState(newPos, BlockTransmutation.blockTransmutationMap.get(block).getDefaultState());
+						world.setBlockState(newPos, state);
 				}
 				
 			}
@@ -94,7 +95,7 @@ public class PhilosophersStone extends Item
 
 	@Override
 	public boolean outlineEntryCondition(BlockState state) {
-		return BlockTransmutation.blockTransmutationMap.containsKey(state.getBlock());
+		return BlockTransmutation.canTransmuteBlock(state.getBlock());
 	}
 
 	@Override
