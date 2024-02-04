@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import com.mojang.brigadier.CommandDispatcher;
@@ -220,12 +221,13 @@ public class TheCommand {
 			context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.recipe.ban.unsupported_type", type));
 			return 0;
 		}
-		Map<String, List<String>> blacklisted = ModDataFiles.BLACKLISTED_MAPPER_RECIPES.getCopy();
+		
 		String name = recipe.getId().toString();
-		if (blacklisted.get(type).contains(name)) {
+		if (ModDataFiles.BLACKLISTED_MAPPER_RECIPES.isRecipeBlacklisted(name, type)) {
 			context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.nothing"));
 			return 0;
 		}
+		Map<String, HashSet<String>> blacklisted = ModDataFiles.BLACKLISTED_MAPPER_RECIPES.getCopy();
 		blacklisted.get(type).add(name);
 		ModDataFiles.BLACKLISTED_MAPPER_RECIPES.setValueAndSave(blacklisted);
 		context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.recipe.ban.success", type));
@@ -238,9 +240,9 @@ public class TheCommand {
 			context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.recipe.pardon.unsupported_type", type));
 			return 0;
 		}
-		Map<String, List<String>> blacklisted = ModDataFiles.BLACKLISTED_MAPPER_RECIPES.getCopy();
+		Map<String, HashSet<String>> blacklisted = ModDataFiles.BLACKLISTED_MAPPER_RECIPES.getCopy();
 		String name = recipe.getId().toString();
-		if (!blacklisted.get(type).contains(name)) {
+		if (!ModDataFiles.BLACKLISTED_MAPPER_RECIPES.isRecipeBlacklisted(name, type)) {
 			context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.nothing"));
 			return 0;
 		}
@@ -314,16 +316,11 @@ public class TheCommand {
 			case "crafting":
 			case "smelting":
 			case "smithing":
+			case "brewing":
 			case "stonecutting":
 				return true;
 			default:
 				return false;
 		}
 	}
-
-
-
-
-
-
 }

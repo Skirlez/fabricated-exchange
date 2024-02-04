@@ -22,7 +22,7 @@ public class EqualTagsFile extends DataFile<HashSet<String>> {
     private HashMap<Item, Integer> tagGroups;
     private int groupAmount;
     public EqualTagsFile(String name) {
-        super(new TypeToken<HashSet<String>>() {}, name);
+        super(new TypeReference<HashSet<String>>() {}, name);
         tagGroups = new HashMap<Item, Integer>();
         groupAmount = 0;
     }

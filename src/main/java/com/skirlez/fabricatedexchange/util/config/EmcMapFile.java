@@ -5,8 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import com.skirlez.fabricatedexchange.util.config.lib.DataFile;
@@ -19,7 +18,7 @@ public class EmcMapFile extends DataFile<Map<String, String>> {
 	private Map<Item, SuperNumber> emcMap;
 	
 	public EmcMapFile(String name) {
-		super(new TypeToken<Map<String, String>>() {}, name);
+		super(new TypeReference<Map<String, String>>() {}, name);
 		emcMap = null;
 	}
 	@Override

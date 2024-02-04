@@ -33,14 +33,13 @@ public abstract class AbstractConfigFile<T> extends AbstractFile<T> {
 		YAML = new Yaml(dumperOptions);
 	}
 
-	private final Class<T> classType;
 	private final Map<String, String[]> commentsMap;
+	private final Class<?> classType;
 	
-	@SuppressWarnings("unchecked")
-	public AbstractConfigFile(String name) {
+	public AbstractConfigFile(Class<?> classType, String name) {
 		super(name);
+		this.classType = classType;
 		this.commentsMap = new ConcurrentHashMap<String, String[]>();
-		this.classType = (Class<T>)new TypeToken<T>() {}.getRawType();
 	}
 
 	protected void clearComments() {

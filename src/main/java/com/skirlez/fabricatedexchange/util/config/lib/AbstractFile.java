@@ -46,7 +46,6 @@ public abstract class AbstractFile<T> {
 
 	// The folder where the file is stored
 	private final Path path;
-	// The type of the value
 	// The name of the file
 	protected final String name;
 	// The file's value

@@ -1,6 +1,5 @@
 package com.skirlez.fabricatedexchange.util.config;
 
-import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +21,7 @@ public class MainConfig extends AbstractConfigFile<Map<String, Object>> {
 	private final Map<String, Object> defaultValue;
 	
 	MainConfig(String name) {
-		super(name);
+		super(Map.class, name);
 		defaultValue = copyDefaultValue();
 	}
 

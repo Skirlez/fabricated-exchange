@@ -16,7 +16,7 @@ import com.skirlez.fabricatedexchange.util.config.lib.DataFile;
 public class NbtItemsFile extends DataFile<Map<String, List<String>>>  {
 
 	public NbtItemsFile(String name) {
-		super(new TypeToken<Map<String, List<String>>>() {}, name);
+		super(new TypeReference<Map<String, List<String>>>() {}, name);
 	}
 
 	HashMap<String, String> itemsToTag = new HashMap<String, String>();

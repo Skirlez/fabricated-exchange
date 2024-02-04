@@ -39,7 +39,7 @@ public class ModDataFiles {
 	//	= new DataFile<Map<Enchantment, SuperNumber>>(emcMapType, "enchantment_emc_map.json");
 
 	public static final DataFile<String[][]> BLOCK_TRANSMUTATION_MAP
-		= new DataFile<String[][]>(new TypeToken<String[][]>() {}, "block_transmutation_map.json");
+		= new DataFile<String[][]>(new TypeReference<String[][]>() {}, "block_transmutation_map.json");
 
     public static final EqualTagsFile EQUAL_TAGS
         = new EqualTagsFile("equal_tags.json");
