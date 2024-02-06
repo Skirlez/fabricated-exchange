@@ -1,11 +1,8 @@
 package com.skirlez.fabricatedexchange.command;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import com.mojang.brigadier.CommandDispatcher;
@@ -88,13 +85,13 @@ public class TheCommand {
 		LiteralCommandNode<ServerCommandSource> banRecipeNode = CommandManager
 		.literal("ban")
 		.then(CommandManager.argument("recipe", IdentifierArgumentType.identifier()).suggests(SuggestionProviders.ALL_RECIPES)
-		.executes(context -> banRecipe(context, IdentifierArgumentType.getRecipeArgument(context, "recipe"))))
+		.executes(context -> changeRecipeStatus(context, IdentifierArgumentType.getRecipeArgument(context, "recipe"), true)))
 		.build();
 
 		LiteralCommandNode<ServerCommandSource> pardonRecipeNode = CommandManager
 		.literal("pardon")
 		.then(CommandManager.argument("recipe", IdentifierArgumentType.identifier()).suggests(SuggestionProviders.ALL_RECIPES)
-		.executes(context -> pardonRecipe(context, IdentifierArgumentType.getRecipeArgument(context, "recipe"))))
+		.executes(context -> changeRecipeStatus(context, IdentifierArgumentType.getRecipeArgument(context, "recipe"), false)))
 		.build();
 		
 		LiteralCommandNode<ServerCommandSource> reloadNode = CommandManager
@@ -215,42 +212,34 @@ public class TheCommand {
 		return 1;
 	}
 
-	private static int banRecipe(CommandContext<ServerCommandSource> context, Recipe<?> recipe) {
+	private static int changeRecipeStatus(CommandContext<ServerCommandSource> context, Recipe<?> recipe, boolean ban) {
+		String actionType = (ban) ? "ban" : "pardon";
+		
+		String unsupportedKey = "commands.fabricated-exchange.recipe." + actionType + ".unsupported_type";
+		String successKey = "commands.fabricated-exchange.recipe." + actionType + ".success";
+		
 		String type = recipe.getType().toString();
 		if (!isRecipeTypeSupported(type)) {
-			context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.recipe.ban.unsupported_type", type));
+			context.getSource().sendMessage(Text.translatable(unsupportedKey, type));
 			return 0;
 		}
 		
 		String name = recipe.getId().toString();
-		if (ModDataFiles.BLACKLISTED_MAPPER_RECIPES.isRecipeBlacklisted(name, type)) {
+		boolean alreadyBlacklisted = ModDataFiles.BLACKLISTED_MAPPER_RECIPES.isRecipeBlacklisted(name, type);
+		if (alreadyBlacklisted == ban) { // (alreadyBlacklisted && ban) || (!alreadyBlacklisted && !ban)
 			context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.nothing"));
 			return 0;
 		}
 		Map<String, HashSet<String>> blacklisted = ModDataFiles.BLACKLISTED_MAPPER_RECIPES.getCopy();
-		blacklisted.get(type).add(name);
+		if (ban)
+			blacklisted.get(type).add(name);
+		else
+			blacklisted.get(type).remove(name);
 		ModDataFiles.BLACKLISTED_MAPPER_RECIPES.setValueAndSave(blacklisted);
-		context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.recipe.ban.success", type));
+		context.getSource().sendMessage(Text.translatable(successKey, type));
 		return 1;
 	}
 	
-	private static int pardonRecipe(CommandContext<ServerCommandSource> context, Recipe<?> recipe) {
-		String type = recipe.getType().toString();
-		if (!isRecipeTypeSupported(type)) {
-			context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.recipe.pardon.unsupported_type", type));
-			return 0;
-		}
-		Map<String, HashSet<String>> blacklisted = ModDataFiles.BLACKLISTED_MAPPER_RECIPES.getCopy();
-		String name = recipe.getId().toString();
-		if (!ModDataFiles.BLACKLISTED_MAPPER_RECIPES.isRecipeBlacklisted(name, type)) {
-			context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.nothing"));
-			return 0;
-		}
-		blacklisted.get(type).remove(name);
-		ModDataFiles.BLACKLISTED_MAPPER_RECIPES.setValueAndSave(blacklisted);
-		context.getSource().sendMessage(Text.translatable("commands.fabricated-exchange.recipe.pardon.success", type));
-		return 1;
-	}
 
 	private static int reload(CommandContext<ServerCommandSource> context) {
 		FabricatedExchange.reload();

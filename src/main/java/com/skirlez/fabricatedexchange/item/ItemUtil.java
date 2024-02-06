@@ -23,7 +23,7 @@ public abstract class ItemUtil {
 			tooltip.add(Text.translatable("item.fabricated-exchange.mode_switch")					
 				.append(" ")
 				.append(Text.translatable("item.fabricated-exchange.mode_uncharged")
-					.setStyle(Style.EMPTY.withColor(Formatting.DARK_GRAY))));
+				.setStyle(Style.EMPTY.withColor(Formatting.DARK_GRAY))));
 		}
 		else
 			ItemWithModes.addModeToTooltip(stack, tooltip);

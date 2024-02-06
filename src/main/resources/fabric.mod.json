@@ -43,5 +43,6 @@
 	},
 	"suggests": {
 		"modmenu": "*"
-	}
+	},
+	"accessWidener" : "fabricated-exchange.accesswidener"
 }

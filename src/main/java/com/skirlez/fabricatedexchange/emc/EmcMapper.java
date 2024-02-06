@@ -113,7 +113,7 @@ public class EmcMapper {
 	        convertRecipesToEquations(allStonecuttingRecipes, "stonecutting", this::createStonecuttingEquation, this::getRecipeName);
 	        convertRecipesToEquations(allBrewingRecipes, "brewing", this::createBrewingEquation, this::getBrewingRecipeName);
 	
-	        createAllWorldInteractionEquations();
+	        createSpecialEquations();
 	        
 	        // TODO: inject recipes provided by mods here
 	        List<List<Item>> itemGroups = equalTags.getItemGroups(); 
@@ -285,11 +285,30 @@ public class EmcMapper {
         }
     }
     
-    private void createAllWorldInteractionEquations() {
+    private void createSpecialEquations() {
+    	ItemEquation tippedArrowEquation = new ItemEquation(
+    			Arrays.asList(Ingredient.ofStacks(new ItemStack(Items.ARROW, 8))), 
+    			Arrays.asList( new ItemStack(Items.TIPPED_ARROW)),
+				new Identifier("fe-equations", "tipped_arrow_base"));
+    	processEquation(tippedArrowEquation);
+    	
     	createWorldInteractionEquation(Blocks.WHITE_CONCRETE_POWDER, Blocks.WHITE_CONCRETE);
-    	createWorldInteractionEquation(Blocks.LIGHT_GRAY_CONCRETE_POWDER, Blocks.LIGHT_GRAY_CONCRETE);
+    	createWorldInteractionEquation(Blocks.ORANGE_CONCRETE_POWDER, Blocks.ORANGE_CONCRETE);
+    	createWorldInteractionEquation(Blocks.MAGENTA_CONCRETE_POWDER, Blocks.MAGENTA_CONCRETE);
+    	createWorldInteractionEquation(Blocks.LIGHT_BLUE_CONCRETE_POWDER, Blocks.LIGHT_BLUE_CONCRETE);
+    	createWorldInteractionEquation(Blocks.YELLOW_CONCRETE_POWDER, Blocks.YELLOW_CONCRETE);
+    	createWorldInteractionEquation(Blocks.LIME_CONCRETE_POWDER, Blocks.LIME_CONCRETE);
+    	createWorldInteractionEquation(Blocks.PINK_CONCRETE_POWDER, Blocks.PINK_CONCRETE);
     	createWorldInteractionEquation(Blocks.GRAY_CONCRETE_POWDER, Blocks.GRAY_CONCRETE);
-    	// you are crazy if you think i'm typing all of that up
+    	createWorldInteractionEquation(Blocks.LIGHT_GRAY_CONCRETE_POWDER, Blocks.LIGHT_GRAY_CONCRETE);
+    	createWorldInteractionEquation(Blocks.CYAN_CONCRETE_POWDER, Blocks.CYAN_CONCRETE);
+    	createWorldInteractionEquation(Blocks.PURPLE_CONCRETE_POWDER, Blocks.PURPLE_CONCRETE);
+    	createWorldInteractionEquation(Blocks.BLUE_CONCRETE_POWDER, Blocks.BLUE_CONCRETE);
+    	createWorldInteractionEquation(Blocks.BROWN_CONCRETE_POWDER, Blocks.BROWN_CONCRETE);
+    	createWorldInteractionEquation(Blocks.GREEN_CONCRETE_POWDER, Blocks.GREEN_CONCRETE);
+    	createWorldInteractionEquation(Blocks.RED_CONCRETE_POWDER, Blocks.RED_CONCRETE);
+    	createWorldInteractionEquation(Blocks.BLACK_CONCRETE_POWDER, Blocks.BLACK_CONCRETE);
+    	
     }
     
     private void createWorldInteractionEquation(Block input, Block output) {
@@ -304,7 +323,7 @@ public class EmcMapper {
 		if (using.isPresent())
 			inputList.add(Ingredient.ofItems(using.get()));
 		ItemEquation equation = new ItemEquation(inputList, Arrays.asList(new ItemStack(output)), 
-			new Identifier("world-interaction", inputName + "_to_" + outputName));
+			new Identifier("fe-equations", inputName + "_to_" + outputName));
 		
 		processEquation(equation);
     }

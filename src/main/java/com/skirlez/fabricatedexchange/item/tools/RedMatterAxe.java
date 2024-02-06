@@ -25,7 +25,6 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import com.skirlez.fabricatedexchange.FabricatedExchange;
 
 public class RedMatterAxe extends AxeItem implements ChargeableItem, OutliningItem, ItemWithModes {
 

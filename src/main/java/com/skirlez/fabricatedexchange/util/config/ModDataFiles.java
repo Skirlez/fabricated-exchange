@@ -1,15 +1,11 @@
 package com.skirlez.fabricatedexchange.util.config;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.gson.reflect.TypeToken;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.util.config.lib.AbstractFile;
 import com.skirlez.fabricatedexchange.util.config.lib.DataFile;
@@ -44,13 +40,12 @@ public class ModDataFiles {
     public static final EqualTagsFile EQUAL_TAGS
         = new EqualTagsFile("equal_tags.json");
 
-	public static final NbtItemsFile NBT_ITEMS = 
-		new NbtItemsFile("nbt_items.json");
+	public static final NbtItemsFile NBT_ITEMS
+		= new NbtItemsFile("nbt_items.json");
 
 	public static final BlacklistedRecipesFile BLACKLISTED_MAPPER_RECIPES
 		= new BlacklistedRecipesFile("blacklisted_mapper_recipes.json");
 
-	
 	public static final List<AbstractFile<?>> ALL_FILES = Arrays.asList(
 			MAIN_CONFIG_FILE, SEED_EMC_MAP, CUSTOM_EMC_MAP,
 			BLOCK_TRANSMUTATION_MAP, EQUAL_TAGS,

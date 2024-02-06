@@ -1,14 +1,15 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "equipment",
   "key": {
+    "C": {
+      "item": "fabricated-exchange:dark_matter"
+    },
     "D": {
       "item": "fabricated-exchange:dark_matter_hoe"
     },
     "M": {
       "item": "fabricated-exchange:red_matter"
-    },
-    "C": {
-      "item": "fabricated-exchange:dark_matter"
     }
   },
   "pattern": [
@@ -18,5 +19,6 @@
   ],
   "result": {
     "item": "fabricated-exchange:red_matter_hoe"
-  }
+  },
+  "show_notification": true
 }

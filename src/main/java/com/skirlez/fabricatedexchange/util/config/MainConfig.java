@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.google.common.collect.ImmutableMap;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
@@ -93,15 +94,38 @@ public class MainConfig extends AbstractConfigFile<Map<String, Object>> {
 	
 	@Environment(EnvType.CLIENT)
 	public void updateComments() {
-		clearComments();
+		ImmutableMap.Builder<String, String[]> commentsBuilder = ImmutableMap.builder();
 		for (String key : defaultValue.keySet()) {
 			List<Text> comments = GeneralUtil.translatableList("config.fabricated-exchange." + key);
 			String[] arr = new String[comments.size()];
 			for (int i = 0; i < arr.length; i++) {
 				arr[i] = comments.get(i).getString();
 			}
-			addComments(key, arr);
-		}	
+			commentsBuilder.put(key, arr);
+		}
+		ImmutableMap<String, String[]> newMap = commentsBuilder.build();
+		if (!areCommentsMapEqual(newMap, commentsMap)) {
+			commentsMap = newMap;
+			save();
+		}
+		
+
+	}
+	
+	public boolean areCommentsMapEqual(Map<String, String[]> map1, Map<String, String[]> map2) {
+		for (Map.Entry<String, String[]> entry : map1.entrySet()) {
+			if (!map2.containsKey(entry.getKey())) 
+				return false;
+			String[] arr1 = entry.getValue();
+			String[] arr2 = map2.get(entry.getKey());
+			if (arr1.length != arr2.length)
+				return false;
+			for (int i = 0; i < arr1.length; i++) {
+				if (!arr1[i].equals(arr2[i]))
+					return false;
+			}
+		}
+		return true;
 	}
 	
 	public Optional<Class<?>> getKeyClass(String key) {

@@ -3,13 +3,13 @@
   "category": "misc",
   "key": {
     "E": {
-      "item": "fabricated-exchange:antimatter_relay_mk2"
+      "item": "fabricated-exchange:energy_collector_mk2"
     },
     "G": {
       "item": "minecraft:glowstone"
     },
     "R": {
-      "item": "fabricated-exchange:dark_matter"
+      "item": "fabricated-exchange:red_matter"
     }
   },
   "pattern": [

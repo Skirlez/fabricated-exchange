@@ -2,11 +2,9 @@ package com.skirlez.fabricatedexchange.util.config.lib;
 
 import java.io.Reader;
 import java.io.Writer;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import org.yaml.snakeyaml.DumperOptions;
@@ -20,8 +18,7 @@ import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.Tag;
 
-import com.google.gson.reflect.TypeToken;
-
+import com.google.common.collect.ImmutableMap;
 
 /** A file that uses YAML to save and supports comments. */
 public abstract class AbstractConfigFile<T> extends AbstractFile<T> {
@@ -33,23 +30,17 @@ public abstract class AbstractConfigFile<T> extends AbstractFile<T> {
 		YAML = new Yaml(dumperOptions);
 	}
 
-	private final Map<String, String[]> commentsMap;
-	private final Class<?> classType;
+	protected ImmutableMap<String, String[]> commentsMap;
+	private final Class<T> classType;
 	
 	public AbstractConfigFile(Class<?> classType, String name) {
 		super(name);
-		this.classType = classType;
-		this.commentsMap = new ConcurrentHashMap<String, String[]>();
+		this.classType = (Class<T>)classType;
+		this.commentsMap = ImmutableMap.of();
 	}
 
-	protected void clearComments() {
-		commentsMap.clear();
-	}
-	
-	protected void addComments(String field, String[] comments) {
-		commentsMap.put(field, comments);
-	}
-	
+
+
 	public Map<String, String[]> getComments() {
 		return commentsMap;
 	}
@@ -57,13 +48,7 @@ public abstract class AbstractConfigFile<T> extends AbstractFile<T> {
 	
 	@Override
 	protected T readValue(Reader reader) throws Exception {
-		Type type = TypeToken.get(classType).getType();
-
-		if (type instanceof Class<?>) {
-			return YAML.loadAs(reader, (Class<T>) type);
-		} else {
-			throw new IllegalArgumentException("Type must be a Class object");
-		}
+		return YAML.loadAs(reader, classType);
 	}
 
 	@Override

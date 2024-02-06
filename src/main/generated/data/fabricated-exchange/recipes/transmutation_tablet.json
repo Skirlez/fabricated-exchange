@@ -6,7 +6,7 @@
       "item": "fabricated-exchange:dark_matter_block"
     },
     "S": {
-      "item": "minecraft:stone"
+      "tag": "c:stone"
     },
     "T": {
       "item": "fabricated-exchange:transmutation_table"

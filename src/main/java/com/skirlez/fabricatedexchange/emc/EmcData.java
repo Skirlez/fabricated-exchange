@@ -183,8 +183,6 @@ public class EmcData {
 		Map<String, String> newEmcMap = file.getCopy();
 		newEmcMap.put(Registries.ITEM.getId(item).toString(), emc.divisionString());
 		file.setValueAndSave(newEmcMap);
-	
-		emcMap = new ImmutableMap.Builder<Item, SuperNumber>().putAll(emcMap).put(item, emc).build();
 	}
 	
 	public static void removeItemEmc(Item item, boolean seed) {

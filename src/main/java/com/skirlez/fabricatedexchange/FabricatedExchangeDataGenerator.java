@@ -380,7 +380,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 				.pattern("GGG")
 				.input('G', Blocks.GLOWSTONE)
 				.input('D', ModItems.DARK_MATTER)
-				.input('E', ModBlocks.ANTIMATTER_RELAY_MK1)
+				.input('E', ModBlocks.ENERGY_COLLECTOR_MK1)
 				.criterion(FabricRecipeProvider.hasItem(ModBlocks.ENERGY_COLLECTOR_MK1),
 				FabricRecipeProvider.conditionsFromItem(ModBlocks.ENERGY_COLLECTOR_MK1))
 				.offerTo(exporter);
@@ -390,8 +390,8 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 				.pattern("GEG")
 				.pattern("GGG")
 				.input('G', Blocks.GLOWSTONE)
-				.input('R', ModItems.DARK_MATTER)
-				.input('E', ModBlocks.ANTIMATTER_RELAY_MK2)
+				.input('R', ModItems.RED_MATTER)
+				.input('E', ModBlocks.ENERGY_COLLECTOR_MK2)
 				.criterion(FabricRecipeProvider.hasItem(ModBlocks.ENERGY_COLLECTOR_MK2),
 				FabricRecipeProvider.conditionsFromItem(ModBlocks.ENERGY_COLLECTOR_MK2))
 				.offerTo(exporter);

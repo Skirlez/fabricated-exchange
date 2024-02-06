@@ -10,7 +10,6 @@ import com.skirlez.fabricatedexchange.util.SuperNumber;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
@@ -33,12 +32,14 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 	private static final BlockEntity RENDER_ENERGY_CONDENSER_MK2 = 
 		new EnergyCondenserBlockEntity(BlockPos.ORIGIN, ModBlocks.ENERGY_CONDENSER_MK2.getDefaultState());
 
+	public static boolean hasInitiallyLoadedConfig = false;
+	
 	@Override
 	public void onInitializeClient() {
 		ModScreens.register();
 		KeyInputHandler.register();
 		ModServerToClientPackets.register();
-		ModDataFiles.MAIN_CONFIG_FILE.fetch();
+		
 		
 		// we can use the vanilla renderers due to the texture mixin, see ModTexturedRenderLayers
 		BlockEntityRendererFactories.register(ModBlockEntities.ALCHEMICAL_CHEST, ChestBlockEntityRenderer::new);
@@ -60,11 +61,19 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
 				@Override
 				public Identifier getFabricId() {
-					return new Identifier(FabricatedExchange.MOD_ID, "update_config_comments");
+					return new Identifier(FabricatedExchange.MOD_ID, "load_config");
 				}
 				@Override
 				public void reload(ResourceManager resourceManager) {
 					ModDataFiles.MAIN_CONFIG_FILE.updateComments();
+					
+					// Dirty hack so the config file is loaded on startup after the translation keys are ready 
+					// (for comments)
+					if (!hasInitiallyLoadedConfig) {
+						ModDataFiles.MAIN_CONFIG_FILE.fetch();
+						hasInitiallyLoadedConfig = true;
+					}
+					
 				}
 			});
 

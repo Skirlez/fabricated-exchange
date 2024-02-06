@@ -21,7 +21,7 @@
       "item": "fabricated-exchange:medium_covalence_dust"
     },
     "S": {
-      "item": "minecraft:stone"
+      "tag": "c:stone"
     }
   },
   "pattern": [
