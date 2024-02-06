@@ -44,7 +44,7 @@ import net.minecraft.util.Identifier;
 // TODO: This class could use some organization into multiple files
 
 public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint {
-	
+
 	@Override
 	public void onInitializeDataGenerator(FabricDataGenerator fabricDataGenerator) {
 		FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
@@ -62,15 +62,15 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 
 		@Override
 		protected void configure(WrapperLookup arg) {
-			addItemsToTag(ModTags.FUEL, 
-	
+			addItemsToTag(ModTags.FUEL,
+
 				Items.COAL, Items.CHARCOAL, Items.REDSTONE, Items.REDSTONE_BLOCK,
 				Items.GUNPOWDER, Items.COAL_BLOCK, Items.BLAZE_POWDER, Items.GLOWSTONE_DUST, Items.GLOWSTONE,
 				ModItems.ALCHEMICAL_COAL, ModBlocks.ALCHEMICAL_COAL_BLOCK, ModItems.RADIANT_COAL, ModBlocks.RADIANT_COAL_BLOCK,
 				ModItems.MOBIUS_FUEL, ModBlocks.MOBIUS_FUEL_BLOCK, ModItems.AETERNALIS_FUEL, ModBlocks.AETERNALIS_FUEL_BLOCK);
-		
-			addItemsToTag(ModTags.STONE, 
-	
+
+			addItemsToTag(ModTags.STONE,
+
 				Items.STONE);
 		}
 
@@ -111,7 +111,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 		public BlockLootTables(FabricDataOutput dataOutput) {
 			super(dataOutput);
 		}
-	
+
 		@Override
 		public void generate() {
 			dropBlocksAsThemselves(
@@ -119,9 +119,9 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 				ModBlocks.AETERNALIS_FUEL_BLOCK, ModBlocks.DARK_MATTER_BLOCK, ModBlocks.RED_MATTER_BLOCK,
 				ModBlocks.ENERGY_COLLECTOR_MK1, ModBlocks.ENERGY_COLLECTOR_MK2, ModBlocks.ENERGY_COLLECTOR_MK3,
 				ModBlocks.ANTIMATTER_RELAY_MK1, ModBlocks.ANTIMATTER_RELAY_MK2, ModBlocks.ANTIMATTER_RELAY_MK3,
-				ModBlocks.ALCHEMICAL_CHEST, ModBlocks.ENERGY_CONDENSER_MK1, ModBlocks.ENERGY_CONDENSER_MK2, 
+				ModBlocks.ALCHEMICAL_CHEST, ModBlocks.ENERGY_CONDENSER_MK1, ModBlocks.ENERGY_CONDENSER_MK2,
 				ModBlocks.TRANSMUTATION_TABLE);
-			
+
 		}
 
 		private void dropBlocksAsThemselves(Block... blocks) {
@@ -134,19 +134,19 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 		private ModelGenerator(FabricDataOutput generator) {
 			super(generator);
 		}
-	
+
 		@Override
 		public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
-			registerCubeAllBlockModels(blockStateModelGenerator, 
+			registerCubeAllBlockModels(blockStateModelGenerator,
 			ModBlocks.ALCHEMICAL_COAL_BLOCK, ModBlocks.RADIANT_COAL_BLOCK, ModBlocks.MOBIUS_FUEL_BLOCK,
 			ModBlocks.AETERNALIS_FUEL_BLOCK, ModBlocks.DARK_MATTER_BLOCK, ModBlocks.RED_MATTER_BLOCK);
-			
-			registerLeveledHorizontalOrientables(blockStateModelGenerator, "antimatter_relays", 
+
+			registerLeveledHorizontalOrientables(blockStateModelGenerator, "antimatter_relays",
 				ModBlocks.ANTIMATTER_RELAY_MK1, ModBlocks.ANTIMATTER_RELAY_MK2, ModBlocks.ANTIMATTER_RELAY_MK3);
-			registerLeveledHorizontalOrientables(blockStateModelGenerator, "energy_collectors", 
+			registerLeveledHorizontalOrientables(blockStateModelGenerator, "energy_collectors",
 				ModBlocks.ENERGY_COLLECTOR_MK1, ModBlocks.ENERGY_COLLECTOR_MK2, ModBlocks.ENERGY_COLLECTOR_MK3);
 		}
-	
+
 		public void registerCubeAllBlockModels(BlockStateModelGenerator blockStateModelGenerator, Block... blocks) {
 			for (int i = 0; i < blocks.length; i++)
 				blockStateModelGenerator.registerSimpleCubeAll(blocks[i]);
@@ -163,19 +163,21 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 					.put(TextureKey.SIDE, id.withSuffixedPath("other"))
 					.put(TextureKey.FRONT, id.withSuffixedPath("front"));
 				Identifier identifier = Models.ORIENTABLE_WITH_BOTTOM.upload(block, textureMap, blockStateModelGenerator.modelCollector);
-				blockStateModelGenerator.blockStateCollector.accept(VariantsBlockStateSupplier.create(block, BlockStateVariant.create().put(VariantSettings.MODEL, identifier)).coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates()));		
+				blockStateModelGenerator.blockStateCollector.accept(VariantsBlockStateSupplier.create(block, BlockStateVariant.create().put(VariantSettings.MODEL, identifier)).coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates()));
 			}
 		}
 
 
 		@Override
 		public void generateItemModels(ItemModelGenerator itemModelGenerator) {
-			registerGeneratedModels(itemModelGenerator, 
-				ModItems.PHILOSOPHERS_STONE, ModItems.ALCHEMICAL_COAL, ModItems.RADIANT_COAL, ModItems.MOBIUS_FUEL, 
+			registerGeneratedModels(itemModelGenerator,
+				ModItems.PHILOSOPHERS_STONE, ModItems.ALCHEMICAL_COAL, ModItems.RADIANT_COAL, ModItems.MOBIUS_FUEL,
 				ModItems.AETERNALIS_FUEL, ModItems.LOW_COVALENCE_DUST, ModItems.MEDIUM_COVALENCE_DUST, ModItems.HIGH_COVALENCE_DUST,
 				ModItems.DARK_MATTER, ModItems.RED_MATTER, ModItems.TOME_OF_KNOWLEDGE, ModItems.TRANSMUTATION_TABLET);
-			registerHandheldModels(itemModelGenerator, ModItems.DARK_MATTER_SWORD, ModItems.DARK_MATTER_PICKAXE, ModItems.DARK_MATTER_AXE, 
-				ModItems.DARK_MATTER_SHOVEL, ModItems.DARK_MATTER_HOE);
+			registerHandheldModels(itemModelGenerator, ModItems.DARK_MATTER_SWORD, ModItems.DARK_MATTER_PICKAXE, ModItems.DARK_MATTER_AXE,
+				ModItems.DARK_MATTER_SHOVEL, ModItems.DARK_MATTER_HOE, ModItems.RED_MATTER_SWORD, ModItems.RED_MATTER_PICKAXE,
+					ModItems.RED_MATTER_AXE, ModItems.RED_MATTER_HOE, ModItems.RED_MATTER_SHOVEL);
+
 
 		}
 
@@ -252,14 +254,14 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 			generatePhilosopherStoneRecipe(ModItems.MOBIUS_FUEL, ModItems.AETERNALIS_FUEL, 4, exporter);
 
 			TagKey<Item> coal = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "coal"));
-			
+
 			ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.LOW_COVALENCE_DUST, 40)
 				.input(coal)
 				.input(Items.COBBLESTONE, 8)
 				.criterion("has_coal", FabricRecipeProvider.conditionsFromTag(coal))
 				.offerTo(exporter);
 
-			
+
 			TagKey<Item> iron = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "iron_ingots"));
 
 			ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.MEDIUM_COVALENCE_DUST, 40)
@@ -269,8 +271,8 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 				.criterion("has_redstone", FabricRecipeProvider.conditionsFromTag(redstone))
 				.offerTo(exporter);
 
-			
-			
+
+
 			ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.HIGH_COVALENCE_DUST, 40)
 				.input(diamond)
 				.input(coal)
@@ -284,7 +286,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 
 			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModBlocks.ALCHEMICAL_CHEST)
 				.pattern("LMH")
-				.pattern("SDS") 
+				.pattern("SDS")
 				.pattern("ICI")
 				.input('L', ModItems.LOW_COVALENCE_DUST)
 				.input('M', ModItems.MEDIUM_COVALENCE_DUST)
@@ -293,11 +295,11 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 				.input('I', iron)
 				.input('C', Blocks.CHEST)
 				.input('S', ModTags.STONE)
-				.criterion(FabricRecipeProvider.hasItem(ModItems.LOW_COVALENCE_DUST), 
+				.criterion(FabricRecipeProvider.hasItem(ModItems.LOW_COVALENCE_DUST),
 					FabricRecipeProvider.conditionsFromItem(ModItems.LOW_COVALENCE_DUST))
-				.criterion(FabricRecipeProvider.hasItem(ModItems.MEDIUM_COVALENCE_DUST), 
+				.criterion(FabricRecipeProvider.hasItem(ModItems.MEDIUM_COVALENCE_DUST),
 					FabricRecipeProvider.conditionsFromItem(ModItems.MEDIUM_COVALENCE_DUST))
-				.criterion(FabricRecipeProvider.hasItem(ModItems.HIGH_COVALENCE_DUST), 
+				.criterion(FabricRecipeProvider.hasItem(ModItems.HIGH_COVALENCE_DUST),
 					FabricRecipeProvider.conditionsFromItem(ModItems.HIGH_COVALENCE_DUST))
 				.offerTo(exporter);
 
@@ -309,7 +311,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 				.input('D', diamond)
 				.input('O', Blocks.OBSIDIAN)
 				.input('A', ModBlocks.ALCHEMICAL_CHEST)
-				.criterion(FabricRecipeProvider.hasItem(ModBlocks.ALCHEMICAL_CHEST), 
+				.criterion(FabricRecipeProvider.hasItem(ModBlocks.ALCHEMICAL_CHEST),
 				FabricRecipeProvider.conditionsFromItem(ModBlocks.ALCHEMICAL_CHEST))
 				.offerTo(exporter);
 
@@ -320,14 +322,14 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 				.input('D', ModBlocks.DARK_MATTER_BLOCK)
 				.input('R', ModBlocks.RED_MATTER_BLOCK)
 				.input('E', ModBlocks.ENERGY_CONDENSER_MK1)
-				.criterion(FabricRecipeProvider.hasItem(ModBlocks.ENERGY_CONDENSER_MK1), 
+				.criterion(FabricRecipeProvider.hasItem(ModBlocks.ENERGY_CONDENSER_MK1),
 				FabricRecipeProvider.conditionsFromItem(ModBlocks.ENERGY_CONDENSER_MK1))
 				.offerTo(exporter);
 
 
 			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModBlocks.ANTIMATTER_RELAY_MK1)
 				.pattern("OGO")
-				.pattern("ODO") 
+				.pattern("ODO")
 				.pattern("OOO")
 				.input('G', Blocks.GLASS)
 				.input('D', Blocks.DIAMOND_BLOCK)
@@ -360,7 +362,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 
 			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModBlocks.ENERGY_COLLECTOR_MK1)
 				.pattern("GTG")
-				.pattern("GDG") 
+				.pattern("GDG")
 				.pattern("GFG")
 				.input('G', Blocks.GLOWSTONE)
 				.input('T', Blocks.GLASS)
@@ -374,7 +376,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 
 			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModBlocks.ENERGY_COLLECTOR_MK2)
 				.pattern("GDG")
-				.pattern("GEG") 
+				.pattern("GEG")
 				.pattern("GGG")
 				.input('G', Blocks.GLOWSTONE)
 				.input('D', ModItems.DARK_MATTER)
@@ -385,7 +387,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 
 			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModBlocks.ENERGY_COLLECTOR_MK3)
 				.pattern("GRG")
-				.pattern("GEG") 
+				.pattern("GEG")
 				.pattern("GGG")
 				.input('G', Blocks.GLOWSTONE)
 				.input('R', ModItems.DARK_MATTER)
@@ -396,7 +398,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 
 			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.DARK_MATTER)
 				.pattern("AAA")
-				.pattern("ADA") 
+				.pattern("ADA")
 				.pattern("AAA")
 				.input('A', ModItems.AETERNALIS_FUEL)
 				.input('D', Blocks.DIAMOND_BLOCK)
@@ -408,7 +410,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 
 			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.RED_MATTER)
 				.pattern("AAA")
-				.pattern("DDD") 
+				.pattern("DDD")
 				.pattern("AAA")
 				.input('A', ModItems.AETERNALIS_FUEL)
 				.input('D', ModItems.DARK_MATTER)
@@ -419,7 +421,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 
 			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.RED_MATTER)
 				.pattern("ADA")
-				.pattern("ADA") 
+				.pattern("ADA")
 				.pattern("ADA")
 				.input('A', ModItems.AETERNALIS_FUEL)
 				.input('D', ModItems.DARK_MATTER)
@@ -439,7 +441,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 
 			ShapedRecipeJsonBuilder.create(RecipeCategory.TOOLS, ModItems.DARK_MATTER_PICKAXE)
 				.pattern("MMM")
-				.pattern(" D ") 
+				.pattern(" D ")
 				.pattern(" D ")
 				.input('M', ModItems.DARK_MATTER)
 				.input('D', diamond)
@@ -449,7 +451,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 
 			ShapedRecipeJsonBuilder.create(RecipeCategory.TOOLS, ModItems.DARK_MATTER_SHOVEL)
 				.pattern("M")
-				.pattern("D") 
+				.pattern("D")
 				.pattern("D")
 				.input('M', ModItems.DARK_MATTER)
 				.input('D', diamond)
@@ -459,7 +461,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 
 			ShapedRecipeJsonBuilder.create(RecipeCategory.TOOLS, ModItems.DARK_MATTER_AXE)
 				.pattern("MM")
-				.pattern("MD") 
+				.pattern("MD")
 				.pattern(" D")
 				.input('M', ModItems.DARK_MATTER)
 				.input('D', diamond)
@@ -469,13 +471,67 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 
 			ShapedRecipeJsonBuilder.create(RecipeCategory.TOOLS, ModItems.DARK_MATTER_HOE)
 				.pattern("MM")
-				.pattern(" D") 
+				.pattern(" D")
 				.pattern(" D")
 				.input('M', ModItems.DARK_MATTER)
 				.input('D', diamond)
 				.criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER),
 					FabricRecipeProvider.conditionsFromItem(ModItems.DARK_MATTER))
 				.offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(RecipeCategory.TOOLS, ModItems.RED_MATTER_SWORD)
+                    .pattern("M")
+                    .pattern("M")
+                    .pattern("D")
+                    .input('M', ModItems.RED_MATTER)
+                    .input('D', ModItems.DARK_MATTER_SWORD)
+                    .criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER_SWORD),
+                            FabricRecipeProvider.conditionsFromItem(ModItems.RED_MATTER))
+                    .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(RecipeCategory.TOOLS, ModItems.RED_MATTER_PICKAXE)
+                    .pattern("MMM")
+                    .pattern(" D ")
+                    .pattern(" C ")
+                    .input('M', ModItems.RED_MATTER)
+                    .input('D', ModItems.DARK_MATTER_PICKAXE)
+                    .input('C', ModItems.DARK_MATTER)
+                    .criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER_PICKAXE),
+                            FabricRecipeProvider.conditionsFromItem(ModItems.RED_MATTER))
+                    .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(RecipeCategory.TOOLS, ModItems.RED_MATTER_AXE)
+                    .pattern("MM")
+                    .pattern("MD")
+                    .pattern(" C")
+                    .input('M', ModItems.RED_MATTER)
+                    .input('D', ModItems.DARK_MATTER_AXE)
+                    .input('C', ModItems.DARK_MATTER)
+                    .criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER_AXE),
+                            FabricRecipeProvider.conditionsFromItem(ModItems.RED_MATTER))
+                    .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(RecipeCategory.TOOLS, ModItems.RED_MATTER_HOE)
+                    .pattern("MM")
+                    .pattern(" D")
+                    .pattern(" C")
+                    .input('M', ModItems.RED_MATTER)
+                    .input('D', ModItems.DARK_MATTER_HOE)
+                    .input('C', ModItems.DARK_MATTER)
+                    .criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER_HOE),
+                            FabricRecipeProvider.conditionsFromItem(ModItems.RED_MATTER))
+                    .offerTo(exporter);
+
+            ShapedRecipeJsonBuilder.create(RecipeCategory.TOOLS, ModItems.RED_MATTER_SHOVEL)
+                    .pattern("M")
+                    .pattern("D")
+                    .pattern("C")
+                    .input('M', ModItems.RED_MATTER)
+                    .input('D', ModItems.DARK_MATTER_SHOVEL)
+                    .input('C', ModItems.DARK_MATTER)
+                    .criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER_SHOVEL),
+                            FabricRecipeProvider.conditionsFromItem(ModItems.RED_MATTER))
+                    .offerTo(exporter);
 
 
 		}
@@ -486,14 +542,14 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 			ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, item2)
 				.input(ModItems.PHILOSOPHERS_STONE)
 				.input(item1, ratio)
-				.criterion(FabricRecipeProvider.hasItem(ModItems.PHILOSOPHERS_STONE), 
+				.criterion(FabricRecipeProvider.hasItem(ModItems.PHILOSOPHERS_STONE),
 					FabricRecipeProvider.conditionsFromItem(ModItems.PHILOSOPHERS_STONE))
 				.offerTo(exporter, new Identifier(FabricatedExchange.MOD_ID, "ps_" + name2 + "_from_" + name1));
-					
+
 			ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, item1, ratio)
 				.input(ModItems.PHILOSOPHERS_STONE)
 				.input(item2)
-				.criterion(FabricRecipeProvider.hasItem(ModItems.PHILOSOPHERS_STONE), 
+				.criterion(FabricRecipeProvider.hasItem(ModItems.PHILOSOPHERS_STONE),
 					FabricRecipeProvider.conditionsFromItem(ModItems.PHILOSOPHERS_STONE))
 				.offerTo(exporter, new Identifier(FabricatedExchange.MOD_ID, "ps_" + name1 + "_from_" + name2));
 		}
@@ -503,20 +559,20 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 			String blockName = Registries.ITEM.getId(block.asItem()).getPath();
 			ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, item, 9)
 				.input(block)
-				.criterion(FabricRecipeProvider.hasItem(item), 
+				.criterion(FabricRecipeProvider.hasItem(item),
 					FabricRecipeProvider.conditionsFromItem(item))
 				.offerTo(exporter, new Identifier(FabricatedExchange.MOD_ID, itemName + "_from_block"));
-					
+
 			ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, block)
 				.input(item, 9)
-				.criterion(FabricRecipeProvider.hasItem(item), 
+				.criterion(FabricRecipeProvider.hasItem(item),
 					FabricRecipeProvider.conditionsFromItem(item))
 				.offerTo(exporter, new Identifier(blockName + "_from_item"));
 		}
 
 
-	}   
-	
+	}
+
 
 
 }

@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "D": {
+      "item": "fabricated-exchange:dark_matter_axe"
+    },
+    "M": {
+      "item": "fabricated-exchange:red_matter"
+    },
+    "C": {
+      "item": "fabricated-exchange:dark_matter"
+    }
+  },
+  "pattern": [
+    "MM",
+    "MD",
+    " C"
+  ],
+  "result": {
+    "item": "fabricated-exchange:red_matter_axe"
+  }
+}
