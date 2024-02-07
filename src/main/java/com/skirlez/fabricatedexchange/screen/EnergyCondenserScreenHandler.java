@@ -1,5 +1,6 @@
 package com.skirlez.fabricatedexchange.screen;
 
+import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.block.EnergyCondenserBlockEntity;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.screen.slot.ConsiderateSlot;
@@ -9,7 +10,6 @@ import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.slot.Slot;
@@ -28,34 +28,39 @@ public class EnergyCondenserScreenHandler extends LeveledScreenHandler implement
 		EnergyCondenserBlockEntity blockEntity = (EnergyCondenserBlockEntity)playerInventory.player.getWorld().getBlockEntity(pos);
 		this.pos = pos;
 		this.level = level;
-		this.size = (13 - level) * 7 + 1;
-		if (blockEntity == null)
-			this.inventory = new SimpleInventory(size);
-		else {
-			this.inventory = (Inventory)blockEntity;
-			checkSize(inventory, size);
+		this.size = EnergyCondenserBlockEntity.inventorySize(level);
+		
+		if (blockEntity == null) { 
+			throw new AssertionError("BlockEntity for Energy Condenser is missing!!!");
 		}
+		
+		this.inventory = (Inventory)blockEntity;
+		checkSize(inventory, size);
+	
+		
 		inventory.onOpen(playerInventory.player);
 		this.buf = buf;
-		this.addSlot(new FakeSlot(inventory, 0, 12, 6));
+		this.addSlot(new FakeSlot(blockEntity.getTargetItemInventory(), 0, 12, 6));
 
 		if (level == 0) {
 			for (int i = 0; i < 7; i++) {
 				for (int j = 0; j < 13; j++) 
-					this.addSlot(new ConsiderateSlot(inventory, 1 + j + i * 13, 12 + j * 18, 26 + i * 18));
+					this.addSlot(new ConsiderateSlot(inventory, j + i * 13, 12 + j * 18, 26 + i * 18));
 			}
 		}
 		else {
 			for (int i = 0; i < 7; i++) {
 				for (int j = 0; j < 6; j++) 
-					this.addSlot(new ConsiderateSlot(inventory, 1 + j + i * 6, 12 + j * 18, 26 + i * 18));
+					this.addSlot(new ConsiderateSlot(inventory, j + i * 6, 12 + j * 18, 26 + i * 18));
 			}
 
 			for (int i = 0; i < 7; i++) {
 				for (int j = 0; j < 6; j++) 
-					this.addSlot(new ConsiderateSlot(inventory, 43 + j + i * 6, 138 + j * 18, 26 + i * 18));
+					this.addSlot(new ConsiderateSlot(inventory, 42 + j + i * 6, 138 + j * 18, 26 + i * 18));
 			}
 		}
+
+			
 
 		GeneralUtil.addPlayerInventory(this, playerInventory, 48, 154);
 		GeneralUtil.addPlayerHotbar(this, playerInventory, 48, 212);
@@ -110,8 +115,7 @@ public class EnergyCondenserScreenHandler extends LeveledScreenHandler implement
 	@Override
 	public void onSlotClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player) {
 		super.onSlotClick(slotIndex, button, actionType, player);
-		if (slotIndex == 0) {
-			FakeSlot slot = (FakeSlot)slots.get(0);
+		if (slotIndex == 0 && slots.get(slotIndex) instanceof FakeSlot slot) {
 			ItemStack cursorStack = getCursorStack();
 			if (slot.hasStack() && !cursorStack.isEmpty()
 					&& ItemStack.areItemsEqual(slot.getStack(), cursorStack)) {

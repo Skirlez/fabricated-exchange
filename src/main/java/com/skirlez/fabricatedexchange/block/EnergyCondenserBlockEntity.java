@@ -17,10 +17,15 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -28,9 +33,13 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 	private final int level;
 	private SuperNumber emc;
 	private int tick;
+	
+	private Inventory targetItemInv;
+	
 	private final LinkedList<ServerPlayerEntity> players = new LinkedList<>();
 	public EnergyCondenserBlockEntity(BlockPos pos, BlockState state) {
 		this(ModBlockEntities.ENERGY_CONDENSER, pos, state);
+		targetItemInv = new SimpleInventory(1);
 	}
 
 	public EnergyCondenserBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
@@ -58,10 +67,10 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 
 	public void serverTick(World world, BlockPos blockPos, BlockState blockState) {
 		Inventory inv = (Inventory)this;
-		ItemStack target = inv.getStack(0);
+		ItemStack target = getTargetItemStack();
 		SuperNumber targetEmc = EmcData.getItemStackEmc(target);
 		if (!targetEmc.equalsZero() && emc.compareTo(targetEmc) >= 0) {
-			int start = (level == 0) ? 1 : 43;
+			int start = (level == 0) ? 0 : 42;
 			SuperNumber emcCopy = new SuperNumber(emc);
 			emcCopy.divide(targetEmc);
 			int maxStacks = (level == 0) ? 1 : Math.min(emcCopy.toInt(target.getMaxCount()), target.getMaxCount());
@@ -87,7 +96,7 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 			}
 		}
 		if (level == 1 && emc.compareTo(targetEmc) == -1) {
-			for (int i = 1; i < 43; i++) {
+			for (int i = 0; i < 42; i++) {
 				ItemStack stack = inv.getStack(i);
 				if (stack.isEmpty())
 					continue;
@@ -120,7 +129,11 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 
 	@Override
 	public int size() {
-		return (13 - level) * 7 + 1;
+		return inventorySize(this.level);
+	}
+	
+	public static int inventorySize(int level) {
+		return (13 - level) * 7;
 	}
 
 	@Override
@@ -154,7 +167,7 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 
 	@Override
 	public boolean isConsuming() {
-		return !getStack(0).isEmpty();
+		return !getTargetItemStack().isEmpty();
 	}
 
 	@Override
@@ -169,6 +182,29 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 	@Override
 	public void update(SuperNumber emc) {
 		this.emc = emc;
+	}
+	
+	@Override
+	public void writeNbt(NbtCompound tag) {
+		// TODO Auto-generated method stub
+		super.writeNbt(tag);
+		tag.putString("target", Registries.ITEM.getId(targetItemInv.getStack(0).getItem()).toString());
+	}
+	
+	public void readNbt(NbtCompound tag) {
+		super.readNbt(tag);
+		String itemId = tag.getString("target");
+		if (itemId.isEmpty())
+			return;
+		targetItemInv.setStack(0, new ItemStack(Registries.ITEM.get(new Identifier(itemId))));
+	}
+	
+	public ItemStack getTargetItemStack() {
+		return targetItemInv.getStack(0);
+	}
+
+	public Inventory getTargetItemInventory() {
+		return targetItemInv;
 	}
 
 }

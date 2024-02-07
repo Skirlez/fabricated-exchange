@@ -14,8 +14,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 
-public class TransmutationTableScreenHandlerFactory implements ExtendedScreenHandlerFactory, ImplementedInventory {
-	private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(19, ItemStack.EMPTY);
+public class TransmutationTableScreenHandlerFactory implements ExtendedScreenHandlerFactory {
 	private TransmutationTableScreenHandler handler;
 	public TransmutationTableScreenHandlerFactory() {
 
@@ -23,19 +22,11 @@ public class TransmutationTableScreenHandlerFactory implements ExtendedScreenHan
 	public Text getDisplayName() {
 		return Text.translatable("screen.fabricated-exchange.transmutation");
 	}
-
-	@Nullable
 	@Override
 	public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-		handler = new TransmutationTableScreenHandler(syncId, inv, this);
+		handler = new TransmutationTableScreenHandler(syncId, inv);
 		return handler;
 	}
-
-	@Override
-	public DefaultedList<ItemStack> getItems() {
-		return this.inventory;
-	}
-
 	@Override
 	public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
 		buf.writeInt(handler == null ? 0 : handler.getLastPageNum());

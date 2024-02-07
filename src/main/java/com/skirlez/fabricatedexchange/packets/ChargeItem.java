@@ -25,7 +25,8 @@ public class ChargeItem extends ClientToServerPacket {
 	}
 	
 	public void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler,
-			PacketByteBuf buf, PacketSender responseSender) {   
+			PacketByteBuf buf, PacketSender responseSender) {
+		
 		ItemStack stack = player.getStackInHand(Hand.MAIN_HAND);
 		if (!(stack.getItem() instanceof ChargeableItem)) {
 			stack = player.getStackInHand(Hand.OFF_HAND);

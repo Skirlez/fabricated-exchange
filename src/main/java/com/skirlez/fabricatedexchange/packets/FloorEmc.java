@@ -4,6 +4,8 @@ import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandler;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
 
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
@@ -16,9 +18,9 @@ public class FloorEmc extends ClientToServerPacket {
 	}
 
 	public void send() {
-		
+		ClientPlayNetworking.send(id, PacketByteBufs.create());
 	}
-	
+
 	public void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler,
 			PacketByteBuf buf, PacketSender responseSender) {   
 		if (!(player.currentScreenHandler instanceof TransmutationTableScreenHandler))

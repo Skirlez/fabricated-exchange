@@ -30,17 +30,6 @@ public class EnergyCondenser extends ChestBlock {
 		this.level = level;
 	}
 
-
-	@Override
-	public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-		if (state.getBlock() != newState.getBlock()) {
-			BlockEntity blockEntity = world.getBlockEntity(pos);
-			if (blockEntity instanceof EnergyCondenserBlockEntity)
-				((Inventory)blockEntity).removeStack(0);
-		}
-		super.onStateReplaced(state, world, pos, newState, moved);
-	}
-
 	@Override
 	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
 		return new EnergyCondenserBlockEntity(pos, state);

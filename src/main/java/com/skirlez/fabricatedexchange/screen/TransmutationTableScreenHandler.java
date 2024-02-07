@@ -38,25 +38,25 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 	private String searchText = "";
 	private int offeringPageNum = 0;
 	private int lastOfferingPage = 0;
+	
 	private List<NbtItem> orderedKnowledge = new ArrayList<NbtItem>();
 	private final DefaultedList<TransmutationSlot> transmutationSlots = DefaultedList.of();
-	public TransmutationTableScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
-		this(syncId, inventory, new SimpleInventory(19));
+	public TransmutationTableScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
+		this(syncId, playerInventory);
 		this.lastOfferingPage = buf.readInt();
 	}
 	
-	public TransmutationTableScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory) {
+	public TransmutationTableScreenHandler(int syncId, PlayerInventory playerInventory) {
 		super(ModScreenHandlers.TRANSMUTATION_TABLE, syncId);
-		checkSize(inventory, 19);
-		this.inventory = inventory;
+		this.inventory = new SimpleInventory(19);
 		this.player = playerInventory.player;
+		
 		inventory.onOpen(playerInventory.player);
+		
 		addSlot(new MidSlot(inventory, 0, 159, 49, this, player.getWorld().isClient()));
 		addSlot(new ForgetSlot(inventory, 1, 91, 97, player, this));
 		emcSlot = new ConsumeSlot(inventory, 2, 109, 97, player, this);
 		addSlot(emcSlot);
-		
-
 		
 		// use trigonometry to create the transmutation slots
 
@@ -82,8 +82,6 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 
 			for (Item item : playerState.knowledge)
 				addKnowledge(new NbtItem(item));
-			
-
 			for (NbtItem item : playerState.specialKnowledge)
 				addKnowledge(item);
 			
@@ -229,11 +227,6 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 			transmutationSlots.get(i + 12).setStack(stack);
 		}
 		return;
-	}
-
-	@Override
-	public void onClosed(PlayerEntity player) {
-		super.onClosed(player);
 	}
 
 

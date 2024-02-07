@@ -93,7 +93,6 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 				inputSlots.add(new InputSlot(inv, i * (2 + level) + j + 2, xInput + 27 + j * 18, yInput + 12 + i * 18, fuelSlot, SlotCondition.alwaysTrue));
 		}
 
-
 		emc = SuperNumber.Zero();
 		tick = 0;
 	}
