@@ -173,10 +173,10 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 			registerGeneratedModels(itemModelGenerator,
 				ModItems.PHILOSOPHERS_STONE, ModItems.ALCHEMICAL_COAL, ModItems.RADIANT_COAL, ModItems.MOBIUS_FUEL,
 				ModItems.AETERNALIS_FUEL, ModItems.LOW_COVALENCE_DUST, ModItems.MEDIUM_COVALENCE_DUST, ModItems.HIGH_COVALENCE_DUST,
-				ModItems.DARK_MATTER, ModItems.RED_MATTER, ModItems.TOME_OF_KNOWLEDGE, ModItems.TRANSMUTATION_TABLET);
+				ModItems.DARK_MATTER, ModItems.RED_MATTER, ModItems.TOME_OF_KNOWLEDGE, ModItems.TRANSMUTATION_TABLET, ModItems.IRON_BAND);
 			registerHandheldModels(itemModelGenerator, ModItems.DARK_MATTER_SWORD, ModItems.DARK_MATTER_PICKAXE, ModItems.DARK_MATTER_AXE,
 				ModItems.DARK_MATTER_SHOVEL, ModItems.DARK_MATTER_HOE, ModItems.RED_MATTER_SWORD, ModItems.RED_MATTER_PICKAXE,
-					ModItems.RED_MATTER_AXE, ModItems.RED_MATTER_HOE, ModItems.RED_MATTER_SHOVEL);
+					ModItems.RED_MATTER_AXE, ModItems.RED_MATTER_HOE, ModItems.RED_MATTER_SHOVEL,ModItems.SWIFTWOLFS_RENDING_GALE);
 
 
 		}
@@ -282,7 +282,6 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 				.criterion("has_diamond", FabricRecipeProvider.conditionsFromTag(diamond))
 				.criterion("has_coal", FabricRecipeProvider.conditionsFromTag(coal))
 				.offerTo(exporter);
-
 
 			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModBlocks.ALCHEMICAL_CHEST)
 				.pattern("LMH")
@@ -533,7 +532,28 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
                             FabricRecipeProvider.conditionsFromItem(ModItems.RED_MATTER))
                     .offerTo(exporter);
 
+			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.IRON_BAND)
+					.pattern("III")
+					.pattern("ILI")
+					.pattern("III")
+					.input('L', Items.LAVA_BUCKET)
+					.input('I', Items.IRON_INGOT)
+					.criterion(FabricRecipeProvider.hasItem(Items.IRON_INGOT),
+							FabricRecipeProvider.conditionsFromItem(Items.IRON_INGOT))
+					.offerTo(exporter);
 
+			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.IRON_BAND)
+					.pattern("DFD")
+					.pattern("FBF")
+					.pattern("DFD")
+					.input('D', ModItems.DARK_MATTER)
+					.input('F', Items.FEATHER)
+					.input('B', ModItems.IRON_BAND)
+					.criterion(FabricRecipeProvider.hasItem(ModItems.IRON_BAND),
+							FabricRecipeProvider.conditionsFromItem(ModItems.IRON_BAND))
+					.criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER),
+							FabricRecipeProvider.conditionsFromItem(ModItems.DARK_MATTER))
+					.offerTo(exporter);
 		}
 
 		private void generatePhilosopherStoneRecipe(Item item1, Item item2, int ratio, Consumer<RecipeJsonProvider> exporter) {

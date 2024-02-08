@@ -3,6 +3,8 @@ package com.skirlez.fabricatedexchange.block;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.skirlez.fabricatedexchange.FabricatedExchange;
+import net.fabricmc.fabric.api.registry.FuelRegistry;
 import org.jetbrains.annotations.Nullable;
 
 import com.skirlez.fabricatedexchange.emc.EmcData;
@@ -112,14 +114,18 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 		if (entity.fuelSlot.hasStack()) {
 			ItemStack stack = entity.fuelSlot.getStack().copy();
 			stack.setCount(1);
-			SuperNumber value = EmcData.getItemStackEmc(stack);		  
-			SuperNumber emcCopy = new SuperNumber(entity.emc);
-			emcCopy.add(value);
-			if (emcCopy.compareTo(entity.maximumEmc) != 1) {
-				entity.emc.add(value);
-				entity.fuelSlot.takeStack(1);
+			Integer burnTime = FuelRegistry.INSTANCE.get(stack.getItem());
+
+			if (burnTime != null) {
+				SuperNumber value = EmcData.getItemStackEmc(stack);
+				SuperNumber emcCopy = new SuperNumber(entity.emc);
+				emcCopy.add(value);
+				if (emcCopy.compareTo(entity.maximumEmc) != 1) {
+					entity.emc.add(value);
+					entity.fuelSlot.takeStack(1);
+				}
 			}
-		}   
+		}
 		
 		if (!entity.emc.equalsZero()) {
 			List<BlockEntity> neighbors = GeneralUtil.getNeighboringBlockEntities(world, blockPos);
