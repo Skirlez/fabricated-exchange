@@ -1,6 +1,7 @@
 package com.skirlez.fabricatedexchange.item;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
+import com.skirlez.fabricatedexchange.item.rings.SwiftWolfsRendingGale;
 import com.skirlez.fabricatedexchange.item.tools.*;
 
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
@@ -31,6 +32,8 @@ public class ModItems {
 		new Item(new FabricItemSettings()));
 	public static final Item HIGH_COVALENCE_DUST = registerItemWithGroup("high_covalence_dust", 
 		new Item(new FabricItemSettings()));
+	public static final Item IRON_BAND = registerItemWithGroup("iron_band",
+		new Item(new FabricItemSettings()));
 	public static final Item DARK_MATTER = registerItemWithGroup("dark_matter", 
 		new Item(new FabricItemSettings()));
 	public static final Item RED_MATTER = registerItemWithGroup("red_matter", 
@@ -60,6 +63,10 @@ public class ModItems {
 			registerItemWithGroup("red_matter_axe", new RedMatterAxe(DarkMatterMaterial.INSTANCE, 12f, -3.0f, new Item.Settings().fireproof()));
 	public static final Item RED_MATTER_HOE =
 			registerItemWithGroup("red_matter_hoe", new RedMatterHoe(DarkMatterMaterial.INSTANCE, 8, 0.0f, new Item.Settings().fireproof()));
+
+	public static final Item SWIFTWOLFS_RENDING_GALE = registerItemWithGroup("swiftwolfs_rending_gale",
+			new SwiftWolfsRendingGale(new FabricItemSettings().maxCount(1)));
+
 	private static Item registerItem(String name, Item item) {
 		Registry.register(Registries.ITEM, new Identifier(FabricatedExchange.MOD_ID, name), item);
 		return item;

@@ -1,4 +1,5 @@
 version: "0.5.5+1.19.4"
+relayBurnNoneFuelItems: true
 showItemEmcOrigin: false
 showEnchantedBookRepairCost: true
 enchantmentEmcConstant: "3260"

@@ -12,7 +12,8 @@
 		"BrewingRecipeAccessor",
 		"ServerPlayerInteractionManagerPreMine",
 		"IngredientAccessor",
-		"TagEntryAccessor"
+		"TagEntryAccessor",
+		"MixinPlayerEntity"
 	],
 	"injectors": {
 		"defaultRequire": 1
