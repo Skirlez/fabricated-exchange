@@ -1,9 +1,13 @@
 package com.skirlez.fabricatedexchange;
+import org.jetbrains.annotations.Nullable;
+
 import com.skirlez.fabricatedexchange.block.AlchemicalChestBlockEntity;
 import com.skirlez.fabricatedexchange.block.EnergyCondenserBlockEntity;
 import com.skirlez.fabricatedexchange.block.ModBlockEntities;
 import com.skirlez.fabricatedexchange.block.ModBlocks;
 import com.skirlez.fabricatedexchange.event.KeyInputHandler;
+import com.skirlez.fabricatedexchange.item.ModItems;
+import com.skirlez.fabricatedexchange.item.rings.SwiftWolfsRendingGale;
 import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
 import com.skirlez.fabricatedexchange.screen.ModScreens;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
@@ -15,8 +19,12 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.render.block.entity.ChestBlockEntityRenderer;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
@@ -42,8 +50,6 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 		
 		
 		// we can use the vanilla renderers due to the texture mixin, see ModTexturedRenderLayers
-		BlockEntityRendererFactories.register(ModBlockEntities.ALCHEMICAL_CHEST, ChestBlockEntityRenderer::new);
-		BlockEntityRendererFactories.register(ModBlockEntities.ENERGY_CONDENSER, ChestBlockEntityRenderer::new);
 
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.ALCHEMICAL_CHEST.asItem(), (stack, mode, matrices, vertexConsumers, light, overlay)
 			-> MinecraftClient.getInstance().getBlockEntityRenderDispatcher().renderEntity(RENDER_ALCHEMICAL_CHEST, matrices, vertexConsumers, light, overlay));
@@ -51,7 +57,13 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 			-> MinecraftClient.getInstance().getBlockEntityRenderDispatcher().renderEntity(RENDER_ENERGY_CONDENSER_MK1, matrices, vertexConsumers, light, overlay));
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.ENERGY_CONDENSER_MK2.asItem(), (stack, mode, matrices, vertexConsumers, light, overlay) 
 			-> MinecraftClient.getInstance().getBlockEntityRenderDispatcher().renderEntity(RENDER_ENERGY_CONDENSER_MK2, matrices, vertexConsumers, light, overlay));
+		
+		ModelPredicateProviderRegistry.register(ModItems.SWIFTWOLFS_RENDING_GALE, new Identifier(FabricatedExchange.MOD_ID, "on"), 
+			(stack, world, entity, number) ->{
+				return SwiftWolfsRendingGale.isOn(stack);
+		});
 
+		
 		/*
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
 			//if (!MinecraftClient.getInstance().isIntegratedServerRunning())
@@ -67,7 +79,7 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 				public void reload(ResourceManager resourceManager) {
 					ModDataFiles.MAIN_CONFIG_FILE.updateComments();
 					
-					// Dirty hack so the config file is loaded on startup after the translation keys are ready 
+					// Annoying check so the config file is loaded on startup after the translation keys are ready 
 					// (for comments)
 					if (!hasInitiallyLoadedConfig) {
 						ModDataFiles.MAIN_CONFIG_FILE.fetch();

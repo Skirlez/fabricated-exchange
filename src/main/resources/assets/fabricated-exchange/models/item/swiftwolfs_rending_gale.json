@@ -1,0 +1,14 @@
+{
+    "parent": "minecraft:item/generated",
+    "textures": {
+        "layer0": "fabricated-exchange:item/swiftwolfs_rending_gale_off"
+    },
+    "overrides": [
+        {
+            "predicate": {
+                "fabricated-exchange:on": 1
+            },
+            "model": "fabricated-exchange:item/swiftwolfs_rending_gale_on"
+        }
+    ]
+}

@@ -1,5 +1,6 @@
 package com.skirlez.fabricatedexchange;
 
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -16,6 +17,7 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.data.client.BlockStateModelGenerator;
 import net.minecraft.data.client.BlockStateVariant;
 import net.minecraft.data.client.ItemModelGenerator;
@@ -170,14 +172,17 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 
 		@Override
 		public void generateItemModels(ItemModelGenerator itemModelGenerator) {
+			
 			registerGeneratedModels(itemModelGenerator,
 				ModItems.PHILOSOPHERS_STONE, ModItems.ALCHEMICAL_COAL, ModItems.RADIANT_COAL, ModItems.MOBIUS_FUEL,
 				ModItems.AETERNALIS_FUEL, ModItems.LOW_COVALENCE_DUST, ModItems.MEDIUM_COVALENCE_DUST, ModItems.HIGH_COVALENCE_DUST,
 				ModItems.DARK_MATTER, ModItems.RED_MATTER, ModItems.TOME_OF_KNOWLEDGE, ModItems.TRANSMUTATION_TABLET, ModItems.IRON_BAND);
 			registerHandheldModels(itemModelGenerator, ModItems.DARK_MATTER_SWORD, ModItems.DARK_MATTER_PICKAXE, ModItems.DARK_MATTER_AXE,
 				ModItems.DARK_MATTER_SHOVEL, ModItems.DARK_MATTER_HOE, ModItems.RED_MATTER_SWORD, ModItems.RED_MATTER_PICKAXE,
-					ModItems.RED_MATTER_AXE, ModItems.RED_MATTER_HOE, ModItems.RED_MATTER_SHOVEL, ModItems.SWIFTWOLFS_RENDING_GALE);
-
+					ModItems.RED_MATTER_AXE, ModItems.RED_MATTER_HOE, ModItems.RED_MATTER_SHOVEL);
+			
+			itemModelGenerator.register(ModItems.SWIFTWOLFS_RENDING_GALE, "_off", Models.GENERATED);
+			itemModelGenerator.register(ModItems.SWIFTWOLFS_RENDING_GALE, "_on", Models.GENERATED);
 
 		}
 
@@ -542,7 +547,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 							FabricRecipeProvider.conditionsFromItem(Items.IRON_INGOT))
 					.offerTo(exporter);
 
-			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.IRON_BAND)
+			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.SWIFTWOLFS_RENDING_GALE)
 					.pattern("DFD")
 					.pattern("FBF")
 					.pattern("DFD")

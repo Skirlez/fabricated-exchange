@@ -44,5 +44,9 @@ public class SwiftWolfsRendingGale extends FlyingAbilityItem
 		player.getAbilities().flying = false;
 		return false;
 	}
+
+	public static float isOn(ItemStack stack) {
+		return stack.getOrCreateNbt().getFloat("CustomModelData");
+	}
 }
 
