@@ -43,14 +43,11 @@ public class EnergyCollector extends BlockWithEntityAndRotation {
 	public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
 		if (state.getBlock() != newState.getBlock()) {
 			BlockEntity blockEntity = world.getBlockEntity(pos);
-			if (blockEntity instanceof EnergyCollectorBlockEntity) {
-				// clear the target slot, as the item in it isn't real
-				((EnergyCollectorBlockEntity)blockEntity).getTargetSlot().setStack(ItemStack.EMPTY);
-				ItemScatterer.spawn(world, pos, (Inventory)blockEntity);
+			if (blockEntity instanceof Inventory inventory) {
+				ItemScatterer.spawn(world, pos, inventory);
 				world.updateComparators(pos, this);
 			}
 		}
-		
 		super.onStateReplaced(state, world, pos, newState, moved);
 	}
 

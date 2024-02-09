@@ -1,5 +1,7 @@
 package com.skirlez.fabricatedexchange.screen;
 
+import java.util.Optional;
+
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.network.PacketByteBuf;
@@ -10,11 +12,14 @@ import net.minecraft.util.math.BlockPos;
 
 // All screen handlers that have levels inherit from this class.
 public abstract class LeveledScreenHandler extends ScreenHandler {
-	protected PacketByteBuf buf;
-	protected BlockPos pos;
-	protected int level;
-	protected LeveledScreenHandler(ScreenHandlerType<?> type, int syncId) {
+	protected Optional<PacketByteBuf> buf;
+	protected final BlockPos pos;
+	protected final int level;
+	protected LeveledScreenHandler(ScreenHandlerType<?> type, int syncId, BlockPos pos, int level, Optional<PacketByteBuf> buf) {
 		super(type, syncId);
+		this.pos = pos;
+		this.level = level;
+		this.buf = buf;
 	}
 
 	public int getLevel() {
@@ -27,11 +32,11 @@ public abstract class LeveledScreenHandler extends ScreenHandler {
 	
 	// intended to be called by the screen instance of the subclasses
 	@Nullable
-	public PacketByteBuf getAndConsumeCreationBuffer() {
-		if (buf == null)
-			return null;
-		PacketByteBuf copy = buf;
-		buf = null;
+	public Optional<PacketByteBuf> getAndConsumeCreationBuffer() {
+		if (buf.isEmpty())
+			return buf;
+		Optional<PacketByteBuf> copy = buf;
+		buf = Optional.empty();
 		return copy;
 	}
 }

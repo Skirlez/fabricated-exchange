@@ -5,8 +5,9 @@ import com.skirlez.fabricatedexchange.FabricatedExchange;
 import net.minecraft.item.ItemStack;
 
 public interface SlotCondition {
-	boolean condition(ItemStack stack);
-	public static SlotCondition alwaysTrue = (stack) -> true;
+	boolean passes(ItemStack stack);
+	public static SlotCondition always = (stack) -> true;
+	public static SlotCondition never = (stack) -> false;
 	public static SlotCondition isFuel = (stack) -> FabricatedExchange.fuelProgressionMap.containsKey(stack.getItem());
 }
 

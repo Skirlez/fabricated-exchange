@@ -44,8 +44,8 @@ public class AntiMatterRelay extends BlockWithEntityAndRotation {
 	public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
 		if (state.getBlock() != newState.getBlock()) {
 			BlockEntity blockEntity = world.getBlockEntity(pos);
-			if (blockEntity instanceof AntiMatterRelayBlockEntity) {
-				ItemScatterer.spawn(world, pos, (Inventory)blockEntity);
+			if (blockEntity instanceof AntiMatterRelayBlockEntity antimatterRelay) {
+				ItemScatterer.spawn(world, pos, antimatterRelay);
 				world.updateComparators(pos, this);
 			}
 		}

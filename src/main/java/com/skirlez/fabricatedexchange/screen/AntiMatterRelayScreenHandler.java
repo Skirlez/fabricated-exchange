@@ -1,48 +1,78 @@
 package com.skirlez.fabricatedexchange.screen;
 
+import java.util.Optional;
+
 import com.skirlez.fabricatedexchange.block.AntiMatterRelayBlockEntity;
+import com.skirlez.fabricatedexchange.screen.slot.SlotCondition;
+import com.skirlez.fabricatedexchange.screen.slot.SlotWithCondition;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
+import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
+
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.BlockPos;
 
 public class AntiMatterRelayScreenHandler extends FuelScreenHandler  {
-	public AntiMatterRelayScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
-		this(syncId, playerInventory, buf.readBlockPos(), buf.readInt(), buf);
+	
+	public static AntiMatterRelayScreenHandler clientConstructor(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
+		BlockPos pos = buf.readBlockPos();
+		int level = buf.readInt();
+		return new AntiMatterRelayScreenHandler(syncId, playerInventory, 
+				new SimpleInventory(AntiMatterRelayBlockEntity.inventorySize(level)),
+				pos, level, Optional.of(buf));
 	}
-	public AntiMatterRelayScreenHandler(int syncId, PlayerInventory playerInventory, BlockPos pos, int level, PacketByteBuf buf) {
-		super(ModScreenHandlers.ANTIMATTER_RELAY, syncId, pos, level, buf);
+	
+	public enum SlotIndicies {
+		FUEL_SLOT,
+		POWER_SLOT
+	}
+	
+	public AntiMatterRelayScreenHandler(int syncId, PlayerInventory playerInventory, 
+			Inventory inventory, BlockPos pos, int level, Optional<PacketByteBuf> buf) {
+		super(ModScreenHandlers.ANTIMATTER_RELAY, syncId, inventory, pos, level, buf);
 
-		AntiMatterRelayBlockEntity blockEntity = (AntiMatterRelayBlockEntity)playerInventory.player.getWorld().getBlockEntity(pos);
-
-		if (blockEntity == null) {
-			inventory = new SimpleInventory(11 + ((level == 0) ? 0 : (level == 1) ? 6 : 14));
-			return;
-		}
-		else
-			inventory = (Inventory)blockEntity;
-
-		addSlot(blockEntity.getFuelSlot());
-		addSlot(blockEntity.getChargeSlot());
-		inputSlots = blockEntity.getInputSlots();
-		for (int i = 0; i < inputSlots.size(); i++) {
-			addSlot(inputSlots.get(i));
-		}
-		int xInv, yInv;
+			
+		int xInput, yInput, xFuel, yFuel, xInv, yInv;
 		if (level == 0) {
+			xInput = 0; 
+			yInput = 0; 
+			xFuel = 0; 
+			yFuel = 0;
 			xInv = 0; 
 			yInv = 0;
 		}
 		else if (level == 1) {
+			xInput = -1; 
+			yInput = 1; 
+			xFuel = 17; 
+			yFuel = 1;
 			xInv = 8; 
 			yInv = 6;
 		}
 		else {
+			xInput = 1; 
+			yInput = 1; 
+			xFuel = 37; 
+			yFuel = 15;
 			xInv = 18; 
 			yInv = 18;
 		}
+
+		boolean onlyFuel = ModDataFiles.MAIN_CONFIG_FILE.antiMatterRelay_onlyAcceptFuelItems;
+		SlotCondition condition = (onlyFuel) ? SlotCondition.isFuel : SlotCondition.always;
+		
+		addSlot(new SlotWithCondition(inventory, SlotIndicies.FUEL_SLOT.ordinal(), 67 + xFuel, 38 + yFuel, condition));
+		addSlot(new Slot(inventory, SlotIndicies.POWER_SLOT.ordinal(), 127 + xFuel, 38 + yFuel));
+		
+		for (int i = 0; i < 3 + level; i++) {
+			for (int j = 0; j < 2 + level; j++)
+				addSlot(new SlotWithCondition(inventory, i * (2 + level) + j + 2, xInput + 27 + j * 18, yInput + 12 + i * 18, condition));
+		}
+		
+		
 		GeneralUtil.addPlayerInventory(this, playerInventory, 8 + xInv, 90 + yInv);
 		GeneralUtil.addPlayerHotbar(this, playerInventory, 8 + xInv, 148 + yInv);
 	}

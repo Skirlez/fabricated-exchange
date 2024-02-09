@@ -2,7 +2,6 @@ package com.skirlez.fabricatedexchange.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
-import com.skirlez.fabricatedexchange.block.EnergyCondenserBlockEntity;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
@@ -21,17 +20,12 @@ public class EnergyCondenserScreen extends HandledScreen<EnergyCondenserScreenHa
 
 	private final Identifier texture;
 	private SuperNumber emc;
-	private EnergyCondenserBlockEntity entity;
 	
 	public EnergyCondenserScreen(EnergyCondenserScreenHandler handler, PlayerInventory inventory, Text title) {
 		super(handler, inventory, title);
 		this.level = handler.getLevel();
-		this.entity = (EnergyCondenserBlockEntity)inventory.player.world.getBlockEntity(handler.getPos());
-		PacketByteBuf buf = handler.getAndConsumeCreationBuffer();
-		if (buf == null)
-			emc = SuperNumber.Zero();
-		else
-			emc = new SuperNumber(buf.readString());
+		PacketByteBuf buf = handler.getAndConsumeCreationBuffer().get();
+		emc = new SuperNumber(buf.readString());
 		this.texture = new Identifier(FabricatedExchange.MOD_ID, "textures/gui/energy_condenser_mk" + (level + 1) + ".png");
 	}
 
@@ -57,7 +51,7 @@ public class EnergyCondenserScreen extends HandledScreen<EnergyCondenserScreenHa
 		drawTexture(matrices, i, j, 0, 0, backgroundWidth, backgroundHeight);
 		
 		
-		ItemStack stack = entity.getTargetItemStack();
+		ItemStack stack = handler.getTargetItemStack();
 		if (stack.isEmpty())
 			return;
 		SuperNumber targetEmc = EmcData.getItemStackEmc(stack);
@@ -73,7 +67,7 @@ public class EnergyCondenserScreen extends HandledScreen<EnergyCondenserScreenHa
 
 	@Override
 	protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
-		ItemStack stack = entity.getTargetItemStack();
+		ItemStack stack = handler.getTargetItemStack();
 		SuperNumber targetEmc;
 		if (stack.isEmpty())
 			targetEmc = emc;

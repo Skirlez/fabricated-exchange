@@ -2,7 +2,7 @@ package com.skirlez.fabricatedexchange.screen;
 
 import org.jetbrains.annotations.Nullable;
 
-import com.skirlez.fabricatedexchange.interfaces.ImplementedInventory;
+import com.skirlez.fabricatedexchange.util.ImplementedInventory;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.entity.player.PlayerEntity;

@@ -3,7 +3,6 @@ package com.skirlez.fabricatedexchange.screen;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.mixin.client.HandledScreenAccessor;
-import com.skirlez.fabricatedexchange.screen.slot.FuelSlot;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -17,6 +16,8 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+import com.skirlez.fabricatedexchange.screen.AntiMatterRelayScreenHandler.SlotIndicies;
+
 public class AntiMatterRelayScreen extends HandledScreen<AntiMatterRelayScreenHandler> {
 	private final Identifier texture;
 	private final int level;
@@ -27,11 +28,8 @@ public class AntiMatterRelayScreen extends HandledScreen<AntiMatterRelayScreenHa
 		super(handler, inventory, title);
 		this.handler = handler;
 		this.level = handler.getLevel();
-		PacketByteBuf buf = handler.getAndConsumeCreationBuffer();
-		if (buf == null) 
-			this.emc = SuperNumber.Zero();
-		else
-			this.emc = new SuperNumber(buf.readString());
+		PacketByteBuf buf = handler.getAndConsumeCreationBuffer().get();
+		this.emc = new SuperNumber(buf.readString());
 
 		if (level == 0) 
 			maximumEmc = new SuperNumber(100000);
@@ -98,8 +96,9 @@ public class AntiMatterRelayScreen extends HandledScreen<AntiMatterRelayScreenHa
 		}
 
 		double percent;
+		
 		// draw fuel energy bar 
-		ItemStack fuelStack = handler.getFuelSlot().getStack();
+		ItemStack fuelStack = handler.getInventory().getStack(SlotIndicies.FUEL_SLOT.ordinal());
 		percent = (double)fuelStack.getCount() / fuelStack.getMaxCount();
 		drawTexture(matrices, x + 64 + xFuel, y + 67 + yFuel, 0, backgroundHeight, (int)(30 * percent), 10); 
 
@@ -110,16 +109,9 @@ public class AntiMatterRelayScreen extends HandledScreen<AntiMatterRelayScreenHa
 		if (percent > 1)
 			percent = 1;
 		drawTexture(matrices, x + 64 + xBar, y + 6, 30, backgroundHeight, (int)(102 * percent), 10); 
-
+		
 	}
 	
-	@Override
-	protected void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType) {
-		if (actionType == SlotActionType.QUICK_MOVE && slot instanceof FuelSlot)
-			((HandledScreenAccessor)this).setDoubleClicking(false);
-		super.onMouseClick(slot, slotId, button, actionType);
-	}
-
 	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		renderBackground(matrices);

@@ -1,11 +1,13 @@
 package com.skirlez.fabricatedexchange.block;
 
 import java.util.LinkedList;
+import java.util.Optional;
 
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
 import com.skirlez.fabricatedexchange.screen.EnergyCondenserScreen;
 import com.skirlez.fabricatedexchange.screen.EnergyCondenserScreenHandler;
+import com.skirlez.fabricatedexchange.util.SingleStackInventoryImpl;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.fabricmc.api.EnvType;
@@ -18,6 +20,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.inventory.SingleStackInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -29,17 +32,19 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+
+
 public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements ExtendedScreenHandlerFactory, ConsumerBlockEntity {
 	private final int level;
 	private SuperNumber emc;
 	private int tick;
 	
-	private Inventory targetItemInv;
+	private SingleStackInventory targetInventory;
 	
 	private final LinkedList<ServerPlayerEntity> players = new LinkedList<>();
 	public EnergyCondenserBlockEntity(BlockPos pos, BlockState state) {
 		this(ModBlockEntities.ENERGY_CONDENSER, pos, state);
-		targetItemInv = new SimpleInventory(1);
+		targetInventory = new SingleStackInventoryImpl();
 	}
 
 	public EnergyCondenserBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
@@ -64,10 +69,9 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 		return;
 	}
 	
-
 	public void serverTick(World world, BlockPos blockPos, BlockState blockState) {
 		Inventory inv = (Inventory)this;
-		ItemStack target = getTargetItemStack();
+		ItemStack target = targetInventory.getStack();
 		SuperNumber targetEmc = EmcData.getItemStackEmc(target);
 		if (!targetEmc.equalsZero() && emc.compareTo(targetEmc) >= 0) {
 			int start = (level == 0) ? 0 : 42;
@@ -139,9 +143,8 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 	@Override
 	public ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
 		ServerPlayerEntity player = (ServerPlayerEntity)playerInventory.player;
-		ModServerToClientPackets.UPDATE_CONSUMER_BLOCK.send(player, pos, emc);
 		players.add(player);
-		return new EnergyCondenserScreenHandler(syncId, playerInventory, pos, level, null);
+		return new EnergyCondenserScreenHandler(syncId, playerInventory, (Inventory)this, targetInventory, pos, level, Optional.empty());
 	}
 
 	public int getLevel() {
@@ -160,14 +163,12 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 
 	@Override
 	public SuperNumber getMaximumEmc() {
-		Inventory inv = (Inventory)this;
-		ItemStack target = inv.getStack(0);
-		return EmcData.getItemStackEmc(target);
+		return EmcData.getItemStackEmc(targetInventory.getStack());
 	}
 
 	@Override
 	public boolean isConsuming() {
-		return !getTargetItemStack().isEmpty();
+		return !targetInventory.getStack().isEmpty();
 	}
 
 	@Override
@@ -186,25 +187,22 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 	
 	@Override
 	public void writeNbt(NbtCompound tag) {
-		// TODO Auto-generated method stub
 		super.writeNbt(tag);
-		tag.putString("target", Registries.ITEM.getId(targetItemInv.getStack(0).getItem()).toString());
+		tag.putString("target", Registries.ITEM.getId(targetInventory.getStack(0).getItem()).toString());
 	}
 	
-	public void readNbt(NbtCompound tag) {
-		super.readNbt(tag);
-		String itemId = tag.getString("target");
-		if (itemId.isEmpty())
+	public void readNbt(NbtCompound nbt) {
+		super.readNbt(nbt);
+		Item item = Registries.ITEM.get(new Identifier(nbt.getString("target")));
+		if (item == null)
 			return;
-		targetItemInv.setStack(0, new ItemStack(Registries.ITEM.get(new Identifier(itemId))));
+		targetInventory.setStack(0, new ItemStack(item));
 	}
 	
-	public ItemStack getTargetItemStack() {
-		return targetItemInv.getStack(0);
-	}
 
-	public Inventory getTargetItemInventory() {
-		return targetItemInv;
+
+	public SingleStackInventory getTargetItemInventory() {
+		return targetInventory;
 	}
 
 }

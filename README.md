@@ -5,7 +5,7 @@ The mod attaches an "EMC" number value to every item. Some are worth more, some 
 Transmute items and blocks into EMC, and EMC to different items you've obtained before.
 
 The mod is currently in beta. It is targetting 1.19.4. Once it is in a stable, feature complete state, 
-I will port it to older versions that are popular for moddding. Afterwards it will be upgraded to whatever versions after 1.19.4 that are most popular for mods.
+I will port it to older versions that are popular for modding. Afterwards it will be upgraded to whatever versions after 1.19.4 that are most popular for mods.
 
 All of the assets were taken from https://github.com/sinkillerj/ProjectE.
 If the author(s) of the assets do not want this project using them, I will take the project 

@@ -95,7 +95,7 @@ public class FabricatedExchange implements ModInitializer {
 		EmcData.potionEmcMap = ImmutableMap.copyOf(mapper.getPotionEmcMap());
 		EmcData.enchantmentEmcMap = ImmutableMap.copyOf(mapper.getEnchantmentEmcMap());
 		List<Item> fuelItemList = new ArrayList<Item>();
-		for (RegistryEntry<Item> entry : Registries.ITEM.getEntryList(ModTags.FUEL).get()) { 
+		for (RegistryEntry<Item> entry : ModTags.FUEL_ITEMS.get()) { 
 			Item item = entry.value();
 			int index = Collections.binarySearch(fuelItemList, item, 
 				(item1, item2) -> 

@@ -4,16 +4,13 @@ package com.skirlez.fabricatedexchange.screen;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
-import com.skirlez.fabricatedexchange.mixin.client.HandledScreenAccessor;
-import com.skirlez.fabricatedexchange.screen.slot.FakeSlot;
-import com.skirlez.fabricatedexchange.screen.slot.FuelSlot;
-import com.skirlez.fabricatedexchange.screen.slot.collection.OutputSlot;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
@@ -22,17 +19,19 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-public class EnergyCollectorScreen extends HandledScreen<FuelScreenHandler> {
+import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreenHandler.SlotIndicies;
+
+public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHandler> {
 	private final Identifier texture;
-	private double fuelProgress; // 0 - 1 how much of the arrow should be displayed
 	private double emcProgress; // 0 - 1 how much of the emc bar should be filled
 	private final EnergyCollectorScreenHandler handler;
 	private int light;
 	private SuperNumber emc;
 	private final int level;
 	private final SuperNumber maximumEmc;
-	public EnergyCollectorScreen(FuelScreenHandler handler, PlayerInventory inventory, Text title) {
+	public EnergyCollectorScreen(EnergyCollectorScreenHandler handler, PlayerInventory inventory, Text title) {
 		super(handler, inventory, title);		
+		
 		this.level = handler.getLevel();
 		if (this.level == 0)
 			maximumEmc = new SuperNumber(10000);
@@ -41,22 +40,15 @@ public class EnergyCollectorScreen extends HandledScreen<FuelScreenHandler> {
 		else 
 			maximumEmc = new SuperNumber(60000);
 
-		this.handler = (EnergyCollectorScreenHandler)handler;
-		PacketByteBuf buf = handler.getAndConsumeCreationBuffer();
-		if (buf != null) {
-			emc = new SuperNumber(buf.readString());
-			light = buf.readInt();
-			calculateFuelProgress();
-			SuperNumber emcCopy = new SuperNumber(emc);
-			emcCopy.divide(maximumEmc);
-			emcProgress = emcCopy.toDouble();
-		}  
-		else {
-			emc = SuperNumber.Zero();
-			light = 0;
-			fuelProgress = 0d;
-			emcProgress = 0d;
-		}
+		this.handler = handler;
+		PacketByteBuf buf = handler.getAndConsumeCreationBuffer().get();
+		emc = new SuperNumber(buf.readString());
+		light = buf.readInt();
+		
+		SuperNumber emcCopy = new SuperNumber(emc);
+		emcCopy.divide(maximumEmc);
+		emcProgress = emcCopy.toDouble();
+		
 
 		texture = new Identifier(FabricatedExchange.MOD_ID, "textures/gui/energy_collector_mk" + String.valueOf(level + 1) + ".png");
 	}
@@ -75,6 +67,7 @@ public class EnergyCollectorScreen extends HandledScreen<FuelScreenHandler> {
 		super.init();
 		titleX = 0; 
 		titleY = 0; 
+		
 	}
 
 	@Override
@@ -82,17 +75,6 @@ public class EnergyCollectorScreen extends HandledScreen<FuelScreenHandler> {
 		SuperNumber emcCopy = new SuperNumber(emc);
 		emcCopy.divide(maximumEmc);
 		emcProgress = emcCopy.toDouble();
-
-		calculateFuelProgress();
-	}
-
-	@Override
-	protected void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType) {
-		if (actionType == SlotActionType.QUICK_MOVE && slot instanceof FuelSlot) {
-			((HandledScreenAccessor)this).setDoubleClicking(false);
-		}
-		
-		super.onMouseClick(slot, slotId, button, actionType);
 	}
 
 	@Override
@@ -118,7 +100,8 @@ public class EnergyCollectorScreen extends HandledScreen<FuelScreenHandler> {
 
 		// arrowOffset and sunOffset are for drawing the sun and the arrow sliced, 
 		// xOffset and uOffset are for offsetting the elements it draws correctly on all sizes.
-
+		double fuelProgress = calculateFuelProgress();
+		
 		final int maxfuelProgress = 24;
 		int arrowOffset = maxfuelProgress - (int)(fuelProgress * maxfuelProgress);
 		drawTexture(matrices, x + 138 + xOffset, y + 31 + arrowOffset, 176 + uOffset, 14 + arrowOffset, 12, 25); // draw arrow
@@ -154,37 +137,40 @@ public class EnergyCollectorScreen extends HandledScreen<FuelScreenHandler> {
 		this.light = light;
 	}
 
-	public void calculateFuelProgress() {
-		fuelProgress = 0d;
-		FuelSlot fuelSlot = (FuelSlot)handler.getSlot(0);
-		FakeSlot targetSlot = (FakeSlot)handler.getSlot(2);
-		ItemStack stack = fuelSlot.getStack();
+	public double calculateFuelProgress() {
+		Inventory inventory = handler.getInventory();
+		
+		ItemStack stack = inventory.getStack(SlotIndicies.FUEL_SLOT.ordinal());
 		if (stack.isEmpty())
-			return;
+			return 0d;
 		Item item = stack.getItem();
 		if (!FabricatedExchange.fuelProgressionMap.containsKey(item))
-			return;
+			return 0d;
 		SuperNumber itemEmc = EmcData.getItemEmc(item);
-		if (targetSlot.hasStack()) {
-			SuperNumber targetItemEmc = EmcData.getItemEmc(targetSlot.getStack().getItem());
+		
+		ItemStack target = handler.getTargetItemStack();
+		if (!target.isEmpty()) {
+			SuperNumber targetItemEmc = EmcData.getItemEmc(target.getItem());
 			if (itemEmc.compareTo(targetItemEmc) >= 0)
-				return;
+				return 0d;
 		}
 
 		Item nextItem = FabricatedExchange.fuelProgressionMap.get(item);
-		OutputSlot outputSlot = (OutputSlot)handler.getSlot(1);
-		if ((!nextItem.equals(outputSlot.getStack().getItem())
-				|| outputSlot.getStack().getMaxCount() <= outputSlot.getStack().getCount()
-				) && outputSlot.hasStack())
-			return; // return if there's an item in the output slot that we cannot merge with the next item in the fuel progression
+		ItemStack outputStack = inventory.getStack(SlotIndicies.OUTPUT_SLOT.ordinal());
+		if ((!nextItem.equals(outputStack.getItem())
+				|| outputStack.getMaxCount() <= outputStack.getCount()
+				) && !outputStack.isEmpty())
+			return 0d; // return if there's an item in the output slot that we cannot merge with the next item in the fuel progression
 		SuperNumber nextEmc = EmcData.getItemEmc(nextItem);
 		
 		nextEmc.subtract(itemEmc);
 
 		SuperNumber emcCopy = new SuperNumber(emc);
 		emcCopy.divide(nextEmc);
-		fuelProgress = emcCopy.toDouble();
+		double fuelProgress = emcCopy.toDouble();
 		if (fuelProgress > 1d)
 			fuelProgress = 1d;
+		return fuelProgress;
+		
 	}
 }

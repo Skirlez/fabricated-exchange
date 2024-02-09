@@ -124,6 +124,7 @@ public class SettingsScreen extends GameOptionsScreen {
 		addBooleanValue("mapper.enabled");
 		addBooleanValue("transmutationTable.animated");
 		addBooleanValue("transmutationTable.floorButton");
+		addBooleanValue("antiMatterRelay.onlyAcceptFuelItems");
 		
 		if (pages.get(pages.size() - 1).isEmpty())
 			pages.remove(pages.size() - 1);

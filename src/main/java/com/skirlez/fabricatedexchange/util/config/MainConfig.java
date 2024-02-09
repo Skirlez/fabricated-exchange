@@ -26,7 +26,7 @@ public class MainConfig extends AbstractConfigFile<Map<String, Object>> {
 		defaultValue = copyDefaultValue();
 	}
 
-	public boolean relayBurnNoneFuelItems;
+	
 	public boolean showItemEmcOrigin;
 	public boolean showEnchantedBookRepairCost;
 	public SuperNumber enchantmentEmcConstant;
@@ -35,7 +35,7 @@ public class MainConfig extends AbstractConfigFile<Map<String, Object>> {
 	public boolean mapper_enabled;
 	public boolean transmutationTable_animated;
 	public boolean transmutationTable_floorButton;
-
+	public boolean antiMatterRelay_onlyAcceptFuelItems;
 
 	/* Fetch the config and compare to the default config to see if any keys
 	are missing or any of them have mismatched value types. If true, set that 
@@ -82,7 +82,7 @@ public class MainConfig extends AbstractConfigFile<Map<String, Object>> {
 	@Override
 	protected void constProcess() {
 		super.constProcess();
-		relayBurnNoneFuelItems = (boolean)value.get("relayBurnNoneFuelItems");
+		
 		showItemEmcOrigin = (boolean)value.get("showItemEmcOrigin");
 		showEnchantedBookRepairCost = (boolean)value.get("showEnchantedBookRepairCost");
 		emcInMultiplier = new SuperNumber((String)value.get("emcInMultiplier"));
@@ -91,7 +91,7 @@ public class MainConfig extends AbstractConfigFile<Map<String, Object>> {
 		mapper_enabled = (boolean)value.get("mapper.enabled");
 		transmutationTable_animated = (boolean)value.get("transmutationTable.animated");
 		transmutationTable_floorButton = (boolean)value.get("transmutationTable.floorButton");
-		
+		antiMatterRelay_onlyAcceptFuelItems = (boolean)value.get("antiMatterRelay.onlyAcceptFuelItems");
 	}
 	
 	@Environment(EnvType.CLIENT)

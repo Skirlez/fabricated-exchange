@@ -14,13 +14,13 @@ public abstract class ModScreenHandlers {
 	public static final ScreenHandlerType<TransmutationTableScreenHandler> TRANSMUTATION_TABLE = 
 		new ExtendedScreenHandlerType<>(TransmutationTableScreenHandler::new);
 	public static final ScreenHandlerType<EnergyCollectorScreenHandler> ENERGY_COLLECTOR = 
-		new ExtendedScreenHandlerType<>(EnergyCollectorScreenHandler::new);
+		new ExtendedScreenHandlerType<>(EnergyCollectorScreenHandler::clientConstructor);
 	public static final ScreenHandlerType<AntiMatterRelayScreenHandler> ANTIMATTER_RELAY = 
-		new ExtendedScreenHandlerType<>(AntiMatterRelayScreenHandler::new);
+		new ExtendedScreenHandlerType<>(AntiMatterRelayScreenHandler::clientConstructor);
 	public static final ScreenHandlerType<AlchemicalChestScreenHandler> ALCHEMICAL_CHEST = 
 		new ScreenHandlerType<AlchemicalChestScreenHandler>(AlchemicalChestScreenHandler::new, FeatureSet.empty());
 	public static final ScreenHandlerType<EnergyCondenserScreenHandler> ENERGY_CONDENSER = 
-		new ExtendedScreenHandlerType<>(EnergyCondenserScreenHandler::new);
+		new ExtendedScreenHandlerType<>(EnergyCondenserScreenHandler::clientConstructor);
 
 
 	public static void registerAllScreenHandlers() {
