@@ -2,7 +2,7 @@ package com.skirlez.fabricatedexchange.item.rings;
 
 import com.skirlez.fabricatedexchange.item.*;
 import com.skirlez.fabricatedexchange.mixin.ItemAccessor;
-import com.skirlez.fabricatedexchange.packets.FlyingAbilityItem;
+import com.skirlez.fabricatedexchange.item.BaseFunction.FlyingAbilityItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.ItemStack;

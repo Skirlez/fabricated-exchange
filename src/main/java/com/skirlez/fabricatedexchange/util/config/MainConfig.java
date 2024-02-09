@@ -26,6 +26,7 @@ public class MainConfig extends AbstractConfigFile<Map<String, Object>> {
 		defaultValue = copyDefaultValue();
 	}
 
+	public boolean relayBurnNoneFuelItems;
 	public boolean showItemEmcOrigin;
 	public boolean showEnchantedBookRepairCost;
 	public SuperNumber enchantmentEmcConstant;
@@ -81,6 +82,7 @@ public class MainConfig extends AbstractConfigFile<Map<String, Object>> {
 	@Override
 	protected void constProcess() {
 		super.constProcess();
+		relayBurnNoneFuelItems = (boolean)value.get("relayBurnNoneFuelItems");
 		showItemEmcOrigin = (boolean)value.get("showItemEmcOrigin");
 		showEnchantedBookRepairCost = (boolean)value.get("showEnchantedBookRepairCost");
 		emcInMultiplier = new SuperNumber((String)value.get("emcInMultiplier"));

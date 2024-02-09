@@ -1,4 +1,4 @@
-package com.skirlez.fabricatedexchange.packets;
+package com.skirlez.fabricatedexchange.item.BaseFunction;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;

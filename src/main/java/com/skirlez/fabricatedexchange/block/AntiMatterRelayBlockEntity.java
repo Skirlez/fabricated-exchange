@@ -39,6 +39,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 
 public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory,
 		ConsumerBlockEntity {
@@ -116,7 +117,7 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 			stack.setCount(1);
 			Integer burnTime = FuelRegistry.INSTANCE.get(stack.getItem());
 
-			if (burnTime != null) {
+			if (burnTime != null || ModDataFiles.MAIN_CONFIG_FILE.relayBurnNoneFuelItems) {
 				SuperNumber value = EmcData.getItemStackEmc(stack);
 				SuperNumber emcCopy = new SuperNumber(entity.emc);
 				emcCopy.add(value);
