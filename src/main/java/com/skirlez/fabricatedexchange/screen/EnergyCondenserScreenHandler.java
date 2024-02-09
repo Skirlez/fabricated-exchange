@@ -2,7 +2,6 @@ package com.skirlez.fabricatedexchange.screen;
 
 import java.util.Optional;
 
-import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.block.EnergyCondenserBlockEntity;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.screen.slot.ConsiderateSlot;
@@ -10,7 +9,6 @@ import com.skirlez.fabricatedexchange.screen.slot.DisplaySlot;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SingleStackInventoryImpl;
 
-import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;

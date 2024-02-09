@@ -1,8 +1,12 @@
 package com.skirlez.fabricatedexchange.block;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Optional;
+import java.util.Set;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.item.ItemUtil;
@@ -41,6 +45,11 @@ import net.minecraft.world.World;
 import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreenHandler.SlotIndicies;
 
 public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory, ConsumerBlockEntity {
+	
+	public static final Set<Block> lightPassingBlocks = new ImmutableSet.Builder<Block>().add(
+			ModBlocks.ENERGY_COLLECTOR_MK1, ModBlocks.ENERGY_COLLECTOR_MK2, ModBlocks.ENERGY_COLLECTOR_MK3,
+			ModBlocks.ANTIMATTER_RELAY_MK1, ModBlocks.ANTIMATTER_RELAY_MK2, ModBlocks.ANTIMATTER_RELAY_MK3,
+			ModBlocks.ENERGY_COLLECTOR_MK1, ModBlocks.ENERGY_CONDENSER_MK2).build();
 	
 	private SuperNumber emc;
 	private int tick;
@@ -88,9 +97,22 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 		return Text.translatable("screen.fabricated-exchange.emc_collection");
 	}
 	
+	
+	
+	public static int getLightLevelAbove(World world, BlockPos pos) {
+		pos = pos.add(0, 1, 0);
+		
+		while (lightPassingBlocks.contains(world.getBlockState(pos).getBlock())) {
+			pos = pos.add(0, 1, 0);
+		}
+		
+		
+		return Math.min(world.getLightLevel(LightType.SKY, pos) - world.getAmbientDarkness(), 15);
+	}
+	
 	public static void tick(World world, BlockPos blockPos, BlockState blockState, EnergyCollectorBlockEntity entity) {
-		entity.light = Math.max(world.getLightLevel(LightType.BLOCK, blockPos.add(0, 1, 0)),
-			world.getLightLevel(LightType.SKY, blockPos.add(0, 1, 0)) - world.getAmbientDarkness());
+		entity.light = getLightLevelAbove(world, blockPos);
+		
 		if (entity.light < 0)
 			entity.light = 0;
 		else if (entity.light > 15)

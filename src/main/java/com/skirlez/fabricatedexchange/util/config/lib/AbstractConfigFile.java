@@ -33,6 +33,7 @@ public abstract class AbstractConfigFile<T> extends AbstractFile<T> {
 	protected ImmutableMap<String, String[]> commentsMap;
 	private final Class<T> classType;
 	
+	@SuppressWarnings("unchecked")
 	public AbstractConfigFile(Class<?> classType, String name) {
 		super(name);
 		this.classType = (Class<T>)classType;

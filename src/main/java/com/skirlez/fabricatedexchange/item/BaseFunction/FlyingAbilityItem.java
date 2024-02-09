@@ -36,7 +36,8 @@ public class FlyingAbilityItem extends Item {
 				// Grant flying ability
 				player.getAbilities().allowFlying = true;
 				player.sendAbilitiesUpdate();
-			} else if (!hasItemNow && hadItemBefore && player.getAbilities().allowFlying && !player.isCreative() && !player.isSpectator()) {
+			} 
+			else if (!hasItemNow && hadItemBefore && player.getAbilities().allowFlying && !player.isCreative() && !player.isSpectator()) {
 				// Revoke flying ability
 				player.getAbilities().allowFlying = false;
 				player.getAbilities().flying = false;
