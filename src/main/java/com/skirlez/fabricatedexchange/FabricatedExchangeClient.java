@@ -1,9 +1,7 @@
 package com.skirlez.fabricatedexchange;
-import org.jetbrains.annotations.Nullable;
 
 import com.skirlez.fabricatedexchange.block.AlchemicalChestBlockEntity;
 import com.skirlez.fabricatedexchange.block.EnergyCondenserBlockEntity;
-import com.skirlez.fabricatedexchange.block.ModBlockEntities;
 import com.skirlez.fabricatedexchange.block.ModBlocks;
 import com.skirlez.fabricatedexchange.event.KeyInputHandler;
 import com.skirlez.fabricatedexchange.item.ModItems;
@@ -20,11 +18,6 @@ import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
-import net.minecraft.client.render.block.entity.ChestBlockEntityRenderer;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
@@ -58,9 +51,14 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 		BuiltinItemRendererRegistry.INSTANCE.register(ModBlocks.ENERGY_CONDENSER_MK2.asItem(), (stack, mode, matrices, vertexConsumers, light, overlay) 
 			-> MinecraftClient.getInstance().getBlockEntityRenderDispatcher().renderEntity(RENDER_ENERGY_CONDENSER_MK2, matrices, vertexConsumers, light, overlay));
 		
-		ModelPredicateProviderRegistry.register(ModItems.SWIFTWOLFS_RENDING_GALE, new Identifier(FabricatedExchange.MOD_ID, "on"), 
+		ModelPredicateProviderRegistry.register(ModItems.SWIFTWOLFS_RENDING_GALE, new Identifier(FabricatedExchange.MOD_ID, "state"), 
 			(stack, world, entity, number) ->{
-				return SwiftWolfsRendingGale.isOn(stack);
+				boolean isOn = SwiftWolfsRendingGale.isOn(stack);
+				boolean isRepelling = SwiftWolfsRendingGale.isRepelling(stack);
+				if (isRepelling)
+					return isOn ? 0.3f : 0.2f;
+				else
+					return isOn ? 0.1f : 0f;
 		});
 
 		

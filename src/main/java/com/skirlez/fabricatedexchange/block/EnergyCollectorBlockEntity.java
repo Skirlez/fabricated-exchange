@@ -1,15 +1,12 @@
 package com.skirlez.fabricatedexchange.block;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Set;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
-import com.skirlez.fabricatedexchange.item.ItemUtil;
 import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
 import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreen;
 import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreenHandler;

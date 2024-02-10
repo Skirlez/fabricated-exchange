@@ -6,9 +6,21 @@
     "overrides": [
         {
             "predicate": {
-                "fabricated-exchange:on": 1
+                "fabricated-exchange:state": 0.1
             },
             "model": "fabricated-exchange:item/swiftwolfs_rending_gale_on"
-        }
+        },
+		{
+			"predicate": {
+                "fabricated-exchange:state": 0.2
+            },
+            "model": "fabricated-exchange:item/swiftwolfs_rending_gale_off_repelling"
+		},
+		{
+			"predicate": {
+                "fabricated-exchange:state": 0.3
+            },
+            "model": "fabricated-exchange:item/swiftwolfs_rending_gale_on_repelling"
+		}
     ]
 }

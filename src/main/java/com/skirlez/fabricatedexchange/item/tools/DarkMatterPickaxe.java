@@ -71,7 +71,6 @@ public class DarkMatterPickaxe extends PickaxeItem implements ChargeableItem, Ou
 	public void appendTooltip(ItemStack stack, World world, List<Text> tooltip, TooltipContext context) {
 		super.appendTooltip(stack, world, tooltip, context);
 		ItemUtil.addModeAndChargeToTooltip(stack, tooltip);
-		
 	}
 
 

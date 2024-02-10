@@ -17,6 +17,8 @@ import net.minecraft.world.RaycastContext.FluidHandling;
 
 
 public abstract class ItemUtil {
+
+	
 	public static void addModeAndChargeToTooltip(ItemStack stack, List<Text> tooltip) {
 		int charge = ChargeableItem.getCharge(stack);
 		if (charge == 0) {

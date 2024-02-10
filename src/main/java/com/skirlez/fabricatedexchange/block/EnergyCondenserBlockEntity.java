@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.Optional;
 
 import com.skirlez.fabricatedexchange.emc.EmcData;
-import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
 import com.skirlez.fabricatedexchange.screen.EnergyCondenserScreen;
 import com.skirlez.fabricatedexchange.screen.EnergyCondenserScreenHandler;
 import com.skirlez.fabricatedexchange.util.SingleStackInventoryImpl;
@@ -19,7 +18,6 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.inventory.SingleStackInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

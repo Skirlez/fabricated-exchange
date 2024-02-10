@@ -1,6 +1,5 @@
 package com.skirlez.fabricatedexchange;
 
-import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -17,7 +16,6 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.data.client.BlockStateModelGenerator;
 import net.minecraft.data.client.BlockStateVariant;
 import net.minecraft.data.client.ItemModelGenerator;
@@ -183,6 +181,8 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 			
 			itemModelGenerator.register(ModItems.SWIFTWOLFS_RENDING_GALE, "_off", Models.GENERATED);
 			itemModelGenerator.register(ModItems.SWIFTWOLFS_RENDING_GALE, "_on", Models.GENERATED);
+			itemModelGenerator.register(ModItems.SWIFTWOLFS_RENDING_GALE, "_off_repelling", Models.GENERATED);
+			itemModelGenerator.register(ModItems.SWIFTWOLFS_RENDING_GALE, "_on_repelling", Models.GENERATED);
 
 		}
 

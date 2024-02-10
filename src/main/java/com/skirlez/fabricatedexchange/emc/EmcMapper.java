@@ -188,8 +188,6 @@ public class EmcMapper {
     }
 
     private ItemEquation createCraftingEquation(CraftingRecipe recipe) {
-   
-    	
         List<Ingredient> ingredients = recipe.getIngredients();
         List<ItemStack> output = new ArrayList<ItemStack>(1);
         output.add(recipe.getOutput(this.dynamicRegistryManager));

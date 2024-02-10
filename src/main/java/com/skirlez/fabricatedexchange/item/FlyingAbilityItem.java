@@ -1,4 +1,4 @@
-package com.skirlez.fabricatedexchange.item.BaseFunction;
+package com.skirlez.fabricatedexchange.item;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
@@ -22,9 +22,7 @@ public class FlyingAbilityItem extends Item {
 	public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
 		super.inventoryTick(stack, world, entity, slot, selected);
 
-		if (entity instanceof ServerPlayerEntity && !world.isClient) {
-			ServerPlayerEntity player = (ServerPlayerEntity) entity;
-
+		if (entity instanceof ServerPlayerEntity player && !world.isClient) {
 			// Check if the player's inventory contains this specific item.
 			// This replaces the previous hasItemNow check with a more thorough search.
 			boolean hasItemNow = hasItemInInventory(player, this);
@@ -42,13 +40,6 @@ public class FlyingAbilityItem extends Item {
 				player.getAbilities().allowFlying = false;
 				player.getAbilities().flying = false;
 				player.sendAbilitiesUpdate();
-			}
-
-			if (player.getAbilities().flying) {
-				stack.getOrCreateNbt().putInt("CustomModelData", 1);
-			}
-			else {
-				stack.getOrCreateNbt().putInt("CustomModelData", 0);
 			}
 
 			// Update the stored state for this player.

@@ -46,9 +46,8 @@
     "item.fabricated-exchange.red_matter_hoe": "Red Matter Hoe",
     "item.fabricated-exchange.mode_switch": "Mode:",
     "item.fabricated-exchange.mode_uncharged": "Uncharged",
-    "item.fabricated-exchange.swiftwolfs_rending_gale.mode_1": "Tree Capitator",
-    "item.fabricated-exchange.swiftwolfs_rending_gale.mode_2": "Tree Capitator",
-    "item.fabricated-exchange.swiftwolfs_rending_gale.mode_3": "Tree Capitator",
+    "item.fabricated-exchange.swiftwolfs_rending_gale.mode_1": "Normal",
+    "item.fabricated-exchange.swiftwolfs_rending_gale.mode_2": "Repelling",
 
     "block.fabricated-exchange.alchemical_coal_block": "Alchemical Coal Block",
     "block.fabricated-exchange.radiant_coal_block": "Radiant Coal Block",

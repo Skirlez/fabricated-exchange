@@ -59,6 +59,7 @@ All of the code in this repository is licensed under the terms of the LGPLv3. I 
 - Alchemical Fuels + Blocks
 - Dark/Red Matter + Blocks
 - (some) Dark Matter tools
+- (some) Red Matter tools
 - Covalence Dusts
 - Configurable EMC Mapper
 

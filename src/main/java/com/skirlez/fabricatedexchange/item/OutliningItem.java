@@ -7,7 +7,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 
-// Items that should highlight multiple blocks implement this interface.
+/** Items that should highlight multiple blocks implement this interface.
+ * The outlines themselves are drawn by {@link com.skirlez.fabricatedexchange.mixin.client.ModWorldRendererOutline}. */
 public interface OutliningItem {
 	boolean outlineEntryCondition(BlockState state);
 
