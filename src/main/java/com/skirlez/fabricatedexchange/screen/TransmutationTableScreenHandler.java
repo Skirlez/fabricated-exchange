@@ -26,6 +26,7 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -33,6 +34,7 @@ import net.minecraft.util.collection.DefaultedList;
 
 public class TransmutationTableScreenHandler extends ScreenHandler {
 	private final Inventory inventory;
+	private final Inventory transmutationInventory;
 	private final PlayerEntity player;
 	private final ConsumeSlot emcSlot;
 	private String searchText = "";
@@ -41,14 +43,19 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 	
 	private List<NbtItem> orderedKnowledge = new ArrayList<NbtItem>();
 	private final DefaultedList<TransmutationSlot> transmutationSlots = DefaultedList.of();
-	public TransmutationTableScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
-		this(syncId, playerInventory);
-		this.lastOfferingPage = buf.readInt();
+
+	public static TransmutationTableScreenHandler clientConstructor(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
+		TransmutationTableScreenHandler ret = new TransmutationTableScreenHandler(syncId, playerInventory);
+		ret.lastOfferingPage = buf.readInt();
+		return ret;
+		
 	}
+	
 	
 	public TransmutationTableScreenHandler(int syncId, PlayerInventory playerInventory) {
 		super(ModScreenHandlers.TRANSMUTATION_TABLE, syncId);
-		this.inventory = new SimpleInventory(19);
+		this.inventory = new SimpleInventory(3);
+		this.transmutationInventory = new SimpleInventory(16);
 		this.player = playerInventory.player;
 		
 		inventory.onOpen(playerInventory.player);
@@ -63,14 +70,14 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 		// outer ring
 		double angle = 270.0;
 		for (int i = 0; i < 12; i++) {
-			addTransmutationSlot(new TransmutationSlot(inventory, i + 3, angle, player, this));
+			addTransmutationSlot(new TransmutationSlot(transmutationInventory, i, angle, player, this));
 			angle += 360.0 / 12.0;
 		}
 
 		// inner ring
 		angle = 270.0;
 		for (int i = 0; i < 4; i++) {
-			addTransmutationSlot(new TransmutationSlot(inventory, i + 15, angle, player, this));
+			addTransmutationSlot(new TransmutationSlot(transmutationInventory, i + 12, angle, player, this));
 			angle += 360.0 / 4.0;
 		}
 
@@ -79,13 +86,10 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 
 		if (!player.getWorld().isClient()) {
 			PlayerState playerState = ServerState.getPlayerState(player);
-
 			for (Item item : playerState.knowledge)
 				addKnowledge(new NbtItem(item));
 			for (NbtItem item : playerState.specialKnowledge)
 				addKnowledge(item);
-			
-			
 			refreshOffering();
 		}
 	}
@@ -93,9 +97,12 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 	public void addKnowledge(NbtItem item) {
 		int index = Collections.binarySearch(orderedKnowledge, item, 
 			(item1, item2) -> 
-				EmcData.getItemEmc(item2)
-				.compareTo(
-				EmcData.getItemEmc(item1)));
+			{
+				int comparison = EmcData.getItemEmc(item2).compareTo(EmcData.getItemEmc(item1));
+				if (comparison != 0)
+					return comparison;
+				return Registries.ITEM.getId(item1.asItem()).compareTo(Registries.ITEM.getId(item2.asItem()));
+			});
 
 		if (index < 0)
 			index = -index - 1;

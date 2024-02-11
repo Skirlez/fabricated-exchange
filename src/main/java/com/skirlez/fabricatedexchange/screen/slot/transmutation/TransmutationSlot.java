@@ -2,7 +2,7 @@ package com.skirlez.fabricatedexchange.screen.slot.transmutation;
 
 import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
 import com.skirlez.fabricatedexchange.emc.EmcData;
-import com.skirlez.fabricatedexchange.mixin.client.SlotModifier;
+import com.skirlez.fabricatedexchange.mixin.client.SlotAccessor;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandler;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
@@ -32,7 +32,7 @@ public class TransmutationSlot extends Slot {
 
 	@Environment(EnvType.CLIENT)
 	public void setPosition(int newX, int newY) {
-		SlotModifier slot = (SlotModifier)this;
+		SlotAccessor slot = (SlotAccessor)this;
 		slot.setX(newX);
 		slot.setY(newY);
 	}

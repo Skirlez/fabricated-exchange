@@ -12,11 +12,11 @@ import net.minecraft.util.Identifier;
 
 public abstract class ModScreenHandlers {
 	public static final ScreenHandlerType<TransmutationTableScreenHandler> TRANSMUTATION_TABLE = 
-		new ExtendedScreenHandlerType<>(TransmutationTableScreenHandler::new);
+		new ExtendedScreenHandlerType<TransmutationTableScreenHandler>(TransmutationTableScreenHandler::clientConstructor);
 	public static final ScreenHandlerType<EnergyCollectorScreenHandler> ENERGY_COLLECTOR = 
-		new ExtendedScreenHandlerType<>(EnergyCollectorScreenHandler::clientConstructor);
+		new ExtendedScreenHandlerType<EnergyCollectorScreenHandler>(EnergyCollectorScreenHandler::clientConstructor);
 	public static final ScreenHandlerType<AntiMatterRelayScreenHandler> ANTIMATTER_RELAY = 
-		new ExtendedScreenHandlerType<>(AntiMatterRelayScreenHandler::clientConstructor);
+		new ExtendedScreenHandlerType<AntiMatterRelayScreenHandler>(AntiMatterRelayScreenHandler::clientConstructor);
 	public static final ScreenHandlerType<AlchemicalChestScreenHandler> ALCHEMICAL_CHEST = 
 		new ScreenHandlerType<AlchemicalChestScreenHandler>(AlchemicalChestScreenHandler::new, FeatureSet.empty());
 	public static final ScreenHandlerType<EnergyCondenserScreenHandler> ENERGY_CONDENSER = 

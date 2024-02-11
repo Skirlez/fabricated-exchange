@@ -7,7 +7,7 @@
 		"ModItemStackTooltip",
 		"HandledScreenAccessor",
 		"ModTexturedRenderLayers",
-		"SlotModifier",
+		"SlotAccessor",
 		"ClientWorldAmbientDarkness"
 	],
 	"injectors": {

@@ -36,4 +36,13 @@ public abstract class ModTexturedRenderLayers {
 				cir.setReturnValue(ENERGY_CONDENSER_MK2);
 		}
 	}
+	/*
+    @Inject(method = "addDefaultTextures", at = @At("TAIL"))
+    private static void addMoreDefaultTextures(Consumer<SpriteIdentifier> adder, CallbackInfo ci) {
+    	System.out.println("textures");
+    	adder.accept(ALCHEMICAL_CHEST);
+        adder.accept(ENERGY_CONDENSER_MK1);
+        adder.accept(ENERGY_CONDENSER_MK2);
+    }
+    */
 }

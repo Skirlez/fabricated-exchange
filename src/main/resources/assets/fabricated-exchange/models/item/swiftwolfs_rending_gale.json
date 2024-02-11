@@ -10,17 +10,17 @@
             },
             "model": "fabricated-exchange:item/swiftwolfs_rending_gale_on"
         },
-		{
-			"predicate": {
+        {
+            "predicate": {
                 "fabricated-exchange:state": 0.2
             },
             "model": "fabricated-exchange:item/swiftwolfs_rending_gale_off_repelling"
-		},
-		{
-			"predicate": {
+        },
+        {
+            "predicate": {
                 "fabricated-exchange:state": 0.3
             },
             "model": "fabricated-exchange:item/swiftwolfs_rending_gale_on_repelling"
-		}
+        }
     ]
 }

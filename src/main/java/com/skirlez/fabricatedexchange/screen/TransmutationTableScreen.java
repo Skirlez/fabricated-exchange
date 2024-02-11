@@ -2,6 +2,8 @@ package com.skirlez.fabricatedexchange.screen;
 
 import java.util.function.Consumer;
 
+import org.lwjgl.glfw.GLFW;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.FabricatedExchangeClient;
@@ -27,7 +29,6 @@ import net.minecraft.util.collection.DefaultedList;
 
 // a graphing calculator is recommended to understand the animation portion of this class!
 public class TransmutationTableScreen extends HandledScreen<TransmutationTableScreenHandler> {
-	
 	public TextFieldWidget searchBar;
 	private ButtonWidget floorButton;
 
@@ -150,7 +151,7 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (searchBar.isFocused() && !(keyCode == 256 && scanCode == 1)) { // keycode == 256 && scanCode == 1 is escape key
+		if (searchBar.isFocused() && !(keyCode == GLFW.GLFW_KEY_ESCAPE && scanCode == 1)) {
 			if (this.client.options.inventoryKey.matchesKey(keyCode, scanCode)) 
 				return true;
 
