@@ -1,6 +1,8 @@
 [
   [
-    "minecraft:dirt#minecraft:sand"
+    "minecraft:dirt",
+    "minecraft:sand",
+    null
   ],
   [
     "minecraft:grass",

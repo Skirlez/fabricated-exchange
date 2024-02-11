@@ -27,24 +27,24 @@ public class BlockTransmutation {
 		
 		Map<Block, Block> map = new HashMap<Block, Block>();
 		for (int i = 0; i < blockTransmutationData.length; i++) {
-			int j = 0;
-		
-			if (blockTransmutationData[i] == null) 
-				continue;
+			
+
+			
 			int len = blockTransmutationData[i].length;
-			if (len == 0)
+			if (len < 2)
 				continue;
-			if (len == 1) {
-				String str = blockTransmutationData[i][j];
-				String[] parts = str.split("#");
-				addBlockRelation(parts[0], parts[1], map); 
+			
+			boolean isLastNull = blockTransmutationData[i][len - 1] == null;
+			if (isLastNull) {
+				for (int j = 0; j < len - 2; j++)
+					addBlockRelation(blockTransmutationData[i][j], blockTransmutationData[i][j + 1], map);
 				continue;
 			}
-			while (j < len - 1) {
+			
+			for (int j = 0; j < len - 1; j++) { 
 				addBlockRelation(blockTransmutationData[i][j], blockTransmutationData[i][j + 1], map); 
-				j++;
 			}
-			addBlockRelation(blockTransmutationData[i][j], blockTransmutationData[i][0], map); 
+			addBlockRelation(blockTransmutationData[i][len - 1], blockTransmutationData[i][0], map); 
 		}
 		
 		blockTransmutationMap = ImmutableMap.copyOf(map);

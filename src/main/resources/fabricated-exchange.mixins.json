@@ -13,7 +13,7 @@
 		"ServerPlayerInteractionManagerPreMine",
 		"IngredientAccessor",
 		"TagEntryAccessor",
-		"MixinPlayerEntity"
+		"ModPlayerEntity"
 	],
 	"injectors": {
 		"defaultRequire": 1
