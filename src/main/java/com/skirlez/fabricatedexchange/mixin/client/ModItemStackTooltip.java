@@ -54,7 +54,6 @@ public class ModItemStackTooltip {
 		if (client.currentScreen instanceof TransmutationTableScreen currentScreen
 				&& currentScreen.getFocusedSlot() instanceof TransmutationSlot 
 				&& Screen.hasShiftDown() && maxCount != 1) {
-		
 			SuperNumber itemCount = new SuperNumber(FabricatedExchangeClient.clientEmc);
 			itemCount.divide(emc);
 			itemCount.floor();
@@ -73,6 +72,14 @@ public class ModItemStackTooltip {
 			if (count > 1) {
 				emc.multiply(count);
 				list.add(Text.literal("§eStack EMC: §r" + emc));
+			}
+			if (itemStack.getNbt() != null) {
+				String storedEmcString = itemStack.getNbt().getString("emc");
+				
+				if (!storedEmcString.isEmpty()) {
+					SuperNumber storedEmc = new SuperNumber(storedEmcString);
+					list.add(Text.literal("§eStored EMC§r: " + storedEmc));
+				}
 			}
 		}
 		

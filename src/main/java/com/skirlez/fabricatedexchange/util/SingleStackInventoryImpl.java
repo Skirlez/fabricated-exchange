@@ -2,8 +2,8 @@ package com.skirlez.fabricatedexchange.util;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SingleStackInventory;
-import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 
 
 // I really do not understand why the original is an interface. Also, this class looks really dumb.
@@ -12,7 +12,7 @@ public class SingleStackInventoryImpl implements SingleStackInventory {
 	private ItemStack stack;
 	
 	public SingleStackInventoryImpl() {
-		this.stack = new ItemStack((ItemConvertible)null);
+		this.stack = Items.AIR.getDefaultStack();
 	}
 	public SingleStackInventoryImpl(ItemStack stack) {
 		this.stack = stack;

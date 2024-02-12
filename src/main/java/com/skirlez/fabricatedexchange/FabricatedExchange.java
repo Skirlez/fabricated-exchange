@@ -12,8 +12,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +48,10 @@ public class FabricatedExchange implements ModInitializer {
 	// (e.g. in vanilla, coal (32 emc) will have a key value pair with redstone (64 emc), the next item with the fuel tag that has more emc than it.)
 	public static Map<Item, Item> fuelProgressionMap = new HashMap<Item, Item>();
 
+	
+	// This set is different to the above map's keyset in that it also contains the very last item in the progression.
+	public static Set<Item> fuelSet = new HashSet<Item>();
+	
 	public static final String VERSION = FabricLoader.getInstance().getModContainer(MOD_ID).get()
 			.getMetadata().getVersion().getFriendlyString();
 	
@@ -90,12 +97,17 @@ public class FabricatedExchange implements ModInitializer {
 		EmcMapper mapper = new EmcMapper(server.getOverworld().getRecipeManager(), server.getRegistryManager());
 		
 		boolean hasWarned = mapper.map();
+		
 		EmcData.emcMap = ImmutableMap.copyOf(mapper.getEmcMap());
 		EmcData.potionEmcMap = ImmutableMap.copyOf(mapper.getPotionEmcMap());
 		EmcData.enchantmentEmcMap = ImmutableMap.copyOf(mapper.getEnchantmentEmcMap());
+		
 		List<Item> fuelItemList = new ArrayList<Item>();
-		for (RegistryEntry<Item> entry : ModTags.FUEL_ITEMS.get()) { 
+		Set<Item> newFuelSet = new HashSet<Item>();
+		
+		for (RegistryEntry<Item> entry : ModTags.FUEL_ITEMS) { 
 			Item item = entry.value();
+			newFuelSet.add(item);
 			int index = Collections.binarySearch(fuelItemList, item, 
 				(item1, item2) -> 
 					EmcData.getItemEmc(item1)
@@ -122,7 +134,8 @@ public class FabricatedExchange implements ModInitializer {
 			}
 		}
 		fuelProgressionMap = newFuelProgressionMap;
-
+		fuelSet = newFuelSet;
+		
 		return hasWarned;
 	}
 

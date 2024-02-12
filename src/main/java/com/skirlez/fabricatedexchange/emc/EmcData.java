@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
+import com.skirlez.fabricatedexchange.item.EmcStoringItem;
 import com.skirlez.fabricatedexchange.item.NbtItem;
 import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
 import com.skirlez.fabricatedexchange.util.PlayerState;
@@ -72,8 +73,8 @@ public class EmcData {
 	}
 
 	private static void considerNbt(Item item, NbtCompound nbt, SuperNumber emc) {
-		if (nbt.contains("emc"))
-			emc.add(new SuperNumber(nbt.getString("emc")));
+		if (nbt.contains(EmcStoringItem.EMC_NBT_KEY))
+			emc.add(new SuperNumber(nbt.getString(EmcStoringItem.EMC_NBT_KEY)));
 	
 		if (!ModDataFiles.NBT_ITEMS.hasItem(Registries.ITEM.getId(item).toString()))
 			return;
