@@ -57,11 +57,11 @@ public abstract class FlyingAbilityItem extends Item {
 		return true;
 	}
 	protected void onFlightEnable(PlayerEntity player, ItemStack stack) {
-		
 	}
-	protected void onFlightDisable(PlayerEntity player, ItemStack stack) {
-		
+	
+	protected void onFlightDisable(PlayerEntity player, ItemStack stack) {	
 	}
+	
 	public static void enablePlayerFlying(PlayerEntity player, ItemStack stack) {
 		player.getAbilities().allowFlying = true;
 		((FlyingAbilityItem)stack.getItem()).onFlightEnable(player, stack);

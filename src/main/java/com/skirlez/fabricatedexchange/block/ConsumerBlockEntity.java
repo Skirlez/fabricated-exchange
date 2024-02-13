@@ -49,12 +49,23 @@ public interface ConsumerBlockEntity {
 			for (ConsumerBlockEntity neighbor : goodNeighbors) {
 				SuperNumber neighborEmc = neighbor.getEmc();
 				SuperNumber neighborMaximumEmc = neighbor.getMaximumEmc();
-				neighborEmc.stealFrom(emc, output);
-				SuperNumber bonusEmc = neighbor.getBonusEmc();
-				if (!bonusEmc.equalsZero()) {
-					neighborEmc.add(bonusEmc);
+				SuperNumber neighborBonusEmc = neighbor.getBonusEmc();
 
+				SuperNumber neighborEmcCopy = new SuperNumber(neighborEmc);
+				neighborEmcCopy.add(output);
+				
+				// If the neighbor is going to go over its maximum EMC,
+				// only give it the exact amount it needs.
+				if (neighborEmcCopy.compareTo(neighborMaximumEmc) != -1) {
+					SuperNumber difference = new SuperNumber(neighborMaximumEmc);
+					difference.subtract(neighborEmc);
+					neighborEmc.copyValueOf(neighborMaximumEmc);
+					emc.subtract(difference);
+					continue;
 				}
+				
+				neighborEmc.stealFrom(emc, output);
+				neighborEmc.add(neighborBonusEmc);
 				if (neighborMaximumEmc.equalsZero())
 					continue;
 				if (neighborEmc.compareTo(neighborMaximumEmc) == 1)

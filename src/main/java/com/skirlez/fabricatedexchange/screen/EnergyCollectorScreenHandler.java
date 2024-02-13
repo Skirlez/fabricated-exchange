@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import com.skirlez.fabricatedexchange.block.EnergyCollectorBlockEntity;
 import com.skirlez.fabricatedexchange.screen.slot.DisplaySlot;
-import com.skirlez.fabricatedexchange.screen.slot.SlotCondition;
+import com.skirlez.fabricatedexchange.screen.slot.StackCondition;
 import com.skirlez.fabricatedexchange.screen.slot.SlotWithCondition;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.ModTags;
@@ -66,13 +66,13 @@ public class EnergyCollectorScreenHandler extends FuelScreenHandler {
 		
 		addSlot(new DisplaySlot(targetInventory, 0, xOffset + 153, 36));
 		
-		addSlot(new SlotWithCondition(mainInventory, SlotIndicies.FUEL_SLOT.ordinal(), xOffset + 124, 58, SlotCondition.isFuel));
-		addSlot(new SlotWithCondition(mainInventory, SlotIndicies.OUTPUT_SLOT.ordinal(), xOffset + 124, 13, SlotCondition.never));
+		addSlot(new SlotWithCondition(mainInventory, SlotIndicies.FUEL_SLOT.ordinal(), xOffset + 124, 58, StackCondition.isFuel));
+		addSlot(new SlotWithCondition(mainInventory, SlotIndicies.OUTPUT_SLOT.ordinal(), xOffset + 124, 13, StackCondition.never));
 		
 		int ind = 2;
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 2 + level; j++) {
-				addSlot(new SlotWithCondition(mainInventory, ind, inputOffset - j * 18, 62 - i * 18, SlotCondition.isFuel));
+				addSlot(new SlotWithCondition(mainInventory, ind, inputOffset - j * 18, 62 - i * 18, StackCondition.isFuel));
 				ind++;
 			}
 		}

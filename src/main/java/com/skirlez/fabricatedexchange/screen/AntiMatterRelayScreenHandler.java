@@ -3,7 +3,7 @@ package com.skirlez.fabricatedexchange.screen;
 import java.util.Optional;
 
 import com.skirlez.fabricatedexchange.block.AntiMatterRelayBlockEntity;
-import com.skirlez.fabricatedexchange.screen.slot.SlotCondition;
+import com.skirlez.fabricatedexchange.screen.slot.StackCondition;
 import com.skirlez.fabricatedexchange.screen.slot.SlotWithCondition;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
@@ -12,7 +12,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.BlockPos;
 
 public class AntiMatterRelayScreenHandler extends FuelScreenHandler  {
@@ -62,14 +61,18 @@ public class AntiMatterRelayScreenHandler extends FuelScreenHandler  {
 		}
 
 		boolean onlyFuel = ModDataFiles.MAIN_CONFIG_FILE.antiMatterRelay_onlyAcceptFuelItems;
-		SlotCondition condition = (onlyFuel) ? SlotCondition.isFuel : SlotCondition.always;
+		StackCondition condition = (onlyFuel) ? StackCondition.isFuel : StackCondition.always;
 		
 		addSlot(new SlotWithCondition(inventory, SlotIndicies.FUEL_SLOT.ordinal(), 67 + xFuel, 38 + yFuel, condition));
-		addSlot(new Slot(inventory, SlotIndicies.POWER_SLOT.ordinal(), 127 + xFuel, 38 + yFuel));
+		addSlot(new SlotWithCondition(inventory, SlotIndicies.POWER_SLOT.ordinal(), 127 + xFuel, 38 + yFuel, StackCondition.isBattery));
+		
+		int ind = 2;
 		
 		for (int i = 0; i < 3 + level; i++) {
-			for (int j = 0; j < 2 + level; j++)
-				addSlot(new SlotWithCondition(inventory, i * (2 + level) + j + 2, xInput + 27 + j * 18, yInput + 12 + i * 18, condition));
+			for (int j = 0; j < 2 + level; j++) {
+				addSlot(new SlotWithCondition(inventory, ind, xInput + 27 + j * 18, yInput + 12 + i * 18, condition));
+				ind++;
+			}
 		}
 		
 		

@@ -25,6 +25,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
@@ -40,6 +41,8 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 	private String searchText = "";
 	private int offeringPageNum = 0;
 	private int lastOfferingPage = 0;
+	
+	private int playerSlotsStart;
 	
 	private List<NbtItem> orderedKnowledge = new ArrayList<NbtItem>();
 	private final DefaultedList<TransmutationSlot> transmutationSlots = DefaultedList.of();
@@ -80,6 +83,8 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 			addTransmutationSlot(new TransmutationSlot(transmutationInventory, i + 12, angle, player, this));
 			angle += 360.0 / 4.0;
 		}
+		
+		playerSlotsStart = slots.size();
 
 		GeneralUtil.addPlayerInventory(this, playerInventory, 37, 117);
 		GeneralUtil.addPlayerHotbar(this, playerInventory, 37, 175);
@@ -238,56 +243,61 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 
 
 	@Override
-	public ItemStack quickMove(PlayerEntity player, int invSlot) {
-		if (invSlot > 2 && invSlot < 19) {
-			ItemStack stack = ItemStack.EMPTY;
-			TransmutationSlot slot = (TransmutationSlot)this.slots.get(invSlot);
-			if (slot != null && slot.hasStack()) {
-				stack = slot.getStack().copy();
-				
-				SuperNumber itemEmc = EmcData.getItemEmc(stack.getItem());
-				if (itemEmc.equalsZero())
-					return ItemStack.EMPTY;
-
-				SuperNumber emc;
-				boolean client = player.getWorld().isClient();
-				if (client)
-					emc = FabricatedExchangeClient.clientEmc;
-				else
-					emc = EmcData.getEmc(player);
-				
-				SuperNumber itemCount = new SuperNumber(emc);
-				itemCount.divide(itemEmc);
-				itemCount.floor();
-				
-				SuperNumber sMaxCount = new SuperNumber(stack.getMaxCount());
-				sMaxCount = SuperNumber.min(sMaxCount, itemCount);
-				int a = sMaxCount.toInt(64);
-				stack.setCount(a);
-
-				SuperNumber itemCost = EmcData.getItemStackEmc(stack);
-
-				if (emc.compareTo(itemCost) != -1) {
-					if (invSlot < this.inventory.size()) {
-						if (!this.insertItem(stack, this.inventory.size(), this.slots.size(), true)) 
-							return ItemStack.EMPTY;
-					} 
-					else if (!this.insertItem(stack, 0, this.inventory.size(), false))
-						return ItemStack.EMPTY;
-					
-					if (!client) {
-						EmcData.subtractEmc((ServerPlayerEntity)player, itemCost);
-						refreshOffering();
-					}
-					return stack;
-				}
-				else
-					return ItemStack.EMPTY;
-			}
+	public ItemStack quickMove(PlayerEntity player, int slotIndex) {
+		if (slotIndex <= 2) {
+			Slot slot = this.slots.get(slotIndex);
+			if (!slot.hasStack())
+				return ItemStack.EMPTY;
+			ItemStack stack = slot.getStack();
+			if (!this.insertItem(stack, playerSlotsStart, this.slots.size(), true)) 
+				return ItemStack.EMPTY;
 			return stack;
 		}
-		// if it is not one of those slots it must mean we're shift clicking the inventory, meaning transmute this item
-		Slot slot = this.slots.get(invSlot);
+		else if (slotIndex < 19) {
+			TransmutationSlot slot = (TransmutationSlot)this.slots.get(slotIndex);
+			if (!slot.hasStack())
+				return ItemStack.EMPTY;
+			ItemStack stack = slot.getStack().copy();
+			
+			SuperNumber itemEmc = EmcData.getItemEmc(stack.getItem());
+			if (itemEmc.equalsZero())
+				return ItemStack.EMPTY;
+
+			SuperNumber emc;
+			boolean client = player.getWorld().isClient();
+			if (client)
+				emc = FabricatedExchangeClient.clientEmc;
+			else
+				emc = EmcData.getEmc(player);
+			
+			SuperNumber itemCount = new SuperNumber(emc);
+			itemCount.divide(itemEmc);
+			itemCount.floor();
+			
+			SuperNumber sMaxCount = new SuperNumber(stack.getMaxCount());
+			sMaxCount = SuperNumber.min(sMaxCount, itemCount);
+			int a = sMaxCount.toInt(64);
+			stack.setCount(a);
+
+			SuperNumber itemCost = EmcData.getItemStackEmc(stack);
+
+			if (emc.compareTo(itemCost) != -1) {
+				if (!this.insertItem(stack, playerSlotsStart, this.slots.size(), true)) 
+					return ItemStack.EMPTY;
+				if (!client) {
+					EmcData.subtractEmc((ServerPlayerEntity)player, itemCost);
+					refreshOffering();
+				}
+				return stack;
+			}
+			
+		
+		}
+
+		
+		// And if it is not one any of the above slots it must mean we're shift clicking in the 
+		// inventory, meaning transmute this item
+		Slot slot = this.slots.get(slotIndex);
 		ItemStack slotItemStack = slot.getStack();
 		ItemStack itemStack = emcSlot.insertStack(slotItemStack, slotItemStack.getCount());
 		if (!ItemStack.areEqual(slotItemStack, itemStack)) {

@@ -25,6 +25,8 @@ public class EnergyCondenserScreenHandler extends LeveledScreenHandler implement
 	private Inventory targetInventory;
 	private int size;
 
+	private int playerSlotsStart;
+	
 	public static EnergyCondenserScreenHandler clientConstructor(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
 		BlockPos pos = buf.readBlockPos();
 		int level = buf.readInt();
@@ -64,9 +66,11 @@ public class EnergyCondenserScreenHandler extends LeveledScreenHandler implement
 			}
 		}
 
+		
 		this.mainInventory = mainInventory;
 		this.targetInventory = targetInventory;
 		
+		this.playerSlotsStart = slots.size();
 		GeneralUtil.addPlayerInventory(this, playerInventory, 48, 154);
 		GeneralUtil.addPlayerHotbar(this, playerInventory, 48, 212);
 	}
@@ -88,32 +92,38 @@ public class EnergyCondenserScreenHandler extends LeveledScreenHandler implement
 	}
 
 	@Override
-	public ItemStack quickMove(PlayerEntity player, int slot) {
-		ItemStack itemStack = ItemStack.EMPTY;
-		Slot slot2 = this.slots.get(slot);
-		if (slot2 != null && slot2.hasStack()) {
-			ItemStack itemStack2 = slot2.getStack();
-			itemStack = itemStack2.copy();
-			if (slot < size) {
-				if (!this.insertItem(itemStack2, size, this.slots.size(), true)) {
+	public ItemStack quickMove(PlayerEntity player, int slotIndex) {
+		Slot slot = this.slots.get(slotIndex);
+		if (!slot.hasStack())
+			return ItemStack.EMPTY;
+		ItemStack stack = slot.getStack();
+		
+		if (slotIndex == 0) {
+			DisplaySlot targetSlot = (DisplaySlot)slots.get(0);
+			targetSlot.setStack(ItemStack.EMPTY);
+			return ItemStack.EMPTY;
+		}
+		else if (slotIndex < playerSlotsStart) {
+			if (!this.insertItem(stack, playerSlotsStart, slots.size(), true)) {
+				return ItemStack.EMPTY;
+			}
+			return stack;
+		}
+		else {
+			if (level == 0) {
+				DisplaySlot targetSlot = (DisplaySlot)slots.get(0);
+				targetSlot.setStack(stack.copyWithCount(1));
+				return ItemStack.EMPTY;
+			}
+			else if (level == 1) {
+				if (!this.insertItem(stack, 1, 43, false)) {
 					return ItemStack.EMPTY;
 				}
-			}
-			else if (level == 1 && !this.insertItem(itemStack2, 1, 43, false)) {
-				return ItemStack.EMPTY;
-			}
-
-			if (itemStack2.isEmpty())
-				slot2.setStack(ItemStack.EMPTY);
-			else {
-				itemStack.setCount(1);
-				DisplaySlot fakeSlot = (DisplaySlot) slots.get(0);
-				fakeSlot.setStack(itemStack);
-				return ItemStack.EMPTY;
+				return stack;
 			}
 		}
-
-		return itemStack;
+		return ItemStack.EMPTY;
+		
 	}
 
 	@Override

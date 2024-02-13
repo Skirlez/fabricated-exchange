@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.registry.FuelRegistry;
 import org.jetbrains.annotations.Nullable;
 
 import com.skirlez.fabricatedexchange.emc.EmcData;
+import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
 import com.skirlez.fabricatedexchange.screen.AntiMatterRelayScreen;
 import com.skirlez.fabricatedexchange.screen.AntiMatterRelayScreenHandler;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
@@ -37,6 +38,7 @@ import net.minecraft.world.World;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 
 import com.skirlez.fabricatedexchange.screen.AntiMatterRelayScreenHandler.SlotIndicies;
+import com.skirlez.fabricatedexchange.screen.slot.StackCondition;
 
 public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory,
 		ConsumerBlockEntity {
@@ -92,8 +94,6 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 
 
 	public static void serverTick(World world, BlockPos blockPos, BlockState blockState, AntiMatterRelayBlockEntity entity) {
-
-		
 		Inventory inventory = (Inventory)entity;
 		ItemStack fuelStack = inventory.getStack(SlotIndicies.FUEL_SLOT.ordinal());
 		Integer burnTime = FuelRegistry.INSTANCE.get(fuelStack.getItem());
@@ -155,16 +155,16 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 	}
 
 	@Override
-	public boolean isValid(int slot, ItemStack stack) {
-		return true;
+	public boolean isValid(int invSlot, ItemStack stack) {
+		return (invSlot == SlotIndicies.POWER_SLOT.ordinal() ? StackCondition.isBattery.passes(stack) : true);
 	}
 	@Override
-	public boolean canTransferTo(Inventory hopperInventory, int slot, ItemStack stack) {
+	public boolean canTransferTo(Inventory hopperInventory, int invSlot, ItemStack stack) {
 		return false;
 	}
 	
 	public static int inventorySize(int level) {
-		return 11 + ((level == 0) ? 0 : (level == 1) ? 6 : 14);
+		return ((level == 0) ? 8 : (level == 1) ? 14 : 22);
 	}
 	
 	@Override

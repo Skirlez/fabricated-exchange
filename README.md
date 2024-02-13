@@ -61,6 +61,8 @@ All of the code in this repository is licensed under the terms of the LGPLv3. I 
 - (some) Dark Matter tools
 - (some) Red Matter tools
 - Covalence Dusts
+- Iron Band
+- Swiftwolf's Rending Gale
 - Configurable EMC Mapper
 
 # NEW Features

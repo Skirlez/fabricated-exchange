@@ -121,12 +121,12 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 	}
 
 	@Override
-	public boolean isValid(int slot, ItemStack stack) {
-		return (level == 0) ? false : (slot < 43 && slot > 0 && !EmcData.getItemStackEmc(stack).equalsZero());
+	public boolean isValid(int invSlot, ItemStack stack) {
+		return (level == 0) ? false : (invSlot < 43 && invSlot >= 0 && !EmcData.getItemStackEmc(stack).equalsZero());
 	}
 	@Override
-	public boolean canTransferTo(Inventory hopperInventory, int slot, ItemStack stack) {
-		return (level == 0) ? slot != 0 : slot > 42;
+	public boolean canTransferTo(Inventory hopperInventory, int invSlot, ItemStack stack) {
+		return (level == 0) ? invSlot != 0 : invSlot > 42;
 	}
 
 	@Override
