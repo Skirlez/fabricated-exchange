@@ -1,6 +1,7 @@
 package com.skirlez.fabricatedexchange.item;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
+import com.skirlez.fabricatedexchange.item.extras.ItemOrb;
 import com.skirlez.fabricatedexchange.item.rings.SwiftWolfsRendingGale;
 import com.skirlez.fabricatedexchange.item.tools.*;
 
@@ -39,7 +40,10 @@ public class ModItems {
 	public static final Item RED_MATTER = registerItemWithGroup("red_matter", 
 		new Item(new FabricItemSettings()));	
 	public static final Item TOME_OF_KNOWLEDGE = registerItemWithGroup("tome_of_knowledge", 
-		new Item(new FabricItemSettings()));   
+		new Item(new FabricItemSettings()));
+
+	public static final Item ITEM_ORB = registerItemWithGroup("item_orb",
+			new ItemOrb(new FabricItemSettings().maxCount(1)));
 
 	public static final Item DARK_MATTER_SWORD = 
 	   registerItemWithGroup("dark_matter_sword", new DarkMatterSword(DarkMatterMaterial.INSTANCE, 12, -2.4f, new Item.Settings().fireproof()));
@@ -52,6 +56,9 @@ public class ModItems {
 	public static final Item DARK_MATTER_HOE = 
 		registerItemWithGroup("dark_matter_hoe", new DarkMatterHoe(DarkMatterMaterial.INSTANCE, 5, 0.0f, new Item.Settings().fireproof()));
 
+	public static final Item DARK_MATTER_HAMMER =
+			registerItemWithGroup("dark_matter_hammer", new DarkMatterHammer(DarkMatterMaterial.INSTANCE, 7, -2.8f, new Item.Settings().fireproof()));
+
     public static final Item RED_MATTER_SWORD =
 			registerItemWithGroup("red_matter_sword", new RedMatterSword(RedMatterMaterial.INSTANCE, 14, -2.4f, new Item.Settings().fireproof()));
 
@@ -63,6 +70,9 @@ public class ModItems {
 			registerItemWithGroup("red_matter_axe", new RedMatterAxe(DarkMatterMaterial.INSTANCE, 12f, -3.0f, new Item.Settings().fireproof()));
 	public static final Item RED_MATTER_HOE =
 			registerItemWithGroup("red_matter_hoe", new RedMatterHoe(DarkMatterMaterial.INSTANCE, 8, 0.0f, new Item.Settings().fireproof()));
+
+	public static final Item RED_MATTER_HAMMER =
+			registerItemWithGroup("red_matter_hammer", new RedMatterHammer(RedMatterMaterial.INSTANCE, 10, -2.8f, new Item.Settings().fireproof()));
 
 	public static final Item SWIFTWOLFS_RENDING_GALE = registerItemWithGroup("swiftwolfs_rending_gale",
 			new SwiftWolfsRendingGale(new FabricItemSettings().maxCount(1)));
