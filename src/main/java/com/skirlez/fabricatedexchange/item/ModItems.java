@@ -42,7 +42,7 @@ public class ModItems {
 	public static final Item TOME_OF_KNOWLEDGE = registerItemWithGroup("tome_of_knowledge", 
 		new Item(new FabricItemSettings()));
 
-	public static final Item ITEM_ORB = registerItemWithGroup("item_orb",
+	public static final Item ITEM_ORB = registerItem("item_orb",
 			new ItemOrb(new FabricItemSettings().maxCount(1)));
 
 	public static final Item DARK_MATTER_SWORD = 
@@ -52,7 +52,7 @@ public class ModItems {
 	public static final Item DARK_MATTER_SHOVEL = 
 		registerItemWithGroup("dark_matter_shovel", new DarkMatterShovel(DarkMatterMaterial.INSTANCE, 5f, -3.0f, new Item.Settings().fireproof()));
 	public static final Item DARK_MATTER_AXE = 
-		registerItemWithGroup("dark_matter_axe", new DarkMatterAxe(DarkMatterMaterial.INSTANCE, 8f, -3.0f, new Item.Settings().fireproof()));
+		registerItemWithGroup("dark_matter_axe", new DarkMatterAxe(DarkMatterMaterial.INSTANCE, 8, -3.0f, new Item.Settings().fireproof()));
 	public static final Item DARK_MATTER_HOE = 
 		registerItemWithGroup("dark_matter_hoe", new DarkMatterHoe(DarkMatterMaterial.INSTANCE, 5, 0.0f, new Item.Settings().fireproof()));
 
@@ -65,9 +65,9 @@ public class ModItems {
 	public static final Item RED_MATTER_PICKAXE =
 			registerItemWithGroup("red_matter_pickaxe", new RedMatterPickaxe(RedMatterMaterial.INSTANCE, 10, -2.8f, new Item.Settings().fireproof()));
 	public static final Item RED_MATTER_SHOVEL =
-			registerItemWithGroup("red_matter_shovel", new RedMatterShovel(DarkMatterMaterial.INSTANCE, 7f, -3.0f, new Item.Settings().fireproof()));
+			registerItemWithGroup("red_matter_shovel", new RedMatterShovel(DarkMatterMaterial.INSTANCE, 7, -3.0f, new Item.Settings().fireproof()));
 	public static final Item RED_MATTER_AXE =
-			registerItemWithGroup("red_matter_axe", new RedMatterAxe(DarkMatterMaterial.INSTANCE, 12f, -3.0f, new Item.Settings().fireproof()));
+			registerItemWithGroup("red_matter_axe", new RedMatterAxe(DarkMatterMaterial.INSTANCE, 12, -3.0f, new Item.Settings().fireproof()));
 	public static final Item RED_MATTER_HOE =
 			registerItemWithGroup("red_matter_hoe", new RedMatterHoe(DarkMatterMaterial.INSTANCE, 8, 0.0f, new Item.Settings().fireproof()));
 
