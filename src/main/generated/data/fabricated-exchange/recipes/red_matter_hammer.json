@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "C": {
+      "item": "fabricated-exchange:dark_matter"
+    },
+    "D": {
+      "item": "fabricated-exchange:dark_matter_hammer"
+    },
+    "M": {
+      "item": "fabricated-exchange:red_matter"
+    }
+  },
+  "pattern": [
+    "MCM",
+    " D ",
+    " C "
+  ],
+  "result": {
+    "item": "fabricated-exchange:red_matter_hammer"
+  },
+  "show_notification": true
+}
