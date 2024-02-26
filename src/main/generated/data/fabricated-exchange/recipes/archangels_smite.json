@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "I": {
+      "item": "fabricated-exchange:iron_band"
+    },
+    "D": {
+      "item": "fabricated-exchange:dark_matter"
+    },
+    "F": {
+      "item": "minecraft:feather"
+    },
+    "B": {
+      "item": "minecraft:bow"
+    }
+  },
+  "pattern": [
+    "BFB",
+    "DID",
+    "BFB"
+  ],
+  "result": {
+    "item": "fabricated-exchange:archangels_smite"
+  },
+  "show_notification": true
+}
