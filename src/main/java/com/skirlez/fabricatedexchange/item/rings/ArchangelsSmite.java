@@ -1,27 +1,19 @@
 package com.skirlez.fabricatedexchange.item.rings;
 
-import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.item.EmcStoringItem;
 import com.skirlez.fabricatedexchange.item.ExtraFunctionItem;
-import com.skirlez.fabricatedexchange.item.FlyingAbilityItem;
 import com.skirlez.fabricatedexchange.item.ItemWithModes;
 import com.skirlez.fabricatedexchange.mixin.ItemAccessor;
-import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
-import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
-import net.minecraft.inventory.StackReference;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.ClickType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
@@ -31,7 +23,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
-import java.math.BigInteger;
 import java.util.List;
 
 
@@ -40,7 +31,7 @@ public class ArchangelsSmite extends Item
 
 	private static final SuperNumber DESIRED_AMOUNT = new SuperNumber(98);
 
-	public Boolean Autoshoot = false;
+	public boolean autoshoot = false;
 
 	public ArchangelsSmite(Settings settings) {
 		super(settings);
@@ -50,7 +41,7 @@ public class ArchangelsSmite extends Item
 
 	@Override
 	public void doExtraFunction(ItemStack stack, ServerPlayerEntity player) {
-		Autoshoot = !Autoshoot;
+		autoshoot = !autoshoot;
 	}
 
 	@Override
@@ -81,11 +72,17 @@ public class ArchangelsSmite extends Item
 	@Override
 	public void inventoryTick(ItemStack stack, World world, Entity pEntity, int slot, boolean selected) {
 		SuperNumber storedEmc = EmcStoringItem.getStoredEmc(stack);
+		var arrowEMC = EmcData.getItemEmc(Items.ARROW);
+
+		if (arrowEMC.equalsZero()) {
+			arrowEMC = new SuperNumber(14);
+		}
 
 		if (pEntity instanceof PlayerEntity player) {
-			if (storedEmc.toDouble() < 98) {
+			if (storedEmc.toDouble() < (arrowEMC.toDouble()*7)) {
 				storedEmc = EmcStoringItem.tryConsumeEmc(DESIRED_AMOUNT, stack, player.getInventory());
-				if (storedEmc.toDouble() < 14)
+
+				if (storedEmc.toDouble() < arrowEMC.toDouble())
 					return;
 			}
 			if (!storedEmc.isPositive())
@@ -93,7 +90,7 @@ public class ArchangelsSmite extends Item
 			EmcStoringItem.setStoredEmc(stack, storedEmc);
 		}
 
-		if (Autoshoot){
+		if (autoshoot){
 			stack.getOrCreateNbt().putInt("CustomModelData", 1);
 			PlayerEntity user = (PlayerEntity) pEntity;
 			arrowFireLogic(world, user, stack);
