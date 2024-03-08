@@ -2,6 +2,7 @@ package com.skirlez.fabricatedexchange.item;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.item.extras.ItemOrb;
+import com.skirlez.fabricatedexchange.item.rings.ArchangelsSmite;
 import com.skirlez.fabricatedexchange.item.rings.SwiftWolfsRendingGale;
 import com.skirlez.fabricatedexchange.item.tools.*;
 
@@ -76,6 +77,9 @@ public class ModItems {
 
 	public static final Item SWIFTWOLFS_RENDING_GALE = registerItemWithGroup("swiftwolfs_rending_gale",
 			new SwiftWolfsRendingGale(new FabricItemSettings().maxCount(1)));
+
+	public static final Item ARCHANGELS_SMITE = registerItemWithGroup("archangels_smite",
+			new ArchangelsSmite(new FabricItemSettings().maxCount(1)));
 
 	private static Item registerItem(String name, Item item) {
 		Registry.register(Registries.ITEM, new Identifier(FabricatedExchange.MOD_ID, name), item);

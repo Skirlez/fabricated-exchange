@@ -51,7 +51,7 @@ public abstract class KeyInputHandler {
 		});
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
-			if (extraFunctionKey.isPressed()) {
+			if (extraFunctionKey.wasPressed()) {
 				ItemStack stack = client.player.getStackInHand(Hand.MAIN_HAND);
 				if (!(stack.getItem() instanceof ExtraFunctionItem item)) {
 					return;
