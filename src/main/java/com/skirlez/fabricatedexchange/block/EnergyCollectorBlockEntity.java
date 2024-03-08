@@ -14,6 +14,7 @@ import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.ImplementedInventory;
 import com.skirlez.fabricatedexchange.util.SingleStackInventoryImpl;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
+import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
@@ -97,6 +98,8 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 	
 	
 	public static int getLightLevelAbove(World world, BlockPos pos) {
+		if (ModDataFiles.MAIN_CONFIG_FILE.energyCollector_alwaysHaveEnergy)
+			return 15;
 		pos = pos.add(0, 1, 0);
 		
 		while (lightPassingBlocks.contains(world.getBlockState(pos).getBlock())) {

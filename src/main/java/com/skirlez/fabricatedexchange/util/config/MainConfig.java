@@ -36,6 +36,7 @@ public class MainConfig extends AbstractConfigFile<Map<String, Object>> {
 	public boolean transmutationTable_animated;
 	public boolean transmutationTable_floorButton;
 	public boolean antiMatterRelay_onlyAcceptFuelItems;
+	public boolean energyCollector_alwaysHaveEnergy;
 
 	/* Fetch the config and compare to the default config to see if any keys
 	are missing or any of them have mismatched value types. If true, set that 
@@ -92,6 +93,7 @@ public class MainConfig extends AbstractConfigFile<Map<String, Object>> {
 		transmutationTable_animated = (boolean)value.get("transmutationTable.animated");
 		transmutationTable_floorButton = (boolean)value.get("transmutationTable.floorButton");
 		antiMatterRelay_onlyAcceptFuelItems = (boolean)value.get("antiMatterRelay.onlyAcceptFuelItems");
+		energyCollector_alwaysHaveEnergy = (boolean)value.get("energyCollector.alwaysHaveEnergy");
 	}
 	
 	@Environment(EnvType.CLIENT)

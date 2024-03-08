@@ -8,3 +8,4 @@ mapper.enabled: true
 transmutationTable.animated: true
 transmutationTable.floorButton: false
 antiMatterRelay.onlyAcceptFuelItems: false
+energyCollector.alwaysHaveEnergy: false

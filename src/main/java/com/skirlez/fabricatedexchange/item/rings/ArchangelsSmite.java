@@ -72,7 +72,7 @@ public class ArchangelsSmite extends Item
 	@Override
 	public void inventoryTick(ItemStack stack, World world, Entity pEntity, int slot, boolean selected) {
 		SuperNumber storedEmc = EmcStoringItem.getStoredEmc(stack);
-		var arrowEMC = EmcData.getItemEmc(Items.ARROW);
+		SuperNumber arrowEMC = EmcData.getItemEmc(Items.ARROW);
 
 		if (arrowEMC.equalsZero()) {
 			arrowEMC = new SuperNumber(14);

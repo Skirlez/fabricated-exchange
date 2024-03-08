@@ -2,16 +2,23 @@ package com.skirlez.fabricatedexchange.item;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
+import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 
 /** Used for items that can store a variable amount of EMC alongside their worth: batteries, rings, etc */
 public interface EmcStoringItem {
 	public static final String EMC_NBT_KEY = "emc";
+	public static final String NO_EMC_TRANSLATION_KEY = "item.fabricated-exchange.no_emc";
+	
 	
 	public static SuperNumber getStoredEmc(ItemStack stack) {
 		if (stack.getNbt() == null)
@@ -36,7 +43,7 @@ public interface EmcStoringItem {
 		
 	}
 	
-	private static SuperNumber getTotalConsumableEmc(Inventory inv) {
+	public static SuperNumber getTotalConsumableEmc(Inventory inv) {
 		SuperNumber sum = SuperNumber.Zero();
 		for (int i = 0; i < inv.size(); i++) {
 			ItemStack stack = inv.getStack(i);
@@ -46,13 +53,30 @@ public interface EmcStoringItem {
 		}
 		return sum;
 	}
-
-	private static boolean isAmountConsumable(SuperNumber amount, Inventory inv) {
+	public static SuperNumber getTotalConsumableEmc(Inventory inv, ItemStack stack) {
+		SuperNumber emc = getTotalConsumableEmc(inv);
+		emc.add(getStoredEmc(stack));
+		return emc;
+	}
+	
+	/** @returns Whether or not the amount can be consumed from this inventory. */
+	public static boolean isAmountConsumable(SuperNumber amount, Inventory inv) {
 		SuperNumber sum = SuperNumber.Zero();
 		for (int i = 0; i < inv.size() && sum.compareTo(amount) == -1; i++) {
 			ItemStack stack = inv.getStack(i);
 			SuperNumber emc = EmcData.getItemStackEmc(stack);
 			if (isItemStackConsumable(stack))
+				sum.add(emc);
+		}
+		return sum.compareTo(amount) != -1;
+	}
+	/** @returns Whether or not the amount can be consumed from this inventory and itemstack combined. */
+	public static boolean isAmountConsumable(SuperNumber amount, ItemStack stack, Inventory inv) {
+		SuperNumber sum = getStoredEmc(stack);
+		for (int i = 0; i < inv.size() && sum.compareTo(amount) == -1; i++) {
+			ItemStack itemStack = inv.getStack(i);
+			SuperNumber emc = EmcData.getItemStackEmc(itemStack);
+			if (isItemStackConsumable(itemStack))
 				sum.add(emc);
 		}
 		return sum.compareTo(amount) != -1;
@@ -101,6 +125,39 @@ public interface EmcStoringItem {
 		return getStoredEmc(stack);
 		
 	}
-
 	
+	/** Tries taking EMC from the item.
+	 * If there isn't enough, this method will try consuming from the inventory via tryConsumeEmc.
+	 * 
+	 * @return false if there wasn't enough EMC stored in the item and provided inventory, or true if the amount was successfully taken. */
+	public static boolean takeStoredEmcOrConsume(SuperNumber amount, ItemStack stack, PlayerInventory inv) {
+		SuperNumber emc = getStoredEmc(stack);
+		if (emc.compareTo(amount) != -1) {
+			SuperNumber copy = new SuperNumber(amount);
+			copy.negate();
+			addStoredEmc(stack, copy);
+			return true;
+		}
+		
+		
+		SuperNumber requiredDifference = new SuperNumber(amount);
+		requiredDifference.subtract(emc);
+		
+		if (!inv.player.isCreative() && !isAmountConsumable(requiredDifference, inv))
+			return false;
+		
+		tryConsumeEmc(requiredDifference, stack, inv);
+		SuperNumber copy = new SuperNumber(amount);
+		copy.negate();
+		addStoredEmc(stack, copy);
+		return true;
+	}
+
+	@Environment(EnvType.CLIENT)
+	public static void showNoEmcMessage() {
+		GeneralUtil.showOverlayMessage(Text.translatable(NO_EMC_TRANSLATION_KEY));
+	}
+	public static void sendNoEmcMessage(ServerPlayerEntity player) {
+		GeneralUtil.sendOverlayMessage(player, Text.translatable(NO_EMC_TRANSLATION_KEY));
+	}
 }

@@ -4,25 +4,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.skirlez.fabricatedexchange.item.ChargeableItem;
+import com.skirlez.fabricatedexchange.item.EmcStoringItem;
 import com.skirlez.fabricatedexchange.item.FakeItemUsageContext;
+import com.skirlez.fabricatedexchange.item.ItemUtil;
+import com.skirlez.fabricatedexchange.item.ItemWithModes;
+import com.skirlez.fabricatedexchange.item.ModToolMaterials;
 import com.skirlez.fabricatedexchange.item.OutliningItem;
+import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.ShovelItem;
 import net.minecraft.item.ToolMaterial;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
-public class DarkMatterShovel extends ShovelItem implements ChargeableItem, OutliningItem {
-	public DarkMatterShovel(ToolMaterial material, float attackDamage, float attackSpeed, Settings settings) {
+public class MatterShovel extends ShovelItem implements ChargeableItem, OutliningItem, EmcStoringItem {
+	
+	public final int maxCharges;
+	
+	public MatterShovel(ToolMaterial material, float attackDamage, float attackSpeed, Settings settings) {
 		super(material, attackDamage, attackSpeed, settings);
+		if (material == ModToolMaterials.DARK_MATTER_MATERIAL)
+			maxCharges = 2;
+		else
+			maxCharges = 4;
 	}
 
 	@Override
@@ -42,7 +58,7 @@ public class DarkMatterShovel extends ShovelItem implements ChargeableItem, Outl
 
 	@Override
 	public int getMaxCharge() {
-		return 2;
+		return maxCharges;
 	}
 
 	@Override
@@ -50,7 +66,6 @@ public class DarkMatterShovel extends ShovelItem implements ChargeableItem, Outl
 		int charge = ChargeableItem.getCharge(context.getStack());
 		if (charge == 0)
 			return super.useOnBlock(context);
-
 
 		World world = context.getWorld();
 		boolean anySuccess = false;
@@ -66,11 +81,17 @@ public class DarkMatterShovel extends ShovelItem implements ChargeableItem, Outl
 		return ActionResult.success(anySuccess);
 	}
 
+	public static final SuperNumber BLOCK_MINE_COST = new SuperNumber(8);
+	
 	@Override
 	public boolean postMine(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity miner) {
 		if (isSuitableFor(state) && miner instanceof PlayerEntity player) {
 			List<BlockPos> positions = getPositionsToOutline(player, stack, pos);
 			for (BlockPos newPos : positions) {
+				if (!EmcStoringItem.takeStoredEmcOrConsume(BLOCK_MINE_COST, stack, player.getInventory())) {
+					EmcStoringItem.showNoEmcMessage();
+					break;
+				}
 				world.breakBlock(newPos, true, miner);
 			}
 		}
@@ -96,5 +117,17 @@ public class DarkMatterShovel extends ShovelItem implements ChargeableItem, Outl
 			}
 		}
 		return list;
+	}
+	@Override
+	public void appendTooltip(ItemStack stack, World world, List<Text> tooltip, TooltipContext context) {
+		super.appendTooltip(stack, world, tooltip, context);
+		tooltip.add(Text.translatable("item.fabricated-exchange.diggy")
+			.setStyle(Style.EMPTY.withColor(Formatting.GOLD)));
+		
+	}
+	
+	@Override
+	public float getMiningSpeedMultiplier(ItemStack stack, BlockState state) {
+		return super.getMiningSpeedMultiplier(stack, state) * 0.7f;
 	}
 }

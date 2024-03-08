@@ -27,7 +27,7 @@ public class CycleItemMode extends ClientToServerPacket {
 				if (!(stack.getItem() instanceof ItemWithModes)) {
 					return;
 				}
-				ItemWithModes.cycleModes(stack, player);
+				ItemWithModes.cycleModes(stack);
 			}
 		});
 	}

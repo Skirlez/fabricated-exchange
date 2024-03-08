@@ -12,18 +12,23 @@ import com.skirlez.fabricatedexchange.mixin.ScreenHandlerInvoker;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
+import net.minecraft.network.packet.s2c.play.OverlayMessageS2CPacket;
 import net.minecraft.registry.DefaultedRegistry;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntryList.Named;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -94,7 +99,9 @@ public abstract class GeneralUtil {
 			pos.getX() + size, pos.getY() + size, pos.getZ() + size);
 	}
 
-
+	/** @
+	 * */
+	
 	public static void nestedLoop(int loops, int max, Consumer<int[]> operation) {
 		int arr[] = new int[loops];
 		while (true) {
@@ -149,6 +156,18 @@ public abstract class GeneralUtil {
             array[i] = Registries.ITEM.getId(items[i]).toString();
         
         return array;
+    }
+    
+    public static void sendOverlayMessage(ServerPlayerEntity player, Text text) {
+		OverlayMessageS2CPacket packet = new OverlayMessageS2CPacket(text);
+		((ServerPlayerEntity)player).networkHandler.sendPacket(packet);	
+    }
+    
+    
+    @Environment(EnvType.CLIENT)
+    public static void showOverlayMessage(Text text) {
+    	MinecraftClient client = MinecraftClient.getInstance();
+    	client.inGameHud.setOverlayMessage(text, false);
     }
     
     

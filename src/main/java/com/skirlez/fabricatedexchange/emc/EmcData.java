@@ -193,9 +193,6 @@ public class EmcData {
 		newEmcMap.remove(Registries.ITEM.getId(item).toString());
 		file.setValueAndSave(newEmcMap);
 	}
-
-	
-	
 	public static void setEmc(ServerPlayerEntity player, SuperNumber amount) {
 		PlayerState playerState = ServerState.getPlayerState(player);
 		playerState.emc = amount;

@@ -8,7 +8,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
 
-// This class allows you to create "fake" usage contexts, manually setting the position of the block and its side without a raycast
+/** This class allows you to create "fake" usage contexts, manually setting the position of the block and its side without a raycast */
 public class FakeItemUsageContext extends ItemUsageContext {
 
 	private BlockPos pos;

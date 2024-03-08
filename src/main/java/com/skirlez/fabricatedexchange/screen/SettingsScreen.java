@@ -125,6 +125,7 @@ public class SettingsScreen extends GameOptionsScreen {
 		addBooleanValue("transmutationTable.animated");
 		addBooleanValue("transmutationTable.floorButton");
 		addBooleanValue("antiMatterRelay.onlyAcceptFuelItems");
+		addBooleanValue("energyCollector.alwaysHaveEnergy");
 		
 		if (pages.get(pages.size() - 1).isEmpty())
 			pages.remove(pages.size() - 1);

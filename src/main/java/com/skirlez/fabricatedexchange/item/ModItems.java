@@ -44,39 +44,38 @@ public class ModItems {
 		new Item(new FabricItemSettings()));
 
 	public static final Item ITEM_ORB = registerItem("item_orb",
-			new ItemOrb(new FabricItemSettings().maxCount(1)));
+		new ItemOrb(new FabricItemSettings().maxCount(1)));
 
 	public static final Item DARK_MATTER_SWORD = 
-	   registerItemWithGroup("dark_matter_sword", new DarkMatterSword(DarkMatterMaterial.INSTANCE, 12, -2.4f, new Item.Settings().fireproof()));
+	   registerItemWithGroup("dark_matter_sword", new MatterSword(ModToolMaterials.DARK_MATTER_MATERIAL, 12, -2.4f, new Item.Settings().fireproof()));
 	public static final Item DARK_MATTER_PICKAXE = 
-		registerItemWithGroup("dark_matter_pickaxe", new DarkMatterPickaxe(DarkMatterMaterial.INSTANCE, 7, -2.8f, new Item.Settings().fireproof()));
+		registerItemWithGroup("dark_matter_pickaxe", new MatterPickaxe(ModToolMaterials.DARK_MATTER_MATERIAL, 7, -2.8f, new Item.Settings().fireproof()));
 	public static final Item DARK_MATTER_SHOVEL = 
-		registerItemWithGroup("dark_matter_shovel", new DarkMatterShovel(DarkMatterMaterial.INSTANCE, 5f, -3.0f, new Item.Settings().fireproof()));
+		registerItemWithGroup("dark_matter_shovel", new MatterShovel(ModToolMaterials.DARK_MATTER_MATERIAL, 5f, -3.0f, new Item.Settings().fireproof()));
 	public static final Item DARK_MATTER_AXE = 
-		registerItemWithGroup("dark_matter_axe", new DarkMatterAxe(DarkMatterMaterial.INSTANCE, 8, -3.0f, new Item.Settings().fireproof()));
+		registerItemWithGroup("dark_matter_axe", new MatterAxe(ModToolMaterials.DARK_MATTER_MATERIAL, 8, -3.0f, new Item.Settings().fireproof()));
 	public static final Item DARK_MATTER_HOE = 
-		registerItemWithGroup("dark_matter_hoe", new DarkMatterHoe(DarkMatterMaterial.INSTANCE, 5, 0.0f, new Item.Settings().fireproof()));
+		registerItemWithGroup("dark_matter_hoe", new MatterHoe(ModToolMaterials.DARK_MATTER_MATERIAL, 5, 0.0f, new Item.Settings().fireproof()));
 
 	public static final Item DARK_MATTER_HAMMER =
-			registerItemWithGroup("dark_matter_hammer", new DarkMatterHammer(DarkMatterMaterial.INSTANCE, 7, -2.8f, new Item.Settings().fireproof()));
+		registerItemWithGroup("dark_matter_hammer", new DarkMatterHammer(ModToolMaterials.DARK_MATTER_MATERIAL, 7, -2.8f, new Item.Settings().fireproof()));
 
     public static final Item RED_MATTER_SWORD =
-			registerItemWithGroup("red_matter_sword", new RedMatterSword(RedMatterMaterial.INSTANCE, 14, -2.4f, new Item.Settings().fireproof()));
+		registerItemWithGroup("red_matter_sword", new MatterSword(ModToolMaterials.RED_MATTER_MATERIAL, 14, -2.4f, new Item.Settings().fireproof()));
 
 	public static final Item RED_MATTER_PICKAXE =
-			registerItemWithGroup("red_matter_pickaxe", new RedMatterPickaxe(RedMatterMaterial.INSTANCE, 10, -2.8f, new Item.Settings().fireproof()));
+		registerItemWithGroup("red_matter_pickaxe", new MatterPickaxe(ModToolMaterials.RED_MATTER_MATERIAL, 10, -2.8f, new Item.Settings().fireproof()));
 	public static final Item RED_MATTER_SHOVEL =
-			registerItemWithGroup("red_matter_shovel", new RedMatterShovel(DarkMatterMaterial.INSTANCE, 7, -3.0f, new Item.Settings().fireproof()));
+		registerItemWithGroup("red_matter_shovel", new MatterShovel(ModToolMaterials.RED_MATTER_MATERIAL, 7, -3.0f, new Item.Settings().fireproof()));
 	public static final Item RED_MATTER_AXE =
-			registerItemWithGroup("red_matter_axe", new RedMatterAxe(DarkMatterMaterial.INSTANCE, 12, -3.0f, new Item.Settings().fireproof()));
+		registerItemWithGroup("red_matter_axe", new MatterAxe(ModToolMaterials.RED_MATTER_MATERIAL, 12, -3.0f, new Item.Settings().fireproof()));
 	public static final Item RED_MATTER_HOE =
-			registerItemWithGroup("red_matter_hoe", new RedMatterHoe(DarkMatterMaterial.INSTANCE, 8, 0.0f, new Item.Settings().fireproof()));
-
+		registerItemWithGroup("red_matter_hoe", new MatterHoe(ModToolMaterials.RED_MATTER_MATERIAL, 8, 0.0f, new Item.Settings().fireproof()));
 	public static final Item RED_MATTER_HAMMER =
-			registerItemWithGroup("red_matter_hammer", new RedMatterHammer(RedMatterMaterial.INSTANCE, 10, -2.8f, new Item.Settings().fireproof()));
+		registerItemWithGroup("red_matter_hammer", new RedMatterHammer(ModToolMaterials.RED_MATTER_MATERIAL, 10, -2.8f, new Item.Settings().fireproof()));
 
 	public static final Item SWIFTWOLFS_RENDING_GALE = registerItemWithGroup("swiftwolfs_rending_gale",
-			new SwiftWolfsRendingGale(new FabricItemSettings().maxCount(1)));
+		new SwiftWolfsRendingGale(new FabricItemSettings().maxCount(1)));
 
 	public static final Item ARCHANGELS_SMITE = registerItemWithGroup("archangels_smite",
 			new ArchangelsSmite(new FabricItemSettings().maxCount(1)));

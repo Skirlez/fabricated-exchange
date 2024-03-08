@@ -2,6 +2,7 @@ package com.skirlez.fabricatedexchange.event;
 
 import com.skirlez.fabricatedexchange.item.ItemWithModes;
 import com.skirlez.fabricatedexchange.packets.ModClientToServerPackets;
+import com.skirlez.fabricatedexchange.util.GeneralUtil;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -16,6 +17,9 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 
 public abstract class KeyInputHandler {
@@ -70,7 +74,13 @@ public abstract class KeyInputHandler {
 			
 				if (item.modeSwitchCondition(stack)) {
 					ModClientToServerPackets.CYCLE_ITEM_MODE.send();
-					ItemWithModes.cycleModes(stack, null);
+					int newMode = ItemWithModes.cycleModes(stack);
+					GeneralUtil.showOverlayMessage(
+						Text.translatable("item.fabricated-exchange.mode_switch")
+						.append(" ")
+						.append(ItemWithModes.getModeName(stack, newMode)
+						.setStyle(Style.EMPTY.withColor(Formatting.GOLD))));
+					
 					client.player.playSound(SoundEvents.BLOCK_STONE_BREAK, SoundCategory.PLAYERS, 1f, 1.4f);
 				}
 			}
