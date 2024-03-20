@@ -16,34 +16,52 @@
     "item.fabricated-exchange.iron_band": "Iron Band",
     "item.fabricated-exchange.item_orb": "",
     "item.fabricated-exchange.tome_of_knowledge": "Tome of Knowledge",
+    
+    "item.fabricated-exchange.dark_matter_boots": "Dark Matter Boots",
+    "item.fabricated-exchange.dark_matter_leggings": "Dark Matter Leggings",
+    "item.fabricated-exchange.dark_matter_chestplate": "Dark Matter Chestplate",
+    "item.fabricated-exchange.dark_matter_helmet": "Dark Matter Helmet",
+    
+    "item.fabricated-exchange.red_matter_boots": "Red Matter Boots",
+    "item.fabricated-exchange.red_matter_leggings": "Red Matter Leggings",
+    "item.fabricated-exchange.red_matter_chestplate": "Red Matter Chestplate",
+    "item.fabricated-exchange.red_matter_helmet": "Red Matter Helmet",
+    
     "item.fabricated-exchange.dark_matter_sword": "Dark Matter Sword",
     "item.fabricated-exchange.dark_matter_pickaxe": "Dark Matter Pickaxe",
     "item.fabricated-exchange.dark_matter_pickaxe.mode_1": "Wideshot",
     "item.fabricated-exchange.dark_matter_pickaxe.mode_2": "Tallshot",
     "item.fabricated-exchange.dark_matter_pickaxe.mode_3": "Longshot",
+    
     "item.fabricated-exchange.dark_matter_hammer": "Dark Matter Hammer",
     "item.fabricated-exchange.dark_matter_hammer.uncharged": "Halted",
     "item.fabricated-exchange.dark_matter_hammer.mode_1": "3x3 Area",
     "item.fabricated-exchange.dark_matter_hammer.mode_2": "5x5 Area",
+    
     "item.fabricated-exchange.dark_matter_axe": "Dark Matter Axe",
     "item.fabricated-exchange.dark_matter_shovel": "Dark Matter Shovel",
     "item.fabricated-exchange.dark_matter_hoe": "Dark Matter Hoe",
+    
     "item.fabricated-exchange.red_matter_sword": "Red Matter Sword",
     "item.fabricated-exchange.red_matter_sword.mode_1": "Aggressive",
     "item.fabricated-exchange.red_matter_sword.mode_2": "Passive",
+    
     "item.fabricated-exchange.red_matter_pickaxe": "Red Matter Pickaxe",
     "item.fabricated-exchange.red_matter_pickaxe.mode_1": "Wideshot",
     "item.fabricated-exchange.red_matter_pickaxe.mode_2": "Tallshot",
     "item.fabricated-exchange.red_matter_pickaxe.mode_3": "Longshot",
+    
     "item.fabricated-exchange.red_matter_hammer": "Red Matter Hammer",
     "item.fabricated-exchange.red_matter_hammer.uncharged": "Halted",
     "item.fabricated-exchange.red_matter_hammer.mode_1": "3x3 Area",
     "item.fabricated-exchange.red_matter_hammer.mode_2": "5x5 Area",
     "item.fabricated-exchange.red_matter_hammer.mode_3": "7x7 Area",
     "item.fabricated-exchange.red_matter_hammer.mode_4": "9x9 Area",
+    
     "item.fabricated-exchange.red_matter_axe": "Red Matter Axe",
     "item.fabricated-exchange.red_matter_shovel": "Red Matter Shovel",
     "item.fabricated-exchange.red_matter_hoe": "Red Matter Hoe",
+    
     "item.fabricated-exchange.mode_switch": "Mode:",
     "item.fabricated-exchange.mode_uncharged": "Uncharged",
     "item.fabricated-exchange.swiftwolfs_rending_gale": "Swiftwolf's Rending Gale",

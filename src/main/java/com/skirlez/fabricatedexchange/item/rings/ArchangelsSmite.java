@@ -194,5 +194,9 @@ public class ArchangelsSmite extends Item
 		EmcStoringItem.setStoredEmc(stack, storedEmc); // Save updated EMC outside the switch
 	}
 
+	public static boolean isAngry(ItemStack stack) {
+		return ItemWithModes.getMode(stack) == 2;
+	}
+	
 }
 

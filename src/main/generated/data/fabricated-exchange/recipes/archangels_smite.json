@@ -2,8 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "I": {
-      "item": "fabricated-exchange:iron_band"
+    "B": {
+      "item": "minecraft:bow"
     },
     "D": {
       "item": "fabricated-exchange:dark_matter"
@@ -11,8 +11,8 @@
     "F": {
       "item": "minecraft:feather"
     },
-    "B": {
-      "item": "minecraft:bow"
+    "I": {
+      "item": "fabricated-exchange:iron_band"
     }
   },
   "pattern": [

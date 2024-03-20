@@ -105,7 +105,7 @@ public class FabricatedExchange implements ModInitializer {
 		List<Item> fuelItemList = new ArrayList<Item>();
 		Set<Item> newFuelSet = new HashSet<Item>();
 		
-		for (RegistryEntry<Item> entry : ModTags.FUEL_ITEMS) { 
+		for (RegistryEntry<Item> entry : ModTags.FUEL_ITEMS.get()) { 
 			Item item = entry.value();
 			newFuelSet.add(item);
 			int index = Collections.binarySearch(fuelItemList, item, 

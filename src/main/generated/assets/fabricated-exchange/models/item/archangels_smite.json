@@ -1,9 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "fabricated-exchange:item/archangels_smite"
-  },
-  "overrides": [
-    { "predicate": { "custom_model_data": 1 }, "model": "fabricated-exchange:item/archangels_smite_angry" }
-  ]
-}

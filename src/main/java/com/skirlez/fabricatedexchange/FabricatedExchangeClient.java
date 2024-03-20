@@ -6,6 +6,7 @@ import com.skirlez.fabricatedexchange.block.ModBlockEntities;
 import com.skirlez.fabricatedexchange.block.ModBlocks;
 import com.skirlez.fabricatedexchange.event.KeyInputHandler;
 import com.skirlez.fabricatedexchange.item.ModItems;
+import com.skirlez.fabricatedexchange.item.rings.ArchangelsSmite;
 import com.skirlez.fabricatedexchange.item.rings.SwiftWolfsRendingGale;
 import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
 import com.skirlez.fabricatedexchange.screen.ModScreens;
@@ -57,13 +58,18 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 			-> MinecraftClient.getInstance().getBlockEntityRenderDispatcher().renderEntity(RENDER_ENERGY_CONDENSER_MK2, matrices, vertexConsumers, light, overlay));
 		
 		ModelPredicateProviderRegistry.register(ModItems.SWIFTWOLFS_RENDING_GALE, new Identifier(FabricatedExchange.MOD_ID, "state"), 
-			(stack, world, entity, number) ->{
-				boolean isOn = SwiftWolfsRendingGale.isOn(stack);
-				boolean isRepelling = SwiftWolfsRendingGale.isRepelling(stack);
-				if (isRepelling)
-					return isOn ? 0.3f : 0.2f;
-				else
-					return isOn ? 0.1f : 0f;
+				(stack, world, entity, number) -> {
+			boolean isOn = SwiftWolfsRendingGale.isOn(stack);
+			boolean isRepelling = SwiftWolfsRendingGale.isRepelling(stack);
+			if (isRepelling)
+				return isOn ? 0.3f : 0.2f;
+			else
+				return isOn ? 0.1f : 0f;
+		});
+		
+		ModelPredicateProviderRegistry.register(ModItems.ARCHANGELS_SMITE, new Identifier(FabricatedExchange.MOD_ID, "state"), 
+				(stack, world, entity, number) -> {
+			return ArchangelsSmite.isAngry(stack) ? 1f : 0f;
 		});
 
 		
