@@ -166,5 +166,7 @@
     "config.fabricated-exchange.energyCollector.alwaysHaveEnergy_1": "When enabled, the Energy Collectors will always have light energy, even in darkness.",
     "config.fabricated-exchange.energyCollector.alwaysHaveEnergy_2": "(default: false)",
     
-    "tag.item.c.transmutation_fuel": "Transmutation Fuel"
+    "tag.item.c.transmutation_fuel": "Transmutation Fuel",
+
+    "emi.category.fabricated-exchange.philosophers_stone": "World Transmutation"
 }

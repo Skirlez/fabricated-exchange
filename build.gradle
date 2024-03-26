@@ -29,7 +29,10 @@ dependencies {
     modImplementation("com.terraformersmc:modmenu:${project.modmenu}") {
         exclude(group: "net.fabricmc.fabric-api")
     }
-	
+
+	modCompileOnly "dev.emi:emi-fabric:${emi_version}:api"
+	modLocalRuntime "dev.emi:emi-fabric:${emi_version}"
+
 	implementation 'org.yaml:snakeyaml:2.2'
 	implementation 'com.fasterxml.jackson.core:jackson-core:2.16.1'
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.1'
