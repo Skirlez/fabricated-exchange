@@ -13,7 +13,7 @@ import com.skirlez.fabricatedexchange.BlockTransmutation;
 import java.util.Map;
 
 public class FabricatedExchangeEmiPlugin implements EmiPlugin {
-    public static final Identifier PHILOSOPHERS_STONE_ICON = new Identifier("fabricated-exchange", "textures/gui/philosophers_stone.png");
+    public static final Identifier PHILOSOPHERS_STONE_ICON = new Identifier("fabricated-exchange", "textures/gui/emi_simplified_philosophers_stone.png");
     public static final EmiStack PHILOSOPHERS_STONE_ITEM = EmiStack.of(ModItems.PHILOSOPHERS_STONE);
     public static final EmiRecipeCategory PHILOSOPHERS_STONE_CATEGORY = new EmiRecipeCategory(new Identifier("fabricated-exchange", "philosophers_stone"), PHILOSOPHERS_STONE_ITEM, new EmiTexture(PHILOSOPHERS_STONE_ICON, 0, 0, 16, 16, 16, 16, 16, 16));
     @Override

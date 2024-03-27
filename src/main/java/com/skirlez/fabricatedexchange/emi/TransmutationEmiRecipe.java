@@ -19,7 +19,7 @@ public class TransmutationEmiRecipe implements EmiRecipe {
     private final EmiStack output;
 
     public TransmutationEmiRecipe(Block input, Block output) {
-        this.id = Identifier.of("fabricated-exchange", String.format("%s_to_%s", Registries.BLOCK.getId(input).getPath(), Registries.BLOCK.getId(output).getPath()));
+        this.id = Identifier.of("fabricated-exchange", String.format("/transmutation/%s/%se/%s/%s", Registries.BLOCK.getId(input).getNamespace(), Registries.BLOCK.getId(input).getPath(), Registries.BLOCK.getId(output).getNamespace(), Registries.BLOCK.getId(output).getPath()));
         this.input = EmiIngredient.of(Ingredient.ofItems(input));
         this.output = EmiStack.of(output);
     }
