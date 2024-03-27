@@ -8,6 +8,7 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.block.Block;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public class TransmutationEmiRecipe implements EmiRecipe {
     private final EmiStack output;
 
     public TransmutationEmiRecipe(Block input, Block output) {
-        this.id = Identifier.of("fabricated-exchange", String.format("%s>%s", input, output));
+        this.id = Identifier.of("fabricated-exchange", String.format("%s_to_%s", Registries.BLOCK.getId(input).getPath(), Registries.BLOCK.getId(output).getPath()));
         this.input = EmiIngredient.of(Ingredient.ofItems(input));
         this.output = EmiStack.of(output);
     }
