@@ -13,13 +13,13 @@ import net.minecraft.util.Identifier;
 
 import java.util.List;
 
-public class TransmutationEmiRecipe implements EmiRecipe {
+public class WorldTransmutationEmiRecipe implements EmiRecipe {
     private final Identifier id;
     private final EmiIngredient input;
     private final EmiStack output;
 
-    public TransmutationEmiRecipe(Block input, Block output) {
-        this.id = Identifier.of("fabricated-exchange", String.format("%s_to_%s", Registries.BLOCK.getId(input).getPath(), Registries.BLOCK.getId(output).getPath()));
+    public WorldTransmutationEmiRecipe(Block input, Block output) {
+        this.id = Identifier.of("fabricated-exchange", String.format("/transmutation/world/%s/%s/%s/%s", Registries.BLOCK.getId(input).getNamespace(), Registries.BLOCK.getId(input).getPath(), Registries.BLOCK.getId(output).getNamespace(), Registries.BLOCK.getId(output).getPath()));
         this.input = EmiIngredient.of(Ingredient.ofItems(input));
         this.output = EmiStack.of(output);
     }
