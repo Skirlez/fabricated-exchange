@@ -168,5 +168,6 @@
     
     "tag.item.c.transmutation_fuel": "Transmutation Fuel",
 
-    "emi.category.fabricated-exchange.philosophers_stone": "World Transmutation"
+    "emi.category.fabricated-exchange.philosophers_stone": "World Transmutation",
+    "emi.category.fabricated-exchange.energy_collector": "Fuel Transmutation"
 }
