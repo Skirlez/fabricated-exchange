@@ -176,7 +176,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 				ModItems.TRANSMUTATION_TABLET, ModItems.IRON_BAND, ModItems.ITEM_ORB, ModItems.DARK_MATTER_BOOTS, 
 				ModItems.DARK_MATTER_LEGGINGS, ModItems.DARK_MATTER_CHESTPLATE, ModItems.DARK_MATTER_HELMET,
 				ModItems.RED_MATTER_BOOTS, ModItems.RED_MATTER_LEGGINGS, ModItems.RED_MATTER_CHESTPLATE,
-				ModItems.RED_MATTER_HELMET);
+				ModItems.RED_MATTER_HELMET, ModItems.REPAIR_TALISMAN);
 			
 			registerHandheldModels(itemModelGenerator, ModItems.DARK_MATTER_SWORD, ModItems.DARK_MATTER_PICKAXE, ModItems.DARK_MATTER_AXE,
 				ModItems.DARK_MATTER_SHOVEL, ModItems.DARK_MATTER_HOE, ModItems.DARK_MATTER_HAMMER, ModItems.RED_MATTER_SWORD, ModItems.RED_MATTER_PICKAXE,
@@ -606,7 +606,26 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 				.criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER),
 						FabricRecipeProvider.conditionsFromItem(ModItems.DARK_MATTER))
 				.offerTo(exporter);
-			
+
+			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.REPAIR_TALISMAN)
+					.pattern("LMH")
+					.pattern("SPS")
+					.pattern("HML")
+					.input('L', ModItems.LOW_COVALENCE_DUST)
+					.input('M', ModItems.MEDIUM_COVALENCE_DUST)
+					.input('H', ModItems.HIGH_COVALENCE_DUST)
+					.input('S', Items.STRING)
+					.input('P', Items.PAPER)
+					.criterion(FabricRecipeProvider.hasItem(ModItems.LOW_COVALENCE_DUST),
+							FabricRecipeProvider.conditionsFromItem(ModItems.LOW_COVALENCE_DUST))
+					.criterion(FabricRecipeProvider.hasItem(ModItems.MEDIUM_COVALENCE_DUST),
+							FabricRecipeProvider.conditionsFromItem(ModItems.MEDIUM_COVALENCE_DUST))
+					.criterion(FabricRecipeProvider.hasItem(ModItems.HIGH_COVALENCE_DUST),
+							FabricRecipeProvider.conditionsFromItem(ModItems.HIGH_COVALENCE_DUST))
+					.offerTo(exporter);
+
+
+
 			generateArmorRecipes(ModItems.DARK_MATTER, ModItems.DARK_MATTER_BOOTS, ModItems.DARK_MATTER_LEGGINGS,
 				ModItems.DARK_MATTER_CHESTPLATE, ModItems.DARK_MATTER_HELMET, exporter);
 

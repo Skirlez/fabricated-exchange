@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "H": {
+      "item": "fabricated-exchange:high_covalence_dust"
+    },
+    "L": {
+      "item": "fabricated-exchange:low_covalence_dust"
+    },
+    "M": {
+      "item": "fabricated-exchange:medium_covalence_dust"
+    },
+    "P": {
+      "item": "minecraft:paper"
+    },
+    "S": {
+      "item": "minecraft:string"
+    }
+  },
+  "pattern": [
+    "LMH",
+    "SPS",
+    "HML"
+  ],
+  "result": {
+    "item": "fabricated-exchange:repair_talisman"
+  },
+  "show_notification": true
+}
