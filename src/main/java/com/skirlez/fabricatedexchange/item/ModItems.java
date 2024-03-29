@@ -92,6 +92,9 @@ public class ModItems {
 	public static final Item ARCHANGELS_SMITE = registerItemWithGroup("archangels_smite",
 			new ArchangelsSmite(new FabricItemSettings().maxCount(1)));
 
+	public static final Item REPAIR_TALISMAN = registerItemWithGroup("repair_talisman",
+			new RepairTalisman(new FabricItemSettings().maxCount(1)));
+
 	private static Item registerItem(String name, Item item) {
 		Registry.register(Registries.ITEM, new Identifier(FabricatedExchange.MOD_ID, name), item);
 		return item;

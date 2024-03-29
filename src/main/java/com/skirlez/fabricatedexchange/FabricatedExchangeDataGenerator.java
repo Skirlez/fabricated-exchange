@@ -176,7 +176,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 				ModItems.TRANSMUTATION_TABLET, ModItems.IRON_BAND, ModItems.ITEM_ORB, ModItems.DARK_MATTER_BOOTS, 
 				ModItems.DARK_MATTER_LEGGINGS, ModItems.DARK_MATTER_CHESTPLATE, ModItems.DARK_MATTER_HELMET,
 				ModItems.RED_MATTER_BOOTS, ModItems.RED_MATTER_LEGGINGS, ModItems.RED_MATTER_CHESTPLATE,
-				ModItems.RED_MATTER_HELMET);
+				ModItems.RED_MATTER_HELMET, ModItems.REPAIR_TALISMAN);
 			
 			registerHandheldModels(itemModelGenerator, ModItems.DARK_MATTER_SWORD, ModItems.DARK_MATTER_PICKAXE, ModItems.DARK_MATTER_AXE,
 				ModItems.DARK_MATTER_SHOVEL, ModItems.DARK_MATTER_HOE, ModItems.DARK_MATTER_HAMMER, ModItems.RED_MATTER_SWORD, ModItems.RED_MATTER_PICKAXE,
