@@ -25,13 +25,12 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.registry.Registry;
 
 public class TransmutationTableScreenHandler extends ScreenHandler {
 	private final Inventory inventory;
@@ -106,7 +105,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 				int comparison = EmcData.getItemEmc(item2).compareTo(EmcData.getItemEmc(item1));
 				if (comparison != 0)
 					return comparison;
-				return Registries.ITEM.getId(item1.asItem()).compareTo(Registries.ITEM.getId(item2.asItem()));
+				return Registry.ITEM.getId(item1.asItem()).compareTo(Registry.ITEM.getId(item2.asItem()));
 			});
 
 		if (index < 0)
@@ -243,7 +242,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 
 
 	@Override
-	public ItemStack quickMove(PlayerEntity player, int slotIndex) {
+	public ItemStack transferSlot(PlayerEntity player, int slotIndex) {
 		if (slotIndex <= 2) {
 			Slot slot = this.slots.get(slotIndex);
 			if (!slot.hasStack())

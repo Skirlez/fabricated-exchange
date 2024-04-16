@@ -10,8 +10,8 @@ import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.config.lib.DataFile;
 
 import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.tag.TagKey;
+import net.minecraft.tag.TagKey;
+import net.minecraft.util.registry.Registry;
 
 public class EqualTagsFile extends DataFile<HashSet<String>> {
 
@@ -51,7 +51,7 @@ public class EqualTagsFile extends DataFile<HashSet<String>> {
     }
 
     public boolean hasTag(TagKey<Item> tag) {
-        Item[] items = GeneralUtil.getItemsFromTag(tag, Registries.ITEM);
+        Item[] items = GeneralUtil.getItemsFromTag(tag, Registry.ITEM);
         boolean hasFirst = tagGroups.containsKey(items[0]);
         if (items.length == 0 || hasFirst == false)
             return hasFirst;

@@ -1,7 +1,7 @@
 package com.skirlez.fabricatedexchange.item;
 
 import net.minecraft.item.ArmorMaterial;
-import net.minecraft.item.ArmorItem.Type;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -11,8 +11,6 @@ public final class ModArmorMaterial {
 	}
 	
 	public static ArmorMaterial DARK_MATTER = new ArmorMaterial() {
-		private static final int[] PROTECTION_VALUES = new int[] {3, 6, 8, 3};
-		
 		@Override
 		public float getToughness() {
 			return 2f;
@@ -22,12 +20,6 @@ public final class ModArmorMaterial {
 		public Ingredient getRepairIngredient() {
 			return Ingredient.ofItems(ModItems.DARK_MATTER);
 		}
-		
-		@Override
-		public int getProtection(Type type) {
-			return PROTECTION_VALUES[type.ordinal()];
-		}
-		
 		@Override
 		public String getName() {
 			return "dark_matter";
@@ -49,13 +41,22 @@ public final class ModArmorMaterial {
 		}
 		
 		@Override
-		public int getDurability(Type type) {
+		public int getDurability(EquipmentSlot slot) {
 			return 0;
+		}
+
+		@Override
+		public int getProtectionAmount(EquipmentSlot slot) {
+			return switch (slot) {
+				case FEET -> 3;
+				case LEGS -> 6;
+				case CHEST -> 8;
+				case HEAD -> 3;
+				default -> 0;
+			};
 		}
 	};
 	public static ArmorMaterial RED_MATTER = new ArmorMaterial() {
-		private static final int[] PROTECTION_VALUES = new int[] {3, 6, 8, 3};
-		
 		@Override
 		public float getToughness() {
 			return 2f;
@@ -64,11 +65,6 @@ public final class ModArmorMaterial {
 		@Override
 		public Ingredient getRepairIngredient() {
 			return Ingredient.ofItems(ModItems.RED_MATTER);
-		}
-		
-		@Override
-		public int getProtection(Type type) {
-			return PROTECTION_VALUES[type.ordinal()];
 		}
 		
 		@Override
@@ -90,10 +86,20 @@ public final class ModArmorMaterial {
 		public int getEnchantability() {
 			return 0;
 		}
-		
 		@Override
-		public int getDurability(Type type) {
+		public int getDurability(EquipmentSlot slot) {
 			return 0;
+		}
+
+		@Override
+		public int getProtectionAmount(EquipmentSlot slot) {
+			return switch (slot) {
+				case FEET -> 3;
+				case LEGS -> 6;
+				case CHEST -> 8;
+				case HEAD -> 3;
+				default -> 0;
+			};
 		}
 	};
 	

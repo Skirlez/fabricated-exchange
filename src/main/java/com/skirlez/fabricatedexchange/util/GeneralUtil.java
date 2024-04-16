@@ -18,13 +18,10 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.network.packet.s2c.play.OverlayMessageS2CPacket;
-import net.minecraft.registry.DefaultedRegistry;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.entry.RegistryEntryList.Named;
-import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.tag.TagKey;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -33,6 +30,9 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.DefaultedRegistry;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntryList.Named;
 import net.minecraft.world.World;
 
 public abstract class GeneralUtil {
@@ -120,7 +120,7 @@ public abstract class GeneralUtil {
 	
 	
     public static Optional<Item> getAnyItemFromItemTag(TagKey<Item> tag) {
-        Optional<Named<Item>> optionalNamed = Registries.ITEM.getEntryList(tag);
+        Optional<Named<Item>> optionalNamed = Registry.ITEM.getEntryList(tag);
         if (optionalNamed.isEmpty())
             return Optional.empty();
         Named<Item> named = optionalNamed.get();
@@ -144,16 +144,16 @@ public abstract class GeneralUtil {
     
     public static Item[] getItemsFromTagString(String tagString) {
         Identifier tagId = new Identifier(tagString);
-        TagKey<Item> tag = Registries.ITEM.streamTags().filter((key) -> key.id().equals(tagId)).findFirst().orElse(null);
+        TagKey<Item> tag = Registry.ITEM.streamTags().filter((key) -> key.id().equals(tagId)).findFirst().orElse(null);
         if (tag != null)
-            return getItemsFromTag(tag, Registries.ITEM);
+            return getItemsFromTag(tag, Registry.ITEM);
         return emptyArr;
     } 
     public static String[] getItemStringsFromTagString(String tagString) {
         Item[] items = getItemsFromTagString(tagString);
         String[] array = new String[items.length];
         for (int i = 0; i < items.length; i++)
-            array[i] = Registries.ITEM.getId(items[i]).toString();
+            array[i] = Registry.ITEM.getId(items[i]).toString();
         
         return array;
     }

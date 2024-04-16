@@ -6,9 +6,10 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.registry.RegistryEntry;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,7 +49,6 @@ public class FabricatedExchange implements ModInitializer {
 	// (e.g. in vanilla, coal (32 emc) will have a key value pair with redstone (64 emc), the next item with the fuel tag that has more emc than it.)
 	public static Map<Item, Item> fuelProgressionMap = new HashMap<Item, Item>();
 
-	
 	// This set is different to the above map's keyset in that it also contains the very last item in the progression.
 	public static Set<Item> fuelSet = new HashSet<Item>();
 	
@@ -90,11 +90,10 @@ public class FabricatedExchange implements ModInitializer {
 	public static void reload() {
 		ModDataFiles.fetchAll();
 		BlockTransmutation.generateBlockRotationMap(ModDataFiles.BLOCK_TRANSMUTATION_MAP.getValue());
-		
 	}
 	
 	public static boolean calculateEmcMap(MinecraftServer server) {
-		EmcMapper mapper = new EmcMapper(server.getOverworld().getRecipeManager(), server.getRegistryManager());
+		EmcMapper mapper = new EmcMapper(server.getOverworld().getRecipeManager());
 		
 		boolean hasWarned = mapper.map();
 		

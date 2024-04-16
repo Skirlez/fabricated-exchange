@@ -9,10 +9,10 @@ import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.item.Item;
 import net.minecraft.recipe.Ingredient;
-import net.minecraft.registry.Registries;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 import java.util.List;
 
@@ -23,7 +23,12 @@ public class FuelTransmutationEmiRecipe implements EmiRecipe {
     private final int cost;
 
     public FuelTransmutationEmiRecipe(Item input, Item output) {
-        this.id = Identifier.of("fabricated-exchange", String.format("/transmutation/fuel/%s/%s/%s/%s", Registries.ITEM.getId(input).getNamespace(), Registries.ITEM.getId(input).getPath(), Registries.ITEM.getId(output).getNamespace(), Registries.ITEM.getId(output).getPath()));
+        this.id = Identifier.of("fabricated-exchange", 
+        		String.format("/transmutation/fuel/%s/%s/%s/%s", 
+        		Registry.ITEM.getId(input).getNamespace(), 
+        		Registry.ITEM.getId(input).getPath(), 
+        		Registry.ITEM.getId(output).getNamespace(), 
+        		Registry.ITEM.getId(output).getPath()));
         this.input = List.of(EmiIngredient.of(Ingredient.ofItems(input)));
         this.output = List.of(EmiStack.of(output));
         this.cost = EmcData.getItemEmc(output).toInt(0) - EmcData.getItemEmc(input).toInt(0);

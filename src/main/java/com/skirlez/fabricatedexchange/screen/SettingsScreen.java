@@ -5,8 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.joml.Math;
-import org.joml.Vector2d;
+
 
 import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
@@ -15,11 +14,11 @@ import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.GameOptionsScreen;
-import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.gui.widget.PressableTextWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.gui.widget.TextWidget;
+
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -40,6 +39,10 @@ public class SettingsScreen extends GameOptionsScreen {
 	private int currentPage;
 	private long prevRenderTime;
 	
+	private static final ButtonWidget.PressAction NO_ACTION = new ButtonWidget.PressAction() {
+		public void onPress(ButtonWidget widget) {	
+		}
+	};
 	
 	private final List<Ball> balls;
 	
@@ -71,8 +74,8 @@ public class SettingsScreen extends GameOptionsScreen {
 			// multiplayer
 			List<Text> warningTexts = GeneralUtil.translatableList("screen.fabricated-exchange.settings.client_warning");
 			for (Text text : warningTexts) {
-				TextWidget serverWarningWidget = new TextWidget(this.width / 2, startY, 0, 0, text, textRenderer);
-				serverWarningWidget.setTextColor(MathHelper.packRgb(1, 0, 0));
+				PressableTextWidget serverWarningWidget = new PressableTextWidget(this.width / 2, startY, 0, 0, text, NO_ACTION, textRenderer);
+				//serverWarningWidget.setTextColor(MathHelper.packRgb(1, 0, 0));
 				addDrawable(serverWarningWidget);
 				this.startY += 10;
 			}
@@ -86,9 +89,9 @@ public class SettingsScreen extends GameOptionsScreen {
 		this.distFromBottom = 30;
 		this.balls.clear();
 		
-		balls.add(Ball.randomVelocityBall(ModItems.PHILOSOPHERS_STONE, this.width / 2 + 50 + Math.random() * 50d - 25d, this.height / 2 + Math.random() * 50d - 25d));
+		balls.add(Ball.randomVelocityBall(ModItems.PHILOSOPHERS_STONE, this.width / 2 + 50 + java.lang.Math.random() * 50d - 25d, this.height / 2 + java.lang.Math.random() * 50d - 25d));
 		for (int i = 0; i < 7; i++) 
-			balls.add(Ball.randomVelocityBall(choose(ModItems.DARK_MATTER, ModItems.RED_MATTER), this.width / 2 + 50 + Math.random() * 50d - 25d, this.height / 2 + Math.random() * 50d - 25d));
+			balls.add(Ball.randomVelocityBall(choose(ModItems.DARK_MATTER, ModItems.RED_MATTER), this.width / 2 + 50 + java.lang.Math.random() * 50d - 25d, this.height / 2 + java.lang.Math.random() * 50d - 25d));
 		
 		this.pages.clear();
 		pages.add(new ArrayList<ClickableWidget>());
@@ -130,9 +133,9 @@ public class SettingsScreen extends GameOptionsScreen {
 		if (pages.get(pages.size() - 1).isEmpty())
 			pages.remove(pages.size() - 1);
 		
-		final TextWidget pageTextWidget = new TextWidget(
+		final PressableTextWidget pageTextWidget = new PressableTextWidget(
 				distFromRight - 40, this.height / 2 - distFromBottom + 1, 
-				13, 13, Text.of(Integer.toString(currentPage)), textRenderer);
+				13, 13, Text.of(Integer.toString(currentPage)), NO_ACTION, textRenderer);
 		
 		if (pages.size() > 1) {
 
@@ -154,7 +157,7 @@ public class SettingsScreen extends GameOptionsScreen {
 		switchPage(currentPage, pageTextWidget);
 	}
 
-	private void switchPage(int page, TextWidget pageTextWidget) {
+	private void switchPage(int page, PressableTextWidget pageTextWidget) {
 		if ((page <= -1) || (page >= pages.size()))
 			return;
 		for (ClickableWidget widget : pages.get(currentPage)) {
@@ -189,8 +192,8 @@ public class SettingsScreen extends GameOptionsScreen {
 		Text nameText = Text.of(key + ":");
 		int width = textRenderer.getWidth(nameText);
 		int height = 12;
-		TextWidget nameWidget = new TextWidget(distFromLeft, lastY + height / 2, width, height, nameText, textRenderer);
-		nameWidget.setTooltip(Tooltip.of(commentsText));
+		PressableTextWidget nameWidget = new PressableTextWidget(distFromLeft, lastY + height / 2, width, height, nameText, NO_ACTION, textRenderer);
+		nameWidget.setTooltip(TooltipCom.of());
 		nameWidget.active = false;
 		nameWidget.visible = false;
 		addDrawableChild(nameWidget);
@@ -275,8 +278,8 @@ public class SettingsScreen extends GameOptionsScreen {
 		renderBackground(matrices);
 		
 		super.render(matrices, mouseX, mouseY, delta);
-		itemRenderer.renderGuiItemIcon(matrices, new ItemStack(ModItems.DARK_MATTER_HOE), mouseX - 8, mouseY - 8);
-		GameOptionsScreen.drawCenteredTextWithShadow(matrices, this.textRenderer, this.title, this.width / 2, 20, 0xFFFFFF);
+		itemRenderer.renderGuiItemIcon(new ItemStack(ModItems.DARK_MATTER_HOE), mouseX - 8, mouseY - 8);
+		GameOptionsScreen.drawCenteredTextWithShadow(matrices, this.textRenderer, this.title.asOrderedText(), this.width / 2, 20, 0xFFFFFF);
 		drawBalls(matrices, mouseX, mouseY);
 
 	}
@@ -296,7 +299,7 @@ public class SettingsScreen extends GameOptionsScreen {
 					dotX - ball.pos.x, 
 					dotY - ball.pos.y)
 					.div(2000d)
-					.mul(Math.random() / 2 + 1)
+					.mul(java.lang.Math.random() / 2 + 1)
 					.mul(dt));
 			
 	
@@ -305,7 +308,7 @@ public class SettingsScreen extends GameOptionsScreen {
 			// move away from mouse
 			double dx = (ball.pos.x - mouseX);
 			double dy = (ball.pos.y - mouseY);
-			double distToMouse = Math.sqrt(dx * dx + dy * dy);
+			double distToMouse = java.lang.Math.sqrt(dx * dx + dy * dy);
 			double maxDist = 40d;
 			if (distToMouse < maxDist) {
 				ball.addVelocity(new Vector2d(
@@ -342,7 +345,7 @@ public class SettingsScreen extends GameOptionsScreen {
 			}
 			
 			
-			itemRenderer.renderGuiItemIcon(matrices, new ItemStack(ball.item), (int)ball.pos.x - 8, (int)ball.pos.y - 8);
+			itemRenderer.renderGuiItemIcon(new ItemStack(ball.item), (int)ball.pos.x - 8, (int)ball.pos.y - 8);
 		}
 		prevRenderTime = currentTime;
 	}
@@ -371,7 +374,7 @@ public class SettingsScreen extends GameOptionsScreen {
 		public static Ball randomVelocityBall(Item item, double x, double y) {
 			return new Ball(item,
 					new Vector2d(x, y), 
-					new Vector2d(Math.random() * 2d - 1d, Math.random() * 2d - 1d));
+					new Vector2d(java.lang.Math.random() * 2d - 1d, java.lang.Math.random() * 2d - 1d));
 		}
 
 
@@ -380,10 +383,61 @@ public class SettingsScreen extends GameOptionsScreen {
 		}
 		
 		public void tick(double dt) {
-			if (vel.length() > 1d)
-				vel.fma(-0.025 * dt, vel.normalize(new Vector2d()));
+			if (vel.magnitude() > 1d)
+				vel.fma(-0.025 * dt, vel.normalize());
 			pos.add(new Vector2d(vel).mul(dt));
 			
+		}
+	}
+	
+	private static class Vector2d {
+		public double x;
+		public double y;
+		public Vector2d(double x, double y) {
+			this.x = x;
+			this.y = y;
+		}
+		public Vector2d(Vector2d other) {
+			this.x = other.x;
+			this.y = other.y;
+		}
+		public double magnitude() {
+			return Math.sqrt(x * x + y * y);
+		}
+
+		public Vector2d normalize() {
+			double mag = magnitude();
+			if (mag == 0)
+				return new Vector2d(0, 0);
+			x /= mag;
+			y /= mag;
+			return this;
+		}
+		public Vector2d add(Vector2d other) {
+			x += other.x;
+			y += other.y;
+			return this;
+		}
+		public Vector2d div(double scalar) {
+			x /= scalar;
+			y /= scalar;
+			return this;
+		}
+
+		public Vector2d mul(double scalar) {
+			x *= scalar;
+			y *= scalar;
+			return this;
+		}
+		public Vector2d fma(double scalar, Vector2d other) {
+			x += scalar * other.x;
+			y += scalar * other.y;
+			return this;
+		}
+		public Vector2d negate() {
+			x *= -1;
+			y *= -1;
+			return this;
 		}
 	}
 }

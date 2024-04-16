@@ -15,8 +15,8 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.registry.Registry;
 
 public class ForgetSlot extends Slot {
 
@@ -35,7 +35,7 @@ public class ForgetSlot extends Slot {
 		if (!player.getWorld().isClient() && !stack.isEmpty()) {
 			PlayerState playerState = ServerState.getPlayerState(player);
 			Item item = stack.getItem();
-			String idName = Registries.ITEM.getId(item).toString();
+			String idName = Registry.ITEM.getId(item).toString();
 			if (item.equals(ModItems.TOME_OF_KNOWLEDGE)) {
 				playerState.knowledge.clear();
 				playerState.specialKnowledge.clear();

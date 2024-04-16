@@ -1,21 +1,24 @@
 package com.skirlez.fabricatedexchange.util;
 
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.SingleStackInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 
 
-// I really do not understand why the original is an interface. Also, this class looks really dumb.
-public class SingleStackInventoryImpl implements SingleStackInventory {
+
+public class SingleStackInventory implements Inventory {
 	private static final String STUPID_ERROR = "Index out of range, there is only one item.";
 	private ItemStack stack;
 	
-	public SingleStackInventoryImpl() {
+	public SingleStackInventory() {
 		this.stack = Items.AIR.getDefaultStack();
 	}
-	public SingleStackInventoryImpl(ItemStack stack) {
+	public SingleStackInventory(ItemStack stack) {
 		this.stack = stack;
+	}
+	public ItemStack getStack() {
+		return stack;
 	}
 	@Override
 	public ItemStack getStack(int index) {
@@ -42,10 +45,28 @@ public class SingleStackInventoryImpl implements SingleStackInventory {
 	public void markDirty() {
 		
 	}
-
 	@Override
 	public boolean canPlayerUse(PlayerEntity player) {
 		return true;
+	}
+	
+	@Override
+	public void clear() {
+		stack = Items.AIR.getDefaultStack();
+	}
+	@Override
+	public int size() {
+		return 1;
+	}
+	@Override
+	public boolean isEmpty() {
+		return stack.getItem() != Items.AIR;
+	}
+	@Override
+	public ItemStack removeStack(int index) {
+		ItemStack store = stack;
+		stack = Items.AIR.getDefaultStack();
+		return store;
 	}
 
 

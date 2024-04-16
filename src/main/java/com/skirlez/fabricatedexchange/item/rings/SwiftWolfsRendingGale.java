@@ -88,7 +88,7 @@ public class SwiftWolfsRendingGale extends FlyingAbilityItem
 					
 					for (Entity otherEntity : entities) {
 						Vec3d velocity = otherEntity.getPos().subtract(player.getPos()).normalize().multiply(0.2);
-						otherEntity.addVelocity(velocity);
+						otherEntity.addVelocity(velocity.getX(), velocity.getY(), velocity.getZ());
 					}
 				}
 				if (shouldSubtract)

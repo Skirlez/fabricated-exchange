@@ -13,6 +13,7 @@ import com.skirlez.fabricatedexchange.util.SuperNumber;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.Monster;
 import net.minecraft.entity.passive.AnimalEntity;
@@ -132,7 +133,7 @@ public class MatterSword extends SwordItem implements ChargeableItem, ExtraFunct
         for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
             if (entity.distanceTo(player) <= radius)
-            	entity.damage(player.getDamageSources().playerAttack(player), getAttackDamage());
+            	entity.damage(DamageSource.player(player), getAttackDamage());
         }
         
         player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.ITEM_CHARGE, 

@@ -3,6 +3,7 @@ package com.skirlez.fabricatedexchange.item.tools;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -14,6 +15,7 @@ import com.skirlez.fabricatedexchange.item.OutliningItem;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -21,12 +23,13 @@ import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.ToolMaterial;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
 import net.minecraft.world.World;
 
 public class MatterAxe extends AxeItem implements ChargeableItem, OutliningItem, EmcStoringItem {
@@ -98,7 +101,10 @@ public class MatterAxe extends AxeItem implements ChargeableItem, OutliningItem,
 
 	
 	public static boolean isLog(BlockState state) {
-		return Registries.BLOCK.getEntry(state.getBlock()).isIn(BlockTags.LOGS);
+		Optional<RegistryEntry<Block>> entry = Registry.BLOCK.getEntry(Registry.BLOCK.getKey(state.getBlock()).orElse(null));
+		if (entry.isEmpty())
+			return false;
+		return entry.get().isIn(BlockTags.LOGS);
 	}
 	
 	@Override

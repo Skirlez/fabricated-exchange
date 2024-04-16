@@ -7,8 +7,8 @@ import java.util.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import net.minecraft.block.Block;
-import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 public class BlockTransmutation {
 	public static ImmutableMap<Block, Block> blockTransmutationMap = ImmutableMap.of();
@@ -51,8 +51,8 @@ public class BlockTransmutation {
 	}
 
 	private static void addBlockRelation(String str1, String str2, Map<Block, Block> map) {
-		Block b1 = Registries.BLOCK.get(new Identifier(str1));
-		Block b2 = Registries.BLOCK.get(new Identifier(str2));
+		Block b1 = Registry.BLOCK.get(new Identifier(str1));
+		Block b2 = Registry.BLOCK.get(new Identifier(str2));
 		if (b1 == null || b2 == null) {
 			FabricatedExchange.LOGGER.error("Invalid block(s) found in block_transmutation_map.json! Block 1: " + str1 + " -> Block 2: " + str2);
 			return;

@@ -6,7 +6,7 @@ import java.util.Optional;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.screen.EnergyCondenserScreen;
 import com.skirlez.fabricatedexchange.screen.EnergyCondenserScreenHandler;
-import com.skirlez.fabricatedexchange.util.SingleStackInventoryImpl;
+import com.skirlez.fabricatedexchange.util.SingleStackInventory;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.fabricmc.api.EnvType;
@@ -18,16 +18,15 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SingleStackInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 
@@ -42,7 +41,7 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 	private final LinkedList<ServerPlayerEntity> players = new LinkedList<>();
 	public EnergyCondenserBlockEntity(BlockPos pos, BlockState state) {
 		this(ModBlockEntities.ENERGY_CONDENSER, pos, state);
-		targetInventory = new SingleStackInventoryImpl();
+		targetInventory = new SingleStackInventory();
 	}
 
 	public EnergyCondenserBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
@@ -81,7 +80,9 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 			for (int i = start; i < inv.size() && !success; i++) {
 				ItemStack stack = inv.getStack(i);
 				if (stack.isEmpty()) {
-					inv.setStack(i, target.copyWithCount(maxStacks));
+					ItemStack targetCopy = target.copy();
+					targetCopy.setCount(1);
+					inv.setStack(i, targetCopy);
 					targetEmc.multiply(maxStacks);
 					success = true;
 				}
@@ -124,11 +125,12 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 	public boolean isValid(int invSlot, ItemStack stack) {
 		return (level == 0) ? false : (invSlot < 43 && invSlot >= 0 && !EmcData.getItemStackEmc(stack).equalsZero());
 	}
+	/*
 	@Override
 	public boolean canTransferTo(Inventory hopperInventory, int invSlot, ItemStack stack) {
 		return (level == 0) ? invSlot != 0 : invSlot > 42;
 	}
-
+	*/
 	@Override
 	public int size() {
 		return inventorySize(this.level);
@@ -186,12 +188,12 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 	@Override
 	public void writeNbt(NbtCompound tag) {
 		super.writeNbt(tag);
-		tag.putString("target", Registries.ITEM.getId(targetInventory.getStack(0).getItem()).toString());
+		tag.putString("target", Registry.ITEM.getId(targetInventory.getStack(0).getItem()).toString());
 	}
 	
 	public void readNbt(NbtCompound nbt) {
 		super.readNbt(nbt);
-		Item item = Registries.ITEM.get(new Identifier(nbt.getString("target")));
+		Item item = Registry.ITEM.get(new Identifier(nbt.getString("target")));
 		if (item == null)
 			return;
 		targetInventory.setStack(0, new ItemStack(item));

@@ -8,17 +8,19 @@ import com.skirlez.fabricatedexchange.screen.slot.StackCondition;
 import com.skirlez.fabricatedexchange.screen.slot.SlotWithCondition;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.ModTags;
-import com.skirlez.fabricatedexchange.util.SingleStackInventoryImpl;
+import com.skirlez.fabricatedexchange.util.SingleStackInventory;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.inventory.SingleStackInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
+import net.minecraft.util.registry.RegistryKey;
 
 public class EnergyCollectorScreenHandler extends FuelScreenHandler {
 
@@ -29,7 +31,7 @@ public class EnergyCollectorScreenHandler extends FuelScreenHandler {
 		int level = buf.readInt();
 		return new EnergyCollectorScreenHandler(syncId, playerInventory, 
 			new SimpleInventory(EnergyCollectorBlockEntity.inventorySize(level)), 
-			new SingleStackInventoryImpl(), pos, level, Optional.of(buf));
+			new SingleStackInventory(), pos, level, Optional.of(buf));
 	}
 	
 	public enum SlotIndicies {
@@ -92,10 +94,14 @@ public class EnergyCollectorScreenHandler extends FuelScreenHandler {
 				slot.setStack(ItemStack.EMPTY);
 				return;
 			}
-			if (cursorStack.isEmpty() || Registries.ITEM.getEntry(cursorStack.getItem()).streamTags().anyMatch(tag -> tag == ModTags.FUEL)) {
-				cursorStack = cursorStack.copy();
-				cursorStack.setCount(1);
-				slot.setStack(cursorStack);
+			Optional<RegistryKey<Item>> key = Registry.ITEM.getKey(cursorStack.getItem());
+			if (key.isPresent()) {
+				Optional<RegistryEntry<Item>> entry = Registry.ITEM.getEntry(key.get());
+				if (entry.isPresent() && entry.get().streamTags().anyMatch(tag -> tag == ModTags.FUEL)) {
+					cursorStack = cursorStack.copy();
+					cursorStack.setCount(1);
+					slot.setStack(cursorStack);
+				}
 			}
 		}
 	}

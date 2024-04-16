@@ -4,8 +4,6 @@ import com.skirlez.fabricatedexchange.item.ChargeableItem;
 import com.skirlez.fabricatedexchange.item.tools.base.FEHammer;
 import net.minecraft.item.*;
 
-import net.minecraft.item.ItemStack;
-
 public class DarkMatterHammer extends FEHammer {
 
     public DarkMatterHammer(ToolMaterial material, int attackDamage, float attackSpeed, Settings settings) {

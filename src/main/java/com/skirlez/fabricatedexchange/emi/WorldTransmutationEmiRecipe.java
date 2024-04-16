@@ -8,8 +8,8 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.block.Block;
 import net.minecraft.recipe.Ingredient;
-import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 import java.util.List;
 
@@ -19,7 +19,12 @@ public class WorldTransmutationEmiRecipe implements EmiRecipe {
     private final EmiStack output;
 
     public WorldTransmutationEmiRecipe(Block input, Block output) {
-        this.id = Identifier.of("fabricated-exchange", String.format("/transmutation/world/%s/%s/%s/%s", Registries.BLOCK.getId(input).getNamespace(), Registries.BLOCK.getId(input).getPath(), Registries.BLOCK.getId(output).getNamespace(), Registries.BLOCK.getId(output).getPath()));
+        this.id = Identifier.of("fabricated-exchange",
+        		String.format("/transmutation/world/%s/%s/%s/%s", 
+        		Registry.BLOCK.getId(input).getNamespace(), 
+        		Registry.BLOCK.getId(input).getPath(), 
+        		Registry.BLOCK.getId(output).getNamespace(), 
+        		Registry.BLOCK.getId(output).getPath()));
         this.input = EmiIngredient.of(Ingredient.ofItems(input));
         this.output = EmiStack.of(output);
     }

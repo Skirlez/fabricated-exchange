@@ -17,9 +17,9 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.registry.Registry;
 
 public class ConsumeSlot extends Slot {
 	// This slot destroys any item put inside and adds its EMC to it to a player.
@@ -37,14 +37,15 @@ public class ConsumeSlot extends Slot {
 		Item item = stack.getItem();
 		ItemStack originalStack = stack;
 		
-		stack = stack.copyWithCount(count);
+		stack = stack.copy();
+		stack.setCount(count);
 		SuperNumber emc = EmcData.getItemStackEmc(stack);
 		if (emc.equalsZero() && !item.equals(ModItems.TOME_OF_KNOWLEDGE))
 			return originalStack;
 		if (!player.getWorld().isClient()) {
 			EmcData.addEmc((ServerPlayerEntity)player, emc);
 			PlayerState playerState = ServerState.getPlayerState(player);
-			String idName = Registries.ITEM.getId(item).toString();
+			String idName = Registry.ITEM.getId(item).toString();
 			if (ModDataFiles.NBT_ITEMS.hasItem(idName)) {
 				List<String> allowedKeys = ModDataFiles.NBT_ITEMS.getAllowedKeys(idName);
 				NbtCompound nbt = stack.getNbt();
@@ -73,9 +74,9 @@ public class ConsumeSlot extends Slot {
 			}
 			else {
 				if (item.equals(ModItems.TOME_OF_KNOWLEDGE)) {	
-					Registries.ITEM.forEach(
+					Registry.ITEM.forEach(
 					currentItem -> {
-						String currentId = Registries.ITEM.getId(currentItem).toString();
+						String currentId = Registry.ITEM.getId(currentItem).toString();
 						if (ModDataFiles.NBT_ITEMS.hasItem(currentId))
 							return;
 						SuperNumber currentEmc = EmcData.getItemEmc(currentItem);

@@ -5,9 +5,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 import net.minecraft.recipe.*;
 
-@SuppressWarnings("removal")
-@Mixin(LegacySmithingRecipe.class)
-public interface LegacySmithingRecipeAccessor {
+@Mixin(SmithingRecipe.class)
+public interface SmithingRecipeAccessor {
 	@Accessor
 	Ingredient getAddition();
 	@Accessor

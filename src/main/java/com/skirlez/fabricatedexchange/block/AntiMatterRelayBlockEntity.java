@@ -99,7 +99,9 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 
 		if (burnTime != null || !ModDataFiles.MAIN_CONFIG_FILE.antiMatterRelay_onlyAcceptFuelItems) {
 			if (!fuelStack.isEmpty()) {
-				SuperNumber value = EmcData.getItemStackEmc(fuelStack.copyWithCount(1));		  
+				ItemStack fuelStackCopy = fuelStack.copy();
+				fuelStackCopy.setCount(1);
+				SuperNumber value = EmcData.getItemStackEmc(fuelStackCopy);		  
 				SuperNumber emcCopy = new SuperNumber(entity.emc);
 				emcCopy.add(value);
 				if (emcCopy.compareTo(entity.maximumEmc) != 1) {
@@ -157,10 +159,12 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 	public boolean isValid(int invSlot, ItemStack stack) {
 		return (invSlot == SlotIndicies.POWER_SLOT.ordinal() ? StackCondition.isBattery.passes(stack) : true);
 	}
+	/*
 	@Override
 	public boolean canTransferTo(Inventory hopperInventory, int invSlot, ItemStack stack) {
 		return false;
 	}
+	*/
 	
 	public static int inventorySize(int level) {
 		return ((level == 0) ? 8 : (level == 1) ? 14 : 22);

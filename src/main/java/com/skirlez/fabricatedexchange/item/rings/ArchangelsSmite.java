@@ -18,7 +18,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
@@ -126,7 +125,7 @@ public class ArchangelsSmite extends Item
 
 			// If a closest visible entity was found, shoot an arrow towards it
 			if (closestEntity != null) {
-				Vec3d direction = closestEntity.getPos().subtract(user.getPos().offset(Direction.UP, 0.5)).normalize();
+				Vec3d direction = closestEntity.getPos().subtract(user.getPos().add(0, 0.5d, 0)).normalize();
 				ArrowEntity arrow = new ArrowEntity(world, user);
 				arrow.updatePosition(user.getX(), user.getEyeY() - 0.1, user.getZ());
 				arrow.setVelocity(direction.x, direction.y, direction.z, speed, divergence);

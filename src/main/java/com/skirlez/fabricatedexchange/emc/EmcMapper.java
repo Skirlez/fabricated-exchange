@@ -16,7 +16,7 @@ import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.mixin.BrewingRecipeAccessor;
 import com.skirlez.fabricatedexchange.mixin.BrewingRecipeRegistryAccessor;
 import com.skirlez.fabricatedexchange.mixin.IngredientAccessor;
-import com.skirlez.fabricatedexchange.mixin.LegacySmithingRecipeAccessor;
+import com.skirlez.fabricatedexchange.mixin.SmithingRecipeAccessor;
 import com.skirlez.fabricatedexchange.mixin.TagEntryAccessor;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
@@ -34,18 +34,17 @@ import net.minecraft.potion.Potions;
 import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.LegacySmithingRecipe;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.SmeltingRecipe;
 import net.minecraft.recipe.SmithingRecipe;
 import net.minecraft.recipe.StonecuttingRecipe;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.tag.TagKey;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.registry.DynamicRegistryManager;
+import net.minecraft.util.registry.Registry;
 
 /** This class tries to infer EMC values of items, potions and enchantments through in-game recipes. 
  * You create it, giving it a RecipeManager and DynamicRegistryManager,
@@ -62,7 +61,6 @@ public class EmcMapper {
     private StringBuilder warning = new StringBuilder();
     
     private RecipeManager recipeManager;
-    private DynamicRegistryManager dynamicRegistryManager;
     
     private Map<Item, Set<MapperAction>> unknownEquationMap = new HashMap<Item, Set<MapperAction>>();
     private LayeredQueue<MapperAction> queue = new LayeredQueue<MapperAction>(5);
@@ -71,9 +69,8 @@ public class EmcMapper {
 
     private final EqualTagsFile equalTags;
     
-    public EmcMapper(RecipeManager recipeManager, DynamicRegistryManager dynamicRegistryManager) {
+    public EmcMapper(RecipeManager recipeManager) {
         this.recipeManager = recipeManager;
-        this.dynamicRegistryManager = dynamicRegistryManager;
         
         emcMap = new HashMap<Item, SuperNumber>();
         potionEmcMap = new HashMap<Potion, SuperNumber>();
@@ -149,7 +146,7 @@ public class EmcMapper {
 	        }
 	
 			SuperNumber constant = ModDataFiles.MAIN_CONFIG_FILE.enchantmentEmcConstant; 
-			for (Enchantment enchantment : Registries.ENCHANTMENT) {
+			for (Enchantment enchantment : Registry.ENCHANTMENT) {
 				int max = enchantment.getMaxLevel();
 				int weight = enchantment.getRarity().getWeight();
 				
@@ -179,9 +176,9 @@ public class EmcMapper {
     }
     private String getBrewingRecipeName(BrewingRecipeRegistry.Recipe<Item> recipe) {
         BrewingRecipeAccessor<Item> accessor = (BrewingRecipeAccessor<Item>)recipe;
-        return "brewing:" + Registries.ITEM.getId(accessor.getInput()).getPath() + "_to_" + 
-            Registries.ITEM.getId(accessor.getOutput()).getPath() + "_using_" + 
-            Registries.ITEM.getId(accessor.getIngredient().getMatchingStacks()[0].getItem()).getPath();
+        return "brewing:" + Registry.ITEM.getId(accessor.getInput()).getPath() + "_to_" + 
+            Registry.ITEM.getId(accessor.getOutput()).getPath() + "_using_" + 
+            Registry.ITEM.getId(accessor.getIngredient().getMatchingStacks()[0].getItem()).getPath();
     }
     private String getEquationName(ItemEquation equation) {
         return (equation == null) ? "none" : (equation.origin + ":" + equation.name);
@@ -190,7 +187,7 @@ public class EmcMapper {
     private ItemEquation createCraftingEquation(CraftingRecipe recipe) {
         List<Ingredient> ingredients = recipe.getIngredients();
         List<ItemStack> output = new ArrayList<ItemStack>(1);
-        output.add(recipe.getOutput(this.dynamicRegistryManager));
+        output.add(recipe.getOutput());
         List<Ingredient> filteredIngredients = new ArrayList<Ingredient>(ingredients.size());
         for (Ingredient ingredient : ingredients) {
             if (ingredient.getMatchingStacks().length == 0)
@@ -227,25 +224,23 @@ public class EmcMapper {
     private ItemEquation createSmeltingEquation(SmeltingRecipe recipe) {
         return new ItemEquation(
             Arrays.asList(recipe.getIngredients().get(0)),
-            Arrays.asList(recipe.getOutput(this.dynamicRegistryManager)),
+            Arrays.asList(recipe.getOutput()),
             recipe.getId());
     }
 
     @Nullable
     private ItemEquation createSmithingEquation(SmithingRecipe recipe) {
-    	if (!(recipe instanceof LegacySmithingRecipe))
-    		return null;
-        LegacySmithingRecipeAccessor recipeAccessor = (LegacySmithingRecipeAccessor) recipe;
+        SmithingRecipeAccessor recipeAccessor = (SmithingRecipeAccessor) recipe;
         return new ItemEquation(
             Arrays.asList(recipeAccessor.getBase(), recipeAccessor.getAddition()),
-            Arrays.asList(recipe.getOutput(this.dynamicRegistryManager)),
+            Arrays.asList(recipe.getOutput()),
             recipe.getId());
     }
 
     private ItemEquation createStonecuttingEquation(StonecuttingRecipe recipe) {
         return new ItemEquation(
             recipe.getIngredients(),
-            Arrays.asList(recipe.getOutput(this.dynamicRegistryManager)),
+            Arrays.asList(recipe.getOutput()),
             recipe.getId());
     }
 
@@ -313,8 +308,8 @@ public class EmcMapper {
     	createWorldInteractionEquation(input, output, Optional.empty());
     }
     private void createWorldInteractionEquation(Block input, Block output, Optional<Item> using) {
-		String inputName = Registries.BLOCK.getId(input).getPath();
-		String outputName = Registries.BLOCK.getId(output).getPath();
+		String inputName = Registry.BLOCK.getId(input).getPath();
+		String outputName = Registry.BLOCK.getId(output).getPath();
 		
 		List<Ingredient> inputList = new ArrayList<Ingredient>();
 		inputList.add(Ingredient.ofItems(input));
@@ -332,7 +327,7 @@ public class EmcMapper {
     }
 
     private String itemName(Item item) {
-        return Registries.ITEM.getId(item).toString();
+        return Registry.ITEM.getId(item).toString();
     }
 
     // Counts the unknowns of the equation and also simplifies it down if it has ingredients with a tag marked as an equal tag.

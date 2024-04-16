@@ -7,13 +7,12 @@ import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.screen.slot.ConsiderateSlot;
 import com.skirlez.fabricatedexchange.screen.slot.DisplaySlot;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
-import com.skirlez.fabricatedexchange.util.SingleStackInventoryImpl;
+import com.skirlez.fabricatedexchange.util.SingleStackInventory;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.inventory.SingleStackInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.slot.Slot;
@@ -32,7 +31,7 @@ public class EnergyCondenserScreenHandler extends LeveledScreenHandler implement
 		int level = buf.readInt();
 		return new EnergyCondenserScreenHandler(syncId, playerInventory, 
 				new SimpleInventory(EnergyCondenserBlockEntity.inventorySize(level)),
-				new SingleStackInventoryImpl(), pos, level, Optional.of(buf));
+				new SingleStackInventory(), pos, level, Optional.of(buf));
 	}
 
 	
@@ -76,8 +75,8 @@ public class EnergyCondenserScreenHandler extends LeveledScreenHandler implement
 	}
 
 	@Override
-	public void onClosed(PlayerEntity player){
-		super.onClosed(player);
+	public void close(PlayerEntity player){
+		super.close(player);
 		this.mainInventory.onClose(player);
 	}
 
@@ -92,7 +91,7 @@ public class EnergyCondenserScreenHandler extends LeveledScreenHandler implement
 	}
 
 	@Override
-	public ItemStack quickMove(PlayerEntity player, int slotIndex) {
+	public ItemStack transferSlot(PlayerEntity player, int slotIndex) {
 		Slot slot = this.slots.get(slotIndex);
 		if (!slot.hasStack())
 			return ItemStack.EMPTY;
@@ -112,7 +111,9 @@ public class EnergyCondenserScreenHandler extends LeveledScreenHandler implement
 		else {
 			if (level == 0) {
 				DisplaySlot targetSlot = (DisplaySlot)slots.get(0);
-				targetSlot.setStack(stack.copyWithCount(1));
+				ItemStack stackCopy = stack.copy();
+				stackCopy.setCount(1);
+				targetSlot.setStack(stackCopy);
 				return ItemStack.EMPTY;
 			}
 			else if (level == 1) {

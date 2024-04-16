@@ -26,13 +26,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
-import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
+import net.minecraft.util.registry.Registry;
 
 public class TheCommand {
 	public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
@@ -283,10 +283,10 @@ public class TheCommand {
 
     private static int printMissing(CommandContext<ServerCommandSource> context) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (Item item : Registries.ITEM) {
+        for (Item item : Registry.ITEM) {
             if (EmcData.getItemEmc(item).equalsZero()) {
                 stringBuilder.append('\n');
-                stringBuilder.append(Registries.ITEM.getId(item));
+                stringBuilder.append(Registry.ITEM.getId(item));
             }
         }
         if (stringBuilder.isEmpty()) {

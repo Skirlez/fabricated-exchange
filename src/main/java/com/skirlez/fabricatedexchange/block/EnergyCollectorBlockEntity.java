@@ -12,7 +12,7 @@ import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreen;
 import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreenHandler;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.ImplementedInventory;
-import com.skirlez.fabricatedexchange.util.SingleStackInventoryImpl;
+import com.skirlez.fabricatedexchange.util.SingleStackInventory;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 
@@ -25,18 +25,17 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SingleStackInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 
@@ -66,7 +65,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 	public EnergyCollectorBlockEntity(BlockPos pos, BlockState state) {
 		super(ModBlockEntities.ENERGY_COLLECTOR, pos, state);
 		emc = SuperNumber.Zero();
-		this.targetInventory = new SingleStackInventoryImpl();
+		this.targetInventory = new SingleStackInventory();
 		tick = 0;
 		Block block = state.getBlock();
 		assert block instanceof EnergyCollector;
@@ -247,10 +246,12 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 	public boolean isValid(int slot, ItemStack stack) {
 		return ((slot >= 2) || slot == 0) && FabricatedExchange.fuelProgressionMap.containsKey(stack.getItem());
 	}
+	/*
 	@Override
 	public boolean canTransferTo(Inventory hopperInventory, int slot, ItemStack stack) {
 		return (slot == 1);
 	}
+	*/
 	@Override
 	public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
 		ModServerToClientPackets.UPDATE_CONSUMER_BLOCK.send((ServerPlayerEntity)player, pos, emc);
@@ -267,7 +268,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 	protected void writeNbt(NbtCompound nbt) {
 		super.writeNbt(nbt);
 		Inventories.writeNbt(nbt, stackContents);
-		nbt.putString("target", Registries.ITEM.getId(targetInventory.getStack(0).getItem()).toString());
+		nbt.putString("target", Registry.ITEM.getId(targetInventory.getStack(0).getItem()).toString());
 		nbt.putString("emc", emc.divisionString());
 	
 	}
@@ -276,7 +277,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 	public void readNbt(NbtCompound nbt) {
 		super.readNbt(nbt);
 		Inventories.readNbt(nbt, stackContents);
-		Item item = Registries.ITEM.get(new Identifier(nbt.getString("target")));
+		Item item = Registry.ITEM.get(new Identifier(nbt.getString("target")));
 		if (item == null)
 			return;
 		targetInventory.setStack(0, new ItemStack(item));

@@ -23,9 +23,9 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.potion.Potion;
-import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 public class EmcData {
 
@@ -76,12 +76,12 @@ public class EmcData {
 		if (nbt.contains(EmcStoringItem.EMC_NBT_KEY))
 			emc.add(new SuperNumber(nbt.getString(EmcStoringItem.EMC_NBT_KEY)));
 	
-		if (!ModDataFiles.NBT_ITEMS.hasItem(Registries.ITEM.getId(item).toString()))
+		if (!ModDataFiles.NBT_ITEMS.hasItem(Registry.ITEM.getId(item).toString()))
 			return;
 		
 		if (item instanceof PotionItem) {
 			String potionName = nbt.getString("Potion");
-			Potion potion = Registries.POTION.get(new Identifier(potionName));
+			Potion potion = Registry.POTION.get(new Identifier(potionName));
 			if (potionEmcMap.containsKey(potion)) {
 				SuperNumber addition = potionEmcMap.get(potion);
 				emc.add(addition);
@@ -89,7 +89,7 @@ public class EmcData {
 		}
 		else if (item instanceof TippedArrowItem) {
 			String potionName = nbt.getString("Potion");
-			Potion potion = Registries.POTION.get(new Identifier(potionName));
+			Potion potion = Registry.POTION.get(new Identifier(potionName));
 			if (potionEmcMap.containsKey(potion)) {
 				SuperNumber addition = new SuperNumber(potionEmcMap.get(potion));
 				addition.divide(8);
@@ -101,7 +101,7 @@ public class EmcData {
 			for (int i = 0; i < enchantments.size(); i++) {
 				NbtCompound enchantmentCompound = enchantments.getCompound(i);
 				String enchantmentId = enchantmentCompound.getString("id");
-				Enchantment enchantment = Registries.ENCHANTMENT.get(new Identifier(enchantmentId));
+				Enchantment enchantment = Registry.ENCHANTMENT.get(new Identifier(enchantmentId));
 				if (enchantment == null)
 					continue;
 				
@@ -143,7 +143,7 @@ public class EmcData {
 			for (int i = 0; i < list.size(); i++) {
 				NbtCompound itemCompound = list.getCompound(i);
 				String id = itemCompound.getString("id");
-				ItemStack stack = new ItemStack(Registries.ITEM.get(new Identifier(id)));
+				ItemStack stack = new ItemStack(Registry.ITEM.get(new Identifier(id)));
 				stack.setCount(itemCompound.getInt("Count"));
 				
 				NbtCompound extraData = itemCompound.getCompound("tag");
@@ -182,7 +182,7 @@ public class EmcData {
 		EmcMapFile file = seed ? ModDataFiles.SEED_EMC_MAP : ModDataFiles.CUSTOM_EMC_MAP;
 
 		Map<String, String> newEmcMap = file.getCopy();
-		newEmcMap.put(Registries.ITEM.getId(item).toString(), emc.divisionString());
+		newEmcMap.put(Registry.ITEM.getId(item).toString(), emc.divisionString());
 		file.setValueAndSave(newEmcMap);
 	}
 	
@@ -190,7 +190,7 @@ public class EmcData {
 		EmcMapFile file = seed ? ModDataFiles.SEED_EMC_MAP : ModDataFiles.CUSTOM_EMC_MAP;
 
 		Map<String, String> newEmcMap = file.getCopy();
-		newEmcMap.remove(Registries.ITEM.getId(item).toString());
+		newEmcMap.remove(Registry.ITEM.getId(item).toString());
 		file.setValueAndSave(newEmcMap);
 	}
 	public static void setEmc(ServerPlayerEntity player, SuperNumber amount) {

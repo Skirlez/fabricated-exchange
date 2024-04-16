@@ -36,7 +36,7 @@ public class FakeItemUsageContext extends ItemUsageContext {
 	}
 
 	public Vec3d getHitPos() {
-		return pos.toCenterPos();
+		return new Vec3d(pos.getX() + 0.5d, pos.getY() + 0.5d, pos.getZ() + 0.5d);
 	}
 
 	public boolean hitsInsideBlock() {

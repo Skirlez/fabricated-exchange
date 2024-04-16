@@ -13,9 +13,9 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.potion.Potion;
-import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 public class UpdateEmcMaps extends ServerToClientPacket {
 	public UpdateEmcMaps(String name) {
@@ -26,17 +26,17 @@ public class UpdateEmcMaps extends ServerToClientPacket {
 		PacketByteBuf buffer = PacketByteBufs.create();
 		buffer.writeInt(EmcData.emcMap.keySet().size());
 		for (Item s : EmcData.emcMap.keySet()) {
-			buffer.writeIdentifier(Registries.ITEM.getId(s));
+			buffer.writeIdentifier(Registry.ITEM.getId(s));
 			buffer.writeString(EmcData.emcMap.get(s).divisionString());
 		}
 		buffer.writeInt(EmcData.potionEmcMap.keySet().size());
 		for (Potion s : EmcData.potionEmcMap.keySet()) {
-			buffer.writeIdentifier(Registries.POTION.getId(s));
+			buffer.writeIdentifier(Registry.POTION.getId(s));
 			buffer.writeString(EmcData.potionEmcMap.get(s).divisionString());
 		}
 		buffer.writeInt(EmcData.enchantmentEmcMap.keySet().size());
 		for (Enchantment s : EmcData.enchantmentEmcMap.keySet()) {
-			buffer.writeIdentifier(Registries.ENCHANTMENT.getId(s));
+			buffer.writeIdentifier(Registry.ENCHANTMENT.getId(s));
 			buffer.writeString(EmcData.enchantmentEmcMap.get(s).divisionString());
 		}
 
@@ -49,17 +49,17 @@ public class UpdateEmcMaps extends ServerToClientPacket {
 		int iterations = buf.readInt();
 		for (int i = 0; i < iterations; i++) {
 			Identifier id = buf.readIdentifier();
-			emcMapBuilder.put(Registries.ITEM.get(id), new SuperNumber(buf.readString()));
+			emcMapBuilder.put(Registry.ITEM.get(id), new SuperNumber(buf.readString()));
 		}
 		int potionIterations = buf.readInt();
 		for (int i = 0; i < potionIterations; i++) {
 			Identifier id = buf.readIdentifier();
-			potionEmcMapBuilder.put(Registries.POTION.get(id), new SuperNumber(buf.readString()));
+			potionEmcMapBuilder.put(Registry.POTION.get(id), new SuperNumber(buf.readString()));
 		}
 		int enchantmentIterations = buf.readInt();
 		for (int i = 0; i < enchantmentIterations; i++) {
 			Identifier id = buf.readIdentifier();
-			enchantmentEmcMapBuilder.put(Registries.ENCHANTMENT.get(id), new SuperNumber(buf.readString()));
+			enchantmentEmcMapBuilder.put(Registry.ENCHANTMENT.get(id), new SuperNumber(buf.readString()));
 		}
 		EmcData.emcMap = emcMapBuilder.build();
 		EmcData.potionEmcMap = potionEmcMapBuilder.build();

@@ -11,8 +11,8 @@ import com.skirlez.fabricatedexchange.util.SuperNumber;
 import com.skirlez.fabricatedexchange.util.config.lib.DataFile;
 
 import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 public class EmcMapFile extends DataFile<Map<String, String>> {
 	private Map<Item, SuperNumber> emcMap;
@@ -28,7 +28,7 @@ public class EmcMapFile extends DataFile<Map<String, String>> {
 		for (Entry<String, String> entry : value.entrySet()) {
 			String itemName = entry.getKey();
 			Identifier id = new Identifier(itemName);
-			Item item = Registries.ITEM.get(id);
+			Item item = Registry.ITEM.get(id);
 			if (item == null)
 				continue;
 			
