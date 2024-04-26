@@ -108,26 +108,16 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 		searchBar.setChangedListener(updater);
 		addDrawableChild(searchBar);
 
-		addDrawableChild(ButtonWidget.builder(
-			Text.of("<"),
-			button -> updatePage(false))
-			.dimensions(x + 127, y + 101, 13, 13)
-			.build());
+		
+		ButtonWidget left = new ButtonWidget(x + 127, y + 101, 13, 13, Text.of("<"), button -> updatePage(false));
+		addDrawableChild(left);
+		ButtonWidget right = new ButtonWidget(x + 194, y + 101, 13, 13, Text.of(">"), button -> updatePage(true));
+		addDrawableChild(right);
 
-		addDrawableChild(ButtonWidget.builder(
-			Text.of(">"),
-			button -> updatePage(true))
-			.dimensions(x + 194, y + 101, 13, 13)
-			.build());
 
 
 		if (floorButtonEnabled) {
-			this.floorButton = ButtonWidget.builder(
-				Text.of("Floor"),
-				button -> floorEmcPress())
-				.dimensions(x + 4, y + 116, 31, 12)
-				.build();
-			
+			this.floorButton = new ButtonWidget(x + 4, y + 116, 31, 12, Text.of("Floor"), button -> floorEmcPress());
 			addDrawableChild(floorButton);
 		}
 	}

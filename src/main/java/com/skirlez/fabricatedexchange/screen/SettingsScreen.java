@@ -14,7 +14,10 @@ import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.GameOptionsScreen;
+import net.minecraft.client.gui.screen.pack.PackScreen;
+import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ButtonWidget.TooltipSupplier;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.PressableTextWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -96,26 +99,34 @@ public class SettingsScreen extends GameOptionsScreen {
 		this.pages.clear();
 		pages.add(new ArrayList<ClickableWidget>());
 		Text resetToDefaultText = Text.translatable("screen.fabricated-exchange.settings.reset");
-		ButtonWidget resetToDefault = new ButtonWidget.Builder(resetToDefaultText, (widget) -> {
-			CONFIG = ModDataFiles.MAIN_CONFIG_FILE.copyDefaultValue();
-			clearAndInit();
-		}).dimensions(distFromLeft, height - distFromBottom, textRenderer.getWidth(resetToDefaultText) + 20, 20).build();
+		ButtonWidget resetToDefault = new ButtonWidget(
+			distFromLeft, height - distFromBottom, 
+			textRenderer.getWidth(resetToDefaultText) + 20, 20, 
+			resetToDefaultText, (widget) -> {
+				CONFIG = ModDataFiles.MAIN_CONFIG_FILE.copyDefaultValue();
+				clearAndInit();
+			});
 		
 		addDrawableChild(resetToDefault);
 		
 		Text closeWithoutSavingText = Text.translatable("screen.fabricated-exchange.settings.close");
-		ButtonWidget closeWithoutSaving = new ButtonWidget.Builder(closeWithoutSavingText, (widget) -> {
-			super.close();
-		}).dimensions(distFromLeft + resetToDefault.getWidth() + 11, height - distFromBottom, textRenderer.getWidth(closeWithoutSavingText) + 20, 20).build();
+		ButtonWidget closeWithoutSaving = new ButtonWidget(
+			distFromLeft + resetToDefault.getWidth() + 11, height - distFromBottom,
+			textRenderer.getWidth(closeWithoutSavingText) + 20, 20, closeWithoutSavingText, (widget) -> {
+				super.close();
+			});
 		
 		addDrawableChild(closeWithoutSaving);
 		
 		Text doneText = Text.translatable("gui.done");
-		ButtonWidget done = new ButtonWidget.Builder(doneText, (widget) -> {
-			ModDataFiles.MAIN_CONFIG_FILE.setValueAndSave(CONFIG);
-			super.close();
-		}).dimensions(distFromLeft + resetToDefault.getWidth() + closeWithoutSaving.getWidth() + 22, height - distFromBottom, closeWithoutSaving.getWidth(), 20).build();
-		
+		ButtonWidget done = new ButtonWidget(
+			distFromLeft + resetToDefault.getWidth() + closeWithoutSaving.getWidth() + 22, height - distFromBottom, 
+			closeWithoutSaving.getWidth(), 20, 
+			doneText, (widget) -> {
+				ModDataFiles.MAIN_CONFIG_FILE.setValueAndSave(CONFIG);
+				super.close();
+			});
+			
 		addDrawableChild(done);
 		
 
@@ -141,15 +152,12 @@ public class SettingsScreen extends GameOptionsScreen {
 
 			addDrawable(pageTextWidget);
 			
-			addDrawableChild(ButtonWidget.builder(
-				Text.of("<"), button -> switchPage(currentPage - 1, pageTextWidget))
-				.dimensions(distFromRight - 60, this.height / 2 - distFromBottom, 13, 13)
-				.build());
-	
-			addDrawableChild(ButtonWidget.builder(
-				Text.of(">"), button -> switchPage(currentPage + 1, pageTextWidget))
-				.dimensions(distFromRight - 20, this.height / 2 - distFromBottom, 13, 13)
-				.build());
+			ButtonWidget left = new ButtonWidget(distFromRight - 60, this.height / 2 - distFromBottom, 13, 13, 
+				Text.of("<"), button -> switchPage(currentPage - 1, pageTextWidget));
+			addDrawableChild(left);
+			ButtonWidget right = new ButtonWidget(distFromRight - 20, this.height / 2 - distFromBottom, 13, 13, 
+				Text.of(">"), button -> switchPage(currentPage + 1, pageTextWidget));
+			addDrawableChild(right);
 			
 				
 		}
@@ -193,7 +201,6 @@ public class SettingsScreen extends GameOptionsScreen {
 		int width = textRenderer.getWidth(nameText);
 		int height = 12;
 		PressableTextWidget nameWidget = new PressableTextWidget(distFromLeft, lastY + height / 2, width, height, nameText, NO_ACTION, textRenderer);
-		nameWidget.setTooltip(TooltipCom.of());
 		nameWidget.active = false;
 		nameWidget.visible = false;
 		addDrawableChild(nameWidget);
@@ -205,10 +212,10 @@ public class SettingsScreen extends GameOptionsScreen {
 
 		Text invalidText = Text.of("Invalid number!!");
 		int invalidWidth = textRenderer.getWidth(invalidText);
-		TextWidget invalidTextWidget = new TextWidget(
+		PressableTextWidget invalidTextWidget = new PressableTextWidget(
 				distFromLeft + nameWidget.getWidth() + field.getWidth() + 20, 
 				lastY + height / 2, invalidWidth, height, 
-				Text.empty(), textRenderer);
+				Text.empty(), NO_ACTION, textRenderer);
 		
 		addDrawable(invalidTextWidget);
 		
@@ -238,11 +245,9 @@ public class SettingsScreen extends GameOptionsScreen {
 	
 	private void addBooleanValue(String key) {
 		String[] comments = COMMENTS.get(key);
-		MutableText commentsText = Text.empty();
+		List<Text> commentsText = new ArrayList<Text>();
 		for (String comment : comments) {
-			commentsText.append("// ");
-			commentsText.append(Text.literal(comment));
-			commentsText.append("\n");
+			commentsText.add(Text.literal("// " + comment));
 		}
 		
 		Text f = Text.of(key + ": OFF");
@@ -250,11 +255,26 @@ public class SettingsScreen extends GameOptionsScreen {
 		int width = textRenderer.getWidth(f) + 15;
 		//TextWidget value = new TextWidget(distFromLeft + width + 20, lastY + 10, 0, 0, (boolean)CONFIG.get(key) ? t : f, textRenderer);
 		//addDrawable(value);
+		
+		ButtonWidget button = new ButtonWidget(distFromLeft, lastY, width, 20, (boolean)CONFIG.get(key) ? t : f, (widget) -> {
+			boolean newValue = !(boolean)CONFIG.get(key);
+			CONFIG.put(key, newValue);
+			widget.setMessage(newValue ? t : f);
+		}, new TooltipSupplier() {
+			
+			@Override
+			public void onTooltip(ButtonWidget button, MatrixStack stack, int x, int y) {
+				renderTooltip(stack, commentsText, x, y);
+			}
+		});
+		
+		/*
 		ButtonWidget button = new ButtonWidget.Builder((boolean)CONFIG.get(key) ? t : f, (widget) -> {
 			boolean newValue = !(boolean)CONFIG.get(key);
 			CONFIG.put(key, newValue);
 			widget.setMessage(newValue ? t : f);
 		}).dimensions(distFromLeft, lastY, width, 20).tooltip(Tooltip.of(commentsText)).build();
+		*/
 		button.active = false;
 		button.visible = false;
 		
@@ -308,16 +328,16 @@ public class SettingsScreen extends GameOptionsScreen {
 			// move away from mouse
 			double dx = (ball.pos.x - mouseX);
 			double dy = (ball.pos.y - mouseY);
-			double distToMouse = java.lang.Math.sqrt(dx * dx + dy * dy);
+			double distToMouse = Math.sqrt(dx * dx + dy * dy);
 			double maxDist = 40d;
 			if (distToMouse < maxDist) {
 				ball.addVelocity(new Vector2d(
-						mouseX - ball.pos.x, 
-						mouseY - ball.pos.y)
-						.div(1000d)
-						.mul((maxDist - distToMouse) / maxDist * 40d)
-						.mul(dt)
-						.negate());
+					mouseX - ball.pos.x, 
+					mouseY - ball.pos.y)
+					.div(1000d)
+					.mul((maxDist - distToMouse) / maxDist * 40d)
+					.mul(dt)
+					.negate());
 			}
 			
 			
@@ -384,7 +404,7 @@ public class SettingsScreen extends GameOptionsScreen {
 		
 		public void tick(double dt) {
 			if (vel.magnitude() > 1d)
-				vel.fma(-0.025 * dt, vel.normalize());
+				vel.fma(-0.025 * dt, new Vector2d(vel).normalize());
 			pos.add(new Vector2d(vel).mul(dt));
 			
 		}
