@@ -1,5 +1,8 @@
 # fabricated-exchange
 
+[![Modrinth Downloads](https://img.shields.io/modrinth/dt/HwTL49Cn?style=flat&logo=modrinth&label=modrinth)](https://modrinth.com/mod/fabricated-exchange)
+[![CurseForge Sucks](https://img.shields.io/badge/cuseforge-sucks-FF8300?style=flat)](https://curseforge.com/minecraft/mc-mods/fabricated-exchange)
+
 A Fabric remake of the Minecraft mod ProjectE/Equivalent Exchange 2.
 The mod attaches an "EMC" number value to every item. Some are worth more, some less.
 Transmute items and blocks into EMC, and EMC to different items you've obtained before.
