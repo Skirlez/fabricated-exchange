@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "D": {
       "item": "fabricated-exchange:dark_matter_block"
@@ -19,6 +18,5 @@
   ],
   "result": {
     "item": "fabricated-exchange:transmutation_tablet"
-  },
-  "show_notification": true
+  }
 }

@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "H": {
       "item": "fabricated-exchange:high_covalence_dust"
@@ -25,6 +24,5 @@
   ],
   "result": {
     "item": "fabricated-exchange:repair_talisman"
-  },
-  "show_notification": true
+  }
 }

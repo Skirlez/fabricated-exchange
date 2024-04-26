@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "A": {
       "item": "fabricated-exchange:antimatter_relay_mk1"
@@ -19,6 +18,5 @@
   ],
   "result": {
     "item": "fabricated-exchange:antimatter_relay_mk2"
-  },
-  "show_notification": true
+  }
 }

@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "D": {
       "item": "fabricated-exchange:dark_matter"
@@ -19,6 +18,5 @@
   ],
   "result": {
     "item": "fabricated-exchange:energy_collector_mk2"
-  },
-  "show_notification": true
+  }
 }

@@ -60,7 +60,7 @@ public class SingleStackInventory implements Inventory {
 	}
 	@Override
 	public boolean isEmpty() {
-		return stack.getItem() != Items.AIR;
+		return stack.isEmpty();
 	}
 	@Override
 	public ItemStack removeStack(int index) {

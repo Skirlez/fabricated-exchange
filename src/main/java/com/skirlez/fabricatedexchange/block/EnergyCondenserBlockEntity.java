@@ -81,7 +81,7 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 				ItemStack stack = inv.getStack(i);
 				if (stack.isEmpty()) {
 					ItemStack targetCopy = target.copy();
-					targetCopy.setCount(1);
+					targetCopy.setCount(maxStacks);
 					inv.setStack(i, targetCopy);
 					targetEmc.multiply(maxStacks);
 					success = true;
@@ -123,7 +123,7 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 
 	@Override
 	public boolean isValid(int invSlot, ItemStack stack) {
-		return (level == 0) ? false : (invSlot < 43 && invSlot >= 0 && !EmcData.getItemStackEmc(stack).equalsZero());
+		return (level == 0) ? false : (invSlot < 42 && invSlot >= 0 && !EmcData.getItemStackEmc(stack).equalsZero());
 	}
 	/*
 	@Override

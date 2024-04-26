@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "equipment",
   "key": {
     "D": {
       "tag": "c:diamonds"
@@ -16,6 +15,5 @@
   ],
   "result": {
     "item": "fabricated-exchange:dark_matter_hammer"
-  },
-  "show_notification": true
+  }
 }

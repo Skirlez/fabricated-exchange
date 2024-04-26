@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "equipment",
   "key": {
     "M": {
       "item": "fabricated-exchange:red_matter"
@@ -13,6 +12,5 @@
   ],
   "result": {
     "item": "fabricated-exchange:red_matter_leggings"
-  },
-  "show_notification": true
+  }
 }

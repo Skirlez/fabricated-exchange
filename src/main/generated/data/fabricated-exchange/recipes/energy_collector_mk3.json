@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "E": {
       "item": "fabricated-exchange:energy_collector_mk2"
@@ -19,6 +18,5 @@
   ],
   "result": {
     "item": "fabricated-exchange:energy_collector_mk3"
-  },
-  "show_notification": true
+  }
 }

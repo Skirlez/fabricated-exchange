@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "B": {
       "item": "minecraft:bow"
@@ -22,6 +21,5 @@
   ],
   "result": {
     "item": "fabricated-exchange:archangels_smite"
-  },
-  "show_notification": true
+  }
 }

@@ -94,7 +94,7 @@
     "block.fabricated-exchange.energy_condenser_mk1": "Energy Condenser MK1",
     "block.fabricated-exchange.energy_condenser_mk2": "Energy Condenser MK2",
     
-    "itemgroup.fabricated-exchange": "Fabricated Exchange", 
+    "itemGroup.fabricated-exchange.fabricated-exchange": "Fabricated Exchange", 
 
     "sounds.fabricated-exchange.philosophers_stone_use": "Blocks transmuted",
     "sounds.fabricated-exchange.item_charge": "Item charged",
@@ -145,8 +145,9 @@
     
     "config.fabricated-exchange.version_1": "Do not modify this version string!",
     "config.fabricated-exchange.showItemEmcOrigin_1": "Show how the mod decided this item's EMC value.",
-    "config.fabricated-exchange.showItemEmcOrigin_2": "Will not be accurate on multiplayer servers. Useful when manually setting EMC values!",
-    "config.fabricated-exchange.showItemEmcOrigin_3": "(default: false)",
+    "config.fabricated-exchange.showItemEmcOrigin_2": "Will not be accurate on multiplayer servers.",
+    "config.fabricated-exchange.showItemEmcOrigin_3": "Useful when manually setting EMC values!",
+    "config.fabricated-exchange.showItemEmcOrigin_4": "(default: false)",
     "config.fabricated-exchange.showEnchantedBookRepairCost_1": "Show the hidden repair cost attribute for Enchanted Books.",
     "config.fabricated-exchange.showEnchantedBookRepairCost_2": "(default: true)",
     "config.fabricated-exchange.enchantmentEmcConstant_1": "A special constant used during the calculation of enchantment EMC.",
@@ -160,12 +161,14 @@
     "config.fabricated-exchange.mapper.enabled_2": "(default: true)",
     "config.fabricated-exchange.transmutationTable.animated_1": "When disabled, the Transmutation Table will look boring.",
  	"config.fabricated-exchange.transmutationTable.animated_2": "(default: true)",
-    "config.fabricated-exchange.transmutationTable.floorButton_1": "When enabled, a button to round down your EMC will appear in the Transmutation Table when your EMC is not a whole number.",
-    "config.fabricated-exchange.transmutationTable.floorButton_2": "(default: true)",
+    "config.fabricated-exchange.transmutationTable.floorButton_1": "When enabled, a button to round down your EMC will appear ",
+    "config.fabricated-exchange.transmutationTable.floorButton_2": "in the Transmutation Table when your EMC is not a whole number.",
+    "config.fabricated-exchange.transmutationTable.floorButton_3": "(default: true)",
     "config.fabricated-exchange.antiMatterRelay.onlyAcceptFuelItems_1": "When enabled, the Anti-Matter Relays will only accept valid furnace fuels.",
     "config.fabricated-exchange.antiMatterRelay.onlyAcceptFuelItems_2": "(default: false)",
-    "config.fabricated-exchange.energyCollector.alwaysHaveEnergy_1": "When enabled, the Energy Collectors will always have light energy, even in darkness.",
-    "config.fabricated-exchange.energyCollector.alwaysHaveEnergy_2": "(default: false)",
+    "config.fabricated-exchange.energyCollector.alwaysHaveEnergy_1": "When enabled, the Energy Collectors will always have",
+    "config.fabricated-exchange.energyCollector.alwaysHaveEnergy_2": "light energy, even in darkness.",
+    "config.fabricated-exchange.energyCollector.alwaysHaveEnergy_3": "(default: false)",
     
     "tag.item.c.transmutation_fuel": "Transmutation Fuel",
 

@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "equipment",
   "key": {
     "C": {
       "item": "fabricated-exchange:dark_matter"
@@ -19,6 +18,5 @@
   ],
   "result": {
     "item": "fabricated-exchange:red_matter_pickaxe"
-  },
-  "show_notification": true
+  }
 }

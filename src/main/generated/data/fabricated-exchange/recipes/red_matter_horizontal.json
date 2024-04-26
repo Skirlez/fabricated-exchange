@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "A": {
       "item": "fabricated-exchange:aeternalis_fuel"
@@ -16,6 +15,5 @@
   ],
   "result": {
     "item": "fabricated-exchange:red_matter"
-  },
-  "show_notification": true
+  }
 }

@@ -12,14 +12,12 @@ import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.GameOptionsScreen;
-import net.minecraft.client.gui.screen.pack.PackScreen;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ButtonWidget.TooltipSupplier;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.gui.widget.PressableTextWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 
 import net.minecraft.client.util.math.MatrixStack;
@@ -27,7 +25,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.MathHelper;
 
 public class SettingsScreen extends GameOptionsScreen {
 	private Map<String, Object> CONFIG;
@@ -42,11 +39,6 @@ public class SettingsScreen extends GameOptionsScreen {
 	private int currentPage;
 	private long prevRenderTime;
 	
-	private static final ButtonWidget.PressAction NO_ACTION = new ButtonWidget.PressAction() {
-		public void onPress(ButtonWidget widget) {	
-		}
-	};
-	
 	private final List<Ball> balls;
 	
 	private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
@@ -59,7 +51,6 @@ public class SettingsScreen extends GameOptionsScreen {
 		prevRenderTime = System.nanoTime();
 		
 		balls = new ArrayList<Ball>();
-		
 	}
 	
 
@@ -77,10 +68,10 @@ public class SettingsScreen extends GameOptionsScreen {
 			// multiplayer
 			List<Text> warningTexts = GeneralUtil.translatableList("screen.fabricated-exchange.settings.client_warning");
 			for (Text text : warningTexts) {
-				PressableTextWidget serverWarningWidget = new PressableTextWidget(this.width / 2, startY, 0, 0, text, NO_ACTION, textRenderer);
+				TextWidget serverWarningWidget = new TextWidget(this.width / 2 - textRenderer.getWidth(text) / 2, startY, 0, 0, text,textRenderer);
 				//serverWarningWidget.setTextColor(MathHelper.packRgb(1, 0, 0));
 				addDrawable(serverWarningWidget);
-				this.startY += 10;
+				this.startY += 12;
 			}
 
 		}
@@ -144,9 +135,9 @@ public class SettingsScreen extends GameOptionsScreen {
 		if (pages.get(pages.size() - 1).isEmpty())
 			pages.remove(pages.size() - 1);
 		
-		final PressableTextWidget pageTextWidget = new PressableTextWidget(
-				distFromRight - 40, this.height / 2 - distFromBottom + 1, 
-				13, 13, Text.of(Integer.toString(currentPage)), NO_ACTION, textRenderer);
+		final TextWidget pageTextWidget = new TextWidget(
+				distFromRight - 37, this.height / 2 - distFromBottom + 1, 
+				13, 13, Text.of(Integer.toString(currentPage)),textRenderer);
 		
 		if (pages.size() > 1) {
 
@@ -165,7 +156,7 @@ public class SettingsScreen extends GameOptionsScreen {
 		switchPage(currentPage, pageTextWidget);
 	}
 
-	private void switchPage(int page, PressableTextWidget pageTextWidget) {
+	private void switchPage(int page, TextWidget pageTextWidget) {
 		if ((page <= -1) || (page >= pages.size()))
 			return;
 		for (ClickableWidget widget : pages.get(currentPage)) {
@@ -177,7 +168,7 @@ public class SettingsScreen extends GameOptionsScreen {
 			widget.active = true;
 			widget.visible = true;
 		}
-		pageTextWidget.setMessage(Text.of(Integer.toString(currentPage)));
+		pageTextWidget.setMessage(Text.of(Integer.toString(page)));
 	}
 	
 	@Override
@@ -200,7 +191,7 @@ public class SettingsScreen extends GameOptionsScreen {
 		Text nameText = Text.of(key + ":");
 		int width = textRenderer.getWidth(nameText);
 		int height = 12;
-		PressableTextWidget nameWidget = new PressableTextWidget(distFromLeft, lastY + height / 2, width, height, nameText, NO_ACTION, textRenderer);
+		TextWidget nameWidget = new TextWidget(distFromLeft, lastY + height / 2, width, height, nameText,textRenderer);
 		nameWidget.active = false;
 		nameWidget.visible = false;
 		addDrawableChild(nameWidget);
@@ -212,10 +203,10 @@ public class SettingsScreen extends GameOptionsScreen {
 
 		Text invalidText = Text.of("Invalid number!!");
 		int invalidWidth = textRenderer.getWidth(invalidText);
-		PressableTextWidget invalidTextWidget = new PressableTextWidget(
+		TextWidget invalidTextWidget = new TextWidget(
 				distFromLeft + nameWidget.getWidth() + field.getWidth() + 20, 
 				lastY + height / 2, invalidWidth, height, 
-				Text.empty(), NO_ACTION, textRenderer);
+				Text.empty(), textRenderer);
 		
 		addDrawable(invalidTextWidget);
 		
@@ -245,9 +236,9 @@ public class SettingsScreen extends GameOptionsScreen {
 	
 	private void addBooleanValue(String key) {
 		String[] comments = COMMENTS.get(key);
-		List<Text> commentsText = new ArrayList<Text>();
+		List<Text> commentsList = new ArrayList<Text>();
 		for (String comment : comments) {
-			commentsText.add(Text.literal("// " + comment));
+			commentsList.add(Text.literal("// " + comment));
 		}
 		
 		Text f = Text.of(key + ": OFF");
@@ -264,7 +255,7 @@ public class SettingsScreen extends GameOptionsScreen {
 			
 			@Override
 			public void onTooltip(ButtonWidget button, MatrixStack stack, int x, int y) {
-				renderTooltip(stack, commentsText, x, y);
+				renderTooltip(stack, commentsList, 0, 20);
 			}
 		});
 		

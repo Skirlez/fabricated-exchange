@@ -86,13 +86,13 @@ public class ModItems {
 			new ArmorItem(ModArmorMaterial.RED_MATTER, EquipmentSlot.HEAD, new Item.Settings().group(ModItemGroups.FABRICATED_EXCHANGE)));
 
 	public static final Item SWIFTWOLFS_RENDING_GALE = registerItem("swiftwolfs_rending_gale",
-			new SwiftWolfsRendingGale(new FabricItemSettings().maxCount(1)));
+			new SwiftWolfsRendingGale(new Item.Settings().maxCount(1).group(ModItemGroups.FABRICATED_EXCHANGE)));
 
 	public static final Item ARCHANGELS_SMITE = registerItem("archangels_smite",
-			new ArchangelsSmite(new FabricItemSettings().maxCount(1)));
+			new ArchangelsSmite(new Item.Settings().maxCount(1).group(ModItemGroups.FABRICATED_EXCHANGE)));
 
 	public static final Item REPAIR_TALISMAN = registerItem("repair_talisman",
-			new RepairTalisman(new FabricItemSettings().maxCount(1)));
+			new RepairTalisman(new Item.Settings().maxCount(1).group(ModItemGroups.FABRICATED_EXCHANGE)));
 
 	private static Item registerItem(String name, Item item) {
 		Registry.register(Registry.ITEM, new Identifier(FabricatedExchange.MOD_ID, name), item);

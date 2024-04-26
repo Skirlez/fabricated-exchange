@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "B": {
       "item": "fabricated-exchange:iron_band"
@@ -19,6 +18,5 @@
   ],
   "result": {
     "item": "fabricated-exchange:swiftwolfs_rending_gale"
-  },
-  "show_notification": true
+  }
 }

@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "equipment",
   "key": {
     "D": {
       "item": "fabricated-exchange:dark_matter_sword"
@@ -16,6 +15,5 @@
   ],
   "result": {
     "item": "fabricated-exchange:red_matter_sword"
-  },
-  "show_notification": true
+  }
 }
