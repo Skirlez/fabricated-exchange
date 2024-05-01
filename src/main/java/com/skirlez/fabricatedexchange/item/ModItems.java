@@ -33,12 +33,14 @@ public class ModItems {
 			new Item(new FabricItemSettings()));
 	public static final Item HIGH_COVALENCE_DUST = registerItemWithGroup("high_covalence_dust",
 			new Item(new FabricItemSettings()));
+	
 	public static final Item LOW_DIVIDING_ROD = registerItemWithGroup("low_divining_rod",
 			new DiviningRod(new FabricItemSettings(), 3));
 	public static final Item MEDIUM_DIVIDING_ROD = registerItemWithGroup("medium_divining_rod",
 			new DiviningRod(new FabricItemSettings(), 16));
 	public static final Item HIGH_DIVIDING_ROD = registerItemWithGroup("high_divining_rod",
 			new DiviningRod(new FabricItemSettings(), 64));
+	
 	public static final Item IRON_BAND = registerItemWithGroup("iron_band", new Item(new FabricItemSettings()));
 	public static final Item DARK_MATTER = registerItemWithGroup("dark_matter", new Item(new FabricItemSettings()));
 	public static final Item RED_MATTER = registerItemWithGroup("red_matter", new Item(new FabricItemSettings()));

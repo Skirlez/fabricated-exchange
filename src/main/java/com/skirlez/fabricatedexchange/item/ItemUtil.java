@@ -12,13 +12,12 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext.FluidHandling;
 
 
 
 public abstract class ItemUtil {
-
-	
 	public static void addModeAndChargeToTooltip(ItemStack stack, List<Text> tooltip) {
 		int charge = ChargeableItem.getCharge(stack);
 		if (charge == 0) {
@@ -37,6 +36,16 @@ public abstract class ItemUtil {
 		if (!result.getBlockPos().equals(pos) || dir == Direction.UP || dir.equals(Direction.DOWN))
 			return player.getHorizontalFacing().getOpposite();
 		return dir;
+	}
+	
+	public static Direction getMineDirection(PlayerEntity player, BlockPos pos) {
+		BlockHitResult result = ItemAccessor.invokeRaycast(player.getWorld(), player, FluidHandling.NONE);
+		Direction dir = result.getSide();
+		if (!result.getBlockPos().equals(pos)) {
+	        Vec3d vec = player.getRotationVec(1.0F);
+	        return Direction.getFacing(vec.x, vec.y, vec.z);
+		}
+		return dir.getOpposite();
 	}
 
 }

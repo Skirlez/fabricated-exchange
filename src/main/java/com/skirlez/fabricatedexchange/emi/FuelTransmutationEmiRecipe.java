@@ -17,8 +17,8 @@ import net.minecraft.util.Identifier;
 import java.util.List;
 
 public class FuelTransmutationEmiRecipe implements EmiRecipe {
-    private final Identifier id;
-    private final List<EmiIngredient> input;
+	private final Identifier id;
+	private final List<EmiIngredient> input;
     private final List<EmiStack> output;
     private final int cost;
 

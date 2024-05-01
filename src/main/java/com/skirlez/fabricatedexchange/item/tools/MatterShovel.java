@@ -21,6 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.ShovelItem;
 import net.minecraft.item.ToolMaterial;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
@@ -85,11 +86,11 @@ public class MatterShovel extends ShovelItem implements ChargeableItem, Outlinin
 	
 	@Override
 	public boolean postMine(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity miner) {
-		if (isSuitableFor(state) && miner instanceof PlayerEntity player) {
+		if (isSuitableFor(state) && miner instanceof ServerPlayerEntity player) {
 			List<BlockPos> positions = getPositionsToOutline(player, stack, pos);
 			for (BlockPos newPos : positions) {
 				if (!EmcStoringItem.takeStoredEmcOrConsume(BLOCK_MINE_COST, stack, player.getInventory())) {
-					EmcStoringItem.showNoEmcMessage();
+					EmcStoringItem.sendNoEmcMessage(player);
 					break;
 				}
 				world.breakBlock(newPos, true, miner);
