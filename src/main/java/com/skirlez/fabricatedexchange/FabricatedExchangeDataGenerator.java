@@ -172,7 +172,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 			registerGeneratedModels(itemModelGenerator,
 				ModItems.PHILOSOPHERS_STONE, ModItems.ALCHEMICAL_COAL, ModItems.RADIANT_COAL, ModItems.MOBIUS_FUEL,
 				ModItems.AETERNALIS_FUEL, ModItems.LOW_COVALENCE_DUST, ModItems.MEDIUM_COVALENCE_DUST, 
-				ModItems.HIGH_COVALENCE_DUST, ModItems.DARK_MATTER, ModItems.RED_MATTER, ModItems.TOME_OF_KNOWLEDGE, 
+				ModItems.HIGH_COVALENCE_DUST, ModItems.LOW_DIVIDING_ROD, ModItems.MEDIUM_DIVIDING_ROD, ModItems.HIGH_DIVIDING_ROD, ModItems.DARK_MATTER, ModItems.RED_MATTER, ModItems.TOME_OF_KNOWLEDGE,
 				ModItems.TRANSMUTATION_TABLET, ModItems.IRON_BAND, ModItems.ITEM_ORB, ModItems.DARK_MATTER_BOOTS, 
 				ModItems.DARK_MATTER_LEGGINGS, ModItems.DARK_MATTER_CHESTPLATE, ModItems.DARK_MATTER_HELMET,
 				ModItems.RED_MATTER_BOOTS, ModItems.RED_MATTER_LEGGINGS, ModItems.RED_MATTER_CHESTPLATE,
@@ -267,7 +267,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 			TagKey<Item> coal = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "coal"));
 
 			ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.LOW_COVALENCE_DUST, 40)
-				.input(coal)
+				.input(Items.CHARCOAL)
 				.input(Items.COBBLESTONE, 8)
 				.criterion("has_coal", FabricRecipeProvider.conditionsFromTag(coal))
 				.offerTo(exporter);
@@ -286,10 +286,10 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 
 			ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.HIGH_COVALENCE_DUST, 40)
 				.input(diamond)
-				.input(coal)
-				.input(coal)
-				.input(coal)
-				.input(coal)
+				.input(Items.COAL)
+				.input(Items.COAL)
+				.input(Items.COAL)
+				.input(Items.COAL)
 				.criterion("has_diamond", FabricRecipeProvider.conditionsFromTag(diamond))
 				.criterion("has_coal", FabricRecipeProvider.conditionsFromTag(coal))
 				.offerTo(exporter);

@@ -6,16 +6,16 @@
       "tag": "c:diamonds"
     },
     {
-      "tag": "c:coal"
+      "item": "minecraft:coal"
     },
     {
-      "tag": "c:coal"
+      "item": "minecraft:coal"
     },
     {
-      "tag": "c:coal"
+      "item": "minecraft:coal"
     },
     {
-      "tag": "c:coal"
+      "item": "minecraft:coal"
     }
   ],
   "result": {
