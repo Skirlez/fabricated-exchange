@@ -15,7 +15,6 @@ import net.minecraft.inventory.StackReference;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.ClickType;
 import net.minecraft.util.math.Vec3d;
@@ -26,6 +25,7 @@ public class SwiftWolfsRendingGale extends FlyingAbilityItem
 		implements ExtraFunctionItem, ItemWithModes, EmcStoringItem {
 
 	public static final String FLYING_MODEL_KEY = "CustomModelData";
+	public static final SuperNumber REFUEL_VALUE = new SuperNumber(2);
 	
 	public SwiftWolfsRendingGale(Settings settings) {
 		super(settings);
@@ -94,7 +94,7 @@ public class SwiftWolfsRendingGale extends FlyingAbilityItem
 				if (shouldSubtract)
 					storedEmc.subtract(BigInteger.ONE);
 			}
-			if (!storedEmc.isPositive())
+			if (storedEmc.compareTo(REFUEL_VALUE) <= 0)
 				storedEmc = EmcStoringItem.tryConsumeEmc(DESIRED_AMOUNT, stack, player.getInventory());
 			EmcStoringItem.setStoredEmc(stack, storedEmc);
 		}

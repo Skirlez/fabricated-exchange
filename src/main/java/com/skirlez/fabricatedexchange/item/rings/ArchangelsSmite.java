@@ -4,6 +4,7 @@ import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.item.EmcStoringItem;
 import com.skirlez.fabricatedexchange.item.ExtraFunctionItem;
 import com.skirlez.fabricatedexchange.item.ItemWithModes;
+import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.mixin.ItemAccessor;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import net.minecraft.entity.Entity;
@@ -195,7 +196,9 @@ public class ArchangelsSmite extends Item
 	}
 
 	public static boolean isAngry(ItemStack stack) {
-		return ItemWithModes.getMode(stack) == 2;
+		if (stack.getItem() instanceof ArchangelsSmite item)
+			return item.autoshoot;
+		return false;
 	}
 	
 }
