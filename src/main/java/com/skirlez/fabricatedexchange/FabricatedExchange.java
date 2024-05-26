@@ -1,5 +1,6 @@
 package com.skirlez.fabricatedexchange;
 
+import com.skirlez.fabricatedexchange.item.ModEntities;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -61,6 +62,7 @@ public class FabricatedExchange implements ModInitializer {
 		ModItems.registerModItems();
 		ModSounds.registerSoundEvents();
 		ModBlocks.registerModBlocks();
+		ModEntities.registerEntities();
 		ModBlockEntities.registerBlockEntities();
 		ModScreenHandlers.registerAllScreenHandlers();
 		ModClientToServerPackets.register();

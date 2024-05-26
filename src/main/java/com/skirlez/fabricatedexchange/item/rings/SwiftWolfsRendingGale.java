@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 import com.skirlez.fabricatedexchange.item.*;
+import com.skirlez.fabricatedexchange.item.projectiles.TornadoThrownEntity;
 import com.skirlez.fabricatedexchange.mixin.ItemAccessor;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
@@ -35,8 +36,18 @@ public class SwiftWolfsRendingGale extends FlyingAbilityItem
 
 	@Override
 	public void doExtraFunction(ItemStack stack, ServerPlayerEntity player) {
-		// Implement the specific extra function logic here
-		// stack.getOrCreateNbt().putInt("CustomModelData", 1);
+
+		if(HadEnoughEMC(stack,player) && !player.getItemCooldownManager().isCoolingDown(this)) {
+			World world = player.world;
+			Vec3d direction = player.getRotationVec(1.0F);
+
+			TornadoThrownEntity projectile = new TornadoThrownEntity(world, player);
+			projectile.setVelocity(direction.x, direction.y, direction.z, 2.5F, 0F);
+
+			world.spawnEntity(projectile);
+
+			player.getItemCooldownManager().set(this, 10);
+		}
 	}
 
 	@Override
@@ -132,6 +143,27 @@ public class SwiftWolfsRendingGale extends FlyingAbilityItem
 	public void onDropped(PlayerEntity player, ItemStack stack) {
 		stack.getOrCreateNbt().putInt(FLYING_MODEL_KEY, 0);
 		super.onDropped(player, stack);
+	}
+
+
+	public boolean HadEnoughEMC(ItemStack stack, ServerPlayerEntity player){
+		SuperNumber storedEmc = EmcStoringItem.getStoredEmc(stack);
+
+		int tempAmount = DESIRED_AMOUNT.toInt(0);
+		SuperNumber BIG_DESIRED_AMOUNT = new SuperNumber(tempAmount * (ChargeableItem.getCharge(stack)+1));
+
+		if(storedEmc.compareTo(BIG_DESIRED_AMOUNT) < 0) {
+			storedEmc = EmcStoringItem.tryConsumeEmc(BIG_DESIRED_AMOUNT, stack, player.getInventory());
+
+			if(storedEmc.compareTo(BIG_DESIRED_AMOUNT) < 0) {
+				return false;
+			}
+		}
+
+		storedEmc.subtract(BIG_DESIRED_AMOUNT);
+		EmcStoringItem.setStoredEmc(stack, storedEmc);
+
+		return true;
 	}
 }
 

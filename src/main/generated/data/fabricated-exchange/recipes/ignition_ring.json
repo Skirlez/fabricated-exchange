@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "D": {
+      "item": "fabricated-exchange:dark_matter"
+    },
+    "F": {
+      "item": "minecraft:flint_and_steel"
+    },
+    "M": {
+      "item": "fabricated-exchange:mobius_fuel"
+    },
+    "B": {
+      "item": "fabricated-exchange:iron_band"
+    }
+  },
+  "pattern": [
+    "FMF",
+    "DBD",
+    "FMF"
+  ],
+  "result": {
+    "item": "fabricated-exchange:ignition_ring"
+  },
+  "show_notification": true
+}

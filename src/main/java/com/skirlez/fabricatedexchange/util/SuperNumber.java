@@ -345,7 +345,7 @@ public class SuperNumber {
 			String numeratorString = numerator.toString();
 			int zeroLen;
 			boolean isPower;
-			if (divisionString.startsWith(numeratorString)) { 
+			if (divisionString.startsWith(numeratorString)) {
 				isPower = true;
 				for (int i = numeratorString.length(); i < divisionString.length(); i++) {
 					if (divisionString.charAt(i) != '0') {

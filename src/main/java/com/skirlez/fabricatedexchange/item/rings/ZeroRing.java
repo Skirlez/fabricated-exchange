@@ -1,12 +1,11 @@
 package com.skirlez.fabricatedexchange.item.rings;
 
 import com.skirlez.fabricatedexchange.emc.EmcData;
+import com.skirlez.fabricatedexchange.item.projectiles.FrozenThrownEntity;
 import com.skirlez.fabricatedexchange.item.rings.base.FEShooterRing;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ArrowEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -15,25 +14,24 @@ import net.minecraft.world.World;
 import java.util.List;
 import java.util.Random;
 
-public class ArchangelsSmite extends FEShooterRing {
+public class ZeroRing extends FEShooterRing {
 
-	public ArchangelsSmite(Settings settings) {
+	public ZeroRing(Settings settings) {
 		super(settings);
 	}
 
 	@Override
 	protected SuperNumber getProjectileEMC() {
-		return EmcData.getItemEmc(Items.ARROW);
+		return EmcData.getItemEmc(Items.POWDER_SNOW_BUCKET);
 	}
 
 	@Override
 	protected void fireSingleProjectile(World world, PlayerEntity user, float speed, float divergence) {
-		ArrowEntity arrow = new ArrowEntity(world, user);
-		arrow.updatePosition(user.getX(), user.getEyeY() - 0.1, user.getZ());
-		Vec3d vec3d = user.getRotationVec(1.0F);
-		arrow.setVelocity(vec3d.x, vec3d.y, vec3d.z, speed, divergence);
-		arrow.pickupType = ArrowEntity.PickupPermission.DISALLOWED;
-		world.spawnEntity(arrow);
+		Vec3d direction = user.getRotationVec(1.0F).normalize();
+		FrozenThrownEntity frozenProjectile = new FrozenThrownEntity(world, user);
+		frozenProjectile.setPosition(user.getX() + direction.x * 2, user.getEyeY() - 1, user.getZ() + direction.z * 2);
+		frozenProjectile.setVelocity(direction.x, direction.y, direction.z, speed, divergence);
+		world.spawnEntity(frozenProjectile);
 	}
 
 	@Override
@@ -53,12 +51,11 @@ public class ArchangelsSmite extends FEShooterRing {
 			}
 
 			if (closestEntity != null) {
-				Vec3d direction = closestEntity.getPos().subtract(user.getPos().offset(Direction.UP, 0.5)).normalize();
-				ArrowEntity arrow = new ArrowEntity(world, user);
-				arrow.updatePosition(user.getX(), user.getEyeY() - 0.1, user.getZ());
-				arrow.setVelocity(direction.x, direction.y, direction.z, speed, divergence);
-				arrow.pickupType = ArrowEntity.PickupPermission.DISALLOWED;
-				world.spawnEntity(arrow);
+				Vec3d direction = closestEntity.getPos().subtract(user.getPos().offset(Direction.UP, 1)).normalize();
+				FrozenThrownEntity frozenProjectile = new FrozenThrownEntity(world, user);
+				frozenProjectile.setPosition(user.getX() + direction.x * 2, user.getEyeY() + direction.y, user.getZ() + direction.z * 2);
+				frozenProjectile.setVelocity(direction.x, direction.y, direction.z, speed, divergence);
+				world.spawnEntity(frozenProjectile);
 				user.getItemCooldownManager().set(this, 5);
 				triggered = true;
 			}
@@ -75,18 +72,9 @@ public class ArchangelsSmite extends FEShooterRing {
 				random.nextDouble() * 2 - 1,
 				random.nextDouble() * 2 - 1
 		).normalize();
-		ArrowEntity arrow = new ArrowEntity(world, user);
-		arrow.setPosition(user.getX() + direction.x * 2, user.getEyeY() - 1, user.getZ() + direction.z * 2);
-		arrow.setVelocity(direction.x, direction.y, direction.z, speed, divergence);
-		arrow.pickupType = ArrowEntity.PickupPermission.DISALLOWED;
-		world.spawnEntity(arrow);
+		FrozenThrownEntity frozenProjectile = new FrozenThrownEntity(world, user);
+		frozenProjectile.setPosition(user.getX() + direction.x * 2, user.getEyeY() - 1, user.getZ() + direction.z * 2);
+		frozenProjectile.setVelocity(direction.x, direction.y, direction.z, speed, divergence);
+		world.spawnEntity(frozenProjectile);
 	}
-
-	public static boolean isAngry(ItemStack stack) {
-		if (stack.getItem() instanceof ArchangelsSmite item)
-			return item.autoshoot;
-		return false;
-	}
-
 }
-
