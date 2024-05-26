@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 public class ZeroRing extends FEShooterRing {
-
+	
 	public ZeroRing(Settings settings) {
 		super(settings);
 	}
