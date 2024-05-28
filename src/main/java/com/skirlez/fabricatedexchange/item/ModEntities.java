@@ -44,10 +44,5 @@ public class ModEntities {
         Registry.register(Registries.ENTITY_TYPE, new Identifier("fabricated-exchange", "lava_projectile"), LAVA_PROJECTILE);
         Registry.register(Registries.ENTITY_TYPE, new Identifier("fabricated-exchange", "tornado_projectile"), TORNADO_PROJECTILE);
         Registry.register(Registries.ENTITY_TYPE, new Identifier("fabricated-exchange", "frozen_projectile"), FROZEN_PROJECTILE);
-
-        EntityRendererRegistry.register(ModEntities.WATER_PROJECTILE, FlyingItemEntityRenderer::new);
-        EntityRendererRegistry.register(ModEntities.LAVA_PROJECTILE, FlyingItemEntityRenderer::new);
-        EntityRendererRegistry.register(ModEntities.TORNADO_PROJECTILE, FlyingItemEntityRenderer::new);
-        EntityRendererRegistry.register(ModEntities.FROZEN_PROJECTILE, FlyingItemEntityRenderer::new);
     }
 }
