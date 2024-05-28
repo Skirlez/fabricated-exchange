@@ -2,8 +2,8 @@ package com.skirlez.fabricatedexchange.item;
 
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.item.extras.ItemOrb;
-import com.skirlez.fabricatedexchange.item.rings.ArchangelsSmite;
-import com.skirlez.fabricatedexchange.item.rings.SwiftWolfsRendingGale;
+import com.skirlez.fabricatedexchange.item.rings.*;
+import com.skirlez.fabricatedexchange.item.stones.GemOfEternalDensity;
 import com.skirlez.fabricatedexchange.item.tools.*;
 
 import com.skirlez.fabricatedexchange.item.tools.DiviningRod;
@@ -35,11 +35,11 @@ public class ModItems {
 			new Item(new FabricItemSettings()));
 	
 	public static final Item LOW_DIVIDING_ROD = registerItemWithGroup("low_divining_rod",
-			new DiviningRod(new FabricItemSettings(), 3));
+			new DiviningRod(new FabricItemSettings().maxCount(1), 3));
 	public static final Item MEDIUM_DIVIDING_ROD = registerItemWithGroup("medium_divining_rod",
-			new DiviningRod(new FabricItemSettings(), 16));
+			new DiviningRod(new FabricItemSettings().maxCount(1), 16));
 	public static final Item HIGH_DIVIDING_ROD = registerItemWithGroup("high_divining_rod",
-			new DiviningRod(new FabricItemSettings(), 64));
+			new DiviningRod(new FabricItemSettings().maxCount(1), 64));
 	
 	public static final Item IRON_BAND = registerItemWithGroup("iron_band", new Item(new FabricItemSettings()));
 	public static final Item DARK_MATTER = registerItemWithGroup("dark_matter", new Item(new FabricItemSettings()));
@@ -48,6 +48,11 @@ public class ModItems {
 			new Item(new FabricItemSettings()));
 
 	public static final Item ITEM_ORB = registerItem("item_orb", new ItemOrb(new FabricItemSettings().maxCount(1)));
+	public static final Item WATER_ORB = registerItem("water_orb", new Item(new FabricItemSettings().maxCount(1)));
+	public static final Item LAVA_ORB = registerItem("lava_orb", new Item(new FabricItemSettings().maxCount(1)));
+	public static final Item TORNADO_ORB = registerItem("tornado_orb", new Item(new FabricItemSettings().maxCount(1)));
+
+	public static final Item FROZEN_ORB = registerItem("frozen_orb", new Item(new FabricItemSettings().maxCount(1)));
 
 	public static final Item DARK_MATTER_SWORD = registerItemWithGroup("dark_matter_sword",
 			new MatterSword(ModToolMaterials.DARK_MATTER_MATERIAL, 12, -2.4f, new Item.Settings().fireproof()));
@@ -103,6 +108,24 @@ public class ModItems {
 
 	public static final Item REPAIR_TALISMAN = registerItemWithGroup("repair_talisman",
 			new RepairTalisman(new FabricItemSettings().maxCount(1)));
+
+	public static final Item GEM_OF_ETERNAL_DENSITY = registerItemWithGroup("gem_of_eternal_density",
+			new GemOfEternalDensity(new FabricItemSettings().maxCount(1)));
+
+	public static final Item BLACK_HOLE_BAND = registerItemWithGroup("black_hole_band",
+			new BlackHoleBand(new FabricItemSettings().maxCount(1)));
+
+	public static final Item IGNITION_RING = registerItemWithGroup("ignition_ring",
+			new IgnitionRing(new FabricItemSettings().maxCount(1)));
+
+	public static final Item ZERO_RING = registerItemWithGroup("zero_ring",
+			new ZeroRing(new FabricItemSettings().maxCount(1)));
+
+	public static final Item EVERTIDE_AMULET = registerItemWithGroup("evertide_amulet",
+			new EvertideAmulet(new FabricItemSettings().maxCount(1)));
+
+	public static final Item VOLCANITE_AMULET = registerItemWithGroup("volcanite_amulet",
+			new VolcaniteAmulet(new FabricItemSettings().maxCount(1)));
 
 	private static Item registerItem(String name, Item item) {
 		Registry.register(Registries.ITEM, new Identifier(FabricatedExchange.MOD_ID, name), item);

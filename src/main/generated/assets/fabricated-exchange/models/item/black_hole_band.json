@@ -1,0 +1,14 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "fabricated-exchange:item/black_hole_off"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "custom_model_data": 1
+      },
+      "model": "fabricated-exchange:item/black_hole_on"
+    }
+  ]
+}

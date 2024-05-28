@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "D": {
+      "item": "fabricated-exchange:dark_matter"
+    },
+    "S": {
+      "item": "minecraft:string"
+    },
+    "B": {
+      "item": "fabricated-exchange:iron_band"
+    }
+  },
+  "pattern": [
+    "SSS",
+    "DBD",
+    "SSS"
+  ],
+  "result": {
+    "item": "fabricated-exchange:black_hole_band"
+  },
+  "show_notification": true
+}

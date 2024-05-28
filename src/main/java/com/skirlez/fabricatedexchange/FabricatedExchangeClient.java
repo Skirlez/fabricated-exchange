@@ -5,6 +5,7 @@ import com.skirlez.fabricatedexchange.block.EnergyCondenserBlockEntity;
 import com.skirlez.fabricatedexchange.block.ModBlockEntities;
 import com.skirlez.fabricatedexchange.block.ModBlocks;
 import com.skirlez.fabricatedexchange.event.KeyInputHandler;
+import com.skirlez.fabricatedexchange.item.ModEntityRenderers;
 import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.item.rings.ArchangelsSmite;
 import com.skirlez.fabricatedexchange.item.rings.SwiftWolfsRendingGale;
@@ -44,7 +45,7 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 		ModScreens.register();
 		KeyInputHandler.register();
 		ModServerToClientPackets.register();
-		
+		ModEntityRenderers.registerEntityRenderers();
 		
 		// we can use the vanilla renderers due to the texture mixin, see ModTexturedRenderLayers
 		BlockEntityRendererFactories.register(ModBlockEntities.ALCHEMICAL_CHEST, ChestBlockEntityRenderer::new);

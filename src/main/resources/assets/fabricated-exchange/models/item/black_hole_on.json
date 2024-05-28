@@ -1,0 +1,6 @@
+{
+    "parent": "minecraft:item/generated",
+    "textures": {
+        "layer0": "fabricated-exchange:item/black_hole_on"
+    }
+}
