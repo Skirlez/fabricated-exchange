@@ -45,16 +45,6 @@ public class BlackHoleBand extends Item
 	}
 
 	@Override
-	public boolean modeSwitchCondition(ItemStack stack) {
-		return true;
-	}
-	@Override
-	public ItemStack getDefaultStack() {
-		ItemStack stack = new ItemStack(this);
-		return stack;
-	}
-
-	@Override
 	public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
 		super.inventoryTick(stack, world, entity, slot, selected);
 

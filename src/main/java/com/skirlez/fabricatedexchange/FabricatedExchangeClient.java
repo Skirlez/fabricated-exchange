@@ -4,8 +4,8 @@ import com.skirlez.fabricatedexchange.block.AlchemicalChestBlockEntity;
 import com.skirlez.fabricatedexchange.block.EnergyCondenserBlockEntity;
 import com.skirlez.fabricatedexchange.block.ModBlockEntities;
 import com.skirlez.fabricatedexchange.block.ModBlocks;
+import com.skirlez.fabricatedexchange.entities.ModEntityRenderers;
 import com.skirlez.fabricatedexchange.event.KeyInputHandler;
-import com.skirlez.fabricatedexchange.item.ModEntityRenderers;
 import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.item.rings.ArchangelsSmite;
 import com.skirlez.fabricatedexchange.item.rings.SwiftWolfsRendingGale;
@@ -70,7 +70,7 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 		
 		ModelPredicateProviderRegistry.register(ModItems.ARCHANGELS_SMITE, new Identifier(FabricatedExchange.MOD_ID, "state"), 
 				(stack, world, entity, number) -> {
-			return ArchangelsSmite.isAngry(stack) ? 1f : 0f;
+			return ArchangelsSmite.shouldLookAngry(stack) ? 1f : 0f;
 		});
 
 		

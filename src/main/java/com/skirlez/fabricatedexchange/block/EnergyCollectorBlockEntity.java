@@ -100,11 +100,10 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 	public static int getLightLevelAbove(World world, BlockPos pos) {
 		if (ModDataFiles.MAIN_CONFIG_FILE.energyCollector_alwaysHaveEnergy)
 			return 15;
-		pos = pos.add(0, 1, 0);
-		
-		while (lightPassingBlocks.contains(world.getBlockState(pos).getBlock())) {
+
+		do {
 			pos = pos.add(0, 1, 0);
-		}
+		} while (lightPassingBlocks.contains(world.getBlockState(pos).getBlock()));
 		
 		
 		return Math.min(world.getLightLevel(LightType.SKY, pos) - world.getAmbientDarkness(), 15);

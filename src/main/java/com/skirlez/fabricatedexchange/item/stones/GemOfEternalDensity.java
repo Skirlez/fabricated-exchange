@@ -23,151 +23,151 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GemOfEternalDensity extends Item
-        implements ExtraFunctionItem, ItemWithModes {
+		implements ExtraFunctionItem, ItemWithModes {
 
-    public boolean active = false;
-    public static final String ACTIVE_MODEL_KEY = "CustomModelData";
+	public boolean active = false;
+	public static final String ACTIVE_MODEL_KEY = "CustomModelData";
 
-    private static final Item[][] validItemsPerMode = new Item[][]{
-            {Items.DIORITE, Items.ANDESITE, Items.GRANITE, Items.TUFF, Items.COBBLESTONE, Items.STONE, Items.COBBLED_DEEPSLATE, Items.DEEPSLATE},
-            {Items.DIORITE, Items.ANDESITE, Items.GRANITE, Items.TUFF, Items.COBBLESTONE, Items.STONE, Items.COBBLED_DEEPSLATE, Items.DEEPSLATE, Items.RAW_IRON},
-            {Items.DIORITE, Items.ANDESITE, Items.GRANITE, Items.TUFF, Items.COBBLESTONE, Items.STONE, Items.COBBLED_DEEPSLATE, Items.DEEPSLATE, Items.RAW_IRON, Items.RAW_GOLD},
-            {Items.DIORITE, Items.ANDESITE, Items.GRANITE, Items.TUFF, Items.COBBLESTONE, Items.STONE, Items.COBBLED_DEEPSLATE, Items.DEEPSLATE, Items.RAW_IRON, Items.RAW_GOLD, Items.DIAMOND}
-    };    private static final Map<Item, Item> itemMapper = new HashMap<>();
+	private static final Item[][] validItemsPerMode = new Item[][]{
+			{Items.DIORITE, Items.ANDESITE, Items.GRANITE, Items.TUFF, Items.COBBLESTONE, Items.STONE, Items.COBBLED_DEEPSLATE, Items.DEEPSLATE},
+			{Items.DIORITE, Items.ANDESITE, Items.GRANITE, Items.TUFF, Items.COBBLESTONE, Items.STONE, Items.COBBLED_DEEPSLATE, Items.DEEPSLATE, Items.RAW_IRON},
+			{Items.DIORITE, Items.ANDESITE, Items.GRANITE, Items.TUFF, Items.COBBLESTONE, Items.STONE, Items.COBBLED_DEEPSLATE, Items.DEEPSLATE, Items.RAW_IRON, Items.RAW_GOLD},
+			{Items.DIORITE, Items.ANDESITE, Items.GRANITE, Items.TUFF, Items.COBBLESTONE, Items.STONE, Items.COBBLED_DEEPSLATE, Items.DEEPSLATE, Items.RAW_IRON, Items.RAW_GOLD, Items.DIAMOND}
+	};	private static final Map<Item, Item> itemMapper = new HashMap<>();
 
-    static {
-        itemMapper.put(Items.COBBLESTONE, Items.RAW_IRON);
-        itemMapper.put(Items.STONE, Items.RAW_IRON);
-        itemMapper.put(Items.DEEPSLATE, Items.RAW_IRON);
-        itemMapper.put(Items.COBBLED_DEEPSLATE, Items.RAW_IRON);
-        itemMapper.put(Items.GRANITE, Items.RAW_IRON);
-        itemMapper.put(Items.ANDESITE, Items.RAW_IRON);
-        itemMapper.put(Items.DIORITE, Items.RAW_IRON);
-        itemMapper.put(Items.TUFF, Items.RAW_IRON);
-        itemMapper.put(Items.RAW_IRON, Items.RAW_GOLD);
-        itemMapper.put(Items.RAW_GOLD, Items.DIAMOND);
-        itemMapper.put(Items.DIAMOND, ModItems.DARK_MATTER);
-    }
+	static {
+		itemMapper.put(Items.COBBLESTONE, Items.RAW_IRON);
+		itemMapper.put(Items.STONE, Items.RAW_IRON);
+		itemMapper.put(Items.DEEPSLATE, Items.RAW_IRON);
+		itemMapper.put(Items.COBBLED_DEEPSLATE, Items.RAW_IRON);
+		itemMapper.put(Items.GRANITE, Items.RAW_IRON);
+		itemMapper.put(Items.ANDESITE, Items.RAW_IRON);
+		itemMapper.put(Items.DIORITE, Items.RAW_IRON);
+		itemMapper.put(Items.TUFF, Items.RAW_IRON);
+		itemMapper.put(Items.RAW_IRON, Items.RAW_GOLD);
+		itemMapper.put(Items.RAW_GOLD, Items.DIAMOND);
+		itemMapper.put(Items.DIAMOND, ModItems.DARK_MATTER);
+	}
 
-    public GemOfEternalDensity(Settings settings) {
-        super(settings);
-    }
+	public GemOfEternalDensity(Settings settings) {
+		super(settings);
+	}
 
-    @Override
-    public void doExtraFunction(ItemStack stack, ServerPlayerEntity player) {
-        active = !active;
-    }
+	@Override
+	public void doExtraFunction(ItemStack stack, ServerPlayerEntity player) {
+		active = !active;
+	}
 
-    @Override
-    public int getModeAmount() {
-        return 4;
-    }
+	@Override
+	public int getModeAmount() {
+		return 4;
+	}
 
-    @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-        super.inventoryTick(stack, world, entity, slot, selected);
+	@Override
+	public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
+		super.inventoryTick(stack, world, entity, slot, selected);
 
-        if (active) {
-            stack.getOrCreateNbt().putInt(ACTIVE_MODEL_KEY, 1);
-            if (entity instanceof PlayerEntity player) {
-                PlayerInventory inventory = player.getInventory();
+		if (active) {
+			stack.getOrCreateNbt().putInt(ACTIVE_MODEL_KEY, 1);
+			if (entity instanceof PlayerEntity player) {
+				PlayerInventory inventory = player.getInventory();
 
-                // Get the current NBT data of the gem
-                NbtCompound gemNbt = stack.getNbt();
-                if (gemNbt == null) {
-                    gemNbt = new NbtCompound();
-                }
+				// Get the current NBT data of the gem
+				NbtCompound gemNbt = stack.getNbt();
+				if (gemNbt == null) {
+					gemNbt = new NbtCompound();
+				}
 
-                int mode = gemNbt.getInt("FE_Mode");
-                Item[] validItems = validItemsPerMode[mode];
+				int mode = gemNbt.getInt("FE_Mode");
+				Item[] validItems = validItemsPerMode[mode];
 
-                // Iterate over the inventory
-                for (int i = 0; i < inventory.size(); i++) {
-                    ItemStack itemStack = inventory.getStack(i);
+				// Iterate over the inventory
+				for (int i = 0; i < inventory.size(); i++) {
+					ItemStack itemStack = inventory.getStack(i);
 
-                    if (Arrays.asList(validItems).contains(itemStack.getItem())) {
-                        String itemKey = itemStack.getItem().toString();
+					if (Arrays.asList(validItems).contains(itemStack.getItem())) {
+						String itemKey = itemStack.getItem().toString();
 
-                        // Get the current count of the item in the gem's NBT data
-                        int currentCount = gemNbt.contains(itemKey, NbtElement.INT_TYPE) ? gemNbt.getInt(itemKey) : 0;
+						// Get the current count of the item in the gem's NBT data
+						int currentCount = gemNbt.contains(itemKey, NbtElement.INT_TYPE) ? gemNbt.getInt(itemKey) : 0;
 
-                        // Add the count of the item in the inventory to the gem's NBT data
-                        gemNbt.putInt(itemKey, currentCount + itemStack.getCount());
+						// Add the count of the item in the inventory to the gem's NBT data
+						gemNbt.putInt(itemKey, currentCount + itemStack.getCount());
 
-                        // Remove the item from the inventory
-                        inventory.removeStack(i);
-                    }
-                }
+						// Remove the item from the inventory
+						inventory.removeStack(i);
+					}
+				}
 
-                // Iterate over the NBT data of the gem
-                for (String key : gemNbt.getKeys()) {
+				// Iterate over the NBT data of the gem
+				for (String key : gemNbt.getKeys()) {
 
-                    if ("CustomModelData".equals(key) || "FE_Mode".equals(key)){
-                        continue;
-                    }
+					if ("CustomModelData".equals(key) || "FE_Mode".equals(key)){
+						continue;
+					}
 
-                    Item currentItem = Registries.ITEM.get(new Identifier(key));
-                    Item mappedItem = itemMapper.get(currentItem);
-                    int currentCount = gemNbt.getInt(key);
+					Item currentItem = Registries.ITEM.get(new Identifier(key));
+					Item mappedItem = itemMapper.get(currentItem);
+					int currentCount = gemNbt.getInt(key);
 
-                    SuperNumber currentItemEMC = EmcData.getItemEmc(currentItem);
-                    SuperNumber multiplierItemEMC = EmcData.getItemEmc(currentItem);
-                    SuperNumber mappedItemEMC = EmcData.getItemEmc(mappedItem);
+					SuperNumber currentItemEMC = EmcData.getItemEmc(currentItem);
+					SuperNumber multiplierItemEMC = EmcData.getItemEmc(currentItem);
+					SuperNumber mappedItemEMC = EmcData.getItemEmc(mappedItem);
 
-                    multiplierItemEMC.multiply(currentCount);
+					multiplierItemEMC.multiply(currentCount);
 
-                    int totalEMC = multiplierItemEMC.toInt(0);
-                    int neededEMC = mappedItemEMC.toInt(0);
-                    int originalEMC = currentItemEMC.toInt(0);
+					int totalEMC = multiplierItemEMC.toInt(0);
+					int neededEMC = mappedItemEMC.toInt(0);
+					int originalEMC = currentItemEMC.toInt(0);
 
-                    if (totalEMC == 0 || neededEMC == 0 || originalEMC == 0) {
-                        continue;
-                    }
+					if (totalEMC == 0 || neededEMC == 0 || originalEMC == 0) {
+						continue;
+					}
 
-                    if (totalEMC >= neededEMC) {
-                        int conversionCount = totalEMC / neededEMC;
-                        int remainingEMC = totalEMC % neededEMC;
-                        int remainingCount = remainingEMC / originalEMC;
+					if (totalEMC >= neededEMC) {
+						int conversionCount = totalEMC / neededEMC;
+						int remainingEMC = totalEMC % neededEMC;
+						int remainingCount = remainingEMC / originalEMC;
 
-                        gemNbt.putInt(key, remainingCount);
-                        player.giveItemStack(new ItemStack(mappedItem, conversionCount));
-                    }
-                }
+						gemNbt.putInt(key, remainingCount);
+						player.giveItemStack(new ItemStack(mappedItem, conversionCount));
+					}
+				}
 
-                // Update the NBT data of the gem
-                stack.setNbt(gemNbt);
-            }
-        } else {
-            stack.getOrCreateNbt().putInt(ACTIVE_MODEL_KEY, 0);
+				// Update the NBT data of the gem
+				stack.setNbt(gemNbt);
+			}
+		} else {
+			stack.getOrCreateNbt().putInt(ACTIVE_MODEL_KEY, 0);
 
-            if (entity instanceof PlayerEntity player) {
-                NbtCompound gemNbt = stack.getNbt();
-                if (gemNbt == null) {
-                    gemNbt = new NbtCompound();
-                }
+			if (entity instanceof PlayerEntity player) {
+				NbtCompound gemNbt = stack.getNbt();
+				if (gemNbt == null) {
+					gemNbt = new NbtCompound();
+				}
 
-                NbtCompound iteratorGemNbt = gemNbt.copy();
+				NbtCompound iteratorGemNbt = gemNbt.copy();
 
-                // Iterate over the NBT data of the gem
-                for (String key : iteratorGemNbt.getKeys()) {
-                    if ("CustomModelData".equals(key) || "FE_Mode".equals(key)) {
-                        continue;
-                    }
+				// Iterate over the NBT data of the gem
+				for (String key : iteratorGemNbt.getKeys()) {
+					if ("CustomModelData".equals(key) || "FE_Mode".equals(key)) {
+						continue;
+					}
 
-                    // Get the current count of the item in the gem's NBT data
-                    int currentCount = iteratorGemNbt.getInt(key);
+					// Get the current count of the item in the gem's NBT data
+					int currentCount = iteratorGemNbt.getInt(key);
 
-                    // Create a new ItemStack for the item and give it to the player
-                    Item currentItem = Registries.ITEM.get(new Identifier(key));
-                    player.giveItemStack(new ItemStack(currentItem, currentCount));
+					// Create a new ItemStack for the item and give it to the player
+					Item currentItem = Registries.ITEM.get(new Identifier(key));
+					player.giveItemStack(new ItemStack(currentItem, currentCount));
 
-                    // Remove the key from the gem's NBT data
-                    gemNbt.remove(key);
-                }
+					// Remove the key from the gem's NBT data
+					gemNbt.remove(key);
+				}
 
-                // Update the NBT data of the gem
-                stack.setNbt(gemNbt);
-            }
-        }
-    }
+				// Update the NBT data of the gem
+				stack.setNbt(gemNbt);
+			}
+		}
+	}
 }

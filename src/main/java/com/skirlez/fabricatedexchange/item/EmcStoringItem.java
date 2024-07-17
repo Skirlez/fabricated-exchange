@@ -106,13 +106,17 @@ public interface EmcStoringItem {
 					// but we don't want all of it - just enough to go over or to the desired amount
 					SuperNumber unitEmc = new SuperNumber(emc);
 					unitEmc.divide(invStack.getCount());
-					int decrease = 0;
-					while (sum.compareTo(desiredAmount) == -1) {
-						sum.add(unitEmc);
-						decrease++;
-					}
 					
-					invStack.decrement(decrease);
+					SuperNumber unitsNeeded = new SuperNumber(desiredAmount);
+					unitsNeeded.subtract(sum);
+					unitsNeeded.divide(unitEmc);
+					
+					int units = unitsNeeded.toInt(0);
+					
+					unitEmc.multiply(units);
+					sum.add(unitEmc);
+
+					invStack.decrement(units);
 					break;
 				}
 				

@@ -1,31 +1,67 @@
 package com.skirlez.fabricatedexchange.item.rings;
 
 import com.skirlez.fabricatedexchange.emc.EmcData;
-import com.skirlez.fabricatedexchange.item.rings.base.FEShooterRing;
+import com.skirlez.fabricatedexchange.item.EmcStoringItem;
+import com.skirlez.fabricatedexchange.item.ItemWithModes;
+import com.skirlez.fabricatedexchange.item.rings.base.ShooterRing;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
+import java.util.Comparator;
 import java.util.List;
-import java.util.Random;
+import java.util.Optional;
 
-public class ArchangelsSmite extends FEShooterRing {
+public class ArchangelsSmite extends ShooterRing implements ItemWithModes {
 
 	public ArchangelsSmite(Settings settings) {
 		super(settings);
 	}
 
-	@Override
-	protected SuperNumber getProjectileEMC() {
+	private SuperNumber getProjectileCost() {
 		return EmcData.getItemEmc(Items.ARROW);
 	}
 
+
+	public static boolean shouldLookAngry(ItemStack stack) {
+		if (stack.getItem() instanceof ArchangelsSmite item)
+			return item.autoshoot;
+		return false;
+	}
+
+
+	protected boolean consumeEmcAndFireProjectile(ItemStack stack, PlayerEntity player, Vec3d direction, World world) {
+		if (!EmcStoringItem.takeStoredEmcOrConsume(getProjectileCost(), stack, player.getInventory()))
+			return false;
+
+		ArrowEntity arrow = new ArrowEntity(world, player);
+		arrow.updatePosition(player.getX(), player.getEyeY() - 0.1, player.getZ());
+		arrow.setVelocity(direction.x, direction.y, direction.z, 3f, 0f);
+		// There's actually no reason why this should be disallowed, technically... you did pay for those
+		arrow.pickupType = ArrowEntity.PickupPermission.DISALLOWED;
+		world.spawnEntity(arrow);
+
+		return true;
+	}
+
+	@Override
+	protected void playShootSound(PlayerEntity player, World world) {
+		world.playSound(null, player.getX(), player.getY(), player.getZ(),
+			SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 1.0f,
+			1.0f / (world.getRandom().nextFloat() * 0.4f + 1.2f) + 0.5f);
+	}
+
+
+
+	/*
 	@Override
 	protected void fireSingleProjectile(World world, PlayerEntity user, float speed, float divergence) {
 		ArrowEntity arrow = new ArrowEntity(world, user);
@@ -82,11 +118,7 @@ public class ArchangelsSmite extends FEShooterRing {
 		world.spawnEntity(arrow);
 	}
 
-	public static boolean isAngry(ItemStack stack) {
-		if (stack.getItem() instanceof ArchangelsSmite item)
-			return item.autoshoot;
-		return false;
-	}
 
+	*/
 }
 

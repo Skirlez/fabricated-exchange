@@ -30,6 +30,15 @@ public interface ItemWithModes {
 			return 0;
 		return nbt.getInt(MODE_KEY);
 	}
+	public static <T extends Enum<T>> T getMode(ItemStack stack, T[] values) {
+		NbtCompound nbt = stack.getNbt();
+		if (nbt == null)
+			return values[0];
+		int mode = nbt.getInt(MODE_KEY);
+		if (values.length <= mode)
+			return values[0];
+		return values[nbt.getInt(MODE_KEY)];
+	}
 
 	public static void addModeToTooltip(ItemStack stack, List<Text> tooltip) {
 		int mode = getMode(stack);

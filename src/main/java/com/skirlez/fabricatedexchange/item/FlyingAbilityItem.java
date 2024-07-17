@@ -36,6 +36,7 @@ public abstract class FlyingAbilityItem extends Item {
 			enablePlayerFlying(player, stack);
 		} 
 		else if (!hasItemNow && hadItemBefore && player.getAbilities().allowFlying) {
+
 			disablePlayerFlying(player, stack);
 		}
 

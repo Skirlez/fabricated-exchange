@@ -37,8 +37,8 @@ public class ModDataFiles {
 	public static final DataFile<String[][]> BLOCK_TRANSMUTATION_MAP
 		= new DataFile<String[][]>(new TypeReference<String[][]>() {}, "block_transmutation_map.json");
 
-    public static final EqualTagsFile EQUAL_TAGS
-        = new EqualTagsFile("equal_tags.json");
+	public static final EqualTagsFile EQUAL_TAGS
+		= new EqualTagsFile("equal_tags.json");
 
 	public static final NbtItemsFile NBT_ITEMS
 		= new NbtItemsFile("nbt_items.json");

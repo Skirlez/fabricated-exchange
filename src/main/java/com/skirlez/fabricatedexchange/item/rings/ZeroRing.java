@@ -1,80 +1,57 @@
 package com.skirlez.fabricatedexchange.item.rings;
 
 import com.skirlez.fabricatedexchange.emc.EmcData;
-import com.skirlez.fabricatedexchange.item.projectiles.FrozenThrownEntity;
-import com.skirlez.fabricatedexchange.item.rings.base.FEShooterRing;
+import com.skirlez.fabricatedexchange.entities.FrozenThrownEntity;
+import com.skirlez.fabricatedexchange.item.EmcStoringItem;
+import com.skirlez.fabricatedexchange.item.rings.base.ShooterRing;
+import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.util.List;
 import java.util.Random;
 
-public class ZeroRing extends FEShooterRing {
+public class ZeroRing extends ShooterRing {
 	
 	public ZeroRing(Settings settings) {
 		super(settings);
 	}
 
 	@Override
-	protected SuperNumber getProjectileEMC() {
-		return EmcData.getItemEmc(Items.POWDER_SNOW_BUCKET);
-	}
-
-	@Override
-	protected void fireSingleProjectile(World world, PlayerEntity user, float speed, float divergence) {
-		Vec3d direction = user.getRotationVec(1.0F).normalize();
-		FrozenThrownEntity frozenProjectile = new FrozenThrownEntity(world, user);
-		frozenProjectile.setPosition(user.getX() + direction.x * 2, user.getEyeY() - 1, user.getZ() + direction.z * 2);
-		frozenProjectile.setVelocity(direction.x, direction.y, direction.z, speed, divergence);
+	protected boolean consumeEmcAndFireProjectile(ItemStack stack, PlayerEntity player, Vec3d direction, World world) {
+		if (!EmcStoringItem.takeStoredEmcOrConsume(getProjectileCost(), stack, player.getInventory()))
+			return false;
+		FrozenThrownEntity frozenProjectile = new FrozenThrownEntity(world, player);
+		frozenProjectile.setPosition(player.getX(), player.getEyeY(), player.getZ());
+		frozenProjectile.setVelocity(direction.x, direction.y, direction.z, 3.0f, 0f);
 		world.spawnEntity(frozenProjectile);
+		return true;
 	}
 
 	@Override
-	protected boolean fireHomingProjectile(World world, PlayerEntity user, float speed, float divergence) {
-		var triggered = false;
-		if (!user.getItemCooldownManager().isCoolingDown(this)) {
-			List<LivingEntity> entities = world.getEntitiesByClass(LivingEntity.class, user.getBoundingBox().expand(20), entity -> entity != user);
-			LivingEntity closestEntity = null;
-			double closestDistance = Double.MAX_VALUE;
+	protected void playShootSound(PlayerEntity player, World world) {
 
-			for (LivingEntity entity : entities) {
-				double distance = user.squaredDistanceTo(entity);
-				if (distance < closestDistance && isVisible(user, entity, world)) {
-					closestEntity = entity;
-					closestDistance = distance;
-				}
-			}
-
-			if (closestEntity != null) {
-				Vec3d direction = closestEntity.getPos().subtract(user.getPos().offset(Direction.UP, 1)).normalize();
-				FrozenThrownEntity frozenProjectile = new FrozenThrownEntity(world, user);
-				frozenProjectile.setPosition(user.getX() + direction.x * 2, user.getEyeY() + direction.y, user.getZ() + direction.z * 2);
-				frozenProjectile.setVelocity(direction.x, direction.y, direction.z, speed, divergence);
-				world.spawnEntity(frozenProjectile);
-				user.getItemCooldownManager().set(this, 5);
-				triggered = true;
-			}
-		}
-		return triggered;
 	}
 
-	@Override
-	protected void fireChaosProjectile(World world, PlayerEntity user, float speed, float divergence) {
-		Random random = new Random();
 
-		Vec3d direction = new Vec3d(
-				random.nextDouble() * 2 - 1,
-				random.nextDouble() * 2 - 1,
-				random.nextDouble() * 2 - 1
-		).normalize();
-		FrozenThrownEntity frozenProjectile = new FrozenThrownEntity(world, user);
-		frozenProjectile.setPosition(user.getX() + direction.x * 2, user.getEyeY() - 1, user.getZ() + direction.z * 2);
-		frozenProjectile.setVelocity(direction.x, direction.y, direction.z, speed, divergence);
-		world.spawnEntity(frozenProjectile);
+	private static SuperNumber FAILSAFE_COST = new SuperNumber(16);
+
+	protected SuperNumber getProjectileCost() {
+		SuperNumber powderSnowBucketEmc = EmcData.getItemEmc(Items.POWDER_SNOW_BUCKET);
+		SuperNumber bucketEmc = EmcData.getItemEmc(Items.BUCKET);
+		if (powderSnowBucketEmc.equalsZero() || bucketEmc.equalsZero())
+			return FAILSAFE_COST;
+		powderSnowBucketEmc.subtract(bucketEmc);
+		return bucketEmc;
 	}
+
+
+
 }

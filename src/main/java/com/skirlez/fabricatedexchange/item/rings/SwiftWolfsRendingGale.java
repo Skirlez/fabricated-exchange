@@ -3,8 +3,8 @@ package com.skirlez.fabricatedexchange.item.rings;
 import java.math.BigInteger;
 import java.util.List;
 
+import com.skirlez.fabricatedexchange.entities.TornadoThrownEntity;
 import com.skirlez.fabricatedexchange.item.*;
-import com.skirlez.fabricatedexchange.item.projectiles.TornadoThrownEntity;
 import com.skirlez.fabricatedexchange.mixin.ItemAccessor;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
@@ -26,7 +26,6 @@ public class SwiftWolfsRendingGale extends FlyingAbilityItem
 		implements ExtraFunctionItem, ItemWithModes, EmcStoringItem {
 
 	public static final String FLYING_MODEL_KEY = "CustomModelData";
-	public static final SuperNumber REFUEL_VALUE = new SuperNumber(2);
 	
 	public SwiftWolfsRendingGale(Settings settings) {
 		super(settings);
@@ -34,14 +33,18 @@ public class SwiftWolfsRendingGale extends FlyingAbilityItem
 		self.setRecipeRemainder(this);
 	}
 
+	
+	private static final SuperNumber PROJECTILE_COST = new SuperNumber(128);
+	
 	@Override
 	public void doExtraFunction(ItemStack stack, ServerPlayerEntity player) {
 
-		if(HadEnoughEMC(stack,player) && !player.getItemCooldownManager().isCoolingDown(this)) {
+		if (!player.getItemCooldownManager().isCoolingDown(this)
+				&& EmcStoringItem.takeStoredEmcOrConsume(PROJECTILE_COST, stack, player.getInventory())) {
 			World world = player.world;
 			Vec3d direction = player.getRotationVec(1.0F);
 
-			TornadoThrownEntity projectile = new TornadoThrownEntity(world, player);
+			TornadoThrownEntity projectile = new TornadoThrownEntity(player, world);
 			projectile.setVelocity(direction.x, direction.y, direction.z, 2.5F, 0F);
 
 			world.spawnEntity(projectile);
@@ -56,10 +59,6 @@ public class SwiftWolfsRendingGale extends FlyingAbilityItem
 	}
 
 	@Override
-	public boolean modeSwitchCondition(ItemStack stack) {
-		return true;
-	}
-	@Override
 	public ItemStack getDefaultStack() {
 		ItemStack stack = new ItemStack(this);
 		stack.getOrCreateNbt().putString(EmcStoringItem.EMC_NBT_KEY, "0");
@@ -73,13 +72,7 @@ public class SwiftWolfsRendingGale extends FlyingAbilityItem
 		super.inventoryTick(stack, world, entity, slot, selected);
 
 		if (entity instanceof PlayerEntity player) {
-		
 			SuperNumber storedEmc = EmcStoringItem.getStoredEmc(stack);
-			if (storedEmc.equalsZero()) {
-				storedEmc = EmcStoringItem.tryConsumeEmc(DESIRED_AMOUNT, stack, player.getInventory());
-				if (storedEmc.equalsZero())
-					return;
-			}
 			boolean shouldSubtract = player.age % 3 == 0;
 			
 			
@@ -105,7 +98,8 @@ public class SwiftWolfsRendingGale extends FlyingAbilityItem
 				if (shouldSubtract)
 					storedEmc.subtract(BigInteger.ONE);
 			}
-			if (storedEmc.compareTo(REFUEL_VALUE) <= 0)
+			
+			if (storedEmc.equalsZero())
 				storedEmc = EmcStoringItem.tryConsumeEmc(DESIRED_AMOUNT, stack, player.getInventory());
 			EmcStoringItem.setStoredEmc(stack, storedEmc);
 		}
@@ -124,11 +118,11 @@ public class SwiftWolfsRendingGale extends FlyingAbilityItem
 	}
 
 	public static boolean isOn(ItemStack stack) {
-		return stack.getNbt() == null ? false : stack.getNbt().getInt(FLYING_MODEL_KEY) == 1 ? true : false;
+		return stack.getNbt() != null && (stack.getNbt().getInt(FLYING_MODEL_KEY) == 1);
 	}
 	
 	public static boolean isRepelling(ItemStack stack) {
-		return ItemWithModes.getMode(stack) == 1 ? true : false;
+		return ItemWithModes.getMode(stack) == 1;
 	}
 	
 	@Override
@@ -145,25 +139,5 @@ public class SwiftWolfsRendingGale extends FlyingAbilityItem
 		super.onDropped(player, stack);
 	}
 
-
-	public boolean HadEnoughEMC(ItemStack stack, ServerPlayerEntity player){
-		SuperNumber storedEmc = EmcStoringItem.getStoredEmc(stack);
-
-		int tempAmount = DESIRED_AMOUNT.toInt(0);
-		SuperNumber BIG_DESIRED_AMOUNT = new SuperNumber(tempAmount * (ChargeableItem.getCharge(stack)+1));
-
-		if(storedEmc.compareTo(BIG_DESIRED_AMOUNT) < 0) {
-			storedEmc = EmcStoringItem.tryConsumeEmc(BIG_DESIRED_AMOUNT, stack, player.getInventory());
-
-			if(storedEmc.compareTo(BIG_DESIRED_AMOUNT) < 0) {
-				return false;
-			}
-		}
-
-		storedEmc.subtract(BIG_DESIRED_AMOUNT);
-		EmcStoringItem.setStoredEmc(stack, storedEmc);
-
-		return true;
-	}
 }
 

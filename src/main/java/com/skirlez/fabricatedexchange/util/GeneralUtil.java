@@ -14,6 +14,8 @@ import net.fabricmc.api.Environment;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
@@ -32,6 +34,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -119,86 +122,101 @@ public abstract class GeneralUtil {
 	}
 	
 	
-    public static Optional<Item> getAnyItemFromItemTag(TagKey<Item> tag) {
-        Optional<Named<Item>> optionalNamed = Registries.ITEM.getEntryList(tag);
-        if (optionalNamed.isEmpty())
-            return Optional.empty();
-        Named<Item> named = optionalNamed.get();
-        if (named.size() == 0)
-            return Optional.empty();
-        return Optional.of(named.get(0).value());
-    }
-    
-    private static Item[] emptyArr = new Item[0];
-    
-    public static <T extends ItemConvertible> Item[] getItemsFromTag(TagKey<T> tag, DefaultedRegistry<T> registry) {
-        Optional<Named<T>> optionalNamed = registry.getEntryList(tag);
-        if (optionalNamed.isEmpty())
-            return emptyArr;
-        Named<T> named = optionalNamed.get();
-        Item[] array = new Item[named.size()];
-        for (int i = 0; i < named.size(); i++)
-            array[i] = named.get(i).value().asItem();
-        return array;
-    }
-    
-    public static Item[] getItemsFromTagString(String tagString) {
-        Identifier tagId = new Identifier(tagString);
-        TagKey<Item> tag = Registries.ITEM.streamTags().filter((key) -> key.id().equals(tagId)).findFirst().orElse(null);
-        if (tag != null)
-            return getItemsFromTag(tag, Registries.ITEM);
-        return emptyArr;
-    } 
-    public static String[] getItemStringsFromTagString(String tagString) {
-        Item[] items = getItemsFromTagString(tagString);
-        String[] array = new String[items.length];
-        for (int i = 0; i < items.length; i++)
-            array[i] = Registries.ITEM.getId(items[i]).toString();
-        
-        return array;
-    }
-    
-    public static void sendOverlayMessage(ServerPlayerEntity player, Text text) {
+	public static Optional<Item> getAnyItemFromItemTag(TagKey<Item> tag) {
+		Optional<Named<Item>> optionalNamed = Registries.ITEM.getEntryList(tag);
+		if (optionalNamed.isEmpty())
+			return Optional.empty();
+		Named<Item> named = optionalNamed.get();
+		if (named.size() == 0)
+			return Optional.empty();
+		return Optional.of(named.get(0).value());
+	}
+	
+	private static Item[] emptyArr = new Item[0];
+	
+	public static <T extends ItemConvertible> Item[] getItemsFromTag(TagKey<T> tag, DefaultedRegistry<T> registry) {
+		Optional<Named<T>> optionalNamed = registry.getEntryList(tag);
+		if (optionalNamed.isEmpty())
+			return emptyArr;
+		Named<T> named = optionalNamed.get();
+		Item[] array = new Item[named.size()];
+		for (int i = 0; i < named.size(); i++)
+			array[i] = named.get(i).value().asItem();
+		return array;
+	}
+	
+	public static Item[] getItemsFromTagString(String tagString) {
+		Identifier tagId = new Identifier(tagString);
+		TagKey<Item> tag = Registries.ITEM.streamTags().filter((key) -> key.id().equals(tagId)).findFirst().orElse(null);
+		if (tag != null)
+			return getItemsFromTag(tag, Registries.ITEM);
+		return emptyArr;
+	} 
+	public static String[] getItemStringsFromTagString(String tagString) {
+		Item[] items = getItemsFromTagString(tagString);
+		String[] array = new String[items.length];
+		for (int i = 0; i < items.length; i++)
+			array[i] = Registries.ITEM.getId(items[i]).toString();
+		
+		return array;
+	}
+	
+	public static void sendOverlayMessage(ServerPlayerEntity player, Text text) {
 		OverlayMessageS2CPacket packet = new OverlayMessageS2CPacket(text);
 		((ServerPlayerEntity)player).networkHandler.sendPacket(packet);	
-    }
-    
-    
-    @Environment(EnvType.CLIENT)
-    public static void showOverlayMessage(Text text) {
-    	MinecraftClient client = MinecraftClient.getInstance();
-    	client.inGameHud.setOverlayMessage(text, false);
-    }
-    
-    
-    @Environment(EnvType.CLIENT)
-    public static List<Text> translatableList(String baseKey) {
-    	List<Text> textList = new ArrayList<Text>();
-    	baseKey += "_";
-    	int num = 1;
-    	
-    	while (true) {
-    		String key = baseKey + num;
-     		if (!I18n.hasTranslation(key))
+	}
+	
+	
+	@Environment(EnvType.CLIENT)
+	public static void showOverlayMessage(Text text) {
+		MinecraftClient client = MinecraftClient.getInstance();
+		client.inGameHud.setOverlayMessage(text, false);
+	}
+	
+	
+	@Environment(EnvType.CLIENT)
+	public static List<Text> translatableList(String baseKey) {
+		List<Text> textList = new ArrayList<Text>();
+		baseKey += "_";
+		int num = 1;
+		
+		while (true) {
+			String key = baseKey + num;
+	 		if (!I18n.hasTranslation(key))
 				break;
-    		textList.add(Text.translatable(key));
-    		num++;
-    	}
-    	
-    	return textList;
-    }
-    
-    public static Text combineTextList(List<Text> textList, String combiner) {
-    	MutableText newText = Text.empty();
-    	if (textList.size() == 0)
+			textList.add(Text.translatable(key));
+			num++;
+		}
+		
+		return textList;
+	}
+	
+	public static Text combineTextList(List<Text> textList, String combiner) {
+		MutableText newText = Text.empty();
+		if (textList.size() == 0)
 			return newText;
-    	for (int i = 0; i < textList.size() - 1; i++) {
-    		newText.append(textList.get(i));
-    		newText.append(combiner);
-    	}
-    	newText.append(textList.get(textList.size() - 1));
-    	return newText;
-    }
+		for (int i = 0; i < textList.size() - 1; i++) {
+			newText.append(textList.get(i));
+			newText.append(combiner);
+		}
+		newText.append(textList.get(textList.size() - 1));
+		return newText;
+	}
+
+	/** Based on {@link net.minecraft.entity.player.PlayerEntity#getRotationVector()}, but with head direction instead of body */
+	public static Vec3d getPlayerLookVector(PlayerEntity player) {
+		float f = player.getPitch() * ((float)Math.PI / 180);
+		float g = -player.getHeadYaw() * ((float)Math.PI / 180);
+		float h = MathHelper.cos(g);
+		float i = MathHelper.sin(g);
+		float j = MathHelper.cos(f);
+		float k = MathHelper.sin(f);
+		return new Vec3d(i * j, -k, h * j);
+	}
+
+	public static void nudgeProjectileInDirection(Entity entity, Vec3d direction) {
+		entity.setPosition(entity.getPos().add(direction.multiply(1)));
+	}
 }
 	
 

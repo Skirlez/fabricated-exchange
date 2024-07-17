@@ -7,7 +7,7 @@ import net.minecraft.recipe.Ingredient;
 
 @Mixin(Ingredient.class)
 public interface IngredientAccessor  {
-    @Accessor
-    public Ingredient.Entry[] getEntries();
+	@Accessor
+	public Ingredient.Entry[] getEntries();
 
 }

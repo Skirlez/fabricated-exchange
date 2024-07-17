@@ -42,8 +42,8 @@ public abstract class ItemUtil {
 		BlockHitResult result = ItemAccessor.invokeRaycast(player.getWorld(), player, FluidHandling.NONE);
 		Direction dir = result.getSide();
 		if (!result.getBlockPos().equals(pos)) {
-	        Vec3d vec = player.getRotationVec(1.0F);
-	        return Direction.getFacing(vec.x, vec.y, vec.z);
+			Vec3d vec = player.getRotationVec(1.0F);
+			return Direction.getFacing(vec.x, vec.y, vec.z);
 		}
 		return dir.getOpposite();
 	}

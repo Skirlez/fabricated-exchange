@@ -10,7 +10,7 @@ import net.minecraft.registry.tag.TagKey;
 
 @Mixin(Ingredient.TagEntry.class)
 public interface TagEntryAccessor  {
-    @Accessor
-    public TagKey<Item> getTag();
+	@Accessor
+	public TagKey<Item> getTag();
 
 }

@@ -54,11 +54,11 @@ public class BlockTransmutation {
 		Block b1 = Registries.BLOCK.get(new Identifier(str1));
 		Block b2 = Registries.BLOCK.get(new Identifier(str2));
 		if (b1 == null || b2 == null) {
-			FabricatedExchange.LOGGER.error("Invalid block(s) found in block_transmutation_map.json! Block 1: " + str1 + " -> Block 2: " + str2);
+			FabricatedExchange.LOGGER.error("Invalid block(s) found in block_transmutation_map.json! Block 1: {} -> Block 2: {}", str1, str2);
 			return;
 		}
 		if (map.containsKey(b1)) {
-			FabricatedExchange.LOGGER.error("Duplicate block transmutation in block_transmutation_map.json! Block 1: " + str1 + " -> Block 2: " + str2);
+			FabricatedExchange.LOGGER.error("Duplicate block transmutation in block_transmutation_map.json! Block 1: {} -> Block 2: {}", str1, str2);
 			return;
 		}
 		map.put(b1, b2);

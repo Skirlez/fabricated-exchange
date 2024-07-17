@@ -1,77 +1,95 @@
 package com.skirlez.fabricatedexchange.item.tools;
 
+import com.skirlez.fabricatedexchange.emc.EmcData;
+import com.skirlez.fabricatedexchange.entities.LavaThrownEntity;
 import com.skirlez.fabricatedexchange.item.ChargeableItem;
+import com.skirlez.fabricatedexchange.item.EmcStoringItem;
 import com.skirlez.fabricatedexchange.item.ItemWithModes;
-import com.skirlez.fabricatedexchange.item.projectiles.LavaThrownEntity;
-import com.skirlez.fabricatedexchange.item.tools.base.FEAmulet;
+import com.skirlez.fabricatedexchange.item.tools.base.Amulet;
+import com.skirlez.fabricatedexchange.util.GeneralUtil;
+import com.skirlez.fabricatedexchange.util.SuperNumber;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CauldronBlock;
 import net.minecraft.block.Waterloggable;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
+import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public class VolcaniteAmulet extends FEAmulet {
-    public VolcaniteAmulet(Settings settings) {
-        super(settings, Fluids.LAVA);
-    }
+public class VolcaniteAmulet extends Amulet {
+	public VolcaniteAmulet(Settings settings) {
+		super(settings, Fluids.LAVA);
+	}
 
-    @Override
-    public void doExtraFunction(ItemStack stack, ServerPlayerEntity player) {
-        super.doExtraFunction(stack, player);
+	private static final SuperNumber FAILSAFE_LAVA_COST = new SuperNumber(128);
+	@Override
+	protected SuperNumber getLiquidCost() {
+		SuperNumber lavaBucketEmc = EmcData.getItemEmc(Items.LAVA_BUCKET);
+		SuperNumber bucketEmc = EmcData.getItemEmc(Items.BUCKET);
+		if (lavaBucketEmc.equalsZero() || bucketEmc.equalsZero() || (lavaBucketEmc.compareTo(bucketEmc) <= 0))
+			return FAILSAFE_LAVA_COST;
+		lavaBucketEmc.subtract(bucketEmc);
+		return lavaBucketEmc;
+	}
 
-        if(HadEnoughEMC(stack,player) && !player.getItemCooldownManager().isCoolingDown(this)) {
-            World world = player.world;
-            Vec3d direction = player.getRotationVec(1.0F);
 
-            int charge = ChargeableItem.getCharge(stack);
-            int mode = ItemWithModes.getMode(stack);
+	@Override
+	public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
 
-            LavaThrownEntity projectile = new LavaThrownEntity(world, player, charge, mode);
-            projectile.setVelocity(direction.x, direction.y, direction.z, 2.5F, 0F);
+		ItemStack stack = player.getStackInHand(hand);
+		if (EmcStoringItem.takeStoredEmcOrConsume(getLiquidCost(), stack, player.getInventory()) && !player.getItemCooldownManager().isCoolingDown(this)) {
 
-            world.spawnEntity(projectile);
-            player.getItemCooldownManager().set(this, 20);
-        }
-    }
+			int charge = ChargeableItem.getCharge(stack);
+			int mode = ItemWithModes.getMode(stack);
+			LavaThrownEntity projectile = new LavaThrownEntity(world, player, charge);
+			Vec3d direction = GeneralUtil.getPlayerLookVector(player);
+			projectile.setVelocity(direction.x, direction.y, direction.z, 2.5F, 0F);
 
-    @Override
-    protected boolean handleLiquidSpecificLogic(World world, BlockPos pos, BlockState targetBlockState) {
-        // Check if the block is a cauldron
-        if (targetBlockState.getBlock() instanceof CauldronBlock) {
-            // Fill the cauldron with water
-            world.setBlockState(pos, Blocks.LAVA_CAULDRON.getDefaultState());
-            return true;
-        }
+			projectile.setPosition(player.getX(), player.getEyeY(), player.getZ());
 
-        // Check if the block can be waterlogged
-        if (targetBlockState.getBlock() instanceof Waterloggable && targetBlockState.contains(Properties.WATERLOGGED)) {
-            // Un-waterlog the block
-            world.setBlockState(pos, targetBlockState.with(Properties.WATERLOGGED, false), 11);
-            return true;
-        }
+			GeneralUtil.nudgeProjectileInDirection(projectile, direction);
 
-        return false;
-    }
+			world.spawnEntity(projectile);
+			player.getItemCooldownManager().set(this, 10);
+			return TypedActionResult.success(stack, true);
+		}
+		return super.use(world, player, hand);
+	}
 
-    @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        super.useOnBlock(context);
-        context.getWorld().playSound(null, context.getBlockPos(), getEmptyBucketSound(), SoundCategory.BLOCKS, 1.0F, 1.0F);
-        return ActionResult.PASS;
-    }
 
-    protected SoundEvent getEmptyBucketSound() {
-        return SoundEvents.ITEM_BUCKET_EMPTY_LAVA;
-    }
+
+	@Override
+	protected boolean handleLiquidSpecificLogic(World world, BlockPos pos, BlockState targetBlockState) {
+		if (targetBlockState.getBlock() instanceof CauldronBlock) {
+			world.setBlockState(pos, Blocks.LAVA_CAULDRON.getDefaultState());
+			return true;
+		}
+		if (targetBlockState.getBlock() instanceof Waterloggable && targetBlockState.contains(Properties.WATERLOGGED)) {
+			world.setBlockState(pos, targetBlockState.with(Properties.WATERLOGGED, false), 11);
+			return true;
+		}
+		return false;
+	}
+
+
+	protected SoundEvent getEmptyBucketSound() {
+		return SoundEvents.ITEM_BUCKET_EMPTY_LAVA;
+	}
+
+
 }

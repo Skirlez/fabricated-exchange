@@ -1,6 +1,5 @@
 package com.skirlez.fabricatedexchange;
 
-import com.skirlez.fabricatedexchange.item.ModEntities;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -27,6 +26,7 @@ import com.skirlez.fabricatedexchange.block.ModBlocks;
 import com.skirlez.fabricatedexchange.command.TheCommand;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.emc.EmcMapper;
+import com.skirlez.fabricatedexchange.entities.ModEntities;
 import com.skirlez.fabricatedexchange.item.ModItemGroups;
 import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.packets.ModClientToServerPackets;
@@ -43,6 +43,7 @@ import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 public class FabricatedExchange implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger("fabricated-exchange");
 	public static final String MOD_ID = "fabricated-exchange";
+
 	// this map tells the philosopher's stone what block to transform when right clicked
 	
 	// this map will be filled with all the items that have the transmutation_fuel tag, and each key value pair will represent a jump in progression between the fuel items
@@ -97,9 +98,7 @@ public class FabricatedExchange implements ModInitializer {
 	
 	public static boolean calculateEmcMap(MinecraftServer server) {
 		EmcMapper mapper = new EmcMapper(server.getOverworld().getRecipeManager(), server.getRegistryManager());
-		
 		boolean hasWarned = mapper.map();
-		
 		EmcData.emcMap = ImmutableMap.copyOf(mapper.getEmcMap());
 		EmcData.potionEmcMap = ImmutableMap.copyOf(mapper.getPotionEmcMap());
 		EmcData.enchantmentEmcMap = ImmutableMap.copyOf(mapper.getEnchantmentEmcMap());

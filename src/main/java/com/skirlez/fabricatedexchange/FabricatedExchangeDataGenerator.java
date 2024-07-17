@@ -177,8 +177,8 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 				ModItems.DARK_MATTER_LEGGINGS, ModItems.DARK_MATTER_CHESTPLATE, ModItems.DARK_MATTER_HELMET,
 				ModItems.RED_MATTER_BOOTS, ModItems.RED_MATTER_LEGGINGS, ModItems.RED_MATTER_CHESTPLATE,
 				ModItems.RED_MATTER_HELMET, ModItems.REPAIR_TALISMAN, ModItems.GEM_OF_ETERNAL_DENSITY,ModItems.EVERTIDE_AMULET,
-			    ModItems.VOLCANITE_AMULET, ModItems.WATER_ORB, ModItems.LAVA_ORB, ModItems.TORNADO_ORB, ModItems.FROZEN_ORB,
-			    ModItems.IGNITION_RING, ModItems.ZERO_RING, ModItems.BLACK_HOLE_BAND);
+				ModItems.VOLCANITE_AMULET, ModItems.WATER_ORB, ModItems.LAVA_ORB, ModItems.TORNADO_ORB, ModItems.FROZEN_ORB,
+				ModItems.IGNITION_RING, ModItems.ZERO_RING, ModItems.BLACK_HOLE_BAND);
 			
 			registerHandheldModels(itemModelGenerator, ModItems.DARK_MATTER_SWORD, ModItems.DARK_MATTER_PICKAXE, ModItems.DARK_MATTER_AXE,
 				ModItems.DARK_MATTER_SHOVEL, ModItems.DARK_MATTER_HOE, ModItems.DARK_MATTER_HAMMER, ModItems.RED_MATTER_SWORD, ModItems.RED_MATTER_PICKAXE,
