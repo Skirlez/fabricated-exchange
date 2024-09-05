@@ -75,7 +75,7 @@ public class EmcData {
 	private static void considerNbt(Item item, NbtCompound nbt, SuperNumber emc) {
 		if (nbt.contains(EmcStoringItem.EMC_NBT_KEY))
 			emc.add(new SuperNumber(nbt.getString(EmcStoringItem.EMC_NBT_KEY)));
-	
+
 		if (!ModDataFiles.NBT_ITEMS.hasItem(Registries.ITEM.getId(item).toString()))
 			return;
 		

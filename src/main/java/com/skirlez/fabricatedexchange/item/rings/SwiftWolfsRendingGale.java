@@ -3,106 +3,154 @@ package com.skirlez.fabricatedexchange.item.rings;
 import java.math.BigInteger;
 import java.util.List;
 
-import com.skirlez.fabricatedexchange.entities.TornadoThrownEntity;
+import com.skirlez.fabricatedexchange.abilities.ItemAbility;
+import com.skirlez.fabricatedexchange.entities.base.FunctionalProjectile;
 import com.skirlez.fabricatedexchange.item.*;
 import com.skirlez.fabricatedexchange.mixin.ItemAccessor;
+import com.skirlez.fabricatedexchange.util.ConstantObjectRegistry;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.minecraft.client.item.TooltipContext;
-import net.minecraft.entity.Entity;
+import net.minecraft.entity.*;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.StackReference;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
-import net.minecraft.util.ClickType;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 
-public class SwiftWolfsRendingGale extends FlyingAbilityItem
-		implements ExtraFunctionItem, ItemWithModes, EmcStoringItem {
+public class SwiftWolfsRendingGale extends Item
+		implements ItemWithModes, EmcStoringItem, AbilityGrantingItem {
 
-	public static final String FLYING_MODEL_KEY = "CustomModelData";
-	
 	public SwiftWolfsRendingGale(Settings settings) {
 		super(settings);
 		ItemAccessor self = (ItemAccessor) this;
 		self.setRecipeRemainder(this);
 	}
 
-	
-	private static final SuperNumber PROJECTILE_COST = new SuperNumber(128);
-	
-	@Override
-	public void doExtraFunction(ItemStack stack, ServerPlayerEntity player) {
-
-		if (!player.getItemCooldownManager().isCoolingDown(this)
-				&& EmcStoringItem.takeStoredEmcOrConsume(PROJECTILE_COST, stack, player.getInventory())) {
-			World world = player.world;
-			Vec3d direction = player.getRotationVec(1.0F);
-
-			TornadoThrownEntity projectile = new TornadoThrownEntity(player, world);
-			projectile.setVelocity(direction.x, direction.y, direction.z, 2.5F, 0F);
-
-			world.spawnEntity(projectile);
-
-			player.getItemCooldownManager().set(this, 10);
-		}
-	}
-
-	@Override
-	public int getModeAmount() {
-		return 2;
-	}
-
-	@Override
-	public ItemStack getDefaultStack() {
-		ItemStack stack = new ItemStack(this);
-		stack.getOrCreateNbt().putString(EmcStoringItem.EMC_NBT_KEY, "0");
-		return stack;
-	}
-	
 	private static final SuperNumber DESIRED_AMOUNT = new SuperNumber(64);
-	
-	@Override
-	public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-		super.inventoryTick(stack, world, entity, slot, selected);
-
-		if (entity instanceof PlayerEntity player) {
-			SuperNumber storedEmc = EmcStoringItem.getStoredEmc(stack);
+	private static final ItemAbility SWRG = new ItemAbility() {
+		@Override
+		public void tick(ItemStack stack, PlayerEntity player) {
+			if (!player.getAbilities().allowFlying) {
+				player.getAbilities().allowFlying = true;
+				player.sendAbilitiesUpdate();
+			}
 			boolean shouldSubtract = player.age % 3 == 0;
-			
-			
+			SuperNumber storedEmc = EmcStoringItem.getStoredEmc(stack);
 			if (player.getAbilities().flying) {
-				stack.getOrCreateNbt().putInt(FLYING_MODEL_KEY, 1);
-				if (shouldSubtract)
+				if (shouldSubtract && storedEmc.isPositive())
 					storedEmc.subtract(BigInteger.ONE);
 			}
-			else
-				stack.getOrCreateNbt().putInt(FLYING_MODEL_KEY, 0);
-			
 			if (ItemWithModes.getMode(stack) == 1) {
-				
-				if (!world.isClient) {
+				if (!player.getWorld().isClient) {
 					List<Entity> entities = player.getWorld()
 						.getOtherEntities(player, GeneralUtil.boxAroundPos(player.getPos(), 8));
-					
+
 					for (Entity otherEntity : entities) {
 						Vec3d velocity = otherEntity.getPos().subtract(player.getPos()).normalize().multiply(0.2);
 						otherEntity.addVelocity(velocity);
 					}
 				}
-				if (shouldSubtract)
+				if (shouldSubtract && storedEmc.isPositive())
 					storedEmc.subtract(BigInteger.ONE);
 			}
-			
-			if (storedEmc.equalsZero())
-				storedEmc = EmcStoringItem.tryConsumeEmc(DESIRED_AMOUNT, stack, player.getInventory());
+			if (!storedEmc.isPositive())
+				storedEmc = EmcStoringItem.tryConsumeEmc(SuperNumber.ONE, stack, player.getInventory());
 			EmcStoringItem.setStoredEmc(stack, storedEmc);
 		}
+
+		@Override
+		public void onRemove(PlayerEntity player) {
+			if (!player.getAbilities().creativeMode && !player.isSpectator()) {
+				player.getAbilities().allowFlying = false;
+				player.getAbilities().flying = false;
+				player.sendAbilitiesUpdate();
+			}
+		}
+	};
+
+	@Override
+	public ItemAbility getAbility() {
+		return SWRG;
+	}
+
+	@Override
+	public boolean shouldGrantAbility(PlayerEntity player, ItemStack stack) {
+		return (EmcStoringItem.getTotalConsumableEmc(player.getInventory(), stack).isPositive());
+	}
+
+	private static final SuperNumber PROJECTILE_COST = new SuperNumber(128);
+
+	public static final FunctionalProjectile.OnHit projectileHitBehavior
+		= ConstantObjectRegistry.register("swiftwolf_hit",
+		(FunctionalProjectile self, HitResult result) -> {
+			World world = self.getWorld();
+			if (world.isThundering() || world.isRaining()) {
+				BlockPos hitPos = BlockPos.ofFloored(result.getPos());
+				int numberOfBolts = 1;
+				if (world.isThundering()) {
+					numberOfBolts = 3;
+				}
+
+				for (int i = 0; i < numberOfBolts; i++) {
+					// Slightly offset each lightning bolt to avoid exact overlap
+					BlockPos offsetPos = hitPos.add(world.random.nextInt(3) - 1, 0, world.random.nextInt(3) - 1);
+
+					LightningEntity lightning = EntityType.LIGHTNING_BOLT.create(world);
+					if (lightning != null) {
+						lightning.refreshPositionAfterTeleport(Vec3d.ofBottomCenter(offsetPos));
+						world.spawnEntity(lightning);
+					}
+				}
+			}
+
+			if (result instanceof EntityHitResult entityHitResult) {
+				Entity entity = entityHitResult.getEntity();
+
+				// Calculate the fling velocity
+				Vec3d velocity = self.getVelocity().normalize().multiply(4.0);
+				entity.addVelocity(velocity.x, velocity.y + 1, velocity.z);
+				entity.velocityModified = true;
+			}
+
+			self.discard();
+		});
+
+
+	@Override
+	public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+	 	super.use(world, player, hand);
+		ItemStack stack = player.getStackInHand(hand);
+		if (player.getItemCooldownManager().isCoolingDown(this)
+				|| !EmcStoringItem.takeStoredEmcOrConsume(PROJECTILE_COST, stack, player.getInventory()))
+			return TypedActionResult.pass(stack);
+
+
+		FunctionalProjectile projectile = FunctionalProjectile.builder(player, ModItems.TORNADO_ORB, new NbtCompound())
+			.disableGravity()
+			.setMaxAge(400)
+			.setHitBehavior(projectileHitBehavior)
+			.build();
+
+		Vec3d direction = GeneralUtil.getPlayerLookVector(player);
+		projectile.setVelocity(direction.x, direction.y, direction.z, 2.5F, 0F);
+		world.spawnEntity(projectile);
+		player.getItemCooldownManager().set(this, 10);
+		return TypedActionResult.success(stack);
+	}
+
+	@Override
+	public int getModeAmount() {
+		return 2;
 	}
 	
 	@Override
@@ -110,34 +158,12 @@ public class SwiftWolfsRendingGale extends FlyingAbilityItem
 		super.appendTooltip(stack, world, tooltip, context);
 		ItemWithModes.addModeToTooltip(stack, tooltip);
 	}
-	
-	@Override
-	public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player, StackReference cursorStackReference) {
-		disablePlayerFlying(player, stack);
-		return false;
-	}
 
-	public static boolean isOn(ItemStack stack) {
-		return stack.getNbt() != null && (stack.getNbt().getInt(FLYING_MODEL_KEY) == 1);
+	public static boolean isOn(LivingEntity entity, ItemStack stack) {
+		return (entity instanceof PlayerEntity player && player.getAbilities().flying);
 	}
-	
 	public static boolean isRepelling(ItemStack stack) {
 		return ItemWithModes.getMode(stack) == 1;
 	}
-	
-	@Override
-	protected boolean flyCondition(PlayerEntity player, ItemStack stack) {
-		return EmcStoringItem.getStoredEmc(stack).isPositive();
-	}
-	@Override
-	protected void onFlightDisable(PlayerEntity player, ItemStack stack) {
-		stack.getOrCreateNbt().putInt(FLYING_MODEL_KEY, 0);
-	}
-	@Override
-	public void onDropped(PlayerEntity player, ItemStack stack) {
-		stack.getOrCreateNbt().putInt(FLYING_MODEL_KEY, 0);
-		super.onDropped(player, stack);
-	}
-
 }
 

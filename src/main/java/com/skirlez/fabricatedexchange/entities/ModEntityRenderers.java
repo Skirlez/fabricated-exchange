@@ -9,5 +9,6 @@ public class ModEntityRenderers {
 		EntityRendererRegistry.register(ModEntities.LAVA_PROJECTILE, ProjectileRenderer::new);
 		EntityRendererRegistry.register(ModEntities.TORNADO_PROJECTILE, ProjectileRenderer::new);
 		EntityRendererRegistry.register(ModEntities.FROZEN_PROJECTILE, ProjectileRenderer::new);
+		EntityRendererRegistry.register(ModEntities.FUNCTIONAL_PROJECTILE, ProjectileRenderer::new);
 	}
 }

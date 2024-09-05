@@ -1,6 +1,5 @@
 package com.skirlez.fabricatedexchange.item.tools;
 
-import com.skirlez.fabricatedexchange.entities.LavaThrownEntity;
 import com.skirlez.fabricatedexchange.entities.WaterThrownEntity;
 import com.skirlez.fabricatedexchange.item.ChargeableItem;
 import com.skirlez.fabricatedexchange.item.EmcStoringItem;
@@ -16,7 +15,6 @@ import net.minecraft.block.Waterloggable;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Properties;
@@ -42,14 +40,15 @@ public class EvertideAmulet extends Amulet {
 			Vec3d direction = player.getRotationVec(1.0F);
 			int charge = ChargeableItem.getCharge(stack);
 			int mode = ItemWithModes.getMode(stack);
-			if (!world.isClient()) {
-				WaterThrownEntity projectile = new WaterThrownEntity(player, world, charge);
 
-				GeneralUtil.nudgeProjectileInDirection(projectile, direction);
-				projectile.setVelocity(direction.x, direction.y, direction.z, 2.5F, 0F);
+			WaterThrownEntity projectile = new WaterThrownEntity(player, world, charge);
 
-				world.spawnEntity(projectile);
-			}
+			projectile.setVelocity(direction.x, direction.y, direction.z, 2.5F, 0F);
+			projectile.setPosition(player.getX(), player.getEyeY() - 0.1f, player.getZ());
+			GeneralUtil.nudgeProjectileInDirection(projectile, direction);
+
+			world.spawnEntity(projectile);
+
 			player.getItemCooldownManager().set(this, 10);
 			return TypedActionResult.success(stack, true);
 		}

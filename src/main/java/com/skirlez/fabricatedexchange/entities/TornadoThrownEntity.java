@@ -29,41 +29,7 @@ public class TornadoThrownEntity extends ZeroGravityThrownEntity {
 		super.onCollision(hitResult);
 
 		if (!this.world.isClient) {
-			// Check if it's raining and thunderstorming
-			if (this.world.isThundering() || this.world.isRaining()) {
-				// Get the position from the HitResult and convert to BlockPos
-				Vec3d hitVec = hitResult.getPos();
-				BlockPos hitPos = new BlockPos((int) hitVec.x, (int) hitVec.y, (int) hitVec.z);
-				int numberOfBolts = 1;
 
-				if (this.world.isThundering()){
-					numberOfBolts = 3;
-				}
-
-				for (int i = 0; i < numberOfBolts; i++) {
-					// Slightly offset each lightning bolt to avoid exact overlap
-					BlockPos offsetPos = hitPos.add(this.random.nextInt(3) - 1, 0, this.random.nextInt(3) - 1);
-
-					// Summon lightning at the offset position
-					LightningEntity lightning = EntityType.LIGHTNING_BOLT.create(this.world);
-					if (lightning != null) {
-						lightning.refreshPositionAfterTeleport(Vec3d.ofBottomCenter(offsetPos));
-						this.world.spawnEntity(lightning);
-					}
-				}
-			}
-
-			if (hitResult.getType() == HitResult.Type.ENTITY) {
-				EntityHitResult entityHitResult = (EntityHitResult) hitResult;
-				Entity entity = entityHitResult.getEntity();
-
-				// Calculate the fling velocity
-				Vec3d velocity = this.getVelocity().normalize().multiply(4.0);
-				entity.addVelocity(velocity.x, velocity.y + 1, velocity.z);
-				entity.velocityModified = true;
-			}
-
-			this.discard();
 		}
 	}
 

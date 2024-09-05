@@ -118,6 +118,9 @@ public class ModItems {
 	public static final Item IGNITION_RING = registerItemWithGroup("ignition_ring",
 			new IgnitionRing(new FabricItemSettings().maxCount(1)));
 
+	public static final Item HYDRATION_RING = registerItemWithGroup("hydration_ring",
+			new HydrationRing(new FabricItemSettings().maxCount(1)));
+
 	public static final Item ZERO_RING = registerItemWithGroup("zero_ring",
 			new ZeroRing(new FabricItemSettings().maxCount(1)));
 

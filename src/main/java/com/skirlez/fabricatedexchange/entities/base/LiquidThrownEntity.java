@@ -1,32 +1,15 @@
 package com.skirlez.fabricatedexchange.entities.base;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
-import com.skirlez.fabricatedexchange.item.ItemWithModes;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.CauldronBlock;
-import net.minecraft.block.Waterloggable;
 import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.Registries;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -94,18 +77,21 @@ public abstract class LiquidThrownEntity extends ZeroGravityThrownEntity {
 			return;
 		BlockPos pos = getBlockPos();
 		boolean shouldPlaySound = false;
-
-		for (int x = -charge; x <= charge; x++) {
-			for (int y = -charge; y <= charge; y++) {
-				for (int z = -charge; z <= charge; z++) {
-					BlockPos offsetPos = pos.add(x, y, z);
-					shouldPlaySound = passByBlock(world, offsetPos) || shouldPlaySound;
+		if (charge != 0) {
+			for (int x = -charge; x <= charge; x++) {
+				for (int y = -charge; y <= charge; y++) {
+					for (int z = -charge; z <= charge; z++) {
+						BlockPos offsetPos = pos.add(x, y, z);
+						shouldPlaySound = passByBlock(world, offsetPos) || shouldPlaySound;
+					}
 				}
 			}
 		}
 		if (shouldPlaySound)
 			this.world.playSound(null, pos, getPassModifySound(), SoundCategory.BLOCKS, 1.0F, 1.0F);
 	}
+
+
 
 	protected abstract void placeLiquid(World world, BlockPos pos);
 

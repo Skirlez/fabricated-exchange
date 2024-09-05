@@ -13,18 +13,13 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CauldronBlock;
 import net.minecraft.block.Waterloggable;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
@@ -59,9 +54,7 @@ public class VolcaniteAmulet extends Amulet {
 			LavaThrownEntity projectile = new LavaThrownEntity(world, player, charge);
 			Vec3d direction = GeneralUtil.getPlayerLookVector(player);
 			projectile.setVelocity(direction.x, direction.y, direction.z, 2.5F, 0F);
-
 			projectile.setPosition(player.getX(), player.getEyeY(), player.getZ());
-
 			GeneralUtil.nudgeProjectileInDirection(projectile, direction);
 
 			world.spawnEntity(projectile);

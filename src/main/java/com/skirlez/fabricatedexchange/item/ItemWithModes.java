@@ -25,10 +25,15 @@ public interface ItemWithModes {
 	}
 
 	public static int getMode(ItemStack stack) {
+		if (!(stack.getItem() instanceof ItemWithModes item))
+			return 0;
 		NbtCompound nbt = stack.getNbt();
 		if (nbt == null)
 			return 0;
-		return nbt.getInt(MODE_KEY);
+		int mode = nbt.getInt(MODE_KEY);
+		if (mode >= item.getModeAmount())
+			return item.getModeAmount() - 1;
+		return mode;
 	}
 	public static <T extends Enum<T>> T getMode(ItemStack stack, T[] values) {
 		NbtCompound nbt = stack.getNbt();

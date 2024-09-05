@@ -1,7 +1,9 @@
 package com.skirlez.fabricatedexchange.item.rings;
 
+import com.skirlez.fabricatedexchange.abilities.ItemAbility;
 import com.skirlez.fabricatedexchange.item.*;
 import com.skirlez.fabricatedexchange.mixin.ItemAccessor;
+import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
@@ -17,16 +19,14 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ClickType;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.util.List;
 
 
 public class BlackHoleBand extends Item
-		implements ExtraFunctionItem, ItemWithModes {
-
-	public boolean active = false;
-	public static final String ACTIVE_MODEL_KEY = "CustomModelData";
+		implements ItemWithModes, AbilityGrantingItem {
 
 	public BlackHoleBand(Settings settings) {
 		super(settings);
@@ -35,71 +35,10 @@ public class BlackHoleBand extends Item
 	}
 
 	@Override
-	public void doExtraFunction(ItemStack stack, ServerPlayerEntity player) {
-		active = !active;
-	}
-
-	@Override
 	public int getModeAmount() {
-		return 10;
+		return 2;
 	}
 
-	@Override
-	public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-		super.inventoryTick(stack, world, entity, slot, selected);
-
-		if (active) {
-			stack.getOrCreateNbt().putInt(ACTIVE_MODEL_KEY, 1);
-			if (entity instanceof PlayerEntity player) {
-				int range = ItemWithModes.getMode(stack);
-
-				// Define the area around the player to search for items (based on range), starting 1 block above the player
-				Box searchBox = new Box(
-						player.getX() - range, player.getY() + 1 - range, player.getZ() - range,
-						player.getX() + range, player.getY() + 1 + range, player.getZ() + range
-				);
-
-				// Find all items within the defined area
-				List<ItemEntity> items = world.getEntitiesByClass(ItemEntity.class, searchBox, item -> true);
-
-				// Pull items towards the player
-				for (ItemEntity itemEntity : items) {
-					ItemStack itemStack = itemEntity.getStack();
-
-					if (world.isClient) {
-						// On the client side, spawn particles
-						for (int i = 0; i < 4; i++) {
-							double offsetX = (world.random.nextDouble() - 0.5) * 0.1;
-							double offsetY = (world.random.nextDouble() - 0.5) * 0.1;
-							double offsetZ = (world.random.nextDouble() - 0.5) * 0.1;
-							world.addParticle(ParticleTypes.REVERSE_PORTAL, itemEntity.getX(), itemEntity.getY(), itemEntity.getZ(), offsetX, offsetY, offsetZ);
-						}
-					} else {
-						// Get or create the timer
-						if (!itemStack.hasNbt() || !itemStack.getNbt().contains("TeleportTimer")) {
-							itemStack.getOrCreateNbt().putInt("TeleportTimer", 10); // Set the initial timer to 20 ticks (1 second)
-						} else {
-							int teleportTimer = itemStack.getNbt().getInt("TeleportTimer");
-							if (teleportTimer > 0) {
-								// Decrement the timer
-								itemStack.getNbt().putInt("TeleportTimer", teleportTimer - 1);
-							} else {
-								// Check if the player has space in their inventory
-								if (hasInventorySpace(player)) {
-									itemStack.removeSubNbt("TeleportTimer"); // Remove the tag when the item is picked up
-									if (player.getInventory().insertStack(itemStack)) {
-										itemEntity.discard();
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		} else {
-			stack.getOrCreateNbt().putInt(ACTIVE_MODEL_KEY, 0);
-		}
-	}
 	// Helper method to check if the player has at least one empty slot in their inventory
 	private boolean hasInventorySpace(PlayerEntity player) {
 		for (int i = 0; i < player.getInventory().size(); i++) {
@@ -118,11 +57,37 @@ public class BlackHoleBand extends Item
 				.append(" ")
 				.append(ItemWithModes.getModeName(stack, mode).setStyle(Style.EMPTY.withColor(Formatting.GOLD))));
 	}
-	
-	@Override
-	public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player, StackReference cursorStackReference) {
-		return false;
+
+	private static final ItemAbility ITEM_PULL = new ItemAbility() {
+		@Override
+		public void tick(ItemStack stack, PlayerEntity player) {
+			Box searchBox = GeneralUtil.boxAroundPos(player.getPos(), 5);
+			List<ItemEntity> items = player.getWorld().getEntitiesByClass(ItemEntity.class, searchBox, item -> true);
+			for (ItemEntity item : items) {
+				Vec3d playerOffset = player.getPos().add(0, 1, 0).subtract(item.getPos());
+				Vec3d playerDirection = playerOffset.normalize();
+				double distance = playerOffset.length();
+				item.addVelocity(playerDirection.multiply(1 / Math.max(2.5d, distance)));
+			}
+		}
+		@Override
+		public void onRemove(PlayerEntity player) {
+
+		}
+	};
+
+	public static boolean isOn(ItemStack stack) {
+		return ItemWithModes.getMode(stack) == 1;
 	}
 
+	@Override
+	public boolean shouldGrantAbility(PlayerEntity player, ItemStack stack) {
+		return ItemWithModes.getMode(stack) == 1;
+	}
+
+	@Override
+	public ItemAbility getAbility() {
+		return ITEM_PULL;
+	}
 }
 

@@ -5,20 +5,14 @@ import com.skirlez.fabricatedexchange.item.EmcStoringItem;
 import com.skirlez.fabricatedexchange.item.ItemWithModes;
 import com.skirlez.fabricatedexchange.item.rings.base.ShooterRing;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
 
 public class ArchangelsSmite extends ShooterRing implements ItemWithModes {
 

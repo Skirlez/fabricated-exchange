@@ -18,8 +18,7 @@ import net.minecraft.text.Text;
 public interface EmcStoringItem {
 	public static final String EMC_NBT_KEY = "emc";
 	public static final String NO_EMC_TRANSLATION_KEY = "item.fabricated-exchange.no_emc";
-	
-	
+
 	public static SuperNumber getStoredEmc(ItemStack stack) {
 		if (stack.getNbt() == null)
 			return SuperNumber.Zero();
@@ -40,9 +39,7 @@ public interface EmcStoringItem {
 	}
 	private static boolean isItemStackConsumable(ItemStack stack) {
 		return (FabricatedExchange.fuelSet.contains(stack.getItem()));
-		
 	}
-	
 	public static SuperNumber getTotalConsumableEmc(Inventory inv) {
 		SuperNumber sum = SuperNumber.Zero();
 		for (int i = 0; i < inv.size(); i++) {
@@ -59,8 +56,10 @@ public interface EmcStoringItem {
 		return emc;
 	}
 	
-	/** @returns Whether or not the amount can be consumed from this inventory. */
-	public static boolean isAmountConsumable(SuperNumber amount, Inventory inv) {
+	/** @return Whether or not the amount can be consumed from this inventory. */
+	public static boolean isAmountConsumable(SuperNumber amount, PlayerInventory inv) {
+		if (inv.player.isCreative())
+			return true;
 		SuperNumber sum = SuperNumber.Zero();
 		for (int i = 0; i < inv.size() && sum.compareTo(amount) == -1; i++) {
 			ItemStack stack = inv.getStack(i);
@@ -70,8 +69,10 @@ public interface EmcStoringItem {
 		}
 		return sum.compareTo(amount) != -1;
 	}
-	/** @returns Whether or not the amount can be consumed from this inventory and itemstack combined. */
-	public static boolean isAmountConsumable(SuperNumber amount, ItemStack stack, Inventory inv) {
+	/** @return Whether or not the amount can be consumed from this inventory and itemstack combined. */
+	public static boolean isAmountConsumable(SuperNumber amount, ItemStack stack, PlayerInventory inv) {
+		if (inv.player.isCreative())
+			return true;
 		SuperNumber sum = getStoredEmc(stack);
 		for (int i = 0; i < inv.size() && sum.compareTo(amount) == -1; i++) {
 			ItemStack itemStack = inv.getStack(i);
@@ -83,13 +84,12 @@ public interface EmcStoringItem {
 	}
 	
 	/** Consumes the desired amount of EMC from the inventory, prioritizing batteries.
-	 * @returns The amount of EMC stored in the stack after the operation, or 0 if there isn't enough EMC in the inventory. */
+	 * @return The amount of EMC stored in the stack after the operation, or 0 if there isn't enough EMC in the inventory. */
 	public static SuperNumber tryConsumeEmc(SuperNumber desiredAmount, ItemStack stack, PlayerInventory inv) {
 		if (inv.player.isCreative()) {
 			addStoredEmc(stack, desiredAmount);
 			return new SuperNumber(desiredAmount);
 		}
-
 		if (!isAmountConsumable(desiredAmount, inv))
 			return SuperNumber.Zero();
 		SuperNumber sum = SuperNumber.Zero();
@@ -110,7 +110,10 @@ public interface EmcStoringItem {
 					SuperNumber unitsNeeded = new SuperNumber(desiredAmount);
 					unitsNeeded.subtract(sum);
 					unitsNeeded.divide(unitEmc);
-					
+
+					// We can't take a fraction of an item. We have to take the next whole number to get over the desired amount.
+					unitsNeeded.ceil();
+
 					int units = unitsNeeded.toInt(0);
 					
 					unitEmc.multiply(units);
@@ -147,7 +150,7 @@ public interface EmcStoringItem {
 		SuperNumber requiredDifference = new SuperNumber(amount);
 		requiredDifference.subtract(emc);
 		
-		if (!inv.player.isCreative() && !isAmountConsumable(requiredDifference, inv))
+		if (!isAmountConsumable(requiredDifference, inv))
 			return false;
 		
 		tryConsumeEmc(requiredDifference, stack, inv);

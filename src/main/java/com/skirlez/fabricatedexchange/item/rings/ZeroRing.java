@@ -4,19 +4,12 @@ import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.entities.FrozenThrownEntity;
 import com.skirlez.fabricatedexchange.item.EmcStoringItem;
 import com.skirlez.fabricatedexchange.item.rings.base.ShooterRing;
-import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-
-import java.util.List;
-import java.util.Random;
 
 public class ZeroRing extends ShooterRing {
 	

@@ -10,7 +10,6 @@ import com.skirlez.fabricatedexchange.item.ItemWithModes;
 import com.skirlez.fabricatedexchange.item.ModToolMaterials;
 import com.skirlez.fabricatedexchange.item.OutliningItem;
 import com.skirlez.fabricatedexchange.item.PreMiningItem;
-import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 
 import net.minecraft.block.BlockState;

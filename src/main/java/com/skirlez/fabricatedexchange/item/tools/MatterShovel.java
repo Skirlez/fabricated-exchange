@@ -6,8 +6,6 @@ import java.util.List;
 import com.skirlez.fabricatedexchange.item.ChargeableItem;
 import com.skirlez.fabricatedexchange.item.EmcStoringItem;
 import com.skirlez.fabricatedexchange.item.FakeItemUsageContext;
-import com.skirlez.fabricatedexchange.item.ItemUtil;
-import com.skirlez.fabricatedexchange.item.ItemWithModes;
 import com.skirlez.fabricatedexchange.item.ModToolMaterials;
 import com.skirlez.fabricatedexchange.item.OutliningItem;
 import com.skirlez.fabricatedexchange.util.SuperNumber;

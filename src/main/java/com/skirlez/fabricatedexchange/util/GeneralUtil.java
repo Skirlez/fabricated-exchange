@@ -96,10 +96,10 @@ public abstract class GeneralUtil {
 			((ScreenHandlerInvoker)self).invokeAddSlot(new Slot(playerInventory, i, x + i * 18, y));
 	}
 	
-	public static Box boxAroundPos(Vec3d pos, double size) {
+	public static Box boxAroundPos(Vec3d pos, double halfsize) {
 		return new Box(
-			pos.getX() - size, pos.getY() - size, pos.getZ() - size,
-			pos.getX() + size, pos.getY() + size, pos.getZ() + size);
+			pos.getX() - halfsize, pos.getY() - halfsize, pos.getZ() - halfsize,
+			pos.getX() + halfsize, pos.getY() + halfsize, pos.getZ() + halfsize);
 	}
 
 	/** @
@@ -215,7 +215,7 @@ public abstract class GeneralUtil {
 	}
 
 	public static void nudgeProjectileInDirection(Entity entity, Vec3d direction) {
-		entity.setPosition(entity.getPos().add(direction.multiply(1)));
+		entity.setPosition(entity.getPos().add(direction));
 	}
 }
 	

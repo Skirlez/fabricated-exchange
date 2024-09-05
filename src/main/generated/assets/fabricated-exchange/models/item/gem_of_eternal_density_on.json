@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "fabricated-exchange:item/gem_of_eternal_density_on"
+  }
+}

@@ -1,20 +1,20 @@
 {
     "parent": "minecraft:item/generated",
     "textures": {
-        "layer0": "fabricated-exchange:item/archangels_smite_off"
+        "layer0": "fabricated-exchange:item/ignition_ring_off"
     },
     "overrides": [
         {
             "predicate": {
                 "fabricated-exchange:state": 0
             },
-            "model": "fabricated-exchange:item/archangels_smite_off"
+            "model": "fabricated-exchange:item/ignition_ring_off"
         },
         {
             "predicate": {
                 "fabricated-exchange:state": 1
             },
-            "model": "fabricated-exchange:item/archangels_smite_on"
+            "model": "fabricated-exchange:item/ignition_ring_on"
         }
     ]
 }

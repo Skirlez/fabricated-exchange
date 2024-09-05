@@ -1,5 +1,6 @@
 package com.skirlez.fabricatedexchange.entities;
 
+import com.skirlez.fabricatedexchange.entities.base.FunctionalProjectile;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
@@ -10,6 +11,15 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
 public class ModEntities {
+
+	public static final EntityType<FunctionalProjectile> FUNCTIONAL_PROJECTILE = registerEntity(
+		FabricEntityTypeBuilder.<FunctionalProjectile>create(SpawnGroup.MISC, FunctionalProjectile::new)
+			.dimensions(EntityDimensions.fixed(0.25f, 0.25f))
+			.trackRangeBlocks(64)
+			.trackedUpdateRate(10)
+			.build(), "functional_projectile");
+
+
 	public static final EntityType<WaterThrownEntity> WATER_PROJECTILE = registerEntity(
 		FabricEntityTypeBuilder.<WaterThrownEntity>create(SpawnGroup.MISC, WaterThrownEntity::new)
 			.dimensions(EntityDimensions.fixed(0.25f, 0.25f))

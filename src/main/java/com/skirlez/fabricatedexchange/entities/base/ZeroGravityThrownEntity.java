@@ -3,7 +3,6 @@ package com.skirlez.fabricatedexchange.entities.base;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.world.World;
 
 public abstract class ZeroGravityThrownEntity extends ThrownItemEntity {
@@ -17,11 +16,6 @@ public abstract class ZeroGravityThrownEntity extends ThrownItemEntity {
 	public ZeroGravityThrownEntity(EntityType<? extends ZeroGravityThrownEntity> entityType, LivingEntity owner, World world) {
 		super(entityType, owner, world);
 		this.setNoGravity(true);
-	}
-
-	@Override
-	protected void onBlockHit(BlockHitResult blockHitResult) {
-		this.remove(RemovalReason.DISCARDED);
 	}
 
 	@Override

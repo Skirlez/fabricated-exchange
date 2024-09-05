@@ -2,14 +2,14 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
+    "B": {
+      "item": "fabricated-exchange:iron_band"
+    },
     "D": {
       "item": "fabricated-exchange:dark_matter"
     },
     "S": {
       "item": "minecraft:string"
-    },
-    "B": {
-      "item": "fabricated-exchange:iron_band"
     }
   },
   "pattern": [

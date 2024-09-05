@@ -37,6 +37,10 @@ public abstract class ShooterRing extends Item implements ExtraFunctionItem, Ite
 		self.setRecipeRemainder(this);
 	}
 
+	public static boolean shouldTurnOn(ItemStack stack) {
+		return ((ShooterRing)stack.getItem()).autoshoot;
+	}
+
 	@Override
 	public void doExtraFunction(ItemStack stack, ServerPlayerEntity player) {
 		autoshoot = !autoshoot;

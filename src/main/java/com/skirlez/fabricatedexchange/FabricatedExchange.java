@@ -1,5 +1,6 @@
 package com.skirlez.fabricatedexchange;
 
+import com.skirlez.fabricatedexchange.abilities.ItemAbilityManager;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -87,7 +88,11 @@ public class FabricatedExchange implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTED.register((server) -> {
 			reload();
 			calculateEmcMap(server);
+
+			ItemAbilityManager.registerServer();
 		});
+
+
 	}
 
 	public static void reload() {
