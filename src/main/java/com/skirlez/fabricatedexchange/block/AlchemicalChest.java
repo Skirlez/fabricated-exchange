@@ -1,9 +1,5 @@
 package com.skirlez.fabricatedexchange.block;
 
-import java.util.function.Supplier;
-
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ChestBlock;
 import net.minecraft.block.entity.BlockEntity;
@@ -16,6 +12,9 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Supplier;
 
 public class AlchemicalChest extends ChestBlock {
 	public AlchemicalChest(Settings settings) {
@@ -42,8 +41,10 @@ public class AlchemicalChest extends ChestBlock {
 
 	@Nullable
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-		return (world.isClient && type == ModBlockEntities.ALCHEMICAL_CHEST) 
-			? (world2, pos, state1, blockEntity) -> ((AlchemicalChestBlockEntity)blockEntity).progressAnimation() 
-			: null;
+		if (type != ModBlockEntities.ALCHEMICAL_CHEST)
+			return null;
+		return (world.isClient)
+			? (world2, pos, state1, blockEntity) -> ((AlchemicalChestBlockEntity)blockEntity).progressAnimation()
+			: (world2, pos, state1, blockEntity) -> ((AlchemicalChestBlockEntity)blockEntity).tickItems(world2, pos, state1, blockEntity);
 	}
 }

@@ -25,24 +25,29 @@ import java.util.*;
  * so I should write what's implemented for Fabricated Exchange.
  * <p>
  * This item has a target item. Every tick, if it is in the on state, it will consume exactly 1 item from the inventory to accumulate EMC to work towards the target item.
- * The items it can consume are ANY stackable item without NBT (that isn't the target item, of course). It also keeps track of which items it consumed.
+ * The items it can consume are ANY stackable item without NBT (that isn't the target item, of course).
+ * <p>
+ * It also keeps track of which items it consumed.
+ * This list is sorted from lowest EMC value to highest EMC value, so the lowest valued EMC values will be the first
+ * that are returned to the player, and the first to be removed once a target item is generated (more on those cases below)
  * <p>
  * If the item has enough stored EMC to make one of the target item, and the player has room for it, it subtracts the target EMC from the stored EMC.
  * Then, it also removes enough items from its list of consumed items to match the EMC of the target item. In total,
  * it's possible that the EMC of the items it removed is higher than the EMC of the target item. Though, this is fine (and unavoidable).
  * The items list only exists as a log of sorts in case you want those items back, not as something to ensure EMC is conserved
  * (that's what the stored EMC value is for)
- *
  * <p>
  * If the item has any items in its list and it is in the off state,
- * it will subtract their values from the stored EMC and give as many of them as it can to the player
+ * it will subtract their values from the stored EMC and give as many of them as it can to the player.
+ * It will do so for all of them at the same time, rather than 1 per tick. I
  * (if they don't fit, the gem will keep the items it couldn't give in the list)
- * (all at the same time, rather than 1 per tick).
  * <p>
  * The case where items have a one EMC value when they are initially consumed,
  * but a higher one when given back due due to player set EMC mappings,
  * resulting in this operation giving this item negative stored EMC, is noted, but
  * not taken care of. I think it actually makes some sense.
+ * <p>
+ * TODO: Whitelist, blacklist.
  * */
 public class GemOfEternalDensity extends Item
 		implements ItemWithModes, EmcStoringItem {
@@ -81,22 +86,6 @@ public class GemOfEternalDensity extends Item
 
 			NbtCompound itemsCompound = gemNbt.getCompound("items");
 
-			for (int i = 0; i < inventory.size(); i++) {
-				ItemStack itemStack = inventory.getStack(i);
-				if (itemStack.isEmpty()
-						|| itemStack.getMaxCount() == 1
-						|| itemStack.hasNbt()
-						|| itemStack.getItem() == targetItem)
-					continue;
-				String itemId = Registries.ITEM.getId(itemStack.getItem()).toString();
-				int currentCount = itemsCompound.getInt(itemId);
-				EmcStoringItem.addStoredEmc(stack, EmcData.getItemEmc(itemStack.getItem()));
-				itemsCompound.putInt(itemId, currentCount + 1);
-				inventory.removeStack(i, 1);
-
-				break;
-			}
-
 			SuperNumber storedEmc = EmcStoringItem.getStoredEmc(stack);
 			String[] keys = getSortedKeyList(itemsCompound);
 
@@ -110,13 +99,47 @@ public class GemOfEternalDensity extends Item
 					SuperNumber sum = SuperNumber.Zero();
 
 					for (String key : keys) {
-						sum.add(getInternalItemEmc(key, itemsCompound));
-						itemsCompound.remove(key);
+						int count = itemsCompound.getInt(key);
+						SuperNumber itemEmc = EmcData.getItemEmc(Registries.ITEM.get(new Identifier(key)));
+
+						SuperNumber countRequired = new SuperNumber(targetEmc);
+						countRequired.subtract(sum);
+						countRequired.divide(itemEmc);
+						countRequired.ceil();
+
+
+						int countTaken = Math.min(countRequired.toInt(1), count);
+						itemEmc.multiply(countTaken);
+						sum.add(itemEmc);
+
+						assert countTaken <= count;
+
+						if (countTaken == count)
+							itemsCompound.remove(key);
+						else
+							itemsCompound.putInt(key, count - countTaken);
 						if (sum.compareTo(targetEmc) >= 0)
 							break;
 					}
 				}
 
+			}
+			else {
+				for (int i = 0; i < inventory.size(); i++) {
+					ItemStack itemStack = inventory.getStack(i);
+					if (itemStack.isEmpty()
+						|| itemStack.getMaxCount() == 1
+						|| itemStack.hasNbt()
+						|| itemStack.getItem() == targetItem)
+						continue;
+					String itemId = Registries.ITEM.getId(itemStack.getItem()).toString();
+					int currentCount = itemsCompound.getInt(itemId);
+					EmcStoringItem.addStoredEmc(stack, EmcData.getItemEmc(itemStack.getItem()));
+					itemsCompound.putInt(itemId, currentCount + 1);
+					inventory.removeStack(i, 1);
+
+					break;
+				}
 			}
 
 			gemNbt.put("items", itemsCompound);

@@ -1,18 +1,20 @@
 package com.skirlez.fabricatedexchange.item.rings;
 
-import java.math.BigInteger;
-import java.util.List;
-
 import com.skirlez.fabricatedexchange.abilities.ItemAbility;
 import com.skirlez.fabricatedexchange.entities.base.FunctionalProjectile;
-import com.skirlez.fabricatedexchange.item.*;
+import com.skirlez.fabricatedexchange.item.AbilityGrantingItem;
+import com.skirlez.fabricatedexchange.item.EmcStoringItem;
+import com.skirlez.fabricatedexchange.item.ItemWithModes;
+import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.mixin.ItemAccessor;
 import com.skirlez.fabricatedexchange.util.ConstantObjectRegistry;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
-
 import net.minecraft.client.item.TooltipContext;
-import net.minecraft.entity.*;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LightningEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -25,6 +27,9 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+
+import java.math.BigInteger;
+import java.util.List;
 
 
 public class SwiftWolfsRendingGale extends Item
