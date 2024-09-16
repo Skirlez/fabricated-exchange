@@ -1,20 +1,20 @@
 {
     "parent": "minecraft:item/generated",
     "textures": {
-        "layer0": "fabricated-exchange:item/archangels_smite_default"
+        "layer0": "fabricated-exchange:item/archangels_smite_off"
     },
     "overrides": [
         {
             "predicate": {
                 "fabricated-exchange:state": 0
             },
-            "model": "fabricated-exchange:item/archangels_smite_default"
+            "model": "fabricated-exchange:item/archangels_smite_off"
         },
         {
             "predicate": {
                 "fabricated-exchange:state": 1
             },
-            "model": "fabricated-exchange:item/archangels_smite_angry"
+            "model": "fabricated-exchange:item/archangels_smite_on"
         }
     ]
 }

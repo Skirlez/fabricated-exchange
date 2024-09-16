@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "minecraft:diamond"
+    },
+    "D": {
+      "item": "fabricated-exchange:dark_matter"
+    },
+    "F": {
+      "item": "minecraft:obsidian"
+    }
+  },
+  "pattern": [
+    "FAF",
+    "DFD",
+    "FAF"
+  ],
+  "result": {
+    "item": "fabricated-exchange:gem_of_eternal_density"
+  },
+  "show_notification": true
+}

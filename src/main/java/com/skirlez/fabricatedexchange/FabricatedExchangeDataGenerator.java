@@ -172,24 +172,25 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 			registerGeneratedModels(itemModelGenerator,
 				ModItems.PHILOSOPHERS_STONE, ModItems.ALCHEMICAL_COAL, ModItems.RADIANT_COAL, ModItems.MOBIUS_FUEL,
 				ModItems.AETERNALIS_FUEL, ModItems.LOW_COVALENCE_DUST, ModItems.MEDIUM_COVALENCE_DUST, 
-				ModItems.HIGH_COVALENCE_DUST, ModItems.LOW_DIVIDING_ROD, ModItems.MEDIUM_DIVIDING_ROD, ModItems.HIGH_DIVIDING_ROD, ModItems.DARK_MATTER, ModItems.RED_MATTER, ModItems.TOME_OF_KNOWLEDGE,
+				ModItems.HIGH_COVALENCE_DUST, ModItems.LOW_DIVIDING_ROD, ModItems.MEDIUM_DIVIDING_ROD, ModItems.HIGH_DIVIDING_ROD,
+				ModItems.DARK_MATTER, ModItems.RED_MATTER, ModItems.TOME_OF_KNOWLEDGE,
 				ModItems.TRANSMUTATION_TABLET, ModItems.IRON_BAND, ModItems.ITEM_ORB, ModItems.DARK_MATTER_BOOTS, 
 				ModItems.DARK_MATTER_LEGGINGS, ModItems.DARK_MATTER_CHESTPLATE, ModItems.DARK_MATTER_HELMET,
 				ModItems.RED_MATTER_BOOTS, ModItems.RED_MATTER_LEGGINGS, ModItems.RED_MATTER_CHESTPLATE,
-				ModItems.RED_MATTER_HELMET, ModItems.REPAIR_TALISMAN);
+				ModItems.RED_MATTER_HELMET, ModItems.REPAIR_TALISMAN, ModItems.EVERTIDE_AMULET,
+				ModItems.VOLCANITE_AMULET, ModItems.WATER_ORB, ModItems.LAVA_ORB, ModItems.TORNADO_ORB, ModItems.FROZEN_ORB);
 			
 			registerHandheldModels(itemModelGenerator, ModItems.DARK_MATTER_SWORD, ModItems.DARK_MATTER_PICKAXE, ModItems.DARK_MATTER_AXE,
 				ModItems.DARK_MATTER_SHOVEL, ModItems.DARK_MATTER_HOE, ModItems.DARK_MATTER_HAMMER, ModItems.RED_MATTER_SWORD, ModItems.RED_MATTER_PICKAXE,
-					ModItems.RED_MATTER_AXE, ModItems.RED_MATTER_HOE, ModItems.RED_MATTER_SHOVEL, ModItems.RED_MATTER_HAMMER);
-			
-			itemModelGenerator.register(ModItems.SWIFTWOLFS_RENDING_GALE, "_off", Models.GENERATED);
-			itemModelGenerator.register(ModItems.SWIFTWOLFS_RENDING_GALE, "_on", Models.GENERATED);
-			itemModelGenerator.register(ModItems.SWIFTWOLFS_RENDING_GALE, "_off_repelling", Models.GENERATED);
-			itemModelGenerator.register(ModItems.SWIFTWOLFS_RENDING_GALE, "_on_repelling", Models.GENERATED);
-			
-			itemModelGenerator.register(ModItems.ARCHANGELS_SMITE, "_default", Models.GENERATED);
-			itemModelGenerator.register(ModItems.ARCHANGELS_SMITE, "_angry", Models.GENERATED);
+				ModItems.RED_MATTER_AXE, ModItems.RED_MATTER_HOE, ModItems.RED_MATTER_SHOVEL, ModItems.RED_MATTER_HAMMER);
 
+
+			registerGeneratedModels(itemModelGenerator, new String[] {"off", "on"},
+				ModItems.IGNITION_RING, ModItems.HYDRATION_RING, ModItems.ZERO_RING, ModItems.GEM_OF_ETERNAL_DENSITY,
+				ModItems.BLACK_HOLE_BAND, ModItems.ARCHANGELS_SMITE);
+
+			registerGeneratedModels(itemModelGenerator, new String[] {"off", "on", "off_repelling", "on_repelling"},
+				ModItems.SWIFTWOLFS_RENDING_GALE);
 		}
 
 		public void registerGeneratedModels(ItemModelGenerator itemModelGenerator, Item... items) {
@@ -197,6 +198,15 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 				itemModelGenerator.register(items[i], Models.GENERATED);
 			}
 		}
+
+		public void registerGeneratedModels(ItemModelGenerator itemModelGenerator, String[] suffixes, Item... items) {
+			for (Item item : items) {
+				for (String suffix : suffixes) {
+					itemModelGenerator.register(item, "_" + suffix, Models.GENERATED);
+				}
+			}
+		}
+
 		public void registerHandheldModels(ItemModelGenerator itemModelGenerator, Item... items) {
 			for (int i = 0; i < items.length; i++) {
 				itemModelGenerator.register(items[i], Models.HANDHELD);
@@ -624,7 +634,47 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 							FabricRecipeProvider.conditionsFromItem(ModItems.HIGH_COVALENCE_DUST))
 					.offerTo(exporter);
 
+			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.GEM_OF_ETERNAL_DENSITY)
+					.pattern("FAF")
+					.pattern("DFD")
+					.pattern("FAF")
+					.input('A', Items.DIAMOND)
+					.input('D', ModItems.DARK_MATTER)
+					.input('F', Items.OBSIDIAN)
+					.criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER),
+							FabricRecipeProvider.conditionsFromItem(ModItems.DARK_MATTER))
+					.offerTo(exporter);
 
+			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.BLACK_HOLE_BAND)
+					.pattern("SSS")
+					.pattern("DBD")
+					.pattern("SSS")
+					.input('S', Items.STRING)
+					.input('D', ModItems.DARK_MATTER)
+					.input('B', ModItems.IRON_BAND)
+					.criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER),
+							FabricRecipeProvider.conditionsFromItem(ModItems.DARK_MATTER))
+					.offerTo(exporter);
+
+			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.EVERTIDE_AMULET)
+					.pattern("WWW")
+					.pattern("DDD")
+					.pattern("WWW")
+					.input('W', Items.WATER_BUCKET)
+					.input('D', ModItems.DARK_MATTER)
+					.criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER),
+							FabricRecipeProvider.conditionsFromItem(ModItems.DARK_MATTER))
+					.offerTo(exporter);
+
+			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.VOLCANITE_AMULET)
+					.pattern("LLL")
+					.pattern("DDD")
+					.pattern("LLL")
+					.input('L', Items.LAVA_BUCKET)
+					.input('D', ModItems.DARK_MATTER)
+					.criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER),
+							FabricRecipeProvider.conditionsFromItem(ModItems.DARK_MATTER))
+					.offerTo(exporter);
 
 			generateArmorRecipes(ModItems.DARK_MATTER, ModItems.DARK_MATTER_BOOTS, ModItems.DARK_MATTER_LEGGINGS,
 				ModItems.DARK_MATTER_CHESTPLATE, ModItems.DARK_MATTER_HELMET, exporter);

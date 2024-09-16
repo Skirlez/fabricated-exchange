@@ -116,8 +116,6 @@ public class SuperNumber {
 
 	/** Rounds the SuperNumber to the closest whole number smaller than itself */
 	public void floor() {
-		if (numerator.equals(BigInteger.ZERO) || denominator.equals(BigInteger.ONE))
-			return;
 		BigInteger mod = numerator.remainder(denominator);
 		numerator = numerator.subtract(mod);
 
@@ -127,8 +125,6 @@ public class SuperNumber {
 
 	/** Rounds the SuperNumber to the closest whole number greater than itself */
 	public void ceil() {
-		if (numerator.equals(BigInteger.ZERO) || denominator.equals(BigInteger.ONE))
-			return;
 		BigInteger mod = numerator.mod(denominator);
 		numerator = numerator.add(denominator.subtract(mod));
 
@@ -345,7 +341,7 @@ public class SuperNumber {
 			String numeratorString = numerator.toString();
 			int zeroLen;
 			boolean isPower;
-			if (divisionString.startsWith(numeratorString)) { 
+			if (divisionString.startsWith(numeratorString)) {
 				isPower = true;
 				for (int i = numeratorString.length(); i < divisionString.length(); i++) {
 					if (divisionString.charAt(i) != '0') {

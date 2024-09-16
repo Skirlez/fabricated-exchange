@@ -1,13 +1,18 @@
 package com.skirlez.fabricatedexchange;
 
+import com.skirlez.fabricatedexchange.abilities.ItemAbilityManager;
 import com.skirlez.fabricatedexchange.block.AlchemicalChestBlockEntity;
 import com.skirlez.fabricatedexchange.block.EnergyCondenserBlockEntity;
 import com.skirlez.fabricatedexchange.block.ModBlockEntities;
 import com.skirlez.fabricatedexchange.block.ModBlocks;
+import com.skirlez.fabricatedexchange.entities.ModEntityRenderers;
 import com.skirlez.fabricatedexchange.event.KeyInputHandler;
 import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.item.rings.ArchangelsSmite;
+import com.skirlez.fabricatedexchange.item.rings.BlackHoleBand;
 import com.skirlez.fabricatedexchange.item.rings.SwiftWolfsRendingGale;
+import com.skirlez.fabricatedexchange.item.rings.base.ShooterRing;
+import com.skirlez.fabricatedexchange.item.stones.GemOfEternalDensity;
 import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
 import com.skirlez.fabricatedexchange.screen.ModScreens;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
@@ -22,10 +27,14 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.render.block.entity.ChestBlockEntityRenderer;
+import net.minecraft.item.Item;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.Arrays;
+
 public class FabricatedExchangeClient implements ClientModInitializer {
 	
 	public static SuperNumber clientEmc = SuperNumber.Zero();
@@ -44,7 +53,9 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 		ModScreens.register();
 		KeyInputHandler.register();
 		ModServerToClientPackets.register();
-		
+		ItemAbilityManager.registerClient();
+
+		ModEntityRenderers.registerEntityRenderers();
 		
 		// we can use the vanilla renderers due to the texture mixin, see ModTexturedRenderLayers
 		BlockEntityRendererFactories.register(ModBlockEntities.ALCHEMICAL_CHEST, ChestBlockEntityRenderer::new);
@@ -59,19 +70,26 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 		
 		ModelPredicateProviderRegistry.register(ModItems.SWIFTWOLFS_RENDING_GALE, new Identifier(FabricatedExchange.MOD_ID, "state"), 
 				(stack, world, entity, number) -> {
-			boolean isOn = SwiftWolfsRendingGale.isOn(stack);
+			boolean isOn = SwiftWolfsRendingGale.isOn(entity, stack);
 			boolean isRepelling = SwiftWolfsRendingGale.isRepelling(stack);
 			if (isRepelling)
 				return isOn ? 0.3f : 0.2f;
 			else
 				return isOn ? 0.1f : 0f;
 		});
-		
 		ModelPredicateProviderRegistry.register(ModItems.ARCHANGELS_SMITE, new Identifier(FabricatedExchange.MOD_ID, "state"), 
-				(stack, world, entity, number) -> {
-			return ArchangelsSmite.isAngry(stack) ? 1f : 0f;
-		});
+				(stack, world, entity, number) -> ArchangelsSmite.shouldLookAngry(stack) ? 1f : 0f);
 
+		ModelPredicateProviderRegistry.register(ModItems.GEM_OF_ETERNAL_DENSITY, new Identifier(FabricatedExchange.MOD_ID, "state"),
+			(stack, world, entity, number) -> GemOfEternalDensity.isCondensing(stack) ? 1f : 0f);
+
+		ModelPredicateProviderRegistry.register(ModItems.BLACK_HOLE_BAND, new Identifier(FabricatedExchange.MOD_ID, "state"),
+			(stack, world, entity, number) -> BlackHoleBand.isOn(stack) ? 1f : 0f);
+
+		for (Item item : Arrays.asList(ModItems.ZERO_RING, ModItems.IGNITION_RING, ModItems.HYDRATION_RING)) {
+			ModelPredicateProviderRegistry.register(item, new Identifier(FabricatedExchange.MOD_ID, "state"),
+				(stack, world, entity, number) -> ShooterRing.shouldTurnOn(stack) ? 1f : 0f);
+		}
 		
 		/*
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {

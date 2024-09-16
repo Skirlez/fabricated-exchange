@@ -1,7 +1,5 @@
 package com.skirlez.fabricatedexchange.screen;
 
-import java.util.function.Consumer;
-
 import org.lwjgl.glfw.GLFW;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -37,8 +35,9 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 			new Identifier(FabricatedExchange.MOD_ID, "textures/gui/transmute.png");
 
 
-	private int fullAngleTime = 800;
-	private int fullDistTime = 800;
+	private static final int FULL_ANGLE_TIME = 800;
+	private static final int FULL_DIST_TIME = 800;
+	private static final int FULL_POP_UP_TIME = 800;
 
 	private String oldSearchText = "";
 
@@ -50,6 +49,7 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 	private double distanceFromCenter;
 	private boolean animated;
 	private int offeringPageNum = 0;
+	private boolean popUpDisabled = true;
 
 	public TransmutationTableScreen(TransmutationTableScreenHandler handler, PlayerInventory inventory, Text title) {
 		super(handler, inventory, title);
@@ -101,11 +101,10 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 		titleX = 5;	 
 		titleY = 5; 
 
-		Consumer<String> updater = searchText -> updateSearchText(searchText);
 
 		searchBar = new TextFieldWidget(this.textRenderer, x + 78, y + 4, 60, 10, Text.empty());
 		searchBar.setMaxLength(30);
-		searchBar.setChangedListener(updater);
+		searchBar.setChangedListener(this::updateSearchText);
 		addDrawableChild(searchBar);
 
 		addDrawableChild(ButtonWidget.builder(
@@ -183,7 +182,7 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 			offeringPageNum = lastPage;
 
 		Text text = Text.literal((offeringPageNum + 1) + "/" + (lastPage + 1));
-		textRenderer.draw(matrices, text, 168 - textRenderer.getWidth(text) / 2, 107, 0x404040);
+		textRenderer.draw(matrices, text, 168 - textRenderer.getWidth(text) / 2f, 107, 0x404040);
 	}
 
 	public void resetAngleTime(double additonalRotations) {
@@ -192,18 +191,18 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 		// any angle below fullAngleTime * multiplier will be floored in order to keep it within that range.
 		// and so for additionalRotations = 1, the x position will stay in the negative range such that the y
 		// never exceeds -1, so it will only do 1 additional rotation at most.
-		double multiplier = Math.cbrt(additonalRotations + 1) - 1; 
-		double maxNegativeAngle = (double)fullAngleTime * multiplier; 
+		double multiplier = Math.cbrt(additonalRotations + 1) - 1;
+		double maxNegativeAngle = (double) FULL_ANGLE_TIME * multiplier;
 		long add = 0;
 		double angleTime = (double)(System.currentTimeMillis() - angleStartTime);
-		if (angleTime < fullAngleTime) {
+		if (angleTime < FULL_ANGLE_TIME) {
 			if (angleTime < 0)
 				angleTime %= maxNegativeAngle;
 			
-			double x = angleTime / fullAngleTime;
+			double x = angleTime / FULL_ANGLE_TIME;
 			double angleOffset = (Math.pow(x - 1.0, 3.0) + 1.0);
 
-			add = (long)(maxNegativeAngle - maxNegativeAngle * angleOffset );
+			add = (long)(maxNegativeAngle - maxNegativeAngle * angleOffset);
 		}
 		angleStartTime = System.currentTimeMillis() + add;
 	}
@@ -219,13 +218,13 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 
 		if (animated) {
 			double angleTime = (double)(System.currentTimeMillis() - angleStartTime);
-			if (angleTime < fullAngleTime) {
-				double x = angleTime / fullAngleTime;
+			if (angleTime < FULL_ANGLE_TIME) {
+				double x = angleTime / FULL_ANGLE_TIME;
 				angleOffset = 360.0 * (Math.pow(x - 1.0, 3.0) + 1.0);
 			}
 			double distTime = (double)(System.currentTimeMillis() - distStartTime);
-			if (distTime < fullDistTime) {
-				double x = distTime / fullDistTime;
+			if (distTime < FULL_DIST_TIME) {
+				double x = distTime / FULL_DIST_TIME;
 				distanceFromCenter = Math.pow(x - 1.0, 3.0) + 1.0;
 			}
 			else
@@ -254,7 +253,6 @@ public class TransmutationTableScreen extends HandledScreen<TransmutationTableSc
 			double radianAngle = Math.toRadians(slot.angle + (angleOffset * rotationDir));
 			int yOffset = (int)(Math.sin(radianAngle) * distanceFromCenter * 41.6);
 			int xOffset = (int)(Math.cos(radianAngle) * distanceFromCenter * 41.6) + (int)xOffsetGlobal;
-
 
 			slot.setPosition(159 + xOffset, 49 + yOffset);
 		}

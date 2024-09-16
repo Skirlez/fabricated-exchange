@@ -18,8 +18,6 @@ public class TransmutationSlot extends Slot {
 	// This slot will contain an item the player has learned. taking it will subtract from the player's EMC.
 	private PlayerEntity player;
 	public double angle;
-	public double distanceFromCenter = 0;
-	public long startTime = System.currentTimeMillis();
 	private TransmutationTableScreenHandler screenHandler;
 	public TransmutationSlot(Inventory inventory, int index, double angle, PlayerEntity player, 
 			TransmutationTableScreenHandler screenHandler) {
@@ -37,24 +35,13 @@ public class TransmutationSlot extends Slot {
 		slot.setY(newY);
 	}
 
-	@Override
-	public void setStack(ItemStack stack) {
-		if (isEnabled())
-			startTime = System.currentTimeMillis();
-		this.setStackNoCallbacks(stack);
 
-	}
 
 	@Override
 	public boolean isEnabled() {
 		return super.hasStack();
 	}
 
-
-	@Override
-	public boolean canTakeItems(PlayerEntity playerEntity) {
-		return true;
-	}
 
 	@Override
 	public ItemStack takeStack(int amount) {

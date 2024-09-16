@@ -18,10 +18,11 @@ public abstract class ModServerToClientPackets {
 		= new UpdateNbtItems("update_nbt_items");
 	
 	public static final ServerToClientPacket[] PACKETS = {
-			UPDATE_CONSUMER_BLOCK, 
-			UPDATE_TRANSMUTATION_LAST_PAGE, UPDATE_PLAYER_EMC,
-			UPDATE_EMC_MAPS, UPDATE_BLOCK_TRANSMUTATION_MAP, 
-			UPDATE_NBT_ITEMS};
+		UPDATE_CONSUMER_BLOCK,
+		UPDATE_TRANSMUTATION_LAST_PAGE, UPDATE_PLAYER_EMC,
+		UPDATE_EMC_MAPS, UPDATE_BLOCK_TRANSMUTATION_MAP,
+		UPDATE_NBT_ITEMS
+	};
 
 	public static void register() {
 		for (ServerToClientPacket packet : PACKETS) {

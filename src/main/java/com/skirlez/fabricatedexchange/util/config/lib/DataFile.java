@@ -39,29 +39,29 @@ public class DataFile<T> extends AbstractFile<T> {
 
 @SuppressWarnings("serial")
 class ActuallyGoodPrettyPrinter extends DefaultPrettyPrinter {
-    public ActuallyGoodPrettyPrinter() {
-    	_objectIndenter = new DefaultIndenter("   ", System.lineSeparator());
+	public ActuallyGoodPrettyPrinter() {
+		_objectIndenter = new DefaultIndenter("   ", System.lineSeparator());
 	}
-    public void writeObjectFieldValueSeparator(JsonGenerator g) throws IOException {
-    	g.writeRaw(": ");
-    }
-    public void writeStartArray(JsonGenerator g) throws IOException {
-    	g.writeRaw("[");
-    	_nesting++;
-    	_objectIndenter.writeIndentation(g, _nesting);
-    }
-    public void writeEndArray(JsonGenerator g, int nrOfValues) throws IOException {
-    	_nesting--;
-    	_objectIndenter.writeIndentation(g, _nesting);
-    	g.writeRaw(']');
-    }
-    public void beforeArrayValues(JsonGenerator g) throws IOException {
-    }
-    @Override
-    public void writeArrayValueSeparator(JsonGenerator g) throws IOException {
-    	g.writeRaw(',');
-    	_objectIndenter.writeIndentation(g, _nesting);
-    }
+	public void writeObjectFieldValueSeparator(JsonGenerator g) throws IOException {
+		g.writeRaw(": ");
+	}
+	public void writeStartArray(JsonGenerator g) throws IOException {
+		g.writeRaw("[");
+		_nesting++;
+		_objectIndenter.writeIndentation(g, _nesting);
+	}
+	public void writeEndArray(JsonGenerator g, int nrOfValues) throws IOException {
+		_nesting--;
+		_objectIndenter.writeIndentation(g, _nesting);
+		g.writeRaw(']');
+	}
+	public void beforeArrayValues(JsonGenerator g) throws IOException {
+	}
+	@Override
+	public void writeArrayValueSeparator(JsonGenerator g) throws IOException {
+		g.writeRaw(',');
+		_objectIndenter.writeIndentation(g, _nesting);
+	}
 	@Override
 	public DefaultPrettyPrinter createInstance() {
 		return new ActuallyGoodPrettyPrinter();

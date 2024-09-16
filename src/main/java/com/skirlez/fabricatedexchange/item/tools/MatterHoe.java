@@ -114,23 +114,23 @@ public class MatterHoe extends HoeItem implements ChargeableItem, OutliningItem,
 	}
 	*/
 	
-    @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        int charge = ChargeableItem.getCharge(context.getStack());
-        if (charge == 0)
-            return super.useOnBlock(context);
-        
-        boolean anySuccess = false;
-        List<BlockPos> positions = getPositionsToOutline(context.getPlayer(), context.getStack(), context.getBlockPos());
-        for (BlockPos newPos : positions) {
-            FakeItemUsageContext fakeContext = 
-                new FakeItemUsageContext(context.getPlayer(), context.getHand(), newPos, Direction.UP);
-            anySuccess = (super.useOnBlock(fakeContext).isAccepted()) || anySuccess;
-        }
+	@Override
+	public ActionResult useOnBlock(ItemUsageContext context) {
+		int charge = ChargeableItem.getCharge(context.getStack());
+		if (charge == 0)
+			return super.useOnBlock(context);
+		
+		boolean anySuccess = false;
+		List<BlockPos> positions = getPositionsToOutline(context.getPlayer(), context.getStack(), context.getBlockPos());
+		for (BlockPos newPos : positions) {
+			FakeItemUsageContext fakeContext = 
+				new FakeItemUsageContext(context.getPlayer(), context.getHand(), newPos, Direction.UP);
+			anySuccess = (super.useOnBlock(fakeContext).isAccepted()) || anySuccess;
+		}
 
-        return ActionResult.success(anySuccess);
-        
-    }
+		return ActionResult.success(anySuccess);
+		
+	}
 
 	
 	@Override
@@ -151,7 +151,7 @@ public class MatterHoe extends HoeItem implements ChargeableItem, OutliningItem,
 		for (int i = 0; i < len; i++) {
 			for (int j = 0; j < len; j++) {
 				BlockPos newPos = corner.add(i, 0, j);
-				if (TILLABLE_BLOCKS.contains(world.getBlockState(newPos).getBlock()) && world.getBlockState(newPos.add(0, 1, 0)).getBlock().equals(Blocks.AIR));
+				if (TILLABLE_BLOCKS.contains(world.getBlockState(newPos).getBlock()) && world.getBlockState(newPos.add(0, 1, 0)).getBlock().equals(Blocks.AIR))
 					list.add(newPos);
 			}
 		}

@@ -1,0 +1,20 @@
+{
+    "parent": "minecraft:item/generated",
+    "textures": {
+        "layer0": "fabricated-exchange:item/black_hole_band_off"
+    },
+    "overrides": [
+        {
+            "predicate": {
+                "fabricated-exchange:state": 0
+            },
+            "model": "fabricated-exchange:item/black_hole_band_off"
+        },
+        {
+            "predicate": {
+                "fabricated-exchange:state": 1
+            },
+            "model": "fabricated-exchange:item/black_hole_band_on"
+        }
+    ]
+}

@@ -2,105 +2,62 @@ package com.skirlez.fabricatedexchange.item.rings;
 
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.item.EmcStoringItem;
-import com.skirlez.fabricatedexchange.item.ExtraFunctionItem;
 import com.skirlez.fabricatedexchange.item.ItemWithModes;
-import com.skirlez.fabricatedexchange.item.ModItems;
-import com.skirlez.fabricatedexchange.mixin.ItemAccessor;
+import com.skirlez.fabricatedexchange.item.rings.base.ShooterRing;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Direction;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
-import java.util.List;
-
-
-public class ArchangelsSmite extends Item
-		implements ExtraFunctionItem, ItemWithModes, EmcStoringItem {
-
-	private static final SuperNumber DESIRED_AMOUNT = new SuperNumber(98);
-
-	public boolean autoshoot = false;
+public class ArchangelsSmite extends ShooterRing implements ItemWithModes {
 
 	public ArchangelsSmite(Settings settings) {
 		super(settings);
-		ItemAccessor self = (ItemAccessor) this;
-		self.setRecipeRemainder(this);
 	}
 
-	@Override
-	public void doExtraFunction(ItemStack stack, ServerPlayerEntity player) {
-		autoshoot = !autoshoot;
+	private SuperNumber getProjectileCost() {
+		return EmcData.getItemEmc(Items.ARROW);
 	}
 
-	@Override
-	public int getModeAmount() {
-		return 3;
+
+	public static boolean shouldLookAngry(ItemStack stack) {
+		if (stack.getItem() instanceof ArchangelsSmite item)
+			return item.autoshoot;
+		return false;
 	}
 
-	@Override
-	public boolean modeSwitchCondition(ItemStack stack) {
+
+	protected boolean consumeEmcAndFireProjectile(ItemStack stack, PlayerEntity player, Vec3d direction, World world) {
+		if (!EmcStoringItem.takeStoredEmcOrConsume(getProjectileCost(), stack, player.getInventory()))
+			return false;
+
+		ArrowEntity arrow = new ArrowEntity(world, player);
+		arrow.updatePosition(player.getX(), player.getEyeY() - 0.1, player.getZ());
+		arrow.setVelocity(direction.x, direction.y, direction.z, 3f, 0f);
+		// There's actually no reason why this should be disallowed, technically... you did pay for those
+		arrow.pickupType = ArrowEntity.PickupPermission.DISALLOWED;
+		world.spawnEntity(arrow);
+
 		return true;
 	}
-	@Override
-	public ItemStack getDefaultStack() {
-		ItemStack stack = new ItemStack(this);
-		stack.getOrCreateNbt().putString(EmcStoringItem.EMC_NBT_KEY, "0");
-		return stack;
-	}
 
 	@Override
-	public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-		ItemStack stack = user.getStackInHand(hand);
-
-		arrowFireLogic(world, user, stack);
-
-		return TypedActionResult.success(stack);
+	protected void playShootSound(PlayerEntity player, World world) {
+		world.playSound(null, player.getX(), player.getY(), player.getZ(),
+			SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 1.0f,
+			1.0f / (world.getRandom().nextFloat() * 0.4f + 1.2f) + 0.5f);
 	}
 
+
+
+	/*
 	@Override
-	public void inventoryTick(ItemStack stack, World world, Entity pEntity, int slot, boolean selected) {
-		SuperNumber storedEmc = EmcStoringItem.getStoredEmc(stack);
-		SuperNumber arrowEMC = EmcData.getItemEmc(Items.ARROW);
-
-		if (arrowEMC.equalsZero()) {
-			arrowEMC = new SuperNumber(14);
-		}
-
-		if (pEntity instanceof PlayerEntity player) {
-			if (storedEmc.toDouble() < (arrowEMC.toDouble()*7)) {
-				storedEmc = EmcStoringItem.tryConsumeEmc(DESIRED_AMOUNT, stack, player.getInventory());
-
-				if (storedEmc.toDouble() < arrowEMC.toDouble())
-					return;
-			}
-			if (!storedEmc.isPositive())
-				storedEmc = EmcStoringItem.tryConsumeEmc(DESIRED_AMOUNT, stack, player.getInventory());
-			EmcStoringItem.setStoredEmc(stack, storedEmc);
-		}
-
-		if (autoshoot){
-			stack.getOrCreateNbt().putInt("CustomModelData", 1);
-			PlayerEntity user = (PlayerEntity) pEntity;
-			arrowFireLogic(world, user, stack);
-		} else{
-			stack.getOrCreateNbt().putInt("CustomModelData", 0);
-		}
-	}
-
-	public void fireSingleArrow(World world, PlayerEntity user, float speed, float divergence){
+	protected void fireSingleProjectile(World world, PlayerEntity user, float speed, float divergence) {
 		ArrowEntity arrow = new ArrowEntity(world, user);
 		arrow.updatePosition(user.getX(), user.getEyeY() - 0.1, user.getZ());
 		Vec3d vec3d = user.getRotationVec(1.0F);
@@ -109,9 +66,9 @@ public class ArchangelsSmite extends Item
 		world.spawnEntity(arrow);
 	}
 
-	public boolean fireHomingArrow(World world, PlayerEntity user, float speed, float divergence) {
+	@Override
+	protected boolean fireHomingProjectile(World world, PlayerEntity user, float speed, float divergence) {
 		var triggered = false;
-		// Get all entities within a certain radius around the player, excluding the player
 		if (!user.getItemCooldownManager().isCoolingDown(this)) {
 			List<LivingEntity> entities = world.getEntitiesByClass(LivingEntity.class, user.getBoundingBox().expand(20), entity -> entity != user);
 			LivingEntity closestEntity = null;
@@ -125,7 +82,6 @@ public class ArchangelsSmite extends Item
 				}
 			}
 
-			// If a closest visible entity was found, shoot an arrow towards it
 			if (closestEntity != null) {
 				Vec3d direction = closestEntity.getPos().subtract(user.getPos().offset(Direction.UP, 0.5)).normalize();
 				ArrowEntity arrow = new ArrowEntity(world, user);
@@ -140,66 +96,23 @@ public class ArchangelsSmite extends Item
 		return triggered;
 	}
 
-	private boolean isVisible(PlayerEntity user, LivingEntity target, World world) {
-		Vec3d userEyes = user.getCameraPosVec(1.0F); // Player's eye position
-		Vec3d targetEyes = target.getPos().add(0, target.getEyeHeight(target.getPose()), 0); // Target's eye position
-		// Create a raycast context from the player to the target
-		RaycastContext context = new RaycastContext(userEyes, targetEyes, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user);
-		// Perform the ray trace
-		BlockHitResult result = world.raycast(context);
-		// Check if the ray trace hit a block before reaching the target
-		return result.getType() == HitResult.Type.MISS || result.getPos().squaredDistanceTo(targetEyes) < 0.5;
+	@Override
+	protected void fireChaosProjectile(World world, PlayerEntity user, float speed, float divergence) {
+		Random random = new Random();
+
+		Vec3d direction = new Vec3d(
+				random.nextDouble() * 2 - 1,
+				random.nextDouble() * 2 - 1,
+				random.nextDouble() * 2 - 1
+		).normalize();
+		ArrowEntity arrow = new ArrowEntity(world, user);
+		arrow.setPosition(user.getX() + direction.x * 2, user.getEyeY() - 1, user.getZ() + direction.z * 2);
+		arrow.setVelocity(direction.x, direction.y, direction.z, speed, divergence);
+		arrow.pickupType = ArrowEntity.PickupPermission.DISALLOWED;
+		world.spawnEntity(arrow);
 	}
 
-	public void arrowFireLogic(World world, PlayerEntity user, ItemStack stack){
-		SuperNumber storedEmc = EmcStoringItem.getStoredEmc(stack);
-		int mode = ItemWithModes.getMode(stack);
 
-		if (!world.isClient) {
-			var arrowEMC = EmcData.getItemEmc(Items.ARROW);
-			if (arrowEMC.equalsZero()) {
-				arrowEMC = new SuperNumber(14);
-			}
-
-			switch (mode) {
-				case 0: {
-					if (storedEmc.toDouble() >= arrowEMC.toDouble() && !user.getItemCooldownManager().isCoolingDown(this)) {
-						storedEmc.subtract(arrowEMC);
-						fireSingleArrow(world, user, 5.0F, 0.0F);
-						user.getItemCooldownManager().set(this, 5);
-					}
-					break;
-				}
-				case 1: {
-					if (storedEmc.toDouble() >= (arrowEMC.toDouble()*7) && !user.getItemCooldownManager().isCoolingDown(this)) {
-						for (int i = 0; i < 7; i++) {
-							storedEmc.subtract(arrowEMC);
-							fireSingleArrow(world, user, 3.5F, 6.0F);
-						}
-						user.getItemCooldownManager().set(this, 10);
-					}
-					break;
-				}
-				case 2: {
-					if (storedEmc.toDouble() >= arrowEMC.toDouble()*2){
-						SuperNumber doubleArrowEMC = arrowEMC;
-						doubleArrowEMC.multiply(2);
-						if (fireHomingArrow(world, user, 3.5f, 0.0f)){
-							storedEmc.subtract(doubleArrowEMC);
-						}
-					}
-					break;
-				}
-			}
-		}
-		EmcStoringItem.setStoredEmc(stack, storedEmc); // Save updated EMC outside the switch
-	}
-
-	public static boolean isAngry(ItemStack stack) {
-		if (stack.getItem() instanceof ArchangelsSmite item)
-			return item.autoshoot;
-		return false;
-	}
-	
+	*/
 }
 
