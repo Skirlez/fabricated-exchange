@@ -1,23 +1,16 @@
 package com.skirlez.fabricatedexchange.item.rings;
 
 import com.skirlez.fabricatedexchange.abilities.ItemAbility;
-import com.skirlez.fabricatedexchange.item.*;
+import com.skirlez.fabricatedexchange.item.AbilityGrantingItem;
 import com.skirlez.fabricatedexchange.mixin.ItemAccessor;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.StackReference;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.ClickType;
-import net.minecraft.util.Formatting;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -26,38 +19,15 @@ import java.util.List;
 
 
 public class BlackHoleBand extends Item
-		implements ItemWithModes, AbilityGrantingItem {
+		implements AbilityGrantingItem {
+
+	private static final String PULLING_KEY = "FE_Pulling";
 
 	public BlackHoleBand(Settings settings) {
 		super(settings);
 		ItemAccessor self = (ItemAccessor) this;
 		self.setRecipeRemainder(this);
 	}
-
-	@Override
-	public int getModeAmount() {
-		return 2;
-	}
-
-	// Helper method to check if the player has at least one empty slot in their inventory
-	private boolean hasInventorySpace(PlayerEntity player) {
-		for (int i = 0; i < player.getInventory().size(); i++) {
-			if (player.getInventory().getStack(i).isEmpty()) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-
-	@Override
-	public void appendTooltip(ItemStack stack, World world, List<Text> tooltip, TooltipContext context) {
-		int mode = ItemWithModes.getMode(stack);
-		tooltip.add(Text.translatable("item.fabricated-exchange.range_switch")
-				.append(" ")
-				.append(ItemWithModes.getModeName(stack, mode).setStyle(Style.EMPTY.withColor(Formatting.GOLD))));
-	}
-
 	private static final ItemAbility ITEM_PULL = new ItemAbility() {
 		@Override
 		public void tick(ItemStack stack, PlayerEntity player) {
@@ -71,23 +41,31 @@ public class BlackHoleBand extends Item
 			}
 		}
 		@Override
-		public void onRemove(PlayerEntity player) {
-
-		}
+		public void onRemove(PlayerEntity player) { }
 	};
 
 	public static boolean isOn(ItemStack stack) {
-		return ItemWithModes.getMode(stack) == 1;
+		NbtCompound nbt = stack.getNbt();
+		if (nbt == null)
+			return false;
+		return nbt.getBoolean(PULLING_KEY);
 	}
 
 	@Override
 	public boolean shouldGrantAbility(PlayerEntity player, ItemStack stack) {
-		return ItemWithModes.getMode(stack) == 1;
+		return isOn(stack);
 	}
 
 	@Override
 	public ItemAbility getAbility() {
 		return ITEM_PULL;
+	}
+
+	@Override
+	public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+		NbtCompound nbt = user.getStackInHand(hand).getOrCreateNbt();
+		nbt.putBoolean(PULLING_KEY, !nbt.getBoolean(PULLING_KEY));
+		return super.use(world, user, hand);
 	}
 }
 

@@ -101,11 +101,8 @@
     "item.fabricated-exchange.gem_of_eternal_density.mode_4": "Dark Matter",
     "item.fabricated-exchange.gem_of_eternal_density.mode_5": "Red Matter",
     "item.fabricated-exchange.evertide_amulet": "Evertide Amulet",
-    "item.fabricated-exchange.evertide_amulet.mode_1": "Place",
-    "item.fabricated-exchange.evertide_amulet.mode_2": "Pass",
     "item.fabricated-exchange.volcanite_amulet": "Volcanite Amulet",
-    "item.fabricated-exchange.volcanite_amulet.mode_1": "Place",
-    "item.fabricated-exchange.volcanite_amulet.mode_2": "Pass",
+
     "item.fabricated-exchange.black_hole_band": "Black Hole Band",
     "item.fabricated-exchange.no_emc": "Not enough EMC!",
 

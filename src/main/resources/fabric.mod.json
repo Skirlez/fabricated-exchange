@@ -5,7 +5,9 @@
 	"name": "Fabricated Exchange",
 	"description": "A Fabric remake of ProjectE/Equivalent Exchange 2.",
 	"authors": [
-		"Skirlez"
+		"Skirlez",
+		"cheesebobi",
+		"hexfae"
 	],
 	"contact": {
 		"homepage": "https://github.com/Skirlez/fabricated-exchange",
