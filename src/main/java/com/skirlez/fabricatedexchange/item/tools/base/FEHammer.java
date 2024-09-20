@@ -192,8 +192,8 @@ public abstract class FEHammer extends PickaxeItem implements ChargeableItem, Ou
 						}
 					}
 
-					// Capture drops from the center block
-					if (!blockState.isAir()) {
+					// Only handle the center block if it's not already in the list of positions to mine
+					if (!positionsToMine.contains(pos) && !blockState.isAir()) {
 						LootContext.Builder builder = new LootContext.Builder((ServerWorld) world)
 								.random(world.random)
 								.parameter(LootContextParameters.ORIGIN, hitResult.getPos())
