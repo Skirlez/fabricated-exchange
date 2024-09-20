@@ -14,6 +14,8 @@ public class ModEntities {
 
 	public static final EntityType<FunctionalProjectile> FUNCTIONAL_PROJECTILE = registerEntity(
 		FabricEntityTypeBuilder.<FunctionalProjectile>create(SpawnGroup.MISC, FunctionalProjectile::new)
+			.disableSummon()
+			.fireImmune()
 			.dimensions(EntityDimensions.fixed(0.25f, 0.25f))
 			.trackRangeBlocks(64)
 			.trackedUpdateRate(10)
@@ -54,7 +56,5 @@ public class ModEntities {
 		return entity;
 	}
 	
-	public static void registerEntities() {
-		
-	}
+	public static void register() {}
 }

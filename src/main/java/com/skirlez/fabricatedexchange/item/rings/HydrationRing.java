@@ -40,7 +40,7 @@ public class HydrationRing extends ShooterRing {
 
 				entity.extinguish();
 				Vec3d velocity = self.getVelocity().normalize().negate().multiply(new Vec3d(1.5d, 1d, 1.5d));
-				entity.setVelocity(velocity);
+				entity.addVelocity(velocity);
 			}
 			else if (result instanceof BlockHitResult blockHitResult) {
 				Vec3d pos = blockHitResult.getPos();

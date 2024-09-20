@@ -17,7 +17,6 @@ import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
 import com.skirlez.fabricatedexchange.screen.ModScreens;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
-
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -56,7 +55,7 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 		ItemAbilityManager.registerClient();
 
 		ModEntityRenderers.registerEntityRenderers();
-		
+
 		// we can use the vanilla renderers due to the texture mixin, see ModTexturedRenderLayers
 		BlockEntityRendererFactories.register(ModBlockEntities.ALCHEMICAL_CHEST, ChestBlockEntityRenderer::new);
 		BlockEntityRendererFactories.register(ModBlockEntities.ENERGY_CONDENSER, ChestBlockEntityRenderer::new);
@@ -115,6 +114,8 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 					
 				}
 			});
-
 	}
+
+
+
 }

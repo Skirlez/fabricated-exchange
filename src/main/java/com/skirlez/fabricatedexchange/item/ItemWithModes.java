@@ -45,20 +45,30 @@ public interface ItemWithModes {
 		return values[nbt.getInt(MODE_KEY)];
 	}
 
-	public static void addModeToTooltip(ItemStack stack, List<Text> tooltip) {
-		int mode = getMode(stack);
-		tooltip.add(Text.translatable("item.fabricated-exchange.mode_switch")					
-					.append(" ")
-					.append(getModeName(stack, mode).setStyle(Style.EMPTY.withColor(Formatting.GOLD))));
+	/** Override - a string to use instead of the item's name in the mode translation key */
+	default String getNameOverrideForModeTranslationKey() {
+		return "";
 	}
 
+	public static void addModeToTooltip(ItemStack stack, List<Text> tooltip) {
+		int mode = getMode(stack);
+		tooltip.add(Text.translatable("item.fabricated-exchange.mode_switch")
+				.append(" ")
+				.append(getModeName(stack, mode).setStyle(Style.EMPTY.withColor(Formatting.GOLD))));
+
+	}
 
 	default boolean modeSwitchCondition(ItemStack stack) {
 		return true;
 	}
 
 	public static MutableText getModeName(ItemStack stack, int mode) {
-		return Text.translatable(stack.getTranslationKey() + ".mode_" + (mode + 1)); // additional + 1 because mode translation keys are 1 indexed 
+		ItemWithModes item = (ItemWithModes)stack.getItem();
+		String override = item.getNameOverrideForModeTranslationKey();
+		if (override.isEmpty())
+			return Text.translatable(stack.getTranslationKey() + ".mode_" + (mode + 1));
+		else
+			return Text.translatable("item.fabricated-exchange." + override + ".mode_" + (mode + 1));
 	}
 
 

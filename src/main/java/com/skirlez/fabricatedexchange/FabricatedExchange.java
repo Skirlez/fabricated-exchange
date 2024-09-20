@@ -1,27 +1,7 @@
 package com.skirlez.fabricatedexchange;
 
-import com.skirlez.fabricatedexchange.abilities.ItemAbilityManager;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.item.Item;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.ImmutableMap;
+import com.skirlez.fabricatedexchange.abilities.ItemAbilityManager;
 import com.skirlez.fabricatedexchange.block.ModBlockEntities;
 import com.skirlez.fabricatedexchange.block.ModBlocks;
 import com.skirlez.fabricatedexchange.command.TheCommand;
@@ -30,6 +10,7 @@ import com.skirlez.fabricatedexchange.emc.EmcMapper;
 import com.skirlez.fabricatedexchange.entities.ModEntities;
 import com.skirlez.fabricatedexchange.item.ModItemGroups;
 import com.skirlez.fabricatedexchange.item.ModItems;
+import com.skirlez.fabricatedexchange.packets.ExtendedVanillaPackets;
 import com.skirlez.fabricatedexchange.packets.ModClientToServerPackets;
 import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
 import com.skirlez.fabricatedexchange.screen.ModScreenHandlers;
@@ -39,6 +20,19 @@ import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.item.Item;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 
 public class FabricatedExchange implements ModInitializer {
@@ -64,11 +58,11 @@ public class FabricatedExchange implements ModInitializer {
 		ModItems.registerModItems();
 		ModSounds.registerSoundEvents();
 		ModBlocks.registerModBlocks();
-		ModEntities.registerEntities();
+		ModEntities.register();
 		ModBlockEntities.registerBlockEntities();
 		ModScreenHandlers.registerAllScreenHandlers();
 		ModClientToServerPackets.register();
-		
+		ExtendedVanillaPackets.register();
 		ModDataFiles.MAIN_CONFIG_FILE.fetch();
 		
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {

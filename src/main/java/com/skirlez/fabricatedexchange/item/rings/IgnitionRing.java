@@ -8,6 +8,7 @@ import com.skirlez.fabricatedexchange.util.ConstantObjectRegistry;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
@@ -45,6 +46,9 @@ public class IgnitionRing extends ShooterRing {
 				Vec3d push = self.getVelocity().multiply(1.0, 0.0, 1.0).normalize();
 				entity.addVelocity(push.x, 0.1d, push.z);
 			}
+
+			self.getWorld().sendEntityStatus(self, EntityStatuses.PLAY_DEATH_SOUND_OR_ADD_PROJECTILE_HIT_PARTICLES);
+			self.discard();
 		});
 
 	@Override
@@ -58,10 +62,12 @@ public class IgnitionRing extends ShooterRing {
 			.disableGravity()
 			.setHitBehavior(projectileHitBehavior)
 			.build();
+
 		GeneralUtil.nudgeProjectileInDirection(projectile, direction);
 		projectile.setVelocity(direction.multiply(2));
-
 		world.spawnEntity(projectile);
+
+
 		return true;
 	}
 

@@ -1,6 +1,8 @@
 package com.skirlez.fabricatedexchange.abilities;
 
 import com.skirlez.fabricatedexchange.item.AbilityGrantingItem;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -10,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.util.*;
+
 
 public class ItemAbilityManager {
 
@@ -34,13 +37,20 @@ public class ItemAbilityManager {
 			abilityMap.remove(handler.player);
 		});
 	}
+
+	@Environment(EnvType.CLIENT)
 	public static void registerClient() {
 		final Map<PlayerEntity, List<ItemAbility>> abilityMap = new HashMap<PlayerEntity, List<ItemAbility>>();
 		ClientTickEvents.END_CLIENT_TICK.register((client) -> {
-			if (client.player != null)
-				handlePlayerAbilities(client.player, abilityMap);
+			// I'm not sure why, but unless we treat client.player like this, Java will try to load
+			// ClientPlayerEntity when the server calls registerServer()
+			PlayerEntity player = (PlayerEntity) (Object) client.player;
+			if (player != null)
+				handlePlayerAbilities(player, abilityMap);
 		});
 	}
+
+
 
 	private static void handlePlayerAbilities(PlayerEntity player, Map<PlayerEntity, List<ItemAbility>> abilityMap) {
 		List<ItemAbility> abilities = new ArrayList<ItemAbility>();

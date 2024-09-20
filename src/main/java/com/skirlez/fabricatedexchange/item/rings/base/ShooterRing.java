@@ -5,12 +5,14 @@ import com.skirlez.fabricatedexchange.item.ExtraFunctionItem;
 import com.skirlez.fabricatedexchange.item.ItemWithModes;
 import com.skirlez.fabricatedexchange.mixin.ItemAccessor;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
@@ -88,11 +90,11 @@ public abstract class ShooterRing extends Item implements ExtraFunctionItem, Ite
 	private static final int SHOTGUN_AMOUNT = 7;
 	protected void tryFireProjectile(ItemStack stack, PlayerEntity player, World world) {
 		ShootMode mode = ItemWithModes.getMode(stack, ShootMode.values());
-
+		boolean anySuccess = false;
 		switch (mode) {
 			case NORMAL:
 				if (consumeEmcAndFireProjectile(stack, player, GeneralUtil.getPlayerLookVector(player), world))
-					playShootSound(player, world);
+					anySuccess = true;
 				break;
 			case SHOTGUN:
 				Vec3d lookDirection = GeneralUtil.getPlayerLookVector(player);
@@ -101,16 +103,13 @@ public abstract class ShooterRing extends Item implements ExtraFunctionItem, Ite
 
 				double moveAngle = angle / (float)SHOTGUN_AMOUNT;
 
-				lookDirection = lookDirection.rotateY((float)(-Math.toRadians(angle) / 2));
-				boolean anySuccess = false;
+				lookDirection = lookDirection.rotateY((float)(-Math.toRadians(angle - moveAngle) / 2));
 				for (int i = 0; i < SHOTGUN_AMOUNT; i++) {
 					if (!consumeEmcAndFireProjectile(stack, player, lookDirection, world))
 						break;
 					anySuccess = true;
 					lookDirection = lookDirection.rotateY((float)Math.toRadians(moveAngle));
 				}
-				if (anySuccess)
-					playShootSound(player, world);
 				break;
 			case HOMING:
 				List<LivingEntity> entities = world.getEntitiesByClass(LivingEntity.class, player.getBoundingBox().expand(20), entity -> entity != player);
@@ -121,13 +120,14 @@ public abstract class ShooterRing extends Item implements ExtraFunctionItem, Ite
 				if (closestEntity.isPresent()) {
 					Vec3d direction = closestEntity.get().getPos().subtract(player.getPos().offset(Direction.UP, 0.5)).normalize();
 					if (consumeEmcAndFireProjectile(stack, player, direction, world)) {
-						playShootSound(player, world);
+						anySuccess = true;
 					}
-
-
 					//player.getItemCooldownManager().set(this, 5);
 
 				}
+				else
+					return;
+
 
 				break;
 			case CHAOS:
@@ -140,10 +140,15 @@ public abstract class ShooterRing extends Item implements ExtraFunctionItem, Ite
 
 					if (!consumeEmcAndFireProjectile(stack, player, direction, world))
 						break;
+					anySuccess = true;
 				}
 				break;
 
 		}
+		if (anySuccess)
+			playShootSound(player, world);
+		else if (world.isClient())
+			EmcStoringItem.showNoEmcMessage();
 
 	}
 
@@ -158,6 +163,17 @@ public abstract class ShooterRing extends Item implements ExtraFunctionItem, Ite
 		RaycastContext context = new RaycastContext(userEyes, targetEyes, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, user);
 		BlockHitResult result = world.raycast(context);
 		return result.getType() == HitResult.Type.MISS || result.getPos().squaredDistanceTo(targetEyes) < 0.5;
+	}
+
+	@Override
+	public void appendTooltip(ItemStack stack, World world, List<Text> tooltip, TooltipContext context) {
+		super.appendTooltip(stack, world, tooltip, context);
+		ItemWithModes.addModeToTooltip(stack, tooltip);
+	}
+
+	@Override
+	public String getNameOverrideForModeTranslationKey() {
+		return "shooter_ring";
 	}
 
 	/** Should returns true if successful, and false otherwise */

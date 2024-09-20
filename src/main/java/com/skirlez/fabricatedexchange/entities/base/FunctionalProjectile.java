@@ -3,6 +3,7 @@ package com.skirlez.fabricatedexchange.entities.base;
 
 import com.skirlez.fabricatedexchange.entities.ModEntities;
 import com.skirlez.fabricatedexchange.item.ModItems;
+import com.skirlez.fabricatedexchange.packets.ExtendedVanillaPackets;
 import com.skirlez.fabricatedexchange.util.ConstantObjectRegistry;
 import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.EntityType;
@@ -11,6 +12,9 @@ import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
@@ -27,10 +31,9 @@ public class FunctionalProjectile extends ThrownItemEntity {
 	private NbtCompound parameters;
 
 	private int maxAge;
-	private int age;
-
 	private OnTick onTick = EMPTY_TICK;
 	private OnHit onHit = EMPTY_HIT;
+	private boolean visualFire = false;
 
 	private static final OnTick EMPTY_TICK =
 		ConstantObjectRegistry.register("empty_tick", (p) -> {});
@@ -45,7 +48,10 @@ public class FunctionalProjectile extends ThrownItemEntity {
 		this.parameters = parameters;
 	}
 
-
+	@Override
+	public boolean doesRenderOnFire() {
+		return visualFire;
+	}
 
 	@Override
 	public void tick() {
@@ -60,13 +66,24 @@ public class FunctionalProjectile extends ThrownItemEntity {
 			}
 		}
 
+		// Undo speed penalties from super.tick()
+		float h;
+		if (this.isTouchingWater()) {
+			h = 0.8f;
+		}
+		else {
+			h = 0.99f;
+		}
+		this.setVelocity(getVelocity().multiply(1 / h));
+
+
 		onTick.evaluate(this);
 	}
 
 	@Override
 	protected void onCollision(HitResult hitResult) {
 		super.onCollision(hitResult);
-		if (isRemoved())
+		if (isRemoved() || getWorld().isClient())
 			return;
 
 		onHit.evaluate(this, hitResult);
@@ -77,23 +94,31 @@ public class FunctionalProjectile extends ThrownItemEntity {
 		return ModItems.DARK_MATTER;
 	}
 
-	@Override
-	public void writeCustomDataToNbt(NbtCompound nbt) {
-		super.writeCustomDataToNbt(nbt);
-		nbt.put("parameters", parameters);
 
+	private void writeExtraData(NbtCompound nbt) {
+		nbt.put("parameters", parameters);
+		nbt.putInt("maxAge", maxAge);
+		nbt.putBoolean("visualFire", visualFire);
 		nbt.putString("onTickId", ConstantObjectRegistry.getObjectId(onTick).orElse(""));
 		nbt.putString("onHitId", ConstantObjectRegistry.getObjectId(onHit).orElse(""));
 	}
+	@Override
+	public void writeCustomDataToNbt(NbtCompound nbt) {
+		super.writeCustomDataToNbt(nbt);
+		writeExtraData(nbt);
+	}
 
+	private void readExtraData(NbtCompound nbt) {
+		parameters = nbt.getCompound("parameters");
+		maxAge = nbt.getInt("maxAge");
+		visualFire = nbt.getBoolean("visualFire");
+		onTick = ConstantObjectRegistry.<OnTick>getObject(nbt.getString("onTickId")).orElse(EMPTY_TICK);
+		onHit = ConstantObjectRegistry.<OnHit>getObject(nbt.getString("onHitId")).orElse(EMPTY_HIT);
+	}
 	@Override
 	public void readCustomDataFromNbt(NbtCompound nbt) {
 		super.readCustomDataFromNbt(nbt);
-		parameters = nbt.getCompound("parameters");
-
-		onTick = ConstantObjectRegistry.<OnTick>getObject(nbt.getString("onTickId")).orElse(EMPTY_TICK);
-		onHit = ConstantObjectRegistry.<OnHit>getObject(nbt.getString("onHitId")).orElse(EMPTY_HIT);
-
+		readExtraData(nbt);
 	}
 
 
@@ -101,7 +126,6 @@ public class FunctionalProjectile extends ThrownItemEntity {
 	public void handleStatus(byte status) {
 		if (status != EntityStatuses.PLAY_DEATH_SOUND_OR_ADD_PROJECTILE_HIT_PARTICLES)
 			return;
-
 		ParticleEffect particleEffect = new ItemStackParticleEffect(ParticleTypes.ITEM, getItem());
 		Random random = world.getRandom();
 		for (int i = 0; i < 8; i++) {
@@ -128,6 +152,7 @@ public class FunctionalProjectile extends ThrownItemEntity {
 		}
 
 		/** The lambda provided with this function must be registered in the ConstantObjectRegistry.
+		 * This lambda will execute on both server and client.
 		 * @see com.skirlez.fabricatedexchange.util.ConstantObjectRegistry */
 		public Builder setTickBehavior(OnTick onTick) {
 			projectile.onTick = onTick;
@@ -137,6 +162,7 @@ public class FunctionalProjectile extends ThrownItemEntity {
 		}
 
 		/** The lambda provided with this function must be registered in the ConstantObjectRegistry.
+		 * This lambda will only be executed on the server.
 		 * @see com.skirlez.fabricatedexchange.util.ConstantObjectRegistry */
 		public Builder setHitBehavior(OnHit onHit) {
 			projectile.onHit = onHit;
@@ -153,7 +179,7 @@ public class FunctionalProjectile extends ThrownItemEntity {
 			return this;
 		}
 		public Builder setOnFire() {
-			projectile.setOnFire(true);
+			projectile.visualFire = true;
 			return this;
 		}
 		public FunctionalProjectile build() {
@@ -170,4 +196,22 @@ public class FunctionalProjectile extends ThrownItemEntity {
 		public void evaluate(FunctionalProjectile projectile, HitResult result);
 	}
 
+
+
+
+
+
+	@Override
+	public Packet<ClientPlayPacketListener> createSpawnPacket() {
+		NbtCompound extraData = new NbtCompound();
+		writeExtraData(extraData);
+		return new ExtendedVanillaPackets.ExtraDataEntitySpawnS2CPacket(this, extraData);
+	}
+
+	@Override
+	public void onSpawnPacket(EntitySpawnS2CPacket packet) {
+		super.onSpawnPacket(packet);
+		NbtCompound extraData = ((ExtendedVanillaPackets.ExtraDataEntitySpawnS2CPacket)packet).getExtraData();
+		readExtraData(extraData);
+	}
 }
