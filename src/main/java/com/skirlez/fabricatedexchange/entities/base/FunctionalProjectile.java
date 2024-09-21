@@ -35,10 +35,10 @@ public class FunctionalProjectile extends ThrownItemEntity {
 	private OnHit onHit = EMPTY_HIT;
 	private boolean visualFire = false;
 
-	private static final OnTick EMPTY_TICK =
-		ConstantObjectRegistry.register("empty_tick", (p) -> {});
-	private static final OnHit EMPTY_HIT =
-		ConstantObjectRegistry.register("empty_hit", (p, h) -> {});
+	public static final OnTick EMPTY_TICK =
+		ConstantObjectRegistry.register("fp_empty_tick", (p) -> {});
+	public static final OnHit EMPTY_HIT =
+		ConstantObjectRegistry.register("fp_empty_hit", (p, h) -> {});
 
 	public FunctionalProjectile(EntityType<? extends FunctionalProjectile> entityType, World world) {
 		super(entityType, world);
@@ -129,7 +129,7 @@ public class FunctionalProjectile extends ThrownItemEntity {
 		ParticleEffect particleEffect = new ItemStackParticleEffect(ParticleTypes.ITEM, getItem());
 		Random random = world.getRandom();
 		for (int i = 0; i < 8; i++) {
-			this.world.addParticle(particleEffect, this.getX(), this.getY(), this.getZ(),
+			world.addParticle(particleEffect, getX(), getY(), getZ(),
 				(random.nextDouble() * 2d - 1d) * 0.2f,
 				(random.nextDouble() * 2d - 1d) * 0.2f,
 				(random.nextDouble() * 2d - 1d) * 0.2f);
@@ -170,6 +170,7 @@ public class FunctionalProjectile extends ThrownItemEntity {
 
 			return this;
 		}
+
 		public Builder setMaxAge(int maxAge) {
 			projectile.maxAge = maxAge;
 			return this;

@@ -8,7 +8,6 @@ import com.skirlez.fabricatedexchange.block.ModBlocks;
 import com.skirlez.fabricatedexchange.entities.ModEntityRenderers;
 import com.skirlez.fabricatedexchange.event.KeyInputHandler;
 import com.skirlez.fabricatedexchange.item.ModItems;
-import com.skirlez.fabricatedexchange.item.rings.ArchangelsSmite;
 import com.skirlez.fabricatedexchange.item.rings.BlackHoleBand;
 import com.skirlez.fabricatedexchange.item.rings.SwiftWolfsRendingGale;
 import com.skirlez.fabricatedexchange.item.rings.base.ShooterRing;
@@ -76,16 +75,13 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 			else
 				return isOn ? 0.1f : 0f;
 		});
-		ModelPredicateProviderRegistry.register(ModItems.ARCHANGELS_SMITE, new Identifier(FabricatedExchange.MOD_ID, "state"), 
-				(stack, world, entity, number) -> ArchangelsSmite.shouldLookAngry(stack) ? 1f : 0f);
-
 		ModelPredicateProviderRegistry.register(ModItems.GEM_OF_ETERNAL_DENSITY, new Identifier(FabricatedExchange.MOD_ID, "state"),
 			(stack, world, entity, number) -> GemOfEternalDensity.isCondensing(stack) ? 1f : 0f);
 
 		ModelPredicateProviderRegistry.register(ModItems.BLACK_HOLE_BAND, new Identifier(FabricatedExchange.MOD_ID, "state"),
 			(stack, world, entity, number) -> BlackHoleBand.isOn(stack) ? 1f : 0f);
 
-		for (Item item : Arrays.asList(ModItems.ZERO_RING, ModItems.IGNITION_RING, ModItems.HYDRATION_RING)) {
+		for (Item item : Arrays.asList(ModItems.ZERO_RING, ModItems.IGNITION_RING, ModItems.HYDRATION_RING, ModItems.ARCHANGELS_SMITE)) {
 			ModelPredicateProviderRegistry.register(item, new Identifier(FabricatedExchange.MOD_ID, "state"),
 				(stack, world, entity, number) -> ShooterRing.shouldTurnOn(stack) ? 1f : 0f);
 		}

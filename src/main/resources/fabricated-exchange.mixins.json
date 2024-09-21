@@ -11,6 +11,7 @@
     "LegacySmithingRecipeAccessor",
     "ModEnchantmentHelper",
     "ModFurnaceFuels",
+    "NetworkStateAccessor",
     "ScreenHandlerInvoker",
     "ServerPlayerInteractionManagerPreMine",
     "TagEntryAccessor"
