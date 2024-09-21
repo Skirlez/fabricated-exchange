@@ -15,7 +15,9 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 
-public class ModItems {
+public final class ModItems {
+	private ModItems() {}
+
 	public static final Item PHILOSOPHERS_STONE = registerItem("philosophers_stone",
 			new PhilosophersStone(new FabricItemSettings().maxCount(1)));
 
@@ -146,7 +148,7 @@ public class ModItems {
 		return item;
 	}
 
-	public static void registerModItems() {
+	public static void register() {
 		registerGroup(PHILOSOPHERS_STONE);
 	}
 }

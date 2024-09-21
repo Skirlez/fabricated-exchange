@@ -10,7 +10,8 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
-public class ModEntities {
+public final class ModEntities {
+	private ModEntities() {}
 
 	public static final EntityType<FunctionalProjectile> FUNCTIONAL_PROJECTILE = registerEntity(
 		FabricEntityTypeBuilder.<FunctionalProjectile>create(SpawnGroup.MISC, FunctionalProjectile::new)

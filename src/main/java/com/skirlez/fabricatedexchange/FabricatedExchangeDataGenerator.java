@@ -1,12 +1,8 @@
 package com.skirlez.fabricatedexchange;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
-
 import com.skirlez.fabricatedexchange.block.ModBlocks;
 import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.util.ModTags;
-
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
@@ -16,14 +12,7 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.data.client.BlockStateModelGenerator;
-import net.minecraft.data.client.BlockStateVariant;
-import net.minecraft.data.client.ItemModelGenerator;
-import net.minecraft.data.client.Models;
-import net.minecraft.data.client.TextureKey;
-import net.minecraft.data.client.TextureMap;
-import net.minecraft.data.client.VariantSettings;
-import net.minecraft.data.client.VariantsBlockStateSupplier;
+import net.minecraft.data.client.*;
 import net.minecraft.data.server.recipe.RecipeJsonProvider;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
@@ -38,11 +27,12 @@ import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+
 
 // welcome to the data gen
-
 // TODO: This class could use some organization into multiple files
-
 public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint {
 
 	@Override
@@ -219,8 +209,6 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 		private RecipeGenerator(FabricDataOutput generator) {
 			super(generator);
 		}
-
-
 
 		@Override
 		public void generate(Consumer<RecipeJsonProvider> exporter) {

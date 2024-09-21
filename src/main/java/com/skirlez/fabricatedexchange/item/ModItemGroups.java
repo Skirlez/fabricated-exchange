@@ -8,13 +8,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-public class ModItemGroups {
+public final class ModItemGroups {
+	private ModItemGroups() {}
+
 	public static ItemGroup FABRICATED_EXCHANGE = FabricItemGroup.builder(
 			new Identifier(FabricatedExchange.MOD_ID, "fabricated-exchange"))
 			.displayName(Text.translatable("itemgroup.fabricated-exchange"))
 			.icon(() -> new ItemStack(ModItems.PHILOSOPHERS_STONE)).build();
 
-	public static void registerItemGroups() {
-		
-	}
+	public static void register() {}
 }

@@ -15,9 +15,7 @@ import java.util.*;
 
 
 public class ItemAbilityManager {
-
-	private ItemAbilityManager() {
-	}
+	private ItemAbilityManager() { }
 
 	public static void registerServer() {
 		final Map<PlayerEntity, List<ItemAbility>> abilityMap = new WeakHashMap<PlayerEntity, List<ItemAbility>>();

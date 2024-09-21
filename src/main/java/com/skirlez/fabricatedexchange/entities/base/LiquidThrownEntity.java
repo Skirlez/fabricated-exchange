@@ -97,8 +97,6 @@ public abstract class LiquidThrownEntity extends ZeroGravityThrownEntity {
 
 	/** @return true if block at that position was modified. */
 	protected abstract boolean passByBlock(World world, BlockPos pos);
-
-
 	protected abstract SoundEvent getEmptyBucketSound();
 	protected abstract SoundEvent getPassModifySound();
 }

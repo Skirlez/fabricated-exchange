@@ -15,7 +15,9 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
-public class ModBlocks {
+public final class ModBlocks {
+	private ModBlocks() {}
+
 	public static final Block ALCHEMICAL_COAL_BLOCK = registerBlock("alchemical_coal_block", 
 		new Block(FabricBlockSettings.of(Material.STONE, MapColor.RED).requiresTool().strength(5.0f, 6.0f)));
 	public static final Block RADIANT_COAL_BLOCK = registerBlock("radiant_coal_block", 
@@ -67,7 +69,7 @@ public class ModBlocks {
 		return item;
 	}
 
-	public static void registerModBlocks() {
+	public static void register() {
 
 	}
 }

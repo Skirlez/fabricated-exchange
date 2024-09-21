@@ -54,15 +54,16 @@ public class FabricatedExchange implements ModInitializer {
 	
 	@Override
 	public void onInitialize() {
-		ModItemGroups.registerItemGroups();
-		ModItems.registerModItems();
-		ModSounds.registerSoundEvents();
-		ModBlocks.registerModBlocks();
+		ModItemGroups.register();
+		ModItems.register();
+		ModSounds.register();
+		ModBlocks.register();
 		ModEntities.register();
-		ModBlockEntities.registerBlockEntities();
-		ModScreenHandlers.registerAllScreenHandlers();
+		ModBlockEntities.register();
+		ModScreenHandlers.register();
 		ModClientToServerPackets.register();
 		ExtendedVanillaPackets.register();
+
 		ModDataFiles.MAIN_CONFIG_FILE.fetch();
 		
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {

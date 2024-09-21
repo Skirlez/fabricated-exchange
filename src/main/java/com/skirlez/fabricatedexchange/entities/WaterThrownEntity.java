@@ -58,7 +58,7 @@ public class WaterThrownEntity extends LiquidThrownEntity {
 		if (this.getY() > 150 && this.getVelocity().y > 0) {
 			if (world instanceof ServerWorld serverWorld) {
 
-				if (world.isRaining()){
+				if (world.isRaining()) {
 					serverWorld.setWeather(0, 6000, true, true);
 				}
 				else {

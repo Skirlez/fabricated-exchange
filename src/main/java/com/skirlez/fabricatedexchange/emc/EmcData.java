@@ -1,8 +1,5 @@
 package com.skirlez.fabricatedexchange.emc;
 
-import java.math.BigInteger;
-import java.util.Map;
-
 import com.google.common.collect.ImmutableMap;
 import com.skirlez.fabricatedexchange.item.EmcStoringItem;
 import com.skirlez.fabricatedexchange.item.NbtItem;
@@ -14,11 +11,7 @@ import com.skirlez.fabricatedexchange.util.config.EmcMapFile;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.PotionItem;
-import net.minecraft.item.TippedArrowItem;
+import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
@@ -27,9 +20,11 @@ import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
+import java.math.BigInteger;
+import java.util.Map;
+
 public class EmcData {
 
-	// All 3 of these maps should be immutable
 	public static volatile ImmutableMap<Item, SuperNumber> emcMap = ImmutableMap.of();
 	public static volatile ImmutableMap<Potion, SuperNumber> potionEmcMap = ImmutableMap.of();
 	public static volatile ImmutableMap<Enchantment, SuperNumber> enchantmentEmcMap = ImmutableMap.of();

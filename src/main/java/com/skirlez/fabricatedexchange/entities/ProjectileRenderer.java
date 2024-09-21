@@ -19,7 +19,9 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
 
-@Environment(value=EnvType.CLIENT)
+
+// FlyingItemEntityRenderer with one portion commented out
+@Environment(EnvType.CLIENT)
 public class ProjectileRenderer<T extends Entity> extends EntityRenderer<T> {
 	private final ItemRenderer itemRenderer;
 	private final float scale;
