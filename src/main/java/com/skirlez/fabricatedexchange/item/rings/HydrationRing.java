@@ -20,6 +20,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
 public class HydrationRing extends ShooterRing {
@@ -47,6 +48,10 @@ public class HydrationRing extends ShooterRing {
 				if (blockHitResult.isInsideBlock())
 					self.setPosition(pos.x, blockHitResult.getPos().offset(blockHitResult.getSide().getOpposite(), 0.5d).getY(), pos.z);
 			}
+
+			Random random = self.getWorld().getRandom();
+			self.getWorld().playSound(null, self.getBlockPos(), SoundEvents.BLOCK_LAVA_POP, SoundCategory.NEUTRAL,
+				0.7f, (2f * random.nextFloat() - 1f) * 0.2f + 1.4f);
 			self.getWorld().sendEntityStatus(self, EntityStatuses.PLAY_DEATH_SOUND_OR_ADD_PROJECTILE_HIT_PARTICLES);
 			self.discard();
 		});
@@ -71,8 +76,7 @@ public class HydrationRing extends ShooterRing {
 
 	@Override
 	protected void playShootSound(PlayerEntity player, World world) {
-
-		world.playSound(null, player.getBlockPos(), SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 1.0F, 1.0F);
+		world.playSound(null, player.getBlockPos(), SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.NEUTRAL, 0.5f, 1.0f);
 	}
 
 

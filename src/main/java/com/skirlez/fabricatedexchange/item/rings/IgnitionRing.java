@@ -14,8 +14,8 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -46,7 +46,12 @@ public class IgnitionRing extends ShooterRing {
 				Vec3d push = self.getVelocity().multiply(1.0, 0.0, 1.0).normalize();
 				entity.addVelocity(push.x, 0.1d, push.z);
 			}
-
+			Random random = self.getWorld().getRandom();
+			for (SoundEvent event :
+					new SoundEvent[] {SoundEvents.BLOCK_NETHERRACK_BREAK, SoundEvents.ITEM_FLINTANDSTEEL_USE}) {
+				self.getWorld().playSound(null, self.getBlockPos(), event, SoundCategory.NEUTRAL,
+					1f, (2f * random.nextFloat() - 1f) * 0.2f + 1f);
+			}
 			self.getWorld().sendEntityStatus(self, EntityStatuses.PLAY_DEATH_SOUND_OR_ADD_PROJECTILE_HIT_PARTICLES);
 			self.discard();
 		});
@@ -56,7 +61,7 @@ public class IgnitionRing extends ShooterRing {
 		if (!EmcStoringItem.takeStoredEmcOrConsume(getProjectileCost(), stack, player.getInventory()))
 			return false;
 
-		FunctionalProjectile projectile = FunctionalProjectile.builder(player, Items.FIRE_CHARGE, new NbtCompound())
+		FunctionalProjectile projectile = FunctionalProjectile.builder(player, Items.FIRE_CHARGE)
 			.setMaxAge(400)
 			.setOnFire()
 			.disableGravity()
@@ -75,7 +80,7 @@ public class IgnitionRing extends ShooterRing {
 	protected void playShootSound(PlayerEntity player, World world) {
 		Random random = world.getRandom();
 		world.playSound(null, player.getBlockPos(), SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.BLOCKS,
-			1.0f, (random.nextFloat() - random.nextFloat()) * 0.2f + 1.0f);
+			0.4f, (2f * random.nextFloat() - 1f) * 0.2f + 1.5f);
 	}
 
 

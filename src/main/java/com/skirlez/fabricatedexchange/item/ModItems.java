@@ -103,9 +103,6 @@ public class ModItems {
 	public static final Item SWIFTWOLFS_RENDING_GALE = registerItemWithGroup("swiftwolfs_rending_gale",
 			new SwiftWolfsRendingGale(new FabricItemSettings().maxCount(1)));
 
-	public static final Item ARCHANGELS_SMITE = registerItemWithGroup("archangels_smite",
-			new ArchangelsSmite(new FabricItemSettings().maxCount(1)));
-
 	public static final Item REPAIR_TALISMAN = registerItemWithGroup("repair_talisman",
 			new RepairTalisman(new FabricItemSettings().maxCount(1)));
 
@@ -114,6 +111,9 @@ public class ModItems {
 
 	public static final Item BLACK_HOLE_BAND = registerItemWithGroup("black_hole_band",
 			new BlackHoleBand(new FabricItemSettings().maxCount(1)));
+
+	public static final Item ARCHANGELS_SMITE = registerItemWithGroup("archangels_smite",
+		new ArchangelsSmite(new FabricItemSettings().maxCount(1)));
 
 	public static final Item IGNITION_RING = registerItemWithGroup("ignition_ring",
 			new IgnitionRing(new FabricItemSettings().maxCount(1)));

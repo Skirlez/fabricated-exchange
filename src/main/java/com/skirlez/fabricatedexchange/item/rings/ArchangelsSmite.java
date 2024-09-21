@@ -25,12 +25,6 @@ public class ArchangelsSmite extends ShooterRing implements ItemWithModes {
 	}
 
 
-	public static boolean shouldLookAngry(ItemStack stack) {
-		if (stack.getItem() instanceof ArchangelsSmite item)
-			return item.autoshoot;
-		return false;
-	}
-
 
 	protected boolean consumeEmcAndFireProjectile(ItemStack stack, PlayerEntity player, Vec3d direction, World world) {
 		if (!EmcStoringItem.takeStoredEmcOrConsume(getProjectileCost(), stack, player.getInventory()))

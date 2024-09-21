@@ -31,8 +31,6 @@ public abstract class ShooterRing extends Item implements ExtraFunctionItem, Ite
 
 	private final Random random = new Random();
 
-	public boolean autoshoot = false;
-
 	public ShooterRing(Settings settings) {
 		super(settings);
 		ItemAccessor self = (ItemAccessor) this;
@@ -40,12 +38,14 @@ public abstract class ShooterRing extends Item implements ExtraFunctionItem, Ite
 	}
 
 	public static boolean shouldTurnOn(ItemStack stack) {
-		return ((ShooterRing)stack.getItem()).autoshoot;
+		if (stack.getNbt() == null)
+			return false;
+		return stack.getNbt().getBoolean("autoshooting");
 	}
 
 	@Override
 	public void doExtraFunction(ItemStack stack, ServerPlayerEntity player) {
-		autoshoot = !autoshoot;
+		stack.getOrCreateNbt().putBoolean("autoshooting", !stack.getNbt().getBoolean("autoshooting"));
 	}
 
 	protected enum ShootMode {
@@ -80,7 +80,7 @@ public abstract class ShooterRing extends Item implements ExtraFunctionItem, Ite
 	public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
 		if (entity instanceof PlayerEntity player) {
 			applyPlayerEffects(player);
-			if (autoshoot) {
+			if (stack.getNbt() != null && stack.getNbt().getBoolean("autoshooting")) {
 				if (world.getTime() % 5 == 0)
 					tryFireProjectile(stack, player, world);
 			}

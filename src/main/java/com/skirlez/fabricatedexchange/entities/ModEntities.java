@@ -27,7 +27,7 @@ public class ModEntities {
 			.dimensions(EntityDimensions.fixed(0.25f, 0.25f))
 			.trackRangeBlocks(64)
 			.trackedUpdateRate(10)
-			.build(), "frozen_projectile");
+			.build(), "water_projectile");
 
 	public static final EntityType<LavaThrownEntity> LAVA_PROJECTILE = registerEntity(
 		FabricEntityTypeBuilder.<LavaThrownEntity>create(SpawnGroup.MISC, LavaThrownEntity::new)
@@ -36,21 +36,6 @@ public class ModEntities {
 			.trackedUpdateRate(10)
 			.build(), "lava_projectile");
 
-	public static final EntityType<TornadoThrownEntity> TORNADO_PROJECTILE = registerEntity(
-		FabricEntityTypeBuilder.<TornadoThrownEntity>create(SpawnGroup.MISC, TornadoThrownEntity::new)
-			.dimensions(EntityDimensions.fixed(0.25f, 0.25f))
-			.trackRangeBlocks(64)
-			.trackedUpdateRate(10)
-			.build(), "tornado_projectile");
-
-	public static final EntityType<FrozenThrownEntity> FROZEN_PROJECTILE = registerEntity(
-		FabricEntityTypeBuilder.<FrozenThrownEntity>create(SpawnGroup.MISC, FrozenThrownEntity::new)
-			.dimensions(EntityDimensions.fixed(0.25f, 0.25f))
-			.trackRangeBlocks(64)
-			.trackedUpdateRate(10)
-			.build(), "water_projectile");
-
-	
 	public static <T extends Entity> EntityType<T> registerEntity(EntityType<T> entity, String name) {
 		Registry.register(Registries.ENTITY_TYPE, new Identifier("fabricated-exchange", name), entity);	
 		return entity;
