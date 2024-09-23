@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
-
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -13,6 +12,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+
+import java.text.NumberFormat;
 
 public class EnergyCondenserScreen extends HandledScreen<EnergyCondenserScreenHandler> {
 	private final int level;
@@ -68,8 +69,10 @@ public class EnergyCondenserScreen extends HandledScreen<EnergyCondenserScreenHa
 		long targetEmc;
 		if (stack.isEmpty())
 			targetEmc = emc;
-		targetEmc = EmcData.getItemStackEmc(stack).toLong(-1);
-		textRenderer.draw(matrices, Long.toString(Long.min(emc, targetEmc)), 150, 10, 0x404040);
+		else
+			targetEmc = EmcData.getItemStackEmc(stack).toLong(-1);
+
+		textRenderer.draw(matrices, NumberFormat.getIntegerInstance().format(Long.min(emc, targetEmc)), 150, 10, 0x404040);
 	}
 
 	@Override

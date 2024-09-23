@@ -19,6 +19,8 @@ import net.minecraft.util.Identifier;
 
 import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreenHandler.SlotIndicies;
 
+import java.text.NumberFormat;
+
 public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHandler> {
 	private final Identifier texture;
 	private double emcProgress; // 0 - 1 how much of the emc bar should be filled
@@ -114,7 +116,7 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
 			xOffset = 16;
 		else if (this.level == 2)
 			xOffset = 34;
-		textRenderer.draw(matrices, Long.toString(emc), 62 + xOffset, 32, 0x404040);
+		textRenderer.draw(matrices, NumberFormat.getIntegerInstance().format(emc), 62 + xOffset, 32, 0x404040);
 	}
 
 	@Override

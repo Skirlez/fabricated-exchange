@@ -12,6 +12,8 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+import java.text.NumberFormat;
+
 public class AntiMatterRelayScreen extends HandledScreen<AntiMatterRelayScreenHandler> {
 	private final Identifier texture;
 	private final int level;
@@ -120,7 +122,7 @@ public class AntiMatterRelayScreen extends HandledScreen<AntiMatterRelayScreenHa
 			xOffset = 37;
 		
 
-		textRenderer.draw(matrices, Long.toString(emc), 88 + xOffset, 16, 0x404040);
+		textRenderer.draw(matrices, NumberFormat.getIntegerInstance().format(emc), 88 + xOffset, 16, 0x404040);
 	}
 
 	public void update(long emc) {
