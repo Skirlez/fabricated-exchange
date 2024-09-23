@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "D": {
+      "item": "fabricated-exchange:medium_covalence_dust"
+    },
+    "R": {
+      "item": "fabricated-exchange:low_divining_rod"
+    }
+  },
+  "pattern": [
+    "DDD",
+    "DRD",
+    "DDD"
+  ],
+  "result": {
+    "item": "fabricated-exchange:medium_divining_rod"
+  },
+  "show_notification": true
+}

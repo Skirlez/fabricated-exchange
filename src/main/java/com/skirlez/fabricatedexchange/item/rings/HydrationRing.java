@@ -5,18 +5,16 @@ import com.skirlez.fabricatedexchange.entities.base.FunctionalProjectile;
 import com.skirlez.fabricatedexchange.item.EmcStoringItem;
 import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.item.rings.base.ShooterRing;
-import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.ConstantObjectRegistry;
+import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
@@ -43,17 +41,10 @@ public class HydrationRing extends ShooterRing {
 				Vec3d velocity = self.getVelocity().normalize().negate().multiply(new Vec3d(1.5d, 1d, 1.5d));
 				entity.addVelocity(velocity);
 			}
-			else if (result instanceof BlockHitResult blockHitResult) {
-				Vec3d pos = blockHitResult.getPos();
-				if (blockHitResult.isInsideBlock())
-					self.setPosition(pos.x, blockHitResult.getPos().offset(blockHitResult.getSide().getOpposite(), 0.5d).getY(), pos.z);
-			}
-
 			Random random = self.getWorld().getRandom();
 			self.getWorld().playSound(null, self.getBlockPos(), SoundEvents.BLOCK_LAVA_POP, SoundCategory.NEUTRAL,
 				0.7f, (2f * random.nextFloat() - 1f) * 0.2f + 1.4f);
-			self.getWorld().sendEntityStatus(self, EntityStatuses.PLAY_DEATH_SOUND_OR_ADD_PROJECTILE_HIT_PARTICLES);
-			self.discard();
+			self.createDeathParticles(result);
 		});
 
 	@Override

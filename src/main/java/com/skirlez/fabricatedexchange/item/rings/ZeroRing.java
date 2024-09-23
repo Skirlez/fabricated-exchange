@@ -9,7 +9,6 @@ import com.skirlez.fabricatedexchange.util.ConstantObjectRegistry;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -43,13 +42,10 @@ public class ZeroRing extends ShooterRing {
 					livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 10, 2));
 				}
 			}
-
 			Random random = self.getWorld().getRandom();
 			self.getWorld().playSound(null, self.getBlockPos(), SoundEvents.BLOCK_GLASS_BREAK, SoundCategory.NEUTRAL,
 				0.6f, (2f * random.nextFloat() - 1f) * 0.2f + 1.2f);
-
-			self.getWorld().sendEntityStatus(self, EntityStatuses.PLAY_DEATH_SOUND_OR_ADD_PROJECTILE_HIT_PARTICLES);
-			self.discard();
+			self.createDeathParticles(result);
 		});
 
 	@Override

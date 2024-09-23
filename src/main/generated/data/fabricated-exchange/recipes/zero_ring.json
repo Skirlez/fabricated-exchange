@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:snow"
+    },
+    "D": {
+      "item": "fabricated-exchange:dark_matter"
+    },
+    "I": {
+      "item": "fabricated-exchange:iron_band"
+    },
+    "S": {
+      "item": "minecraft:snowball"
+    }
+  },
+  "pattern": [
+    "BSB",
+    "DID",
+    "BSB"
+  ],
+  "result": {
+    "item": "fabricated-exchange:zero_ring"
+  },
+  "show_notification": true
+}

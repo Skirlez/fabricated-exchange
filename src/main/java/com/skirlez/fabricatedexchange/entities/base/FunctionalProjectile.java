@@ -5,7 +5,6 @@ import com.skirlez.fabricatedexchange.entities.ModEntities;
 import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.packets.ExtendedVanillaPackets;
 import com.skirlez.fabricatedexchange.util.ConstantObjectRegistry;
-import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
@@ -18,7 +17,10 @@ import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
@@ -30,7 +32,8 @@ import net.minecraft.world.World;
 public class FunctionalProjectile extends ThrownItemEntity {
 	private NbtCompound parameters;
 
-	private int maxAge;
+	private int maxAge = 400;
+	private boolean discardOnHit = true;
 	private OnTick onTick = EMPTY_TICK;
 	private OnHit onHit = EMPTY_HIT;
 	private boolean visualFire = false;
@@ -87,6 +90,8 @@ public class FunctionalProjectile extends ThrownItemEntity {
 			return;
 
 		onHit.evaluate(this, hitResult);
+		if (discardOnHit)
+			discard();
 	}
 
 	@Override
@@ -98,6 +103,7 @@ public class FunctionalProjectile extends ThrownItemEntity {
 	private void writeExtraData(NbtCompound nbt) {
 		nbt.put("parameters", parameters);
 		nbt.putInt("maxAge", maxAge);
+		nbt.putBoolean("discardOnHit", discardOnHit);
 		nbt.putBoolean("visualFire", visualFire);
 		nbt.putString("onTickId", ConstantObjectRegistry.getObjectId(onTick).orElse(""));
 		nbt.putString("onHitId", ConstantObjectRegistry.getObjectId(onHit).orElse(""));
@@ -112,6 +118,7 @@ public class FunctionalProjectile extends ThrownItemEntity {
 		parameters = nbt.getCompound("parameters");
 		maxAge = nbt.getInt("maxAge");
 		visualFire = nbt.getBoolean("visualFire");
+		discardOnHit = nbt.getBoolean("discardOnHit");
 		onTick = ConstantObjectRegistry.<OnTick>getObject(nbt.getString("onTickId")).orElse(EMPTY_TICK);
 		onHit = ConstantObjectRegistry.<OnHit>getObject(nbt.getString("onHitId")).orElse(EMPTY_HIT);
 	}
@@ -121,18 +128,22 @@ public class FunctionalProjectile extends ThrownItemEntity {
 		readExtraData(nbt);
 	}
 
+	private void getSurfaceHitPos() {
 
-	@Override
-	public void handleStatus(byte status) {
-		if (status != EntityStatuses.PLAY_DEATH_SOUND_OR_ADD_PROJECTILE_HIT_PARTICLES)
+	}
+
+	public void createDeathParticles(HitResult result) {
+		if (!(world instanceof ServerWorld serverWorld))
 			return;
+		Vec3d pos = result.getPos();
+		if (result instanceof BlockHitResult blockHitResult) {
+			if (blockHitResult.isInsideBlock())
+				pos = new Vec3d(pos.x, blockHitResult.getPos().offset(blockHitResult.getSide().getOpposite(), 0.5d).getY(), pos.z);
+		}
 		ParticleEffect particleEffect = new ItemStackParticleEffect(ParticleTypes.ITEM, getItem());
 		Random random = world.getRandom();
 		for (int i = 0; i < 8; i++) {
-			world.addParticle(particleEffect, getX(), getY(), getZ(),
-				(random.nextDouble() * 2d - 1d) * 0.2f,
-				(random.nextDouble() * 2d - 1d) * 0.2f,
-				(random.nextDouble() * 2d - 1d) * 0.2f);
+			serverWorld.spawnParticles(particleEffect, pos.x, pos.y, pos.z, 1, 0, 0, 0, 0.2d);
 		}
 	}
 
@@ -152,7 +163,7 @@ public class FunctionalProjectile extends ThrownItemEntity {
 		}
 
 		/** The lambda provided with this function must be registered in the ConstantObjectRegistry.
-		 * This lambda will execute on both server and client.
+		 * This lambda will execute on both client and server.
 		 * @see com.skirlez.fabricatedexchange.util.ConstantObjectRegistry */
 		public Builder setTickBehavior(OnTick onTick) {
 			projectile.onTick = onTick;
@@ -162,12 +173,17 @@ public class FunctionalProjectile extends ThrownItemEntity {
 		}
 
 		/** The lambda provided with this function must be registered in the ConstantObjectRegistry.
-		 * This lambda will only be executed on the server.
+		 * This lambda will only execute on the server.
 		 * @see com.skirlez.fabricatedexchange.util.ConstantObjectRegistry */
 		public Builder setHitBehavior(OnHit onHit) {
 			projectile.onHit = onHit;
 			assert (ConstantObjectRegistry.getObjectId(onHit)).isPresent();
 
+			return this;
+		}
+
+		public Builder setDiscardOnHit(boolean discardOnHit) {
+			projectile.discardOnHit = discardOnHit;
 			return this;
 		}
 
@@ -196,11 +212,6 @@ public class FunctionalProjectile extends ThrownItemEntity {
 	public static interface OnHit {
 		public void evaluate(FunctionalProjectile projectile, HitResult result);
 	}
-
-
-
-
-
 
 	@Override
 	public Packet<ClientPlayPacketListener> createSpawnPacket() {

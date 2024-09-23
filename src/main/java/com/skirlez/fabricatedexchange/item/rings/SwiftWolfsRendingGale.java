@@ -39,18 +39,35 @@ public class SwiftWolfsRendingGale extends Item
 		self.setRecipeRemainder(this);
 	}
 
-	private static final SuperNumber DESIRED_AMOUNT = new SuperNumber(64);
+	private static final SuperNumber DESIRED_AMOUNT = new SuperNumber(16);
+
 	private static final ItemAbility SWRG = new ItemAbility() {
 		@Override
 		public void tick(ItemStack stack, PlayerEntity player) {
+			boolean shouldTick = player.age % 3 == 0;
+			if (!shouldTick)
+				return;
+
+			SuperNumber storedEmc = EmcStoringItem.getStoredEmc(stack);
+			if (storedEmc.compareTo(SuperNumber.ONE) < 0) {
+				storedEmc = EmcStoringItem.tryConsumeEmc(DESIRED_AMOUNT, stack, player.getInventory());
+				if (storedEmc.compareTo(SuperNumber.ONE) < 0) {
+					if (player.getAbilities().allowFlying) {
+						player.getAbilities().allowFlying = false;
+						player.getAbilities().flying = false;
+						player.sendAbilitiesUpdate();
+					}
+					return;
+				}
+
+			}
 			if (!player.getAbilities().allowFlying) {
 				player.getAbilities().allowFlying = true;
 				player.sendAbilitiesUpdate();
 			}
-			boolean shouldSubtract = player.age % 3 == 0;
-			SuperNumber storedEmc = EmcStoringItem.getStoredEmc(stack);
+
 			if (player.getAbilities().flying) {
-				if (shouldSubtract && storedEmc.isPositive())
+				if (storedEmc.compareTo(SuperNumber.ONE) >= 0)
 					storedEmc.subtract(BigInteger.ONE);
 			}
 			if (ItemWithModes.getMode(stack) == 1) {
@@ -63,11 +80,13 @@ public class SwiftWolfsRendingGale extends Item
 						otherEntity.addVelocity(velocity);
 					}
 				}
-				if (shouldSubtract && storedEmc.isPositive())
+				if (storedEmc.compareTo(SuperNumber.ONE) >= 0)
 					storedEmc.subtract(BigInteger.ONE);
 			}
-			if (!storedEmc.isPositive())
-				storedEmc = EmcStoringItem.tryConsumeEmc(SuperNumber.ONE, stack, player.getInventory());
+			if (storedEmc.compareTo(SuperNumber.ONE) < 0) {
+				SuperNumber emc = EmcStoringItem.tryConsumeEmc(DESIRED_AMOUNT, stack, player.getInventory());
+				storedEmc.add(emc);
+			}
 			EmcStoringItem.setStoredEmc(stack, storedEmc);
 		}
 
@@ -84,11 +103,6 @@ public class SwiftWolfsRendingGale extends Item
 	@Override
 	public ItemAbility getAbility() {
 		return SWRG;
-	}
-
-	@Override
-	public boolean shouldGrantAbility(PlayerEntity player, ItemStack stack) {
-		return (EmcStoringItem.getTotalConsumableEmc(player.getInventory(), stack).isPositive());
 	}
 
 	private static final SuperNumber PROJECTILE_COST = new SuperNumber(128);
@@ -109,10 +123,12 @@ public class SwiftWolfsRendingGale extends Item
 					BlockPos offsetPos = hitPos.add(world.random.nextInt(3) - 1, 0, world.random.nextInt(3) - 1);
 
 					LightningEntity lightning = EntityType.LIGHTNING_BOLT.create(world);
+
 					if (lightning != null) {
 						lightning.refreshPositionAfterTeleport(Vec3d.ofBottomCenter(offsetPos));
 						world.spawnEntity(lightning);
 					}
+
 				}
 			}
 
@@ -124,8 +140,6 @@ public class SwiftWolfsRendingGale extends Item
 				entity.addVelocity(velocity.x, velocity.y + 1, velocity.z);
 				entity.velocityModified = true;
 			}
-
-			self.discard();
 		});
 
 
@@ -140,12 +154,12 @@ public class SwiftWolfsRendingGale extends Item
 
 		FunctionalProjectile projectile = FunctionalProjectile.builder(player, ModItems.TORNADO_ORB, new NbtCompound())
 			.disableGravity()
-			.setMaxAge(400)
 			.setHitBehavior(projectileHitBehavior)
 			.build();
 
 		Vec3d direction = GeneralUtil.getPlayerLookVector(player);
 		projectile.setVelocity(direction.x, direction.y, direction.z, 2.5F, 0F);
+		GeneralUtil.nudgeProjectileInDirection(projectile, direction);
 		world.spawnEntity(projectile);
 		player.getItemCooldownManager().set(this, 10);
 		return TypedActionResult.success(stack);
