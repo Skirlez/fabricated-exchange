@@ -69,7 +69,9 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 	public void serverTick(World world, BlockPos blockPos, BlockState blockState) {
 		Inventory inv = (Inventory)this;
 		ItemStack target = targetInventory.getStack();
-		long targetEmc = EmcData.getItemStackEmc(target).toLong(0);
+		SuperNumber superTargetEmc = EmcData.getItemStackEmc(target);
+		superTargetEmc.ceil();
+		long targetEmc = superTargetEmc.toLong(0);
 		if (targetEmc != 0 && emc >= targetEmc) {
 			int start = (level == 0) ? 0 : 42;
 			long emcCopy = emc / targetEmc;
@@ -199,7 +201,10 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 		if (item == null)
 			return;
 		targetInventory.setStack(0, new ItemStack(item));
-		emc = Long.parseLong(nbt.getString("emc"));
+		String str = nbt.getString("emc");
+		if (str.isEmpty())
+			str = "0";
+		emc = Long.parseLong(str);
 	}
 	
 
