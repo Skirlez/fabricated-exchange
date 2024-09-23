@@ -17,16 +17,16 @@ public class UpdateConsumerBlock extends ServerToClientPacket {
 		super(name);
 	}
 
-	public void send(ServerPlayerEntity player, BlockPos pos, SuperNumber emc) {
+	public void send(ServerPlayerEntity player, BlockPos pos, long emc) {
 		PacketByteBuf buf = PacketByteBufs.create();
 		buf.writeBlockPos(pos);
-		buf.writeString(emc.divisionString());
+		buf.writeString(Long.toString(emc));
 		ServerPlayNetworking.send(player, id, buf);
 	}
 	
 	public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
 		BlockPos pos = buf.readBlockPos();
-		SuperNumber emc = new SuperNumber(buf.readString());
+		long emc = Long.parseLong(buf.readString());
 		if (client.world.getBlockEntity(pos) instanceof ConsumerBlockEntity blockEntity)
 			blockEntity.update(emc);
 	}
