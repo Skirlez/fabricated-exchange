@@ -1,14 +1,6 @@
 package com.skirlez.fabricatedexchange.util;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Consumer;
-
 import com.skirlez.fabricatedexchange.mixin.ScreenHandlerInvoker;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.entity.BlockEntity;
@@ -28,9 +20,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -38,8 +28,11 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public abstract class GeneralUtil {
-	
+import java.util.*;
+import java.util.function.Consumer;
+
+public class GeneralUtil {
+	private GeneralUtil() {};
 	
 	public static <T, E> void mergeMap(Map<E, T> map, Map<E, T> newMap) {
 		int iterations = newMap.keySet().size();
@@ -217,6 +210,16 @@ public abstract class GeneralUtil {
 	public static void nudgeProjectileInDirection(Entity entity, Vec3d direction) {
 		entity.setPosition(entity.getPos().add(direction));
 	}
+
+	public static long parseLongFromPossiblySuperNumberData(String str) {
+		int slash = str.indexOf('/');
+		if (slash == -1)
+			return Long.parseLong(str);
+		else {
+			return Long.parseLong(str.substring(0, slash));
+		}
+	}
+
 }
 	
 

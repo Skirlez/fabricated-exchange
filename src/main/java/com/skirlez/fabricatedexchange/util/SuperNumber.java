@@ -1,8 +1,9 @@
 package com.skirlez.fabricatedexchange.util;
 
+import com.google.common.math.BigIntegerMath;
+
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import com.google.common.math.BigIntegerMath;
 
 /** SuperNumber
 *<p> TODO I want cool ASCII art here of the name
@@ -25,7 +26,7 @@ public class SuperNumber {
 	public static final SuperNumber ONE = new SuperNumber(BigInteger.ONE);
 	public static final SuperNumber INTEGER_LIMIT = new SuperNumber(Integer.MAX_VALUE);
 
-	private static char[] metricPrefixes = {'k', 'M', 'G', 'T', 'P'}; 
+	private static char[] metricPrefixes = {'k', 'M', 'G', 'T', 'P'};
 
 	// constructor heaven
 	public SuperNumber(int numerator) {
@@ -41,7 +42,7 @@ public class SuperNumber {
 		this.numerator = BigInteger.valueOf(numerator);
 		this.denominator = BigInteger.valueOf(denominator);
 		simplify();
-	}   
+	}
 	public SuperNumber(BigInteger numerator, int denominator) {
 		this.numerator = numerator;
 		this.denominator = BigInteger.valueOf(denominator);
@@ -64,7 +65,7 @@ public class SuperNumber {
 	 *  @see SuperNumber#divisionString() */
 	public SuperNumber(String divisionString) {
 		String[] parts = divisionString.split("/");
-		
+
 		this.numerator = new BigInteger(parts[0]);
 		if (parts.length > 1) {
 			this.denominator = new BigInteger(parts[1]);
@@ -77,12 +78,26 @@ public class SuperNumber {
 	/** Convert the SuperNumber to an integer. If above the integer limit, return the failsafe parameter. */
 	public int toInt(int failsafe) { // TODO: this is still dumb
 		this.floor();
-		if (numerator.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) == 1) {
+		try {
+			return (numerator.intValueExact());
+		}
+		catch (ArithmeticException thanks) {
 			return failsafe;
 		}
-		return (numerator.intValue()/denominator.intValue());
 	}
-	
+
+
+	/** Convert the SuperNumber to an long. If above the long limit, return the failsafe parameter. */
+	public long toLong(long failsafe) { // TODO: this is still dumb
+		this.floor();
+		try {
+			return (numerator.longValueExact());
+		}
+		catch (ArithmeticException thanks) {
+			return failsafe;
+		}
+	}
+
 	public static SuperNumber NegativeOne() {
 		return new SuperNumber(BigInteger.ONE.negate());
 	}
@@ -102,12 +117,12 @@ public class SuperNumber {
 		return denominator.equals(BigInteger.ONE);
 	}
 
-	/** Rounds the SuperNumber to the closest whole number. 
+	/** Rounds the SuperNumber to the closest whole number.
 	 * If it's the same distance from two whole numbers, it'll choose the one greater than itself. */
 	public void round() {
 		if (numerator.equals(BigInteger.ZERO) || denominator.equals(BigInteger.ONE))
 			return;
-		if (numerator.multiply(BigInteger.TWO).compareTo(denominator) >= 0) 
+		if (numerator.multiply(BigInteger.TWO).compareTo(denominator) >= 0)
 			ceil();
 		else
 			round();
@@ -131,7 +146,7 @@ public class SuperNumber {
 		numerator = numerator.divide(denominator);
 		denominator = BigInteger.ONE;
 	}
-	
+
 	// addition methods
 	public void add(BigInteger other) {
 		if (denominator.equals(BigInteger.ONE)) {
@@ -239,7 +254,7 @@ public class SuperNumber {
 	public void divide(SuperNumber other) {
 		if (other.equalsZero())
 			throw new ArithmeticException("SuperNumber: division by zero");
-		
+
 		if (denominator.equals(BigInteger.ONE)) {
 			if (other.denominator.equals(BigInteger.ONE)) {
 				denominator = other.numerator;
@@ -264,7 +279,7 @@ public class SuperNumber {
 	}
 
 
-	/** Swaps the numerator and denominator. This instance will become the inverse of the original number. 
+	/** Swaps the numerator and denominator. This instance will become the inverse of the original number.
 	 * <p> (0.5 = 1/2) -> (2 = 2/1)
 	 * <p> (0.4 = 2/5) -> (2.5 = 5/2)
 	*/
@@ -274,7 +289,7 @@ public class SuperNumber {
 		denominator = temp;
 	}
 
-	
+
 	/** Negates the SuperNumber
 	 * <p> 1 -> -1
 	 * <p> 3/4 -> -3/4
@@ -301,7 +316,7 @@ public class SuperNumber {
 		return numerator.compareTo(BigInteger.ZERO) < 0;
 	}
 
-	/** A comparison between this and another SuperNumber. 
+	/** A comparison between this and another SuperNumber.
 	 * @return -1 for if this is smaller than other
 	 * <p> 0 for if this equals to other
 	 * <p> 1 for if this is bigger than other */
@@ -322,15 +337,15 @@ public class SuperNumber {
 		if (equalsZero())
 			return "0";
 		StringBuilder newStr = new StringBuilder();
-		
+
 		if (numerator.abs().compareTo(denominator) == -1) { // This will fail for numbers who's decimal representation is longer than the 32-bit integer limit due to zeroLen. Too bad!
 			/* Our desired output for numbers smaller than zero is as follows:
 				1. if there are any zeros before the first real digit, get ALL of them
 				2. afterwards get a maximum of 3 digits
 				We can actually get the number of zeros after the point by using Log10! Except it's off by one
-				for any number that's a power of 10 multiplied by the numerator. It's easy to see why 
+				for any number that's a power of 10 multiplied by the numerator. It's easy to see why
 				if you graph it in software like Desmos. So we explicitly check for that case.
-				after that, we can get the next 3 digits by multiplying the numerator by 
+				after that, we can get the next 3 digits by multiplying the numerator by
 				10^(number of zeros + 3) and dividing it by the denominator.
 			*/
 			if (numerator.compareTo(BigInteger.ZERO) == -1)
@@ -358,9 +373,9 @@ public class SuperNumber {
 				zeroLen = divisionString.length() - 2;
 			for (int i = 0; i < zeroLen; i++)
 				newStr.append("0");
-			
+
 			String str = numerator.multiply(BigInteger.TEN.pow(Math.max(zeroLen + 3, 3))).divide(denominator).toString();
-			
+
 			newStr.append(str);
 
 			int len = newStr.length();
@@ -368,7 +383,7 @@ public class SuperNumber {
 				newStr.deleteCharAt(len - 1);
 				len--;
 			}
-			
+
 			return newStr.toString();
 		}
 
@@ -376,7 +391,7 @@ public class SuperNumber {
 		BigInteger temp = numerator.multiply(BigInteger.valueOf(1000)).divide(denominator);
 		String str = temp.toString();
 		int i;
-		
+
 		for (i = 0; i < 3; i++) {
 			if (!str.endsWith("0"))
 				break;
@@ -399,7 +414,7 @@ public class SuperNumber {
 		return newStr.toString();
 	}
 
-	
+
 	// TODO: this function isn't general enough to be justified to be here
 	/** @return a representation of the number as a String, guaranteed to be <=16 in length. either formatted with commas and a point,
 	 * with SI (metric) prefixes, or in scientific notation, depending on the size of the number.
@@ -414,20 +429,20 @@ public class SuperNumber {
 			while (ind < str.length()) {
 				if (str.charAt(ind) != '0')
 					break;
-				ind++; 
+				ind++;
 			}
 			int length = 0;
 			for (int i = ind; i < str.length(); i++) {
 				if (str.charAt(i) == '0')
 					break;
-				length++; 
+				length++;
 			}
 
 			int offset = 0;
 			if (str.length() - ind > 6)
 				offset = str.length() - ind - 6;
 			str = str.substring(ind, str.length() - offset);
-			
+
 			return str + "e-" + (ind + length - 2); // string with scientific notation (negative exponent)
 		}
 
@@ -438,7 +453,7 @@ public class SuperNumber {
 		}
 		if (str.length() <= 15)
 			return str; // string without fraction
-		if (diff > 17) { 
+		if (diff > 17) {
 			str = str.replaceAll(",", "");
 			int offset = str.length() - 7;
 			str = str.charAt(0) + "." + str.substring(1, str.length());
@@ -462,15 +477,15 @@ public class SuperNumber {
 	}
 
 
-	/** @return the SuperNumber as a double. 
+	/** @return the SuperNumber as a double.
 	 * Will return 0 if the value of the SuperNumber is not representable with a double. */
-	public double toDouble() {		
+	public double toDouble() {
 		double result = (numerator.doubleValue() / denominator.doubleValue());
 		if (Double.isNaN(result))
 			return 0;
 		return result;
 	}
-	
+
 	/** Returns a two-dimensional byte array representing the SuperNumber. The array at index 0 represents the numerator,
 	 * and the array at index 1 represents the denominator.
 	 * @see SuperNumber#SuperNumber(byte[], byte[])
@@ -478,7 +493,7 @@ public class SuperNumber {
 	public byte[][] toByteArrays() {
 		byte[] numeratorBytes = numerator.toByteArray();
 		byte[] denominatorBytes = denominator.toByteArray();
-		
+
 		byte[][] bytes = new byte[2][];
 		bytes[0] = numeratorBytes;
 		bytes[1] = denominatorBytes;
@@ -507,7 +522,7 @@ public class SuperNumber {
 	public static SuperNumber min(SuperNumber a, SuperNumber b) {
 		return (a.compareTo(b) == -1) ? a : b;
 	}
-	/** @return true if the number is valid for use in SuperNumber(String divisionString) 
+	/** @return true if the number is valid for use in SuperNumber(String divisionString)
 	 * @see SuperNumber#SuperNumber(String divisionString) */
 	public static boolean isValidNumberString(String number) {
 		int slashPos = -1;

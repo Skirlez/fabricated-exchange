@@ -15,17 +15,16 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class EnergyCondenserScreen extends HandledScreen<EnergyCondenserScreenHandler> {
-
 	private final int level;
 
 	private final Identifier texture;
-	private SuperNumber emc;
+	private long emc;
 	
 	public EnergyCondenserScreen(EnergyCondenserScreenHandler handler, PlayerInventory inventory, Text title) {
 		super(handler, inventory, title);
 		this.level = handler.getLevel();
 		PacketByteBuf buf = handler.getAndConsumeCreationBuffer().get();
-		emc = new SuperNumber(buf.readString());
+		long emc = Long.parseLong(buf.readString());
 		this.texture = new Identifier(FabricatedExchange.MOD_ID, "textures/gui/energy_condenser_mk" + (level + 1) + ".png");
 	}
 
@@ -57,9 +56,7 @@ public class EnergyCondenserScreen extends HandledScreen<EnergyCondenserScreenHa
 		SuperNumber targetEmc = EmcData.getItemStackEmc(stack);
 		if (targetEmc.equalsZero())
 			return;
-		SuperNumber emcCopy = new SuperNumber(emc);
-		emcCopy.divide(targetEmc);
-		double percent = emcCopy.toDouble();
+		double percent = ((double)emc / (double)targetEmc.toDouble());
 		if (percent > 1d)
 			percent = 1d;
 		drawTexture(matrices, x + 33, y + 9, 0, backgroundHeight, (int)(102 * percent), 10);
@@ -68,14 +65,11 @@ public class EnergyCondenserScreen extends HandledScreen<EnergyCondenserScreenHa
 	@Override
 	protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
 		ItemStack stack = handler.getTargetItemStack();
-		SuperNumber targetEmc;
+		long targetEmc;
 		if (stack.isEmpty())
 			targetEmc = emc;
-		targetEmc = EmcData.getItemStackEmc(stack);
-		SuperNumber emcCopy = new SuperNumber(SuperNumber.min(emc, targetEmc));
-		emcCopy.floor();
-
-		textRenderer.draw(matrices, emcCopy.toString(), 150, 10, 0x404040);
+		targetEmc = EmcData.getItemStackEmc(stack).toLong(-1);
+		textRenderer.draw(matrices, Long.toString(Long.min(emc, targetEmc)), 150, 10, 0x404040);
 	}
 
 	@Override
@@ -85,7 +79,7 @@ public class EnergyCondenserScreen extends HandledScreen<EnergyCondenserScreenHa
 		drawMouseoverTooltip(matrices, mouseX, mouseY);
 	}
 
-	public void update(SuperNumber emc) {
+	public void update(long emc) {
 		this.emc = emc;
 	}
 }
