@@ -2,7 +2,9 @@ package com.skirlez.fabricatedexchange.screen;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 
-public abstract class ModScreens {
+public final class ModScreens {
+	private ModScreens() {}
+
 	public static void register() {
 		HandledScreens.register(ModScreenHandlers.TRANSMUTATION_TABLE, TransmutationTableScreen::new);
 		HandledScreens.register(ModScreenHandlers.ENERGY_COLLECTOR, EnergyCollectorScreen::new);

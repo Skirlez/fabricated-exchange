@@ -9,7 +9,9 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
-public class ModBlockEntities {
+public final class ModBlockEntities {
+	private ModBlockEntities() {}
+
 	public static final BlockEntityType<EnergyCollectorBlockEntity> ENERGY_COLLECTOR = 
 		registerBlockEntity("energy_collector_entity",
 		FabricBlockEntityTypeBuilder.create(EnergyCollectorBlockEntity::new, 
@@ -40,7 +42,7 @@ public class ModBlockEntities {
 		return Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier(FabricatedExchange.MOD_ID, name), blockEntityType);
 	}
 
-	public static void registerBlockEntities() {
+	public static void register() {
 
 	}
 }

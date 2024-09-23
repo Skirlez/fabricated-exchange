@@ -1,17 +1,16 @@
 package com.skirlez.fabricatedexchange.block;
 
+import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
+import com.skirlez.fabricatedexchange.screen.LeveledScreenHandler;
+import com.skirlez.fabricatedexchange.util.SuperNumber;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.BlockPos;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
-import com.skirlez.fabricatedexchange.screen.LeveledScreenHandler;
-import com.skirlez.fabricatedexchange.util.SuperNumber;
-
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
 
 /** This interface is used by block entities that can share and take EMC from other block entities. 
 the block entites can be in one of two states: an idle state and a consuming state.
@@ -27,16 +26,14 @@ public interface ConsumerBlockEntity {
 		return SuperNumber.ZERO;
 	}
 	boolean isConsuming();
-
 	default void distributeEmc(List<BlockEntity> neighbors) {
 		// stores the neighbors which will be given EMC (as a gift!)
 		List<ConsumerBlockEntity> goodNeighbors = new ArrayList<ConsumerBlockEntity>(); 
 		for (int i = 0; i < neighbors.size(); i++) {
 			BlockEntity neighbor = neighbors.get(i);
-			if (neighbor instanceof ConsumerBlockEntity
-					&& ((ConsumerBlockEntity)neighbor).isConsuming()) {
+			if (neighbor instanceof ConsumerBlockEntity consumerNeighbor
+					&& consumerNeighbor.isConsuming()) {
 
-				ConsumerBlockEntity consumerNeighbor = (ConsumerBlockEntity)neighbor;
 				SuperNumber max = consumerNeighbor.getMaximumEmc();
 				if (max.equalsZero() || consumerNeighbor.getEmc().compareTo(max) == -1)
 					goodNeighbors.add(consumerNeighbor);

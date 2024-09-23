@@ -3,7 +3,9 @@ package com.skirlez.fabricatedexchange.item;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.recipe.Ingredient;
 
-public abstract class ModToolMaterials {
+public final class ModToolMaterials {
+	private ModToolMaterials() {}
+
 	public static final ToolMaterial DARK_MATTER_MATERIAL = new ToolMaterial() {
 		@Override
 		public int getDurability() {

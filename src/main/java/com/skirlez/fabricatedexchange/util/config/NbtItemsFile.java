@@ -1,14 +1,14 @@
 package com.skirlez.fabricatedexchange.util.config;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.config.lib.DataFile;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class NbtItemsFile extends DataFile<Map<String, List<String>>>  {
 
@@ -31,7 +31,7 @@ public class NbtItemsFile extends DataFile<Map<String, List<String>>>  {
 			// tag found
 			String[] items = GeneralUtil.getItemStringsFromTagString(key);
 			if (items.length == 0) {
-				FabricatedExchange.LOGGER.warn("Item-less tag provided in nbt_items.json: " + key + ". Ignoring...");
+				FabricatedExchange.LOGGER.warn("Item-less tag provided in nbt_items.json: {}. Ignoring...", key);
 				continue;
 			}
 			for (int i = 0; i < items.length; i++) {
@@ -54,7 +54,7 @@ public class NbtItemsFile extends DataFile<Map<String, List<String>>>  {
 		else {
 			String tag = itemsToTag.get(idName);
 			if (tag == null) {
-				FabricatedExchange.LOGGER.error("Item " + idName + " does not have an entry in nbt_items.json!");
+				FabricatedExchange.LOGGER.error("Item {} does not have an entry in nbt_items.json!", idName);
 				return null;
 			}
 			return value.get("#" + tag);

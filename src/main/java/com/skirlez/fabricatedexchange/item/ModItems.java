@@ -15,7 +15,9 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 
-public class ModItems {
+public final class ModItems {
+	private ModItems() {}
+
 	public static final Item PHILOSOPHERS_STONE = registerItem("philosophers_stone",
 			new PhilosophersStone(new FabricItemSettings().maxCount(1)));
 
@@ -34,11 +36,11 @@ public class ModItems {
 	public static final Item HIGH_COVALENCE_DUST = registerItemWithGroup("high_covalence_dust",
 			new Item(new FabricItemSettings()));
 	
-	public static final Item LOW_DIVIDING_ROD = registerItemWithGroup("low_divining_rod",
+	public static final Item LOW_DIVINING_ROD = registerItemWithGroup("low_divining_rod",
 			new DiviningRod(new FabricItemSettings().maxCount(1), 3));
-	public static final Item MEDIUM_DIVIDING_ROD = registerItemWithGroup("medium_divining_rod",
+	public static final Item MEDIUM_DIVINING_ROD = registerItemWithGroup("medium_divining_rod",
 			new DiviningRod(new FabricItemSettings().maxCount(1), 16));
-	public static final Item HIGH_DIVIDING_ROD = registerItemWithGroup("high_divining_rod",
+	public static final Item HIGH_DIVINING_ROD = registerItemWithGroup("high_divining_rod",
 			new DiviningRod(new FabricItemSettings().maxCount(1), 64));
 	
 	public static final Item IRON_BAND = registerItemWithGroup("iron_band", new Item(new FabricItemSettings()));
@@ -146,7 +148,7 @@ public class ModItems {
 		return item;
 	}
 
-	public static void registerModItems() {
+	public static void register() {
 		registerGroup(PHILOSOPHERS_STONE);
 	}
 }

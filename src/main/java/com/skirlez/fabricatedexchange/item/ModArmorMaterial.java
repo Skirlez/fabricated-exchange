@@ -7,8 +7,7 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 
 public final class ModArmorMaterial {
-	private ModArmorMaterial() {
-	}
+	private ModArmorMaterial() {}
 	
 	public static ArmorMaterial DARK_MATTER = new ArmorMaterial() {
 		private static final int[] PROTECTION_VALUES = new int[] {4, 9, 7, 4};

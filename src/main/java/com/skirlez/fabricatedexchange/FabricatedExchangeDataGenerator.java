@@ -1,12 +1,8 @@
 package com.skirlez.fabricatedexchange;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
-
 import com.skirlez.fabricatedexchange.block.ModBlocks;
 import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.util.ModTags;
-
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
@@ -16,14 +12,7 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.data.client.BlockStateModelGenerator;
-import net.minecraft.data.client.BlockStateVariant;
-import net.minecraft.data.client.ItemModelGenerator;
-import net.minecraft.data.client.Models;
-import net.minecraft.data.client.TextureKey;
-import net.minecraft.data.client.TextureMap;
-import net.minecraft.data.client.VariantSettings;
-import net.minecraft.data.client.VariantsBlockStateSupplier;
+import net.minecraft.data.client.*;
 import net.minecraft.data.server.recipe.RecipeJsonProvider;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder;
@@ -38,11 +27,12 @@ import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+
 
 // welcome to the data gen
-
 // TODO: This class could use some organization into multiple files
-
 public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint {
 
 	@Override
@@ -172,7 +162,7 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 			registerGeneratedModels(itemModelGenerator,
 				ModItems.PHILOSOPHERS_STONE, ModItems.ALCHEMICAL_COAL, ModItems.RADIANT_COAL, ModItems.MOBIUS_FUEL,
 				ModItems.AETERNALIS_FUEL, ModItems.LOW_COVALENCE_DUST, ModItems.MEDIUM_COVALENCE_DUST, 
-				ModItems.HIGH_COVALENCE_DUST, ModItems.LOW_DIVIDING_ROD, ModItems.MEDIUM_DIVIDING_ROD, ModItems.HIGH_DIVIDING_ROD,
+				ModItems.HIGH_COVALENCE_DUST, ModItems.LOW_DIVINING_ROD, ModItems.MEDIUM_DIVINING_ROD, ModItems.HIGH_DIVINING_ROD,
 				ModItems.DARK_MATTER, ModItems.RED_MATTER, ModItems.TOME_OF_KNOWLEDGE,
 				ModItems.TRANSMUTATION_TABLET, ModItems.IRON_BAND, ModItems.ITEM_ORB, ModItems.DARK_MATTER_BOOTS, 
 				ModItems.DARK_MATTER_LEGGINGS, ModItems.DARK_MATTER_CHESTPLATE, ModItems.DARK_MATTER_HELMET,
@@ -219,8 +209,6 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 		private RecipeGenerator(FabricDataOutput generator) {
 			super(generator);
 		}
-
-
 
 		@Override
 		public void generate(Consumer<RecipeJsonProvider> exporter) {
@@ -633,6 +621,72 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 					.criterion(FabricRecipeProvider.hasItem(ModItems.HIGH_COVALENCE_DUST),
 							FabricRecipeProvider.conditionsFromItem(ModItems.HIGH_COVALENCE_DUST))
 					.offerTo(exporter);
+
+			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.ZERO_RING)
+				.pattern("BSB")
+				.pattern("DID")
+				.pattern("BSB")
+				.input('S', Items.SNOWBALL)
+				.input('B', Items.SNOW)
+				.input('D', ModItems.DARK_MATTER)
+				.input('I', ModItems.IRON_BAND)
+				.criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER),
+					FabricRecipeProvider.conditionsFromItem(ModItems.DARK_MATTER))
+				.offerTo(exporter);
+
+			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.IGNITION_RING)
+				.pattern("FMF")
+				.pattern("DID")
+				.pattern("FMF")
+				.input('F', Items.FLINT_AND_STEEL)
+				.input('M', ModItems.MOBIUS_FUEL)
+				.input('D', ModItems.DARK_MATTER)
+				.input('I', ModItems.IRON_BAND)
+				.criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER),
+					FabricRecipeProvider.conditionsFromItem(ModItems.DARK_MATTER))
+				.offerTo(exporter);
+
+
+			ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.HYDRATION_RING)
+				.input(ModItems.IGNITION_RING)
+				.input(ModItems.ZERO_RING)
+				.criterion(FabricRecipeProvider.hasItem(ModItems.IGNITION_RING),
+					FabricRecipeProvider.conditionsFromItem(ModItems.IGNITION_RING))
+				.criterion(FabricRecipeProvider.hasItem(ModItems.ZERO_RING),
+					FabricRecipeProvider.conditionsFromItem(ModItems.ZERO_RING))
+				.offerTo(exporter);
+
+
+			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.LOW_DIVINING_ROD)
+				.pattern("DDD")
+				.pattern("DSD")
+				.pattern("DDD")
+				.input('S', Items.STICK)
+				.input('D', ModItems.LOW_COVALENCE_DUST)
+				.criterion(FabricRecipeProvider.hasItem(ModItems.LOW_COVALENCE_DUST),
+					FabricRecipeProvider.conditionsFromItem(ModItems.LOW_COVALENCE_DUST))
+				.offerTo(exporter);
+			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.MEDIUM_DIVINING_ROD)
+				.pattern("DDD")
+				.pattern("DRD")
+				.pattern("DDD")
+				.input('R', ModItems.LOW_DIVINING_ROD)
+				.input('D', ModItems.MEDIUM_COVALENCE_DUST)
+				.criterion(FabricRecipeProvider.hasItem(ModItems.MEDIUM_COVALENCE_DUST),
+					FabricRecipeProvider.conditionsFromItem(ModItems.MEDIUM_COVALENCE_DUST))
+				.offerTo(exporter);
+			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.HIGH_DIVINING_ROD)
+				.pattern("DDD")
+				.pattern("DRD")
+				.pattern("DDD")
+				.input('R', ModItems.MEDIUM_DIVINING_ROD)
+				.input('D', ModItems.HIGH_COVALENCE_DUST)
+				.criterion(FabricRecipeProvider.hasItem(ModItems.HIGH_COVALENCE_DUST),
+					FabricRecipeProvider.conditionsFromItem(ModItems.HIGH_COVALENCE_DUST))
+				.offerTo(exporter);
+
+
+
 
 			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.GEM_OF_ETERNAL_DENSITY)
 					.pattern("FAF")

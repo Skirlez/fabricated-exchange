@@ -5,6 +5,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 
 public interface AbilityGrantingItem {
-	public boolean shouldGrantAbility(PlayerEntity player, ItemStack stack);
+	default boolean shouldGrantAbility(PlayerEntity player, ItemStack stack) {
+		return true;
+	}
 	public ItemAbility getAbility();
 }

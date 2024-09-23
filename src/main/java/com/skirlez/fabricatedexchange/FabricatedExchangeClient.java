@@ -51,11 +51,12 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 		ModScreens.register();
 		KeyInputHandler.register();
 		ModServerToClientPackets.register();
+		ModEntityRenderers.register();
 		ItemAbilityManager.registerClient();
 
-		ModEntityRenderers.registerEntityRenderers();
 
-		// we can use the vanilla renderers due to the texture mixin, see ModTexturedRenderLayers
+
+		// We can use the vanilla renderers due to the texture mixin, see ModTexturedRenderLayers
 		BlockEntityRendererFactories.register(ModBlockEntities.ALCHEMICAL_CHEST, ChestBlockEntityRenderer::new);
 		BlockEntityRendererFactories.register(ModBlockEntities.ENERGY_CONDENSER, ChestBlockEntityRenderer::new);
 		
@@ -85,13 +86,7 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 			ModelPredicateProviderRegistry.register(item, new Identifier(FabricatedExchange.MOD_ID, "state"),
 				(stack, world, entity, number) -> ShooterRing.shouldTurnOn(stack) ? 1f : 0f);
 		}
-		
-		/*
-		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-			//if (!MinecraftClient.getInstance().isIntegratedServerRunning())
-				
-		});
-		*/
+
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
 				@Override
 				public Identifier getFabricId() {

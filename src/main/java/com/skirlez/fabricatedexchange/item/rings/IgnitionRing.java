@@ -8,7 +8,6 @@ import com.skirlez.fabricatedexchange.util.ConstantObjectRegistry;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
@@ -48,12 +47,11 @@ public class IgnitionRing extends ShooterRing {
 			}
 			Random random = self.getWorld().getRandom();
 			for (SoundEvent event :
-					new SoundEvent[] {SoundEvents.BLOCK_NETHERRACK_BREAK, SoundEvents.ITEM_FLINTANDSTEEL_USE}) {
+				new SoundEvent[] {SoundEvents.BLOCK_NETHERRACK_BREAK, SoundEvents.ITEM_FLINTANDSTEEL_USE}) {
 				self.getWorld().playSound(null, self.getBlockPos(), event, SoundCategory.NEUTRAL,
 					1f, (2f * random.nextFloat() - 1f) * 0.2f + 1f);
 			}
-			self.getWorld().sendEntityStatus(self, EntityStatuses.PLAY_DEATH_SOUND_OR_ADD_PROJECTILE_HIT_PARTICLES);
-			self.discard();
+			self.createDeathParticles(result);
 		});
 
 	@Override

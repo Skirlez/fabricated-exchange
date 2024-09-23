@@ -78,10 +78,12 @@ public abstract class ShooterRing extends Item implements ExtraFunctionItem, Ite
 
 	@Override
 	public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
+		if (world.isClient)
+			return;
 		if (entity instanceof PlayerEntity player) {
 			applyPlayerEffects(player);
 			if (stack.getNbt() != null && stack.getNbt().getBoolean("autoshooting")) {
-				if (world.getTime() % 5 == 0)
+				if (player.age % 5 == 0)
 					tryFireProjectile(stack, player, world);
 			}
 		}

@@ -10,7 +10,9 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 
 
-public abstract class ModScreenHandlers {
+public final class ModScreenHandlers {
+	private ModScreenHandlers() {}
+
 	public static final ScreenHandlerType<TransmutationTableScreenHandler> TRANSMUTATION_TABLE = 
 		new ExtendedScreenHandlerType<TransmutationTableScreenHandler>(TransmutationTableScreenHandler::clientConstructor);
 	public static final ScreenHandlerType<EnergyCollectorScreenHandler> ENERGY_COLLECTOR = 
@@ -23,7 +25,7 @@ public abstract class ModScreenHandlers {
 		new ExtendedScreenHandlerType<>(EnergyCondenserScreenHandler::clientConstructor);
 
 
-	public static void registerAllScreenHandlers() {
+	public static void register() {
 		// TODO figure out what the Strings are for
 		Registry.register(Registries.SCREEN_HANDLER, new Identifier(FabricatedExchange.MOD_ID,
 			"transmutation_table"), TRANSMUTATION_TABLE);
