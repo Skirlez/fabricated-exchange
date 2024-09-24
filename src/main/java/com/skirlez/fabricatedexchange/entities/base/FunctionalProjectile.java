@@ -7,6 +7,7 @@ import com.skirlez.fabricatedexchange.packets.ExtendedVanillaPackets;
 import com.skirlez.fabricatedexchange.util.ConstantObjectRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -100,6 +101,39 @@ public class FunctionalProjectile extends ThrownItemEntity {
 	}
 
 
+	/** Fires the projectile.
+	 * It is moved a bit away from the player as to not block the screen.
+	 * This method will only actually spawn the projectile entity
+	 * if nothing exists between the starting point and the player. In this case,
+	 * the collision code still runs, but the entity will never actually tick, because it never exists. */
+	public void fire(World world, Vec3d velocity) {
+		setVelocity(velocity);
+		if (!nudgeForwardAndCollide(velocity.normalize()))
+			world.spawnEntity(this);
+	}
+
+	/** Used to nudge the projectile a bit forward when fired.
+	 * Returns true if the projectile is discared as a result of this call. */
+	private boolean nudgeForwardAndCollide(Vec3d direction) {
+		HitResult result = ProjectileUtil.getCollision(this, this::canHit);
+
+		if (result.getType() == HitResult.Type.MISS) {
+			setPosition(getPos().add(direction));
+			return false;
+		}
+		else {
+			setPosition(result.getPos());
+			onHit.evaluate(this, result);
+			if (discardOnHit) {
+				discard();
+				return true;
+			}
+			else
+				return (getRemovalReason() == RemovalReason.DISCARDED);
+		}
+	}
+
+
 	private void writeExtraData(NbtCompound nbt) {
 		nbt.put("parameters", parameters);
 		nbt.putInt("maxAge", maxAge);
@@ -122,6 +156,7 @@ public class FunctionalProjectile extends ThrownItemEntity {
 		onTick = ConstantObjectRegistry.<OnTick>getObject(nbt.getString("onTickId")).orElse(EMPTY_TICK);
 		onHit = ConstantObjectRegistry.<OnHit>getObject(nbt.getString("onHitId")).orElse(EMPTY_HIT);
 	}
+
 	@Override
 	public void readCustomDataFromNbt(NbtCompound nbt) {
 		super.readCustomDataFromNbt(nbt);
@@ -182,11 +217,10 @@ public class FunctionalProjectile extends ThrownItemEntity {
 			return this;
 		}
 
-		public Builder setDiscardOnHit(boolean discardOnHit) {
-			projectile.discardOnHit = discardOnHit;
+		public Builder doNotDiscardOnHit() {
+			projectile.discardOnHit = false;
 			return this;
 		}
-
 		public Builder setMaxAge(int maxAge) {
 			projectile.maxAge = maxAge;
 			return this;

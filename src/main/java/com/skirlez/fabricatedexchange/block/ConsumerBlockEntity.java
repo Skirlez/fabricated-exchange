@@ -2,14 +2,12 @@ package com.skirlez.fabricatedexchange.block;
 
 import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
 import com.skirlez.fabricatedexchange.screen.LeveledScreenHandler;
-import com.skirlez.fabricatedexchange.util.SuperNumber;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 /** This interface is used by block entities that can share and take EMC from other block entities. 
@@ -18,12 +16,17 @@ For example: When the Energy Collectors have no fuel items in them, They are in 
 simply generating EMC. When a fuel item is put inside of them, they are in the consuming state,
 consuming their EMC in order to transmute the fuel item to the next one. these states will be used 
 by the block entities to determine if they should spread their EMC to the surrounding block entities or not. */
+
+// This interface originally used SuperNumber, then switched to long, so forgive me if the arithmetic looks strange.
 public interface ConsumerBlockEntity {
-	SuperNumber getEmc();
-	SuperNumber getOutputRate();
-	SuperNumber getMaximumEmc();
-	default SuperNumber getBonusEmc() {
-		return SuperNumber.ZERO;
+	long getEmc();
+	void setEmc(long emc);
+	long getOutputRate();
+	default long getMaximumEmc() {
+		return Long.MAX_VALUE;
+	}
+	default long getBonusEmc() {
+		return 0;
 	}
 	boolean isConsuming();
 	default void distributeEmc(List<BlockEntity> neighbors) {
@@ -34,43 +37,39 @@ public interface ConsumerBlockEntity {
 			if (neighbor instanceof ConsumerBlockEntity consumerNeighbor
 					&& consumerNeighbor.isConsuming()) {
 
-				SuperNumber max = consumerNeighbor.getMaximumEmc();
-				if (max.equalsZero() || consumerNeighbor.getEmc().compareTo(max) == -1)
+				long max = consumerNeighbor.getMaximumEmc();
+				if (max == 0 || consumerNeighbor.getEmc() < max)
 					goodNeighbors.add(consumerNeighbor);
 			}
 		}
 		if (goodNeighbors.size() > 0) {
-			SuperNumber emc = getEmc();
-			SuperNumber output = new SuperNumber(SuperNumber.min(getOutputRate(), emc));
-			output.divide(goodNeighbors.size());
+			long emc = getEmc();
+			long output = Long.min(getOutputRate(), emc);
+			output /= goodNeighbors.size();
 			for (ConsumerBlockEntity neighbor : goodNeighbors) {
-				SuperNumber neighborEmc = neighbor.getEmc();
-				SuperNumber neighborMaximumEmc = neighbor.getMaximumEmc();
-				SuperNumber neighborBonusEmc = neighbor.getBonusEmc();
+				long neighborEmc = neighbor.getEmc();
+				long neighborMaximumEmc = neighbor.getMaximumEmc();
+				long neighborBonusEmc = neighbor.getBonusEmc();
 
-				SuperNumber neighborEmcCopy = new SuperNumber(neighborEmc);
-				neighborEmcCopy.add(output);
-				
 				// If the neighbor is going to go over its maximum EMC,
 				// only give it the exact amount it needs.
-				if (neighborEmcCopy.compareTo(neighborMaximumEmc) != -1) {
-					SuperNumber difference = new SuperNumber(neighborMaximumEmc);
-					difference.subtract(neighborEmc);
-					neighborEmc.copyValueOf(neighborMaximumEmc);
-					emc.subtract(difference);
-					continue;
+				if (neighborEmc >= neighborMaximumEmc - output - neighborBonusEmc) {
+					long difference = neighborMaximumEmc;
+					difference -= neighborEmc;
+					neighborEmc = neighborMaximumEmc;
+					emc -= difference;
 				}
-				
-				neighborEmc.stealFrom(emc, output);
-				neighborEmc.add(neighborBonusEmc);
-				if (neighborMaximumEmc.equalsZero())
-					continue;
-				if (neighborEmc.compareTo(neighborMaximumEmc) == 1)
-					neighborEmc.copyValueOf(neighborMaximumEmc);
+				else {
+					neighborEmc += output + neighborBonusEmc;
+					emc -= output;
+				}
+
+				neighbor.setEmc(neighborEmc);
 			}
+			setEmc(emc);
 		}
 	}
-	default void serverSync(BlockPos pos, SuperNumber emc, LinkedList<ServerPlayerEntity> list) {
+	default void serverSync(BlockPos pos, long emc, List<ServerPlayerEntity> list) {
 		if (list.size() == 0)
 			return;
 		Iterator<ServerPlayerEntity> iterator = list.iterator();
@@ -84,5 +83,5 @@ public interface ConsumerBlockEntity {
 		}
 	}
 
-	void update(SuperNumber emc);
+	void update(long emc);
 }

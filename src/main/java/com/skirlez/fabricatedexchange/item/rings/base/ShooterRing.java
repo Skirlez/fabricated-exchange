@@ -3,7 +3,6 @@ package com.skirlez.fabricatedexchange.item.rings.base;
 import com.skirlez.fabricatedexchange.item.EmcStoringItem;
 import com.skirlez.fabricatedexchange.item.ExtraFunctionItem;
 import com.skirlez.fabricatedexchange.item.ItemWithModes;
-import com.skirlez.fabricatedexchange.mixin.ItemAccessor;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
@@ -33,8 +32,6 @@ public abstract class ShooterRing extends Item implements ExtraFunctionItem, Ite
 
 	public ShooterRing(Settings settings) {
 		super(settings);
-		ItemAccessor self = (ItemAccessor) this;
-		self.setRecipeRemainder(this);
 	}
 
 	public static boolean shouldTurnOn(ItemStack stack) {
@@ -127,8 +124,11 @@ public abstract class ShooterRing extends Item implements ExtraFunctionItem, Ite
 					//player.getItemCooldownManager().set(this, 5);
 
 				}
-				else
+				else {
+					if (world.isClient())
+						GeneralUtil.showOverlayMessage(Text.translatable("item.fabricated-exchange.shooter_ring.no_homing_target"));
 					return;
+				}
 
 
 				break;
