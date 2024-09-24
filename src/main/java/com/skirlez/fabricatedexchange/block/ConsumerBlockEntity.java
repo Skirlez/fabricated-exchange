@@ -8,7 +8,6 @@ import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 /** This interface is used by block entities that can share and take EMC from other block entities. 
@@ -70,7 +69,7 @@ public interface ConsumerBlockEntity {
 			setEmc(emc);
 		}
 	}
-	default void serverSync(BlockPos pos, long emc, LinkedList<ServerPlayerEntity> list) {
+	default void serverSync(BlockPos pos, long emc, List<ServerPlayerEntity> list) {
 		if (list.size() == 0)
 			return;
 		Iterator<ServerPlayerEntity> iterator = list.iterator();

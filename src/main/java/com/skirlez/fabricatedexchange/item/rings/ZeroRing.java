@@ -6,7 +6,6 @@ import com.skirlez.fabricatedexchange.item.EmcStoringItem;
 import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.item.rings.base.ShooterRing;
 import com.skirlez.fabricatedexchange.util.ConstantObjectRegistry;
-import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -59,9 +58,7 @@ public class ZeroRing extends ShooterRing {
 			.setHitBehavior(projectileHitBehavior)
 			.build();
 
-		GeneralUtil.nudgeProjectileInDirection(projectile, direction);
-		projectile.setVelocity(direction.multiply(2));
-		world.spawnEntity(projectile);
+		projectile.fire(world, direction.multiply(2));
 		return true;
 	}
 

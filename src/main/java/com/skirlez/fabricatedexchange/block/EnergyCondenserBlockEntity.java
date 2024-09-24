@@ -68,14 +68,15 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 	
 	public void serverTick(World world, BlockPos blockPos, BlockState blockState) {
 		Inventory inv = (Inventory)this;
+
 		ItemStack target = targetInventory.getStack();
 		SuperNumber superTargetEmc = EmcData.getItemStackEmc(target);
 		superTargetEmc.ceil();
 		long targetEmc = superTargetEmc.toLong(0);
-		if (targetEmc != 0 && emc >= targetEmc) {
+		if (!targetInventory.getStack().isEmpty() && targetEmc != 0 && emc >= targetEmc) {
 			int start = (level == 0) ? 0 : 42;
-			long emcCopy = emc / targetEmc;
-			int maxStacks = (level == 0) ? 1 : Math.min((int)emcCopy, target.getMaxCount());
+			long stacksCanMake = emc / targetEmc;
+			int maxStacks = (level == 0) ? 1 : Math.min((int)stacksCanMake, target.getMaxCount());
 
 			boolean success = false;
 			for (int i = start; i < inv.size() && !success; i++) {
@@ -166,7 +167,11 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 
 	@Override
 	public long getMaximumEmc() {
-		return EmcData.getItemStackEmc(targetInventory.getStack()).toLong(Long.MAX_VALUE);
+		if (targetInventory.getStack().isEmpty())
+			return 0;
+		SuperNumber targetEmc = EmcData.getItemStackEmc(targetInventory.getStack());
+		targetEmc.ceil();
+		return targetEmc.toLong(0);
 	}
 
 	@Override

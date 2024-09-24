@@ -17,7 +17,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -152,16 +151,13 @@ public class SwiftWolfsRendingGale extends Item
 			return TypedActionResult.pass(stack);
 
 
-		FunctionalProjectile projectile = FunctionalProjectile.builder(player, ModItems.TORNADO_ORB, new NbtCompound())
+		FunctionalProjectile projectile = FunctionalProjectile.builder(player, ModItems.TORNADO_ORB)
 			.disableGravity()
 			.setHitBehavior(projectileHitBehavior)
 			.build();
 
 		Vec3d direction = GeneralUtil.getPlayerLookVector(player);
-		projectile.setVelocity(direction.x, direction.y, direction.z, 2.5F, 0F);
-		GeneralUtil.nudgeProjectileInDirection(projectile, direction);
-		world.spawnEntity(projectile);
-		player.getItemCooldownManager().set(this, 10);
+		projectile.fire(world, direction.multiply(2));
 		return TypedActionResult.success(stack);
 	}
 

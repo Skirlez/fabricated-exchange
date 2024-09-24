@@ -6,7 +6,6 @@ import com.skirlez.fabricatedexchange.item.EmcStoringItem;
 import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.item.rings.base.ShooterRing;
 import com.skirlez.fabricatedexchange.util.ConstantObjectRegistry;
-import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -58,10 +57,7 @@ public class HydrationRing extends ShooterRing {
 			.setHitBehavior(projectileHitBehavior)
 			.build();
 
-		projectile.setVelocity(direction.x, direction.y, direction.z, 2.5F, 0F);
-		GeneralUtil.nudgeProjectileInDirection(projectile, direction);
-
-		world.spawnEntity(projectile);
+		projectile.fire(world, direction.multiply(2));
 		return true;
 	}
 

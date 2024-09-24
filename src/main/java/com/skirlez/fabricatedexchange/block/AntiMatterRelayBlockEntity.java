@@ -46,9 +46,8 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 	
 	private final int level;
 	private final DefaultedList<ItemStack> stackContents;
-	private final LinkedList<ServerPlayerEntity> players = new LinkedList<>();
+	private final List<ServerPlayerEntity> players = new LinkedList<>();
 	private int tick;
-
 
 	public AntiMatterRelayBlockEntity(BlockPos pos, BlockState state) {
 		super(ModBlockEntities.ANTIMATTER_RELAY, pos, state);
@@ -127,9 +126,7 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 		
 		if (entity.emc != 0) {
 			List<BlockEntity> neighbors = GeneralUtil.getNeighboringBlockEntities(world, blockPos);
-
 			List<BlockEntity> neighborsToDistribute = new ArrayList<BlockEntity>();
-
 			for (BlockEntity blockEntity : neighbors) {
 				if (!(blockEntity instanceof ConsumerBlockEntity) || blockEntity instanceof AntiMatterRelayBlockEntity)
 					continue;
@@ -170,7 +167,6 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 	@Nullable
 	@Override
 	public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-		//ModServerToClientPackets.UPDATE_CONSUMER_BLOCK.send((ServerPlayerEntity)player, pos, emc);
 		players.add((ServerPlayerEntity)player);
 		return new AntiMatterRelayScreenHandler(syncId, playerInventory, this, pos, level, Optional.empty());
 	}

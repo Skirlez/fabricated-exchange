@@ -1,15 +1,9 @@
 package com.skirlez.fabricatedexchange.item.tools;
 
-import com.skirlez.fabricatedexchange.item.ChargeableItem;
-import com.skirlez.fabricatedexchange.item.EmcStoringItem;
-import com.skirlez.fabricatedexchange.item.ExtraFunctionItem;
-import com.skirlez.fabricatedexchange.item.ItemUtil;
-import com.skirlez.fabricatedexchange.item.ItemWithModes;
-import com.skirlez.fabricatedexchange.item.ModToolMaterials;
+import com.skirlez.fabricatedexchange.item.*;
 import com.skirlez.fabricatedexchange.sound.ModSounds;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
-
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
@@ -62,7 +56,7 @@ public class MatterSword extends SwordItem implements ChargeableItem, ExtraFunct
 
 	@Override
 	public boolean modeSwitchCondition(ItemStack stack) {
-		return (getMaterial() == ModToolMaterials.RED_MATTER_MATERIAL) && ChargeableItem.getCharge(stack) != 0;
+		return (getMaterial() == ModToolMaterials.RED_MATTER_MATERIAL);
 	}
 	
 	@Override
@@ -160,7 +154,7 @@ public class MatterSword extends SwordItem implements ChargeableItem, ExtraFunct
 		super.appendTooltip(stack, world, tooltip, context);
 		ToolMaterial material = getMaterial();
 		if (material == ModToolMaterials.RED_MATTER_MATERIAL)
-			ItemUtil.addModeAndChargeToTooltip(stack, tooltip);
+			ItemWithModes.addModeToTooltip(stack, tooltip);
 		 
 	}
 }
