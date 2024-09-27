@@ -1,9 +1,9 @@
 package com.skirlez.fabricatedexchange.util;
 
-import com.google.common.math.BigIntegerMath;
-
 import java.math.BigInteger;
-import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 
 /** SuperNumber
 *<p> TODO I want cool ASCII art here of the name
@@ -76,10 +76,11 @@ public class SuperNumber {
 	}
 
 	/** Convert the SuperNumber to an integer. If above the integer limit, return the failsafe parameter. */
-	public int toInt(int failsafe) { // TODO: this is still dumb
-		this.floor();
+	public int toInt(int failsafe) {
+		BigInteger mod = numerator.remainder(denominator);
+		BigInteger flooredValue = numerator.subtract(mod).divide(denominator);
 		try {
-			return (numerator.intValueExact());
+			return (flooredValue.intValueExact());
 		}
 		catch (ArithmeticException thanks) {
 			return failsafe;
@@ -88,10 +89,11 @@ public class SuperNumber {
 
 
 	/** Convert the SuperNumber to an long. If above the long limit, return the failsafe parameter. */
-	public long toLong(long failsafe) { // TODO: this is still dumb
-		this.floor();
+	public long toLong(long failsafe) {
+		BigInteger mod = numerator.remainder(denominator);
+		BigInteger flooredValue = numerator.subtract(mod).divide(denominator);
 		try {
-			return (numerator.longValueExact());
+			return (flooredValue.longValueExact());
 		}
 		catch (ArithmeticException thanks) {
 			return failsafe;
@@ -335,87 +337,43 @@ public class SuperNumber {
 		return thisCopy.numerator.compareTo(otherCopy.numerator);
 	}
 
+	private static final BigInteger ONE_THOUSAND = BigInteger.valueOf(1000);
+	private static final DecimalFormatSymbols symbols = new DecimalFormatSymbols();
 	/** @return a representation of the number as a String, formatted with commas and a point */
 	// TODO: This function is stupidily written and slow
 	public String toString() {
 		if (equalsZero())
 			return "0";
-		StringBuilder newStr = new StringBuilder();
+		String whole = numerator.divide(denominator).toString();
+		DecimalFormat decimalFormat = ((DecimalFormat) NumberFormat.getInstance());
 
-		if (numerator.abs().compareTo(denominator) == -1) { // This will fail for numbers who's decimal representation is longer than the 32-bit integer limit due to zeroLen. Too bad!
-			/* Our desired output for numbers smaller than zero is as follows:
-				1. if there are any zeros before the first real digit, get ALL of them
-				2. afterwards get a maximum of 3 digits
-				We can actually get the number of zeros after the point by using Log10! Except it's off by one
-				for any number that's a power of 10 multiplied by the numerator. It's easy to see why
-				if you graph it in software like Desmos. So we explicitly check for that case.
-				after that, we can get the next 3 digits by multiplying the numerator by
-				10^(number of zeros + 3) and dividing it by the denominator.
-			*/
-			if (numerator.compareTo(BigInteger.ZERO) == -1)
-				newStr.append("-");
-			newStr.append("0.");
-			BigInteger division = denominator.divide(numerator);
-			String divisionString = division.toString();
-			String numeratorString = numerator.toString();
-			int zeroLen;
-			boolean isPower;
-			if (divisionString.startsWith(numeratorString)) {
-				isPower = true;
-				for (int i = numeratorString.length(); i < divisionString.length(); i++) {
-					if (divisionString.charAt(i) != '0') {
-						isPower = false;
-						break;
-					}
-				}
+		// Group the whole part (like 1234 to 1,234)
+		if (decimalFormat.isGroupingUsed() && whole.length() > decimalFormat.getGroupingSize()) {
+			StringBuilder builder = new StringBuilder(whole);
+			int groupSize = decimalFormat.getGroupingSize();
+
+			int end = (numerator.signum() == -1) ? 1 : 0; // End earlier when negative because of the - sign
+
+			for (int i = whole.length() - groupSize; i > end; i -= groupSize) {
+				builder.insert(i, symbols.getGroupingSeparator());
 			}
-			else
-				isPower = false;
-			if (!isPower)
-				zeroLen = BigIntegerMath.log10(division.abs(), RoundingMode.FLOOR);
-			else
-				zeroLen = divisionString.length() - 2;
-			for (int i = 0; i < zeroLen; i++)
-				newStr.append("0");
-
-			String str = numerator.multiply(BigInteger.TEN.pow(Math.max(zeroLen + 3, 3))).divide(denominator).toString();
-
-			newStr.append(str);
-
-			int len = newStr.length();
-			while (newStr.charAt(len - 1) == '0') {
-				newStr.deleteCharAt(len - 1);
-				len--;
-			}
-
-			return newStr.toString();
+			whole = builder.toString();
 		}
+		if (denominator.equals(BigInteger.ONE))
+			return whole;
 
+		BigInteger remainderNumerator = numerator.abs().mod(denominator);
+		// Multiply by 1000 to get at least 3 digits
+		String fraction = remainderNumerator.multiply(ONE_THOUSAND).divide(denominator).toString();
 
-		BigInteger temp = numerator.multiply(BigInteger.valueOf(1000)).divide(denominator);
-		String str = temp.toString();
-		int i;
-
-		for (i = 0; i < 3; i++) {
-			if (!str.endsWith("0"))
-				break;
-			str = str.substring(0, str.length() - 1);
+		// Remove any trailing zeros
+		int lastNonZeroIndex = 0;
+		for (int i = 0; i < fraction.length(); i++) {
+			if (fraction.charAt(i) != '0')
+				lastNonZeroIndex = i;
 		}
-		int commaCount = (3 - ((str.length() + i) % 3)) % 3;
-		for (int j = 0; j < str.length(); j++) {
-			int o = str.length() - (4 - i);
-			newStr.append(str.charAt(j));
-			if (j == o && o != str.length() - 1)
-				newStr.append('.');
-			if (j < o) {
-				commaCount++;
-				if (commaCount >= 3) {
-					commaCount = 0;
-					newStr.append(',');
-				}
-			}
-		}
-		return newStr.toString();
+		fraction = fraction.substring(0, lastNonZeroIndex + 1);
+		return whole + symbols.getDecimalSeparator() + fraction;
 	}
 
 
