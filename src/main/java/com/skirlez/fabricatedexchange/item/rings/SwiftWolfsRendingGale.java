@@ -6,7 +6,7 @@ import com.skirlez.fabricatedexchange.item.AbilityGrantingItem;
 import com.skirlez.fabricatedexchange.item.EmcStoringItem;
 import com.skirlez.fabricatedexchange.item.ItemWithModes;
 import com.skirlez.fabricatedexchange.item.ModItems;
-import com.skirlez.fabricatedexchange.mixin.ItemAccessor;
+import com.skirlez.fabricatedexchange.sound.ModSoundEvents;
 import com.skirlez.fabricatedexchange.util.ConstantObjectRegistry;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
@@ -17,12 +17,16 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
 import java.math.BigInteger;
@@ -34,8 +38,6 @@ public class SwiftWolfsRendingGale extends Item
 
 	public SwiftWolfsRendingGale(Settings settings) {
 		super(settings);
-		ItemAccessor self = (ItemAccessor) this;
-		self.setRecipeRemainder(this);
 	}
 
 	private static final SuperNumber DESIRED_AMOUNT = new SuperNumber(16);
@@ -77,6 +79,7 @@ public class SwiftWolfsRendingGale extends Item
 					for (Entity otherEntity : entities) {
 						Vec3d velocity = otherEntity.getPos().subtract(player.getPos()).normalize().multiply(0.2);
 						otherEntity.addVelocity(velocity);
+						otherEntity.velocityModified = true;
 					}
 				}
 				if (storedEmc.compareTo(SuperNumber.ONE) >= 0)
@@ -118,9 +121,7 @@ public class SwiftWolfsRendingGale extends Item
 				}
 
 				for (int i = 0; i < numberOfBolts; i++) {
-					// Slightly offset each lightning bolt to avoid exact overlap
 					BlockPos offsetPos = hitPos.add(world.random.nextInt(3) - 1, 0, world.random.nextInt(3) - 1);
-
 					LightningEntity lightning = EntityType.LIGHTNING_BOLT.create(world);
 
 					if (lightning != null) {
@@ -134,11 +135,14 @@ public class SwiftWolfsRendingGale extends Item
 			if (result instanceof EntityHitResult entityHitResult) {
 				Entity entity = entityHitResult.getEntity();
 
-				// Calculate the fling velocity
 				Vec3d velocity = self.getVelocity().normalize().multiply(4.0);
 				entity.addVelocity(velocity.x, velocity.y + 1, velocity.z);
 				entity.velocityModified = true;
 			}
+			Random random = world.getRandom();
+			world.playSound(null, self.getBlockPos(), SoundEvents.BLOCK_SNOW_BREAK, SoundCategory.NEUTRAL,
+				1.2f, (2f * world.getRandom().nextFloat() - 1f) * 0.2f + 1f);
+			self.createDeathParticles(result, Items.SNOW.getDefaultStack());
 		});
 
 
@@ -146,15 +150,16 @@ public class SwiftWolfsRendingGale extends Item
 	public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
 	 	super.use(world, player, hand);
 		ItemStack stack = player.getStackInHand(hand);
-		if (player.getItemCooldownManager().isCoolingDown(this)
-				|| !EmcStoringItem.takeStoredEmcOrConsume(PROJECTILE_COST, stack, player.getInventory()))
+		if (!EmcStoringItem.takeStoredEmcOrConsume(PROJECTILE_COST, stack, player.getInventory()))
 			return TypedActionResult.pass(stack);
-
 
 		FunctionalProjectile projectile = FunctionalProjectile.builder(player, ModItems.TORNADO_ORB)
 			.disableGravity()
 			.setHitBehavior(projectileHitBehavior)
 			.build();
+
+		world.playSound(null, player.getBlockPos(), ModSoundEvents.WIND_PROJECTILE_FIRE, SoundCategory.NEUTRAL,
+			0.6f, (2f * world.getRandom().nextFloat() - 1f) * 0.2f + 1.1f);
 
 		Vec3d direction = GeneralUtil.getPlayerLookVector(player);
 		projectile.fire(world, direction.multiply(2));

@@ -1,7 +1,7 @@
 package com.skirlez.fabricatedexchange.item.tools;
 
 import com.skirlez.fabricatedexchange.item.*;
-import com.skirlez.fabricatedexchange.sound.ModSounds;
+import com.skirlez.fabricatedexchange.sound.ModSoundEvents;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import net.minecraft.client.item.TooltipContext;
@@ -130,7 +130,7 @@ public class MatterSword extends SwordItem implements ChargeableItem, ExtraFunct
 				entity.damage(player.getDamageSources().playerAttack(player), getAttackDamage());
 		}
 		
-		player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.ITEM_CHARGE, 
+		player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), ModSoundEvents.ITEM_CHARGE,
 			SoundCategory.PLAYERS, 1, 1.0f);
 		
 	}

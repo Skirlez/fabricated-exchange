@@ -1,5 +1,7 @@
 package com.skirlez.fabricatedexchange.util;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -18,7 +20,7 @@ import java.text.NumberFormat;
 *@author Jesus H. Christ
 *@see BigInteger
 **/
-public class SuperNumber {
+public class SuperNumber implements Comparable<SuperNumber> {
 	private BigInteger numerator;
 	private BigInteger denominator;
 
@@ -108,6 +110,13 @@ public class SuperNumber {
 	}
 	public static SuperNumber One() {
 		return new SuperNumber(BigInteger.ONE);
+	}
+
+	public boolean isPositive() {
+		return numerator.compareTo(BigInteger.ZERO) > 0;
+	}
+	public boolean isNegative() {
+		return numerator.compareTo(BigInteger.ZERO) < 0;
 	}
 	public boolean equalsZero() {
 		return numerator.equals(BigInteger.ZERO);
@@ -310,23 +319,19 @@ public class SuperNumber {
 		this.numerator = other. numerator;
 	}
 
-	/** @return Whether the value of the SuperNumbers is equal. */
-	public boolean equalTo(SuperNumber other) {
-		return numerator.equals(other.numerator) && denominator.equals(other.denominator);
-	}
-
-	public boolean isPositive() {
-		return numerator.compareTo(BigInteger.ZERO) > 0;
-	}
-	public boolean isNegative() {
-		return numerator.compareTo(BigInteger.ZERO) < 0;
+	@Override
+	public boolean equals(Object object) {
+		if (object instanceof SuperNumber other)
+			return numerator.equals(other.numerator) && denominator.equals(other.denominator);
+		return false;
 	}
 
 	/** A comparison between this and another SuperNumber.
 	 * @return -1 for if this is smaller than other
 	 * <p> 0 for if this equals to other
 	 * <p> 1 for if this is bigger than other */
-	public int compareTo(SuperNumber other) {
+	@Override
+	public int compareTo(@NotNull SuperNumber other) {
 		if (denominator.equals(other.denominator))
 			return numerator.compareTo(other.numerator);
 
@@ -336,6 +341,7 @@ public class SuperNumber {
 		otherCopy.numerator = otherCopy.numerator.multiply(denominator);
 		return thisCopy.numerator.compareTo(otherCopy.numerator);
 	}
+
 
 	private static final BigInteger ONE_THOUSAND = BigInteger.valueOf(1000);
 	private static final DecimalFormatSymbols symbols = new DecimalFormatSymbols();
@@ -482,8 +488,13 @@ public class SuperNumber {
 
 	/** @return the smaller of the two SuperNumbers. */
 	public static SuperNumber min(SuperNumber a, SuperNumber b) {
-		return (a.compareTo(b) == -1) ? a : b;
+		return (a.compareTo(b) < 0) ? a : b;
 	}
+	/** @return the bigger of the two SuperNumbers. */
+	public static SuperNumber max(SuperNumber a, SuperNumber b) {
+		return (a.compareTo(b) > 0) ? a : b;
+	}
+
 	/** @return true if the number is valid for use in SuperNumber(String divisionString)
 	 * @see SuperNumber#SuperNumber(String divisionString) */
 	public static boolean isValidNumberString(String number) {
@@ -500,6 +511,9 @@ public class SuperNumber {
 		}
 		return slashPos != 0 && slashPos != number.length() - 1;
 	}
+
+
+
 }
 
 

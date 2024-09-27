@@ -496,7 +496,7 @@ public class EmcMapper {
 			return true;
 		}
 		SuperNumber emc = getItemEmc(item);
-		if (emc.equalTo(value))
+		if (emc.equals(value))
 			return false;
 		warn("Item EMC conflict for item " + itemName(item) 
 			+ ", EMC Mapper tried assigning two different values! Original value: " + emc + ", new value: " + value

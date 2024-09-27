@@ -122,6 +122,7 @@
     "itemgroup.fabricated-exchange": "Fabricated Exchange", 
 
     "sounds.fabricated-exchange.philosophers_stone_use": "Blocks transmuted",
+    "sounds.fabricated-exchange.wind_projectile_fire": "Wind projectile fired",
     "sounds.fabricated-exchange.item_charge": "Item charged",
     "sounds.fabricated-exchange.item_discharge": "Item discharged",
 

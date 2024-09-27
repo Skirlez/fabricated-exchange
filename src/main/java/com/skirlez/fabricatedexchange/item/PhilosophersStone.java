@@ -3,7 +3,7 @@ package com.skirlez.fabricatedexchange.item;
 import com.skirlez.fabricatedexchange.BlockTransmutation;
 import com.skirlez.fabricatedexchange.mixin.ItemAccessor;
 import com.skirlez.fabricatedexchange.screen.BlocklessCraftingScreenHandler;
-import com.skirlez.fabricatedexchange.sound.ModSounds;
+import com.skirlez.fabricatedexchange.sound.ModSoundEvents;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -59,7 +59,7 @@ public class PhilosophersStone extends Item
 		Block block = world.getBlockState(pos).getBlock();
 		boolean valid = BlockTransmutation.canTransmuteBlock(block);
 		if (valid) {
-			context.getPlayer().playSound(ModSounds.PS_USE, 1f, 1f);
+			context.getPlayer().playSound(ModSoundEvents.PS_USE, 1f, 1f);
 			if (world.isClient()) {
 				for (int i = 0; i < 3; i++) {
 					world.addParticle(ParticleTypes.LARGE_SMOKE, 
