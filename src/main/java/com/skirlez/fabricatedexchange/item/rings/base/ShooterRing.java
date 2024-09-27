@@ -10,7 +10,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
@@ -41,7 +40,7 @@ public abstract class ShooterRing extends Item implements ExtraFunctionItem, Ite
 	}
 
 	@Override
-	public void doExtraFunction(ItemStack stack, ServerPlayerEntity player) {
+	public void doExtraFunction(World world, PlayerEntity player, ItemStack stack) {
 		stack.getOrCreateNbt().putBoolean("autoshooting", !stack.getNbt().getBoolean("autoshooting"));
 	}
 

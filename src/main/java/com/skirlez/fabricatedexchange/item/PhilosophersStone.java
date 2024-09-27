@@ -1,10 +1,5 @@
 package com.skirlez.fabricatedexchange.item;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.function.Consumer;
-
 import com.skirlez.fabricatedexchange.BlockTransmutation;
 import com.skirlez.fabricatedexchange.mixin.ItemAccessor;
 import com.skirlez.fabricatedexchange.screen.BlocklessCraftingScreenHandler;
@@ -19,12 +14,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.function.Consumer;
 
 
 // The philosopher's stone implements nearly all the special item interfaces. A good example item, I'd say.
@@ -88,7 +87,7 @@ public class PhilosophersStone extends Item
 	private final Text TITLE = Text.translatable("container.crafting");
 
 	@Override
-	public void doExtraFunction(ItemStack stack, ServerPlayerEntity player) {
+	public void doExtraFunction(World world, PlayerEntity player, ItemStack stack) {
 		player.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, inventory, player2) 
 			-> new BlocklessCraftingScreenHandler(syncId, inventory), TITLE));
 	}
