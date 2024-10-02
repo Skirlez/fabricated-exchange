@@ -14,7 +14,7 @@ import com.skirlez.fabricatedexchange.packets.ExtendedVanillaPackets;
 import com.skirlez.fabricatedexchange.packets.ModClientToServerPackets;
 import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
 import com.skirlez.fabricatedexchange.screen.ModScreenHandlers;
-import com.skirlez.fabricatedexchange.sound.ModSounds;
+import com.skirlez.fabricatedexchange.sound.ModSoundEvents;
 import com.skirlez.fabricatedexchange.util.ModTags;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
@@ -56,13 +56,14 @@ public class FabricatedExchange implements ModInitializer {
 	public void onInitialize() {
 		ModItemGroups.register();
 		ModItems.register();
-		ModSounds.register();
+		ModSoundEvents.register();
 		ModBlocks.register();
 		ModEntities.register();
 		ModBlockEntities.register();
 		ModScreenHandlers.register();
 		ModClientToServerPackets.register();
 		ExtendedVanillaPackets.register();
+		ItemAbilityManager.registerServer();
 
 		ModDataFiles.MAIN_CONFIG_FILE.fetch();
 		
@@ -84,7 +85,7 @@ public class FabricatedExchange implements ModInitializer {
 			reload();
 			calculateEmcMap(server);
 
-			ItemAbilityManager.registerServer();
+
 		});
 
 

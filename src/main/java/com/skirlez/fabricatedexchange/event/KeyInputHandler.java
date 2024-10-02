@@ -57,11 +57,10 @@ public abstract class KeyInputHandler {
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			if (extraFunctionKey.wasPressed()) {
 				ItemStack stack = client.player.getStackInHand(Hand.MAIN_HAND);
-				if (!(stack.getItem() instanceof ExtraFunctionItem item)) {
+				if (!(stack.getItem() instanceof ExtraFunctionItem item))
 					return;
-				}
 				ModClientToServerPackets.DO_ITEM_EXTRA_FUNCTION.send();
-				item.doExtraFunctionClient(stack, client.player);
+				item.doExtraFunction(client.world, client.player, stack);
 			}
 		});
 

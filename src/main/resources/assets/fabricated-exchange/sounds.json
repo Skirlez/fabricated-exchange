@@ -1,20 +1,26 @@
 {
-    "philosophers_stone_use": {
-        "subtitle": "sounds.fabricated-exchange.philosophers_stone_use",
-        "sounds": [
-            "fabricated-exchange:philosophers_stone_use"
-        ]
-    },
-    "item_charge": {
-        "subtitle": "sounds.fabricated-exchange.item_charge",
-        "sounds": [
-            "fabricated-exchange:item_charge"
-        ]
-    },
-    "item_discharge": {
-        "subtitle": "sounds.fabricated-exchange.item_discharge",
-        "sounds": [
-            "fabricated-exchange:item_discharge"
-        ]
-    }
+	"philosophers_stone_use": {
+		"subtitle": "sounds.fabricated-exchange.philosophers_stone_use",
+		"sounds": [
+			"fabricated-exchange:philosophers_stone_use"
+		]
+	},
+	"item_charge": {
+		"subtitle": "sounds.fabricated-exchange.item_charge",
+		"sounds": [
+			"fabricated-exchange:item_charge"
+		]
+	},
+	"item_discharge": {
+		"subtitle": "sounds.fabricated-exchange.item_discharge",
+		"sounds": [
+			"fabricated-exchange:item_discharge"
+		]
+	},
+	"wind_projectile_fire": {
+		"subtitle": "sounds.fabricated-exchange.wind_projectile_fire",
+		"sounds": [
+			"fabricated-exchange:wind_projectile_fire"
+		]
+	}
 }

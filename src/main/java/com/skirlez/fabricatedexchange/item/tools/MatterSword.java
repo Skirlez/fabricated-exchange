@@ -1,17 +1,10 @@
 package com.skirlez.fabricatedexchange.item.tools;
 
-import com.skirlez.fabricatedexchange.item.ChargeableItem;
-import com.skirlez.fabricatedexchange.item.EmcStoringItem;
-import com.skirlez.fabricatedexchange.item.ExtraFunctionItem;
-import com.skirlez.fabricatedexchange.item.ItemUtil;
-import com.skirlez.fabricatedexchange.item.ItemWithModes;
-import com.skirlez.fabricatedexchange.item.ModToolMaterials;
-import com.skirlez.fabricatedexchange.sound.ModSounds;
+import com.skirlez.fabricatedexchange.item.*;
+import com.skirlez.fabricatedexchange.sound.ModSoundEvents;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
-
 import net.minecraft.client.item.TooltipContext;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.Monster;
@@ -23,7 +16,6 @@ import net.minecraft.item.ToolMaterial;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
@@ -62,7 +54,7 @@ public class MatterSword extends SwordItem implements ChargeableItem, ExtraFunct
 
 	@Override
 	public boolean modeSwitchCondition(ItemStack stack) {
-		return (getMaterial() == ModToolMaterials.RED_MATTER_MATERIAL) && ChargeableItem.getCharge(stack) != 0;
+		return (getMaterial() == ModToolMaterials.RED_MATTER_MATERIAL);
 	}
 	
 	@Override
@@ -114,13 +106,16 @@ public class MatterSword extends SwordItem implements ChargeableItem, ExtraFunct
 	
 	private static final SuperNumber BASE_AMOUNT = new SuperNumber(64);
 	@Override
-	public void doExtraFunction(ItemStack stack, ServerPlayerEntity player) {
+	public void doExtraFunction(World world, PlayerEntity player, ItemStack stack) {
 		if (player.getAttackCooldownProgress(0.0f) < 1.0f)
 			return;
 		SuperNumber amount = new SuperNumber(BASE_AMOUNT);
 		amount.multiply(ChargeableItem.getCharge(stack) + 1);
-		if (!EmcStoringItem.takeStoredEmcOrConsume(amount, stack, player.getInventory()))
+		if (!EmcStoringItem.takeStoredEmcOrConsume(amount, stack, player.getInventory())) {
+			if (world.isClient())
+				EmcStoringItem.showNoEmcMessage();
 			return;
+		}
 		player.resetLastAttackedTicks();
 		player.swingHand(Hand.MAIN_HAND);
 
@@ -135,32 +130,18 @@ public class MatterSword extends SwordItem implements ChargeableItem, ExtraFunct
 				entity.damage(player.getDamageSources().playerAttack(player), getAttackDamage());
 		}
 		
-		player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.ITEM_CHARGE, 
+		player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), ModSoundEvents.ITEM_CHARGE,
 			SoundCategory.PLAYERS, 1, 1.0f);
 		
 	}
-	
-	@Override 
-	public void doExtraFunctionClient(ItemStack stack, ClientPlayerEntity player) {
-		if (player.getAttackCooldownProgress(0.0f) < 1.0f)
-			return;
-		SuperNumber amount = new SuperNumber(BASE_AMOUNT);
-		amount.multiply(ChargeableItem.getCharge(stack) + 1);
-		if (!EmcStoringItem.takeStoredEmcOrConsume(amount, stack, player.getInventory())) {
-			EmcStoringItem.showNoEmcMessage();
-			return;
-		}
-		player.resetLastAttackedTicks();
-		player.swingHand(Hand.MAIN_HAND, false);
-		
-	}
+
 
 	@Override
 	public void appendTooltip(ItemStack stack, World world, List<Text> tooltip, TooltipContext context) {
 		super.appendTooltip(stack, world, tooltip, context);
 		ToolMaterial material = getMaterial();
 		if (material == ModToolMaterials.RED_MATTER_MATERIAL)
-			ItemUtil.addModeAndChargeToTooltip(stack, tooltip);
+			ItemWithModes.addModeToTooltip(stack, tooltip);
 		 
 	}
 }

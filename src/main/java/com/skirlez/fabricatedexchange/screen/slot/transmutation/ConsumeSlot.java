@@ -1,8 +1,5 @@
 package com.skirlez.fabricatedexchange.screen.slot.transmutation;
 
-import java.util.Iterator;
-import java.util.List;
-
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.item.NbtItem;
@@ -11,7 +8,6 @@ import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
-
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
@@ -20,6 +16,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
+
+import java.util.List;
 
 public class ConsumeSlot extends Slot {
 	// This slot destroys any item put inside and adds its EMC to it to a player.
@@ -50,14 +48,8 @@ public class ConsumeSlot extends Slot {
 				NbtCompound nbt = stack.getNbt();
 				if (nbt == null)
 					nbt = new NbtCompound();
-				if (!nbt.isEmpty()) {
-					Iterator<String> keyIterator = nbt.getKeys().iterator();
-					while (keyIterator.hasNext()) {
-						String key = keyIterator.next();
-						if (!allowedKeys.contains(key))
-							keyIterator.remove();
-					}
-				}
+				if (!nbt.isEmpty())
+					nbt.getKeys().removeIf(key -> !allowedKeys.contains(key));
 				boolean match = false;
 				NbtItem nbtItem = new NbtItem(item, nbt);
 				for (NbtItem currentNbtItem : playerState.specialKnowledge) {

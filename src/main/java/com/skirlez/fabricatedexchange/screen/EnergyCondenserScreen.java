@@ -25,7 +25,7 @@ public class EnergyCondenserScreen extends HandledScreen<EnergyCondenserScreenHa
 		super(handler, inventory, title);
 		this.level = handler.getLevel();
 		PacketByteBuf buf = handler.getAndConsumeCreationBuffer().get();
-		long emc = Long.parseLong(buf.readString());
+		this.emc = Long.parseLong(buf.readString());
 		this.texture = new Identifier(FabricatedExchange.MOD_ID, "textures/gui/energy_condenser_mk" + (level + 1) + ".png");
 	}
 

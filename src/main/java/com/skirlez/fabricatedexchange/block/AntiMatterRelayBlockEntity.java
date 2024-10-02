@@ -31,6 +31,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -41,13 +42,12 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 	private long emc;
 	private final long outputRate;
 	private final long maximumEmc;
-	private final long bonusEmc;
+	private final double bonusEmcChance;
 	
 	private final int level;
 	private final DefaultedList<ItemStack> stackContents;
-	private final LinkedList<ServerPlayerEntity> players = new LinkedList<>();
+	private final List<ServerPlayerEntity> players = new LinkedList<>();
 	private int tick;
-
 
 	public AntiMatterRelayBlockEntity(BlockPos pos, BlockState state) {
 		super(ModBlockEntities.ANTIMATTER_RELAY, pos, state);
@@ -60,17 +60,17 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 		if (level == 0) {
 			outputRate = 64;
 			maximumEmc = 100000;
-			bonusEmc = 0; //new SuperNumber(1, 20);
+			bonusEmcChance = 0.05d; //new SuperNumber(1, 20);
 		}
 		else if (level == 1) {
 			outputRate = 192;
 			maximumEmc = 1000000;
-			bonusEmc = 0; //new SuperNumber(3, 20);
+			bonusEmcChance = 0.15d; //new SuperNumber(3, 20);
 		}
 		else {
 			outputRate = 640;
 			maximumEmc = 10000000;
-			bonusEmc = 0; //new SuperNumber(1, 2);
+			bonusEmcChance = 0.5d; //new SuperNumber(1, 2);
 		}
 
 		emc = 0;
@@ -126,18 +126,17 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 		
 		if (entity.emc != 0) {
 			List<BlockEntity> neighbors = GeneralUtil.getNeighboringBlockEntities(world, blockPos);
-			boolean hasConsumingNeighbors = false;
+			List<BlockEntity> neighborsToDistribute = new ArrayList<BlockEntity>();
 			for (BlockEntity blockEntity : neighbors) {
 				if (!(blockEntity instanceof ConsumerBlockEntity) || blockEntity instanceof AntiMatterRelayBlockEntity)
 					continue;
 				if (((ConsumerBlockEntity)blockEntity).isConsuming()) {
-					hasConsumingNeighbors = true;
-					break;
+					neighborsToDistribute.add(blockEntity);
 				}
 			}
 			
-			if (hasConsumingNeighbors) {
-				entity.distributeEmc(neighbors);
+			if (neighborsToDistribute.size() > 0) {
+				entity.distributeEmc(neighborsToDistribute);
 			}
 		}
 
@@ -155,7 +154,7 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 	public boolean canTransferTo(Inventory hopperInventory, int invSlot, ItemStack stack) {
 		return false;
 	}
-	
+
 	public static int inventorySize(int level) {
 		return ((level == 0) ? 8 : (level == 1) ? 14 : 22);
 	}
@@ -168,7 +167,6 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 	@Nullable
 	@Override
 	public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-		//ModServerToClientPackets.UPDATE_CONSUMER_BLOCK.send((ServerPlayerEntity)player, pos, emc);
 		players.add((ServerPlayerEntity)player);
 		return new AntiMatterRelayScreenHandler(syncId, playerInventory, this, pos, level, Optional.empty());
 	}
@@ -225,7 +223,7 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 	}
 	@Override
 	public long getBonusEmc() {
-		return bonusEmc;
+		return (Math.random() <= bonusEmcChance) ? 1 : 0;
 	}
 	public void update(long emc) {
 		this.emc = emc;

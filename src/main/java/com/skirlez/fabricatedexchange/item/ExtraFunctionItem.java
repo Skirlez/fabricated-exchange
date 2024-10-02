@@ -1,13 +1,9 @@
 package com.skirlez.fabricatedexchange.item;
 
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.world.World;
 
 public interface ExtraFunctionItem {
-	void doExtraFunction(ItemStack stack, ServerPlayerEntity player);
-
-	default void doExtraFunctionClient(ItemStack stack, ClientPlayerEntity player) {
-
-	}
+	void doExtraFunction(World world, PlayerEntity player, ItemStack stack);
 }

@@ -79,6 +79,7 @@
     "item.fabricated-exchange.shooter_ring.mode_2": "Wide Shot",
     "item.fabricated-exchange.shooter_ring.mode_3": "Homing Projectile",
     "item.fabricated-exchange.shooter_ring.mode_4": "Chaos",
+    "item.fabricated-exchange.shooter_ring.no_homing_target": "Nothing to home into!",
 
     "item.fabricated-exchange.swiftwolfs_rending_gale": "Swiftwolf's Rending Gale",
     "item.fabricated-exchange.swiftwolfs_rending_gale.mode_1": "Normal",
@@ -121,6 +122,7 @@
     "itemgroup.fabricated-exchange": "Fabricated Exchange", 
 
     "sounds.fabricated-exchange.philosophers_stone_use": "Blocks transmuted",
+    "sounds.fabricated-exchange.wind_projectile_fire": "Wind projectile fired",
     "sounds.fabricated-exchange.item_charge": "Item charged",
     "sounds.fabricated-exchange.item_discharge": "Item discharged",
 

@@ -1,9 +1,11 @@
 package com.skirlez.fabricatedexchange.util;
 
-import com.google.common.math.BigIntegerMath;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
-import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 
 /** SuperNumber
 *<p> TODO I want cool ASCII art here of the name
@@ -18,7 +20,7 @@ import java.math.RoundingMode;
 *@author Jesus H. Christ
 *@see BigInteger
 **/
-public class SuperNumber {
+public class SuperNumber implements Comparable<SuperNumber> {
 	private BigInteger numerator;
 	private BigInteger denominator;
 
@@ -76,10 +78,11 @@ public class SuperNumber {
 	}
 
 	/** Convert the SuperNumber to an integer. If above the integer limit, return the failsafe parameter. */
-	public int toInt(int failsafe) { // TODO: this is still dumb
-		this.floor();
+	public int toInt(int failsafe) {
+		BigInteger mod = numerator.remainder(denominator);
+		BigInteger flooredValue = numerator.subtract(mod).divide(denominator);
 		try {
-			return (numerator.intValueExact());
+			return (flooredValue.intValueExact());
 		}
 		catch (ArithmeticException thanks) {
 			return failsafe;
@@ -88,10 +91,11 @@ public class SuperNumber {
 
 
 	/** Convert the SuperNumber to an long. If above the long limit, return the failsafe parameter. */
-	public long toLong(long failsafe) { // TODO: this is still dumb
-		this.floor();
+	public long toLong(long failsafe) {
+		BigInteger mod = numerator.remainder(denominator);
+		BigInteger flooredValue = numerator.subtract(mod).divide(denominator);
 		try {
-			return (numerator.longValueExact());
+			return (flooredValue.longValueExact());
 		}
 		catch (ArithmeticException thanks) {
 			return failsafe;
@@ -106,6 +110,13 @@ public class SuperNumber {
 	}
 	public static SuperNumber One() {
 		return new SuperNumber(BigInteger.ONE);
+	}
+
+	public boolean isPositive() {
+		return numerator.compareTo(BigInteger.ZERO) > 0;
+	}
+	public boolean isNegative() {
+		return numerator.compareTo(BigInteger.ZERO) < 0;
 	}
 	public boolean equalsZero() {
 		return numerator.equals(BigInteger.ZERO);
@@ -131,6 +142,8 @@ public class SuperNumber {
 
 	/** Rounds the SuperNumber to the closest whole number smaller than itself */
 	public void floor() {
+		if (denominator.equals(BigInteger.ONE))
+			return;
 		BigInteger mod = numerator.remainder(denominator);
 		numerator = numerator.subtract(mod);
 
@@ -140,6 +153,8 @@ public class SuperNumber {
 
 	/** Rounds the SuperNumber to the closest whole number greater than itself */
 	public void ceil() {
+		if (denominator.equals(BigInteger.ONE))
+			return;
 		BigInteger mod = numerator.mod(denominator);
 		numerator = numerator.add(denominator.subtract(mod));
 
@@ -304,23 +319,19 @@ public class SuperNumber {
 		this.numerator = other. numerator;
 	}
 
-	/** @return Whether the value of the SuperNumbers is equal. */
-	public boolean equalTo(SuperNumber other) {
-		return numerator.equals(other.numerator) && denominator.equals(other.denominator);
-	}
-
-	public boolean isPositive() {
-		return numerator.compareTo(BigInteger.ZERO) > 0;
-	}
-	public boolean isNegative() {
-		return numerator.compareTo(BigInteger.ZERO) < 0;
+	@Override
+	public boolean equals(Object object) {
+		if (object instanceof SuperNumber other)
+			return numerator.equals(other.numerator) && denominator.equals(other.denominator);
+		return false;
 	}
 
 	/** A comparison between this and another SuperNumber.
 	 * @return -1 for if this is smaller than other
 	 * <p> 0 for if this equals to other
 	 * <p> 1 for if this is bigger than other */
-	public int compareTo(SuperNumber other) {
+	@Override
+	public int compareTo(@NotNull SuperNumber other) {
 		if (denominator.equals(other.denominator))
 			return numerator.compareTo(other.numerator);
 
@@ -331,87 +342,44 @@ public class SuperNumber {
 		return thisCopy.numerator.compareTo(otherCopy.numerator);
 	}
 
+
+	private static final BigInteger ONE_THOUSAND = BigInteger.valueOf(1000);
+	private static final DecimalFormatSymbols symbols = new DecimalFormatSymbols();
 	/** @return a representation of the number as a String, formatted with commas and a point */
 	// TODO: This function is stupidily written and slow
 	public String toString() {
 		if (equalsZero())
 			return "0";
-		StringBuilder newStr = new StringBuilder();
+		String whole = numerator.divide(denominator).toString();
+		DecimalFormat decimalFormat = ((DecimalFormat) NumberFormat.getInstance());
 
-		if (numerator.abs().compareTo(denominator) == -1) { // This will fail for numbers who's decimal representation is longer than the 32-bit integer limit due to zeroLen. Too bad!
-			/* Our desired output for numbers smaller than zero is as follows:
-				1. if there are any zeros before the first real digit, get ALL of them
-				2. afterwards get a maximum of 3 digits
-				We can actually get the number of zeros after the point by using Log10! Except it's off by one
-				for any number that's a power of 10 multiplied by the numerator. It's easy to see why
-				if you graph it in software like Desmos. So we explicitly check for that case.
-				after that, we can get the next 3 digits by multiplying the numerator by
-				10^(number of zeros + 3) and dividing it by the denominator.
-			*/
-			if (numerator.compareTo(BigInteger.ZERO) == -1)
-				newStr.append("-");
-			newStr.append("0.");
-			BigInteger division = denominator.divide(numerator);
-			String divisionString = division.toString();
-			String numeratorString = numerator.toString();
-			int zeroLen;
-			boolean isPower;
-			if (divisionString.startsWith(numeratorString)) {
-				isPower = true;
-				for (int i = numeratorString.length(); i < divisionString.length(); i++) {
-					if (divisionString.charAt(i) != '0') {
-						isPower = false;
-						break;
-					}
-				}
+		// Group the whole part (like 1234 to 1,234)
+		if (decimalFormat.isGroupingUsed() && whole.length() > decimalFormat.getGroupingSize()) {
+			StringBuilder builder = new StringBuilder(whole);
+			int groupSize = decimalFormat.getGroupingSize();
+
+			int end = (numerator.signum() == -1) ? 1 : 0; // End earlier when negative because of the - sign
+
+			for (int i = whole.length() - groupSize; i > end; i -= groupSize) {
+				builder.insert(i, symbols.getGroupingSeparator());
 			}
-			else
-				isPower = false;
-			if (!isPower)
-				zeroLen = BigIntegerMath.log10(division.abs(), RoundingMode.FLOOR);
-			else
-				zeroLen = divisionString.length() - 2;
-			for (int i = 0; i < zeroLen; i++)
-				newStr.append("0");
-
-			String str = numerator.multiply(BigInteger.TEN.pow(Math.max(zeroLen + 3, 3))).divide(denominator).toString();
-
-			newStr.append(str);
-
-			int len = newStr.length();
-			while (newStr.charAt(len - 1) == '0') {
-				newStr.deleteCharAt(len - 1);
-				len--;
-			}
-
-			return newStr.toString();
+			whole = builder.toString();
 		}
+		if (denominator.equals(BigInteger.ONE))
+			return whole;
 
+		BigInteger remainderNumerator = numerator.abs().mod(denominator);
+		// Multiply by 1000 to get at least 3 digits
+		String fraction = remainderNumerator.multiply(ONE_THOUSAND).divide(denominator).toString();
 
-		BigInteger temp = numerator.multiply(BigInteger.valueOf(1000)).divide(denominator);
-		String str = temp.toString();
-		int i;
-
-		for (i = 0; i < 3; i++) {
-			if (!str.endsWith("0"))
-				break;
-			str = str.substring(0, str.length() - 1);
+		// Remove any trailing zeros
+		int lastNonZeroIndex = 0;
+		for (int i = 0; i < fraction.length(); i++) {
+			if (fraction.charAt(i) != '0')
+				lastNonZeroIndex = i;
 		}
-		int commaCount = (3 - ((str.length() + i) % 3)) % 3;
-		for (int j = 0; j < str.length(); j++) {
-			int o = str.length() - (4 - i);
-			newStr.append(str.charAt(j));
-			if (j == o && o != str.length() - 1)
-				newStr.append('.');
-			if (j < o) {
-				commaCount++;
-				if (commaCount >= 3) {
-					commaCount = 0;
-					newStr.append(',');
-				}
-			}
-		}
-		return newStr.toString();
+		fraction = fraction.substring(0, lastNonZeroIndex + 1);
+		return whole + symbols.getDecimalSeparator() + fraction;
 	}
 
 
@@ -520,8 +488,13 @@ public class SuperNumber {
 
 	/** @return the smaller of the two SuperNumbers. */
 	public static SuperNumber min(SuperNumber a, SuperNumber b) {
-		return (a.compareTo(b) == -1) ? a : b;
+		return (a.compareTo(b) < 0) ? a : b;
 	}
+	/** @return the bigger of the two SuperNumbers. */
+	public static SuperNumber max(SuperNumber a, SuperNumber b) {
+		return (a.compareTo(b) > 0) ? a : b;
+	}
+
 	/** @return true if the number is valid for use in SuperNumber(String divisionString)
 	 * @see SuperNumber#SuperNumber(String divisionString) */
 	public static boolean isValidNumberString(String number) {
@@ -538,6 +511,9 @@ public class SuperNumber {
 		}
 		return slashPos != 0 && slashPos != number.length() - 1;
 	}
+
+
+
 }
 
 

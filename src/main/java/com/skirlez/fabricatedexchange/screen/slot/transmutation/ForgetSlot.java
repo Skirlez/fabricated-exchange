@@ -1,15 +1,11 @@
 package com.skirlez.fabricatedexchange.screen.slot.transmutation;
 
-import java.util.Iterator;
-import java.util.List;
-
 import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.item.NbtItem;
 import com.skirlez.fabricatedexchange.screen.TransmutationTableScreenHandler;
 import com.skirlez.fabricatedexchange.util.PlayerState;
 import com.skirlez.fabricatedexchange.util.ServerState;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
-
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
@@ -17,6 +13,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.Slot;
+
+import java.util.List;
 
 public class ForgetSlot extends Slot {
 
@@ -53,12 +51,7 @@ public class ForgetSlot extends Slot {
 				if (nbt == null)
 					nbt = new NbtCompound();
 				if (!nbt.isEmpty()) {
-					Iterator<String> keyIterator = nbt.getKeys().iterator();
-					while (keyIterator.hasNext()) {
-						String key = keyIterator.next();
-						if (!allowedKeys.contains(key))
-							keyIterator.remove();
-					}
+					nbt.getKeys().removeIf(key -> !allowedKeys.contains(key));
 				}
 			
 
