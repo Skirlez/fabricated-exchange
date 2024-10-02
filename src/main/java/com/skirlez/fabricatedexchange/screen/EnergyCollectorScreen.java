@@ -19,33 +19,34 @@ import net.minecraft.util.Identifier;
 
 import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreenHandler.SlotIndicies;
 
+import java.text.NumberFormat;
+
 public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHandler> {
 	private final Identifier texture;
 	private double emcProgress; // 0 - 1 how much of the emc bar should be filled
 	private final EnergyCollectorScreenHandler handler;
 	private int light;
-	private SuperNumber emc;
+	private long emc;
 	private final int level;
-	private final SuperNumber maximumEmc;
+	private final long maximumEmc;
 	public EnergyCollectorScreen(EnergyCollectorScreenHandler handler, PlayerInventory inventory, Text title) {
 		super(handler, inventory, title);		
 		
 		this.level = handler.getLevel();
 		if (this.level == 0)
-			maximumEmc = new SuperNumber(10000);
+			maximumEmc = 10000;
 		else if (this.level == 1)
-			maximumEmc = new SuperNumber(30000);
+			maximumEmc = 30000;
 		else 
-			maximumEmc = new SuperNumber(60000);
+			maximumEmc = 60000;
 
 		this.handler = handler;
 		PacketByteBuf buf = handler.getAndConsumeCreationBuffer().get();
-		emc = new SuperNumber(buf.readString());
+		emc = Long.parseLong(buf.readString());
 		light = buf.readInt();
-		
-		SuperNumber emcCopy = new SuperNumber(emc);
-		emcCopy.divide(maximumEmc);
-		emcProgress = emcCopy.toDouble();
+
+
+		emcProgress = ((double)emc / (double)maximumEmc);
 		
 
 		texture = new Identifier(FabricatedExchange.MOD_ID, "textures/gui/energy_collector_mk" + String.valueOf(level + 1) + ".png");
@@ -70,9 +71,7 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
 
 	@Override
 	protected void handledScreenTick() {
-		SuperNumber emcCopy = new SuperNumber(emc);
-		emcCopy.divide(maximumEmc);
-		emcProgress = emcCopy.toDouble();
+		emcProgress = ((double)emc / (double)maximumEmc);
 	}
 
 	@Override
@@ -117,9 +116,7 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
 			xOffset = 16;
 		else if (this.level == 2)
 			xOffset = 34;
-		SuperNumber emcCopy = new SuperNumber(emc);
-		emcCopy.floor();
-		textRenderer.draw(matrices, emcCopy.toString(), 62 + xOffset, 32, 0x404040);
+		textRenderer.draw(matrices, NumberFormat.getIntegerInstance().format(emc), 62 + xOffset, 32, 0x404040);
 	}
 
 	@Override
@@ -130,7 +127,7 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
 	}
 
 
-	public void update(SuperNumber emc, int light) {
+	public void update(long emc, int light) {
 		this.emc = emc;
 		this.light = light;
 	}
@@ -163,9 +160,7 @@ public class EnergyCollectorScreen extends HandledScreen<EnergyCollectorScreenHa
 		
 		nextEmc.subtract(itemEmc);
 
-		SuperNumber emcCopy = new SuperNumber(emc);
-		emcCopy.divide(nextEmc);
-		double fuelProgress = emcCopy.toDouble();
+		double fuelProgress = ((double)emc / nextEmc.toDouble());
 		if (fuelProgress > 1d)
 			fuelProgress = 1d;
 		return fuelProgress;

@@ -22,19 +22,12 @@ public class DoItemExtraFunction extends ClientToServerPacket {
 	public void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler,
 			PacketByteBuf buf, PacketSender responseSender) {
 		ItemStack stack = player.getStackInHand(Hand.MAIN_HAND);
-		stack.getItem();
-		if (!(stack.getItem() instanceof ExtraFunctionItem))
+		if (!(stack.getItem() instanceof ExtraFunctionItem item))
 			return;
-	
-		final ItemStack theStack = stack;
-		ExtraFunctionItem item = (ExtraFunctionItem)(stack.getItem());
-		server.execute(new Runnable() {
-			@Override
-			public void run() {
-				if (player.isDisconnected())
-					return;
-				item.doExtraFunction(theStack, player);
-			}
+		server.execute(() -> {
+			if (player.isDisconnected())
+				return;
+			item.doExtraFunction(player.getWorld(), player, stack);
 		});
 	}
 

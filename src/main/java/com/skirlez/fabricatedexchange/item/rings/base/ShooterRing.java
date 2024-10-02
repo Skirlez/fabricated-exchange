@@ -3,7 +3,6 @@ package com.skirlez.fabricatedexchange.item.rings.base;
 import com.skirlez.fabricatedexchange.item.EmcStoringItem;
 import com.skirlez.fabricatedexchange.item.ExtraFunctionItem;
 import com.skirlez.fabricatedexchange.item.ItemWithModes;
-import com.skirlez.fabricatedexchange.mixin.ItemAccessor;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
@@ -11,7 +10,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
@@ -33,8 +31,6 @@ public abstract class ShooterRing extends Item implements ExtraFunctionItem, Ite
 
 	public ShooterRing(Settings settings) {
 		super(settings);
-		ItemAccessor self = (ItemAccessor) this;
-		self.setRecipeRemainder(this);
 	}
 
 	public static boolean shouldTurnOn(ItemStack stack) {
@@ -44,7 +40,7 @@ public abstract class ShooterRing extends Item implements ExtraFunctionItem, Ite
 	}
 
 	@Override
-	public void doExtraFunction(ItemStack stack, ServerPlayerEntity player) {
+	public void doExtraFunction(World world, PlayerEntity player, ItemStack stack) {
 		stack.getOrCreateNbt().putBoolean("autoshooting", !stack.getNbt().getBoolean("autoshooting"));
 	}
 
@@ -127,8 +123,11 @@ public abstract class ShooterRing extends Item implements ExtraFunctionItem, Ite
 					//player.getItemCooldownManager().set(this, 5);
 
 				}
-				else
+				else {
+					if (world.isClient())
+						GeneralUtil.showOverlayMessage(Text.translatable("item.fabricated-exchange.shooter_ring.no_homing_target"));
 					return;
+				}
 
 
 				break;

@@ -1,6 +1,6 @@
 package com.skirlez.fabricatedexchange.item;
 
-import com.skirlez.fabricatedexchange.sound.ModSounds;
+import com.skirlez.fabricatedexchange.sound.ModSoundEvents;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -32,7 +32,7 @@ public interface ChargeableItem {
 			newValue = min;
 		if (oldValue != newValue) {
 			stackNbt.putInt(CHARGE_KEY, newValue);
-			SoundEvent sound = (Math.signum(value) == 1) ? ModSounds.ITEM_CHARGE : ModSounds.ITEM_DISCHARGE;
+			SoundEvent sound = (Math.signum(value) == 1) ? ModSoundEvents.ITEM_CHARGE : ModSoundEvents.ITEM_DISCHARGE;
 
 			if (player.world.isClient()) {
 				((ClientPlayerEntity)player).playSound(sound, 

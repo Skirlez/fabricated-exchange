@@ -5,8 +5,10 @@ import com.skirlez.fabricatedexchange.entities.base.FunctionalProjectile;
 import com.skirlez.fabricatedexchange.item.EmcStoringItem;
 import com.skirlez.fabricatedexchange.item.rings.base.ShooterRing;
 import com.skirlez.fabricatedexchange.util.ConstantObjectRegistry;
-import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
+import net.minecraft.block.AbstractFireBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -16,8 +18,10 @@ import net.minecraft.item.Items;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
@@ -45,6 +49,14 @@ public class IgnitionRing extends ShooterRing {
 				Vec3d push = self.getVelocity().multiply(1.0, 0.0, 1.0).normalize();
 				entity.addVelocity(push.x, 0.1d, push.z);
 			}
+			else if (result instanceof BlockHitResult blockHitResult) {
+
+				BlockPos blockPos = blockHitResult.getBlockPos().offset(blockHitResult.getSide());
+				if (AbstractFireBlock.canPlaceAt(self.getWorld(), blockPos, blockHitResult.getSide())) {
+					BlockState blockState = AbstractFireBlock.getState(self.getWorld(), blockPos);
+					self.getWorld().setBlockState(blockPos, blockState, Block.NOTIFY_ALL | Block.REDRAW_ON_MAIN_THREAD);
+				}
+			}
 			Random random = self.getWorld().getRandom();
 			for (SoundEvent event :
 				new SoundEvent[] {SoundEvents.BLOCK_NETHERRACK_BREAK, SoundEvents.ITEM_FLINTANDSTEEL_USE}) {
@@ -66,11 +78,7 @@ public class IgnitionRing extends ShooterRing {
 			.setHitBehavior(projectileHitBehavior)
 			.build();
 
-		GeneralUtil.nudgeProjectileInDirection(projectile, direction);
-		projectile.setVelocity(direction.multiply(2));
-		world.spawnEntity(projectile);
-
-
+		projectile.fire(world, direction.multiply(2));
 		return true;
 	}
 

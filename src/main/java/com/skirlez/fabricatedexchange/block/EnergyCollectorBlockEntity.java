@@ -1,21 +1,16 @@
 package com.skirlez.fabricatedexchange.block;
 
-import java.util.LinkedList;
-import java.util.Optional;
-import java.util.Set;
-
 import com.google.common.collect.ImmutableSet;
 import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
 import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreen;
 import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreenHandler;
+import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreenHandler.SlotIndicies;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.ImplementedInventory;
 import com.skirlez.fabricatedexchange.util.SingleStackInventoryImpl;
-import com.skirlez.fabricatedexchange.util.SuperNumber;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
-
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -40,7 +35,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 
-import com.skirlez.fabricatedexchange.screen.EnergyCollectorScreenHandler.SlotIndicies;
+import java.util.LinkedList;
+import java.util.Optional;
+import java.util.Set;
 
 public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory, ConsumerBlockEntity {
 	
@@ -49,15 +46,18 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 			ModBlocks.ANTIMATTER_RELAY_MK1, ModBlocks.ANTIMATTER_RELAY_MK2, ModBlocks.ANTIMATTER_RELAY_MK3,
 			ModBlocks.ENERGY_COLLECTOR_MK1, ModBlocks.ENERGY_CONDENSER_MK2).build();
 	
-	private SuperNumber emc;
+	private long emc;
 	private int tick;
 	private int light;
 	private boolean consuming;
 	private final int level;
 
-	private final SuperNumber maximumEmc;
-	private final SuperNumber genPerTick;
-	private final SuperNumber outputRate;
+	private final long maximumEmc;
+	private final double genPerTick;
+	private final long outputRate;
+
+	private double accum = 0;
+
 	private final LinkedList<ServerPlayerEntity> players = new LinkedList<>();
 
 	private final DefaultedList<ItemStack> stackContents;
@@ -65,26 +65,26 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 	
 	public EnergyCollectorBlockEntity(BlockPos pos, BlockState state) {
 		super(ModBlockEntities.ENERGY_COLLECTOR, pos, state);
-		emc = SuperNumber.Zero();
+		emc = 0;
 		this.targetInventory = new SingleStackInventoryImpl();
 		tick = 0;
 		Block block = state.getBlock();
 		assert block instanceof EnergyCollector;
 		this.level = ((EnergyCollector)block).getLevel();
 		if (this.level == 0) {
-			maximumEmc = new SuperNumber(10000);
-			genPerTick = new SuperNumber(1, 5);
-			outputRate = new SuperNumber(10);
+			maximumEmc = 10000;
+			genPerTick = 1d / 5d;
+			outputRate = 10;
 		}
 		else if (this.level == 1) {
-			maximumEmc = new SuperNumber(30000);
-			genPerTick = new SuperNumber(3, 5);
-			outputRate = new SuperNumber(20);
+			maximumEmc = 30000;
+			genPerTick = 3d / 5d;
+			outputRate = 20;
 		}
 		else {
-			maximumEmc = new SuperNumber(60000);
-			genPerTick = new SuperNumber(2);
-			outputRate = new SuperNumber(50);
+			maximumEmc = 60000;
+			genPerTick = 2d;
+			outputRate = 50;
 		}
 
 		this.stackContents = DefaultedList.ofSize(inventorySize(level), ItemStack.EMPTY);
@@ -94,9 +94,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 	public Text getDisplayName() {
 		return Text.translatable("screen.fabricated-exchange.emc_collection");
 	}
-	
-	
-	
+
 	public static int getLightLevelAbove(World world, BlockPos pos) {
 		if (ModDataFiles.MAIN_CONFIG_FILE.energyCollector_alwaysHaveEnergy)
 			return 15;
@@ -104,8 +102,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 		do {
 			pos = pos.add(0, 1, 0);
 		} while (lightPassingBlocks.contains(world.getBlockState(pos).getBlock()));
-		
-		
+
 		return Math.min(world.getLightLevel(LightType.SKY, pos) - world.getAmbientDarkness(), 15);
 	}
 	
@@ -127,12 +124,17 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 		}
 
 		entity.consuming = entity.tickInventoryLogic();
-		SuperNumber addition = new SuperNumber(entity.light + 1, 16);
+		double addition = ((double)entity.light + 1d) / 16d;
+		addition *= entity.genPerTick;
+		entity.accum += addition;
 
-		addition.multiply(entity.genPerTick);
-		entity.emc.add(addition);
-		if (entity.emc.compareTo(entity.maximumEmc) == 1)
-			entity.emc.copyValueOf(entity.maximumEmc);
+		if (entity.accum >= 1) {
+			long value = (long)entity.accum;
+			entity.accum -= value;
+			entity.emc += value;
+			if (entity.emc > entity.maximumEmc)
+				entity.emc = entity.maximumEmc;
+		}
 		if (entity.consuming == false) {
 			entity.distributeEmc(GeneralUtil.getNeighboringBlockEntities(world, blockPos));
 		}
@@ -159,10 +161,14 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 		if (!FabricatedExchange.fuelProgressionMap.containsKey(fuelItem))
 			return false;
 		
-		SuperNumber fuelEmc = EmcData.getItemEmc(fuelItem);
-		SuperNumber targetItemEmc = EmcData.getItemEmc(targetInventory.getStack().getItem());
+		long fuelEmc = EmcData.getItemEmc(fuelItem).toLong(0);
+		if (fuelEmc == 0)
+			return false;
+		long targetItemEmc = EmcData.getItemEmc(targetInventory.getStack().getItem()).toLong(0);
+		if (targetItemEmc == 0)
+			return false;
 		if (!targetInventory.isEmpty()) {
-			if (fuelEmc.compareTo(targetItemEmc) >= 0)
+			if (fuelEmc >= targetItemEmc)
 				return false;
 		}
 		
@@ -171,11 +177,13 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 		
 		if ((!nextItem.equals(outputStack.getItem())
 				|| outputStack.getMaxCount() <= outputStack.getCount()) && !outputStack.isEmpty())
-			return false; // return if there's an item in the output slot that we cannot merge with the next item in the progression
+			return false; // return because there's an item in the output slot that we cannot merge with the next item in the progression
 		
-		SuperNumber nextEmc = EmcData.getItemEmc(nextItem);
-		nextEmc.subtract(fuelEmc);
-		if (emc.compareTo(nextEmc) >= 0) {
+		long nextEmc = EmcData.getItemEmc(nextItem).toLong(0);
+		if (nextEmc == 0)
+			return false;
+		nextEmc -= fuelEmc;
+		if (emc >= nextEmc) {
 			if (outputStack.isEmpty()) {
 				outputStack = new ItemStack(nextItem);
 				this.setStack(SlotIndicies.OUTPUT_SLOT.ordinal(), outputStack);
@@ -183,7 +191,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 			else
 				outputStack.increment(1);
 			fuelStack.decrement(1);
-			emc.subtract(nextEmc);
+			emc -= nextEmc;
 		}
 		moveOutputToInput();
 		return true;
@@ -267,7 +275,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 		super.writeNbt(nbt);
 		Inventories.writeNbt(nbt, stackContents);
 		nbt.putString("target", Registries.ITEM.getId(targetInventory.getStack(0).getItem()).toString());
-		nbt.putString("emc", emc.divisionString());
+		nbt.putString("emc", Long.toString(emc));
 	
 	}
 
@@ -279,8 +287,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 		if (item == null)
 			return;
 		targetInventory.setStack(0, new ItemStack(item));
-		
-		emc = new SuperNumber(nbt.getString("emc"));
+		emc = GeneralUtil.parseLongFromPossiblySuperNumberData(nbt.getString("emc"));
 	}
 
 	@Override
@@ -290,7 +297,7 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 		buf.writeInt(level);
 
 		// these will only be read on the screen
-		buf.writeString(emc.divisionString());
+		buf.writeString(Long.toString(emc));
 		buf.writeInt(light);
 	}
 	
@@ -299,19 +306,22 @@ public class EnergyCollectorBlockEntity extends BlockEntity implements ExtendedS
 		return consuming;
 	}
 	@Override
-	public SuperNumber getEmc() {
+	public long getEmc() {
 		return emc;
 	}
+	public void setEmc(long emc) {
+		this.emc = emc;
+	}
 	@Override
-	public SuperNumber getOutputRate() {
+	public long getOutputRate() {
 		return outputRate;
 	}
 	@Override
-	public SuperNumber getMaximumEmc() {
+	public long getMaximumEmc() {
 		return maximumEmc;
 	}
 
-	public void update(SuperNumber emc) {
+	public void update(long emc) {
 		this.emc = emc;
 	}
 

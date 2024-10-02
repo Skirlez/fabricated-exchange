@@ -1,14 +1,10 @@
 package com.skirlez.fabricatedexchange.block;
 
-import java.util.LinkedList;
-import java.util.Optional;
-
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.screen.EnergyCondenserScreen;
 import com.skirlez.fabricatedexchange.screen.EnergyCondenserScreenHandler;
 import com.skirlez.fabricatedexchange.util.SingleStackInventoryImpl;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
@@ -30,11 +26,14 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import java.util.LinkedList;
+import java.util.Optional;
+
 
 
 public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements ExtendedScreenHandlerFactory, ConsumerBlockEntity {
 	private final int level;
-	private SuperNumber emc;
+	private long emc;
 	private int tick;
 	
 	private SingleStackInventory targetInventory;
@@ -48,7 +47,7 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 	public EnergyCondenserBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state) {
 		super(blockEntityType, pos, state);
 		Block block = state.getBlock();
-		emc = SuperNumber.Zero();
+		emc = 0;
 		if (block instanceof EnergyCondenser)
 			this.level = ((EnergyCondenser)block).getLevel();
 		else
@@ -69,35 +68,37 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 	
 	public void serverTick(World world, BlockPos blockPos, BlockState blockState) {
 		Inventory inv = (Inventory)this;
+
 		ItemStack target = targetInventory.getStack();
-		SuperNumber targetEmc = EmcData.getItemStackEmc(target);
-		if (!targetEmc.equalsZero() && emc.compareTo(targetEmc) >= 0) {
+		SuperNumber superTargetEmc = EmcData.getItemStackEmc(target);
+		superTargetEmc.ceil();
+		long targetEmc = superTargetEmc.toLong(0);
+		if (!targetInventory.getStack().isEmpty() && targetEmc != 0 && emc >= targetEmc) {
 			int start = (level == 0) ? 0 : 42;
-			SuperNumber emcCopy = new SuperNumber(emc);
-			emcCopy.divide(targetEmc);
-			int maxStacks = (level == 0) ? 1 : Math.min(emcCopy.toInt(target.getMaxCount()), target.getMaxCount());
+			long stacksCanMake = emc / targetEmc;
+			int maxStacks = (level == 0) ? 1 : Math.min((int)stacksCanMake, target.getMaxCount());
 
 			boolean success = false;
 			for (int i = start; i < inv.size() && !success; i++) {
 				ItemStack stack = inv.getStack(i);
 				if (stack.isEmpty()) {
 					inv.setStack(i, target.copyWithCount(maxStacks));
-					targetEmc.multiply(maxStacks);
+					targetEmc *= maxStacks;
 					success = true;
 				}
 				else if (ItemStack.canCombine(stack, target) && stack.getCount() < stack.getMaxCount()) {
 					int increment = Math.min(stack.getMaxCount()-stack.getCount(), maxStacks);
 					stack.increment(increment);
-					targetEmc.multiply(increment);
+					targetEmc *= increment;
 					success = true;
 				}
 			}
 			if (success) {   
-				emc.subtract(targetEmc);
+				emc -= targetEmc;
 				inv.markDirty();
 			}
 		}
-		if (level == 1 && emc.compareTo(targetEmc) == -1) {
+		if (level == 1 && emc < targetEmc) {
 			for (int i = 0; i < 42; i++) {
 				ItemStack stack = inv.getStack(i);
 				if (stack.isEmpty())
@@ -108,7 +109,7 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 					continue;
 				
 				inv.removeStack(i);
-				emc.add(stackEmc);
+				emc += stackEmc.toLong(0);
 				break;
 			}
 		}
@@ -150,18 +151,27 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 	}
 
 	@Override
-	public SuperNumber getEmc() {
+	public long getEmc() {
 		return emc;
 	}
 
 	@Override
-	public SuperNumber getOutputRate() {
-		return SuperNumber.ZERO;
+	public void setEmc(long emc) {
+		this.emc = emc;
 	}
 
 	@Override
-	public SuperNumber getMaximumEmc() {
-		return EmcData.getItemStackEmc(targetInventory.getStack());
+	public long getOutputRate() {
+		return 0;
+	}
+
+	@Override
+	public long getMaximumEmc() {
+		if (targetInventory.getStack().isEmpty())
+			return 0;
+		SuperNumber targetEmc = EmcData.getItemStackEmc(targetInventory.getStack());
+		targetEmc.ceil();
+		return targetEmc.toLong(0);
 	}
 
 	@Override
@@ -175,11 +185,11 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 		buf.writeBlockPos(pos);
 		buf.writeInt(level);
 		// intended to be read by the screen
-		buf.writeString(emc.divisionString());
+		buf.writeString(Long.toString(emc));
 	}
 
 	@Override
-	public void update(SuperNumber emc) {
+	public void update(long emc) {
 		this.emc = emc;
 	}
 	
@@ -187,6 +197,7 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 	public void writeNbt(NbtCompound tag) {
 		super.writeNbt(tag);
 		tag.putString("target", Registries.ITEM.getId(targetInventory.getStack(0).getItem()).toString());
+		tag.putString("emc", Long.toString(emc));
 	}
 	
 	public void readNbt(NbtCompound nbt) {
@@ -195,6 +206,10 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 		if (item == null)
 			return;
 		targetInventory.setStack(0, new ItemStack(item));
+		String str = nbt.getString("emc");
+		if (str.isEmpty())
+			str = "0";
+		emc = Long.parseLong(str);
 	}
 	
 

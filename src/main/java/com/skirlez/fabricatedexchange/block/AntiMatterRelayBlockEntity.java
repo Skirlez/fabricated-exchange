@@ -1,21 +1,16 @@
 package com.skirlez.fabricatedexchange.block;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-
-import net.fabricmc.fabric.api.registry.FuelRegistry;
-import org.jetbrains.annotations.Nullable;
-
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.screen.AntiMatterRelayScreen;
 import com.skirlez.fabricatedexchange.screen.AntiMatterRelayScreenHandler;
+import com.skirlez.fabricatedexchange.screen.AntiMatterRelayScreenHandler.SlotIndicies;
+import com.skirlez.fabricatedexchange.screen.slot.StackCondition;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.ImplementedInventory;
-import com.skirlez.fabricatedexchange.util.SuperNumber;
-
+import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -34,24 +29,25 @@ import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
+import org.jetbrains.annotations.Nullable;
 
-import com.skirlez.fabricatedexchange.screen.AntiMatterRelayScreenHandler.SlotIndicies;
-import com.skirlez.fabricatedexchange.screen.slot.StackCondition;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 
 public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory,
 		ConsumerBlockEntity {
 
-	private SuperNumber emc;
-	private final SuperNumber outputRate;
-	private final SuperNumber maximumEmc;
-	private final SuperNumber bonusEmc;
+	private long emc;
+	private final long outputRate;
+	private final long maximumEmc;
+	private final double bonusEmcChance;
 	
 	private final int level;
 	private final DefaultedList<ItemStack> stackContents;
-	private final LinkedList<ServerPlayerEntity> players = new LinkedList<>();
+	private final List<ServerPlayerEntity> players = new LinkedList<>();
 	private int tick;
-
 
 	public AntiMatterRelayBlockEntity(BlockPos pos, BlockState state) {
 		super(ModBlockEntities.ANTIMATTER_RELAY, pos, state);
@@ -62,22 +58,22 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 		stackContents = DefaultedList.ofSize(inventorySize(level), ItemStack.EMPTY);
 
 		if (level == 0) {
-			outputRate = new SuperNumber(64);
-			maximumEmc = new SuperNumber(100000);
-			bonusEmc = new SuperNumber(1, 20);
+			outputRate = 64;
+			maximumEmc = 100000;
+			bonusEmcChance = 0.05d; //new SuperNumber(1, 20);
 		}
 		else if (level == 1) {
-			outputRate = new SuperNumber(192);
-			maximumEmc = new SuperNumber(1000000);
-			bonusEmc = new SuperNumber(3, 20);
+			outputRate = 192;
+			maximumEmc = 1000000;
+			bonusEmcChance = 0.15d; //new SuperNumber(3, 20);
 		}
 		else {
-			outputRate = new SuperNumber(640);
-			maximumEmc = new SuperNumber(10000000);
-			bonusEmc = new SuperNumber(1, 2);
+			outputRate = 640;
+			maximumEmc = 10000000;
+			bonusEmcChance = 0.5d; //new SuperNumber(1, 2);
 		}
 
-		emc = SuperNumber.Zero();
+		emc = 0;
 		tick = 0;
 	}
 
@@ -99,11 +95,9 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 
 		if (burnTime != null || !ModDataFiles.MAIN_CONFIG_FILE.antiMatterRelay_onlyAcceptFuelItems) {
 			if (!fuelStack.isEmpty()) {
-				SuperNumber value = EmcData.getItemStackEmc(fuelStack.copyWithCount(1));		  
-				SuperNumber emcCopy = new SuperNumber(entity.emc);
-				emcCopy.add(value);
-				if (emcCopy.compareTo(entity.maximumEmc) != 1) {
-					entity.emc.add(value);
+				long value = EmcData.getItemStackEmc(fuelStack.copyWithCount(1)).toLong(-1);
+				if (entity.emc <= entity.maximumEmc - value) {
+					entity.emc += value;
 					fuelStack.decrement(1);
 				}
 			}  
@@ -130,20 +124,19 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 			break;
 		}
 		
-		if (!entity.emc.equalsZero()) {
+		if (entity.emc != 0) {
 			List<BlockEntity> neighbors = GeneralUtil.getNeighboringBlockEntities(world, blockPos);
-			boolean hasConsumingNeighbors = false;
+			List<BlockEntity> neighborsToDistribute = new ArrayList<BlockEntity>();
 			for (BlockEntity blockEntity : neighbors) {
 				if (!(blockEntity instanceof ConsumerBlockEntity) || blockEntity instanceof AntiMatterRelayBlockEntity)
 					continue;
 				if (((ConsumerBlockEntity)blockEntity).isConsuming()) {
-					hasConsumingNeighbors = true;
-					break;
+					neighborsToDistribute.add(blockEntity);
 				}
 			}
 			
-			if (hasConsumingNeighbors) {
-				entity.distributeEmc(neighbors);
+			if (neighborsToDistribute.size() > 0) {
+				entity.distributeEmc(neighborsToDistribute);
 			}
 		}
 
@@ -161,7 +154,7 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 	public boolean canTransferTo(Inventory hopperInventory, int invSlot, ItemStack stack) {
 		return false;
 	}
-	
+
 	public static int inventorySize(int level) {
 		return ((level == 0) ? 8 : (level == 1) ? 14 : 22);
 	}
@@ -174,7 +167,6 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 	@Nullable
 	@Override
 	public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-		//ModServerToClientPackets.UPDATE_CONSUMER_BLOCK.send((ServerPlayerEntity)player, pos, emc);
 		players.add((ServerPlayerEntity)player);
 		return new AntiMatterRelayScreenHandler(syncId, playerInventory, this, pos, level, Optional.empty());
 	}
@@ -190,29 +182,35 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 		buf.writeInt(level);
 
 		// these will only be read on the screen
-		buf.writeString(emc.divisionString());
+		buf.writeString(Long.toString(emc));
 	}
 	
 	@Override
 	protected void writeNbt(NbtCompound nbt) {
 		super.writeNbt(nbt);
 		Inventories.writeNbt(nbt, stackContents);
-		nbt.putString("emc", emc.divisionString());
+		nbt.putString("emc", Long.toString(emc));
 	
 	}
 	@Override
 	public void readNbt(NbtCompound nbt) {
 		super.readNbt(nbt);
 		Inventories.readNbt(nbt, stackContents);
-		emc = new SuperNumber(nbt.getString("emc"));
+
+		emc = GeneralUtil.parseLongFromPossiblySuperNumberData(nbt.getString("emc"));
 	}
 
 	@Override
-	public SuperNumber getEmc() {
+	public long getEmc() {
 		return emc;
 	}
 	@Override
-	public SuperNumber getOutputRate() {
+	public void setEmc(long emc) {
+		this.emc = emc;
+	}
+
+	@Override
+	public long getOutputRate() {
 		return outputRate;
 	}
 	@Override
@@ -220,14 +218,14 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 		return true;
 	}
 	@Override
-	public SuperNumber getMaximumEmc() {
+	public long getMaximumEmc() {
 		return maximumEmc;
 	}
 	@Override
-	public SuperNumber getBonusEmc() {
-		return bonusEmc;
+	public long getBonusEmc() {
+		return (Math.random() <= bonusEmcChance) ? 1 : 0;
 	}
-	public void update(SuperNumber emc) {
+	public void update(long emc) {
 		this.emc = emc;
 	}
 }

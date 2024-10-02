@@ -1,24 +1,27 @@
 package com.skirlez.fabricatedexchange.screen;
 
-import java.util.Optional;
-
 import com.skirlez.fabricatedexchange.block.EnergyCondenserBlockEntity;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.screen.slot.ConsiderateSlot;
 import com.skirlez.fabricatedexchange.screen.slot.DisplaySlot;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SingleStackInventoryImpl;
-
+import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.inventory.SingleStackInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.List;
+import java.util.Optional;
 
 public class EnergyCondenserScreenHandler extends LeveledScreenHandler implements ChestScreenHandler {
 	private Inventory mainInventory;
@@ -46,7 +49,22 @@ public class EnergyCondenserScreenHandler extends LeveledScreenHandler implement
 		checkSize(targetInventory, 1);
 		
 		mainInventory.onOpen(playerInventory.player);
-		this.addSlot(new DisplaySlot(targetInventory, 0, 12, 6));
+		this.addSlot(new DisplaySlot(targetInventory, 0, 12, 6, (stack) -> {
+			String idName = Registries.ITEM.getId(stack.getItem()).toString();
+			NbtCompound nbt = stack.getNbt();
+			if (nbt == null)
+				return stack;
+			if (!ModDataFiles.NBT_ITEMS.hasItem(idName)) {
+				stack.setNbt(null);
+				return stack;
+			}
+			List<String> allowedKeys = ModDataFiles.NBT_ITEMS.getAllowedKeys(idName);
+
+			if (!nbt.isEmpty()) {
+				nbt.getKeys().removeIf(key -> !allowedKeys.contains(key));
+			}
+			return stack;
+		}));
 
 		if (level == 0) {
 			for (int i = 0; i < 7; i++) {
@@ -133,13 +151,13 @@ public class EnergyCondenserScreenHandler extends LeveledScreenHandler implement
 			ItemStack cursorStack = getCursorStack();
 			if (slot.hasStack() && !cursorStack.isEmpty()
 					&& ItemStack.areItemsEqual(slot.getStack(), cursorStack)) {
-				slot.setStackNoCallbacks(ItemStack.EMPTY);
+				slot.setStack(ItemStack.EMPTY);
 				return;
 			}
 			if (cursorStack.isEmpty() || !EmcData.getItemEmc(cursorStack.getItem()).equalsZero()) {
 				cursorStack = cursorStack.copy();
 				cursorStack.setCount(1);
-				slot.setStackNoCallbacks(cursorStack);
+				slot.setStack(cursorStack);
 			}
   
 		}

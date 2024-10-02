@@ -41,10 +41,11 @@ public class ItemAbilityManager {
 		final Map<PlayerEntity, List<ItemAbility>> abilityMap = new HashMap<PlayerEntity, List<ItemAbility>>();
 		ClientTickEvents.END_CLIENT_TICK.register((client) -> {
 			// I'm not sure why, but unless we treat client.player like this, Java will try to load
-			// ClientPlayerEntity when the server calls registerServer()
+			// ClientPlayerEntity when the server calls registerServer() (causing a crash)
 			PlayerEntity player = (PlayerEntity) (Object) client.player;
-			if (player != null)
+			if (player != null) {
 				handlePlayerAbilities(player, abilityMap);
+			}
 		});
 	}
 

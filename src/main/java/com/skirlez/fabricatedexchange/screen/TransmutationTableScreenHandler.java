@@ -25,7 +25,6 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
@@ -133,7 +132,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 				orderedKnowledge.remove(i);
 				return;
 			}
-			if (!EmcData.getItemEmc(currentItem).equalTo(targetEmc))
+			if (!EmcData.getItemEmc(currentItem).equals(targetEmc))
 				break;
 		}
 
@@ -148,7 +147,7 @@ public class TransmutationTableScreenHandler extends ScreenHandler {
 				orderedKnowledge.remove(i);
 				return;
 			}
-			if (!EmcData.getItemEmc(currentItem).equalTo(targetEmc))
+			if (!EmcData.getItemEmc(currentItem).equals(targetEmc))
 				break;
 		}
 
