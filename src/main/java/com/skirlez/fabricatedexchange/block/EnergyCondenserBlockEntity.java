@@ -194,18 +194,30 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 	}
 	
 	@Override
-	public void writeNbt(NbtCompound tag) {
-		super.writeNbt(tag);
-		tag.putString("target", Registries.ITEM.getId(targetInventory.getStack(0).getItem()).toString());
-		tag.putString("emc", Long.toString(emc));
+	public void writeNbt(NbtCompound nbt) {
+		super.writeNbt(nbt);
+		ItemStack stack = targetInventory.getStack(0);
+		nbt.putString("target", Registries.ITEM.getId(stack.getItem()).toString());
+		if (stack.hasNbt())
+			nbt.put("targetNbt", stack.getNbt());
+		nbt.putString("emc", Long.toString(emc));
 	}
 	
 	public void readNbt(NbtCompound nbt) {
 		super.readNbt(nbt);
-		Item item = Registries.ITEM.get(new Identifier(nbt.getString("target")));
-		if (item == null)
-			return;
-		targetInventory.setStack(0, new ItemStack(item));
+		if (nbt.contains("target")) {
+			Item item = Registries.ITEM.get(new Identifier(nbt.getString("target")));
+
+			ItemStack stack = new ItemStack(item);
+			if (nbt.contains("targetNbt")) {
+				NbtCompound targetNbt = nbt.getCompound("targetNbt");
+				stack.setNbt(targetNbt);
+			}
+			if (item != null)
+				targetInventory.setStack(0, stack);
+		}
+
+
 		String str = nbt.getString("emc");
 		if (str.isEmpty())
 			str = "0";

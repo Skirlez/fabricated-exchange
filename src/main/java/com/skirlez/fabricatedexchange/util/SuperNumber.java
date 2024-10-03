@@ -329,7 +329,9 @@ public class SuperNumber implements Comparable<SuperNumber> {
 	/** A comparison between this and another SuperNumber.
 	 * @return -1 for if this is smaller than other
 	 * <p> 0 for if this equals to other
-	 * <p> 1 for if this is bigger than other */
+	 * <p> 1 for if this is bigger than other
+	 * TODO rewrite to not create two objects every call, I'm very tired ):
+	 * */
 	@Override
 	public int compareTo(@NotNull SuperNumber other) {
 		if (denominator.equals(other.denominator))

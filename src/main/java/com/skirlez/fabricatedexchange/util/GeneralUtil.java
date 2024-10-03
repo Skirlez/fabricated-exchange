@@ -95,9 +95,31 @@ public class GeneralUtil {
 			pos.getX() + halfsize, pos.getY() + halfsize, pos.getZ() + halfsize);
 	}
 
-	/** @
-	 * */
-	
+	private static double[][] vertices = {
+		{-0.5, -0.5, -0.5},
+		{ 0.5, -0.5, -0.5},
+		{ 0.5, 0.5, -0.5},
+		{-0.5, 0.5, -0.5},
+		{-0.5, -0.5, 0.5},
+		{ 0.5, -0.5, 0.5},
+		{ 0.5, 0.5, 0.5},
+		{-0.5, 0.5, 0.5}
+	};
+	public static Vec3d farthestCubeVertexFromPoint(Vec3d cubeCenter, Vec3d point) {
+		Vec3d farthestVertex = cubeCenter;
+		double farthestDist = 0d;
+		for (double[] vertexOffsets : vertices) {
+			Vec3d vertex = cubeCenter.add(vertexOffsets[0], vertexOffsets[1], vertexOffsets[2]);
+			double dist = vertex.distanceTo(point);
+			if (farthestDist < vertex.distanceTo(point)) {
+				farthestVertex = vertex;
+				farthestDist = dist;
+			}
+		}
+		return farthestVertex;
+	}
+
+
 	public static void nestedLoop(int loops, int max, Consumer<int[]> operation) {
 		int arr[] = new int[loops];
 		while (true) {
@@ -212,6 +234,8 @@ public class GeneralUtil {
 	}
 
 	public static long parseLongFromPossiblySuperNumberData(String str) {
+		if (str.isEmpty())
+			return 0;
 		int slash = str.indexOf('/');
 		if (slash == -1)
 			return Long.parseLong(str);

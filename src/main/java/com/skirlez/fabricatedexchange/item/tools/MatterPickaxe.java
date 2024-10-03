@@ -1,17 +1,7 @@
 package com.skirlez.fabricatedexchange.item.tools;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.skirlez.fabricatedexchange.item.ChargeableItem;
-import com.skirlez.fabricatedexchange.item.EmcStoringItem;
-import com.skirlez.fabricatedexchange.item.ItemUtil;
-import com.skirlez.fabricatedexchange.item.ItemWithModes;
-import com.skirlez.fabricatedexchange.item.ModToolMaterials;
-import com.skirlez.fabricatedexchange.item.OutliningItem;
-import com.skirlez.fabricatedexchange.item.PreMiningItem;
+import com.skirlez.fabricatedexchange.item.*;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
@@ -24,6 +14,9 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MatterPickaxe extends PickaxeItem implements ChargeableItem, OutliningItem, ItemWithModes, 
 	PreMiningItem, EmcStoringItem {
@@ -87,12 +80,6 @@ public class MatterPickaxe extends PickaxeItem implements ChargeableItem, Outlin
 		ItemUtil.addModeAndChargeToTooltip(stack, tooltip);
 	}
 
-
-	@Override
-	public boolean outlineEntryCondition(BlockState state) {
-		return true;
-	}
-
 	public static final SuperNumber BLOCK_MINE_COST = new SuperNumber(20);
 	
 	@Override
@@ -151,9 +138,9 @@ public class MatterPickaxe extends PickaxeItem implements ChargeableItem, Outlin
 
 
 	@Override
-	public List<BlockPos> getPositionsToOutline(PlayerEntity player, ItemStack stack, BlockPos center) {
-		BlockState state = player.getWorld().getBlockState(center);
-		return getBlocksToMine(player, stack, player.getWorld(), center, state);
+	public List<BlockPos> getPositionsToOutline(PlayerEntity player, ItemStack stack, BlockPos selectedBlockPos) {
+		BlockState state = player.getWorld().getBlockState(selectedBlockPos);
+		return getBlocksToMine(player, stack, player.getWorld(), selectedBlockPos, state);
 	}
 }
 

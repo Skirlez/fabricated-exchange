@@ -20,7 +20,6 @@ public final class ModItems {
 
 	public static final Item PHILOSOPHERS_STONE = registerItem("philosophers_stone",
 			new PhilosophersStone(new FabricItemSettings().maxCount(1)));
-
 	public static final Item TRANSMUTATION_TABLET = registerItemWithGroup("transmutation_tablet",
 			new TransmutationTablet(new FabricItemSettings().maxCount(1)));
 	public static final Item ALCHEMICAL_COAL = registerItemWithGroup("alchemical_coal",
@@ -83,7 +82,6 @@ public final class ModItems {
 			new MatterHoe(ModToolMaterials.RED_MATTER_MATERIAL, 8, 0.0f, new Item.Settings().fireproof()));
 	public static final Item RED_MATTER_HAMMER = registerItemWithGroup("red_matter_hammer",
 			new RedMatterHammer(ModToolMaterials.RED_MATTER_MATERIAL, 10, -2.8f, new Item.Settings().fireproof()));
-
 	public static Item DARK_MATTER_BOOTS = registerItemWithGroup("dark_matter_boots",
 			new ArmorItem(ModArmorMaterial.DARK_MATTER, ArmorItem.Type.BOOTS, new Item.Settings()));
 	public static Item DARK_MATTER_LEGGINGS = registerItemWithGroup("dark_matter_leggings",
@@ -131,6 +129,9 @@ public final class ModItems {
 
 	public static final Item VOLCANITE_AMULET = registerItemWithGroup("volcanite_amulet",
 			new VolcaniteAmulet(new FabricItemSettings().maxCount(1)));
+
+	public static final Item MERCURIAL_EYE = registerItemWithGroup("mercurial_eye",
+			new MercurialEye(new FabricItemSettings().maxCount(1)));
 
 	private static Item registerItem(String name, Item item) {
 		Registry.register(Registries.ITEM, new Identifier(FabricatedExchange.MOD_ID, name), item);

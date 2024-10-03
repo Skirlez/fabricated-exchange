@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:bricks"
+    },
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "O": {
+      "item": "minecraft:obsidian"
+    },
+    "R": {
+      "item": "fabricated-exchange:red_matter"
+    }
+  },
+  "pattern": [
+    "OBO",
+    "BRB",
+    "BDB"
+  ],
+  "result": {
+    "item": "fabricated-exchange:mercurial_eye"
+  },
+  "show_notification": true
+}

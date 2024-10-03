@@ -1,17 +1,7 @@
 package com.skirlez.fabricatedexchange.item.tools;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import com.skirlez.fabricatedexchange.item.ChargeableItem;
-import com.skirlez.fabricatedexchange.item.EmcStoringItem;
-import com.skirlez.fabricatedexchange.item.FakeItemUsageContext;
-import com.skirlez.fabricatedexchange.item.ModToolMaterials;
-import com.skirlez.fabricatedexchange.item.OutliningItem;
-import com.skirlez.fabricatedexchange.util.SuperNumber;
-
+import com.skirlez.fabricatedexchange.item.*;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
@@ -24,6 +14,10 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class MatterHoe extends HoeItem implements ChargeableItem, OutliningItem, EmcStoringItem {
 
@@ -133,20 +127,16 @@ public class MatterHoe extends HoeItem implements ChargeableItem, OutliningItem,
 	}
 
 	
-	@Override
-	public boolean outlineEntryCondition(BlockState state) {
-		return true;
-	}
 
 	private final Set<Block> TILLABLE_BLOCKS = TILLING_ACTIONS.keySet();
 
 	@Override
-	public List<BlockPos> getPositionsToOutline(PlayerEntity player, ItemStack stack, BlockPos center) {
+	public List<BlockPos> getPositionsToOutline(PlayerEntity player, ItemStack stack, BlockPos selectedBlockPos) {
 		World world = player.getWorld();
 		List<BlockPos> list = new ArrayList<BlockPos>();
 
 		int size = ChargeableItem.getCharge(stack);
-		BlockPos corner = center.add(-size, 0, -size);
+		BlockPos corner = selectedBlockPos.add(-size, 0, -size);
 		int len = size * 2 + 1;
 		for (int i = 0; i < len; i++) {
 			for (int j = 0; j < len; j++) {

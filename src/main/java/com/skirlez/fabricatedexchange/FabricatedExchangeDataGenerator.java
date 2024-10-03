@@ -168,7 +168,8 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 				ModItems.DARK_MATTER_LEGGINGS, ModItems.DARK_MATTER_CHESTPLATE, ModItems.DARK_MATTER_HELMET,
 				ModItems.RED_MATTER_BOOTS, ModItems.RED_MATTER_LEGGINGS, ModItems.RED_MATTER_CHESTPLATE,
 				ModItems.RED_MATTER_HELMET, ModItems.REPAIR_TALISMAN, ModItems.EVERTIDE_AMULET,
-				ModItems.VOLCANITE_AMULET, ModItems.WATER_ORB, ModItems.LAVA_ORB, ModItems.TORNADO_ORB, ModItems.FROZEN_ORB);
+				ModItems.VOLCANITE_AMULET, ModItems.WATER_ORB, ModItems.LAVA_ORB, ModItems.TORNADO_ORB,
+				ModItems.FROZEN_ORB, ModItems.MERCURIAL_EYE);
 			
 			registerHandheldModels(itemModelGenerator, ModItems.DARK_MATTER_SWORD, ModItems.DARK_MATTER_PICKAXE, ModItems.DARK_MATTER_AXE,
 				ModItems.DARK_MATTER_SHOVEL, ModItems.DARK_MATTER_HOE, ModItems.DARK_MATTER_HAMMER, ModItems.RED_MATTER_SWORD, ModItems.RED_MATTER_PICKAXE,
@@ -645,6 +646,19 @@ public class FabricatedExchangeDataGenerator implements DataGeneratorEntrypoint 
 				.criterion(FabricRecipeProvider.hasItem(ModItems.DARK_MATTER),
 					FabricRecipeProvider.conditionsFromItem(ModItems.DARK_MATTER))
 				.offerTo(exporter);
+
+			ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.MERCURIAL_EYE)
+				.pattern("OBO")
+				.pattern("BRB")
+				.pattern("BDB")
+				.input('B', Items.BRICKS)
+				.input('O', Items.OBSIDIAN)
+				.input('D', Items.DIAMOND)
+				.input('R', ModItems.RED_MATTER)
+				.criterion(FabricRecipeProvider.hasItem(ModItems.RED_MATTER),
+					FabricRecipeProvider.conditionsFromItem(ModItems.RED_MATTER))
+				.offerTo(exporter);
+
 
 
 			ShapelessRecipeJsonBuilder.create(RecipeCategory.MISC, ModItems.HYDRATION_RING)
