@@ -244,6 +244,10 @@ public class GeneralUtil {
 		}
 	}
 
+	public static boolean canPlayerPlace(PlayerEntity player, BlockPos pos) {
+		return FactionsReflection.canPlayerPlace(player, pos) && player.canModifyAt(player.getWorld(), pos);
+	}
+
 }
 	
 

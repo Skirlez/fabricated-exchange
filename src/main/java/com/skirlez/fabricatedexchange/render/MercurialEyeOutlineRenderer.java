@@ -30,6 +30,9 @@ public final class MercurialEyeOutlineRenderer {
 	}
 
 
+	// List of edges.
+	// The first 3 values are the x, y, z of one point, and the next 3 are the x, y, z of another.
+	// Connecting each element's 2 points gives you all the edges in a unit cube.
 	private static final int[][] edges = new int[][] {
 		{0, 0, 0, 0, 0, 1},
 		{0, 0, 0, 0, 1, 0},
@@ -129,23 +132,16 @@ public final class MercurialEyeOutlineRenderer {
 				.normal(entry.getNormalMatrix(), k, l, m)
 				.next();
 		}
-
-
-		drawText("1", center1, matrices, provider, context.camera());
-		if (positions.length == 2 && !center1.equals(center2))
-			drawText("2", center2, matrices, provider, context.camera());
-
-
-
-
 		matrices.pop();
+
+		drawText("➀", center1, matrices, provider, context.camera());
+		if (positions.length == 2 && !center1.equals(center2))
+			drawText("➁", center2, matrices, provider, context.camera());
 	}
 
 
 	private static void drawText(String text, Vec3d pos, MatrixStack matrices, VertexConsumerProvider provider, Camera camera) {
-
 		matrices.push();
-
 		matrices.translate(pos.x - camera.getPos().x, pos.y - camera.getPos().y, pos.z - camera.getPos().z);
 		matrices.multiply(new Quaternionf(camera.getRotation())
 			.rotateX((float)Math.toRadians(180))
@@ -158,19 +154,17 @@ public final class MercurialEyeOutlineRenderer {
 
 		MinecraftClient client = MinecraftClient.getInstance();
 		client.textRenderer.draw(text,
-			-(float)client.textRenderer.getWidth(text) / 2f + 1, -5,
+			-(float)client.textRenderer.getWidth(text) / 2f, -4,
 			MathHelper.packRgb(1, 1, 1), false,
 			matrices.peek().getPositionMatrix(), provider,
 			TextRenderer.TextLayerType.SEE_THROUGH,
 			0, 255);
 		client.textRenderer.draw(text,
-			-(float)client.textRenderer.getWidth(text) / 2f + 1, -5,
+			-(float)client.textRenderer.getWidth(text) / 2f, -4,
 			MathHelper.packRgb(1, 1, 1), false,
 			matrices.peek().getPositionMatrix(), provider,
 			TextRenderer.TextLayerType.NORMAL,
 			0, 255);
-
-
 		matrices.pop();
 	}
 }

@@ -1,31 +1,28 @@
 package com.skirlez.fabricatedexchange.item.tools;
 
+import com.skirlez.fabricatedexchange.item.EmcStoringItem;
+import com.skirlez.fabricatedexchange.item.ExtraFunctionItem;
 import com.skirlez.fabricatedexchange.mixin.ItemAccessor;
+import com.skirlez.fabricatedexchange.screen.MercurialEyeScreenHandler;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
 import java.util.WeakHashMap;
 
-public class MercurialEye extends Item {
+public class MercurialEye extends Item implements EmcStoringItem, ExtraFunctionItem {
 	private static final WeakHashMap<PlayerEntity, BlockPos[]> state = new WeakHashMap<PlayerEntity, BlockPos[]>();
 
 	public MercurialEye(Settings settings) {
@@ -72,4 +69,19 @@ public class MercurialEye extends Item {
 	}
 
 
+	private static NamedScreenHandlerFactory factory = new NamedScreenHandlerFactory() {
+		@Override
+		public Text getDisplayName() {
+			return Text.empty();
+		}
+
+		public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+			return new MercurialEyeScreenHandler(syncId, playerInventory);
+		}
+	};
+
+	@Override
+	public void doExtraFunction(World world, PlayerEntity player, ItemStack stack) {
+		player.openHandledScreen(factory);
+	}
 }

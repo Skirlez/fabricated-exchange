@@ -2,7 +2,6 @@ package com.skirlez.fabricatedexchange.entities;
 
 import com.skirlez.fabricatedexchange.entities.base.LiquidThrownEntity;
 import com.skirlez.fabricatedexchange.item.ModItems;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CauldronBlock;
@@ -30,6 +29,11 @@ public class LavaThrownEntity extends LiquidThrownEntity {
 
 	@Override
 	protected void placeLiquid(World world, BlockPos pos) {
+		if (world.isClient())
+			return;
+
+
+
 		BlockState state = world.getBlockState(pos);
 		if (state.getBlock() instanceof CauldronBlock) {
 			world.setBlockState(pos, Blocks.LAVA_CAULDRON.getDefaultState());
@@ -42,6 +46,7 @@ public class LavaThrownEntity extends LiquidThrownEntity {
 		if (state.canBucketPlace(Fluids.LAVA)) {
 			world.setBlockState(pos, Blocks.LAVA.getDefaultState(), 11);
 		}
+
 	}
 
 	@Override

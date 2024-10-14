@@ -45,7 +45,6 @@ public class FabricatedExchange implements ModInitializer {
 	// (e.g. in vanilla, coal (32 emc) will have a key value pair with redstone (64 emc), the next item with the fuel tag that has more emc than it.)
 	public static Map<Item, Item> fuelProgressionMap = new HashMap<Item, Item>();
 
-	
 	// This set is different to the above map's keyset in that it also contains the very last item in the progression.
 	public static Set<Item> fuelSet = new HashSet<Item>();
 	
@@ -64,7 +63,6 @@ public class FabricatedExchange implements ModInitializer {
 		ModClientToServerPackets.register();
 		ExtendedVanillaPackets.register();
 		ItemAbilityManager.registerServer();
-
 		ModDataFiles.MAIN_CONFIG_FILE.fetch();
 		
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
