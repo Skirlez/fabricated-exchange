@@ -1,5 +1,6 @@
 package com.skirlez.fabricatedexchange.mixin;
 
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,8 +18,11 @@ import net.minecraft.util.math.BlockPos;
 @Mixin(ServerPlayerInteractionManager.class)
 public abstract class ServerPlayerInteractionManagerPreMine {
 	
-	@Shadow private ServerPlayerEntity player;
-	@Shadow private ServerWorld world;
+	@Final
+	@Shadow
+	protected ServerPlayerEntity player;
+	@Shadow
+	protected ServerWorld world;
 
 	@Inject(method = "tryBreakBlock", at =  @At(value = 
 		"INVOKE", 
@@ -34,7 +38,6 @@ public abstract class ServerPlayerInteractionManagerPreMine {
 		ItemStack stack = player.getMainHandStack();
 		if (stack.getItem() instanceof PreMiningItem item) {
 			item.preMine(stack, world, world.getBlockState(pos), pos, player);
-
 		}
 	}
 }

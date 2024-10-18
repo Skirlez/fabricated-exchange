@@ -21,6 +21,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -92,30 +93,26 @@ public class PhilosophersStone extends Item
 			-> new BlocklessCraftingScreenHandler(syncId, inventory), TITLE));
 	}
 
-	@Override
-	public boolean outlineEntryCondition(BlockState state) {
-		return BlockTransmutation.canTransmuteBlock(state.getBlock());
-	}
 
 	@Override
-	public List<BlockPos> getPositionsToOutline(PlayerEntity player, ItemStack stack, BlockPos center) {
-		List<BlockPos> list = new ArrayList<BlockPos>();
+	public List<BlockPos> getPositionsToOutline(PlayerEntity player, ItemStack stack, BlockPos selectedBlockPos) {
 		World world = player.getWorld();
+		if (!BlockTransmutation.canTransmuteBlock(world.getBlockState(selectedBlockPos).getBlock()))
+			return Collections.emptyList();
+		List<BlockPos> list = new ArrayList<BlockPos>();
 
-		
-
-		Block block = world.getBlockState(center).getBlock();
+		Block block = world.getBlockState(selectedBlockPos).getBlock();
 		int size = ChargeableItem.getCharge(stack); 
 		int len = size * 2 + 1;
-		Direction dir = ItemUtil.getHorizontalMineDirection(player, center).rotateYClockwise();
+		Direction dir = ItemUtil.getHorizontalMineDirection(player, selectedBlockPos).rotateYClockwise();
 
 		int mode = ItemWithModes.getMode(stack);
 		final BlockPos corner;
 		corner = switch (mode) {
-			case 0 -> center.add(-size, -size, -size);
-			case 1 -> center.add(-size, 0, -size);
-			case 2 -> center.offset(dir, -size).up(size);
-			default -> center;
+			case 0 -> selectedBlockPos.add(-size, -size, -size);
+			case 1 -> selectedBlockPos.add(-size, 0, -size);
+			case 2 -> selectedBlockPos.offset(dir, -size).up(size);
+			default -> selectedBlockPos;
 		};
 
 		Consumer<int[]> cubeConsumer = new Consumer<int[]>() {

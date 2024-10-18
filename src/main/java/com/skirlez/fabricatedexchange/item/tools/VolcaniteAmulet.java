@@ -64,8 +64,6 @@ public class VolcaniteAmulet extends Amulet {
 		return super.use(world, player, hand);
 	}
 
-
-
 	@Override
 	protected boolean handleLiquidSpecificLogic(World world, BlockPos pos, BlockState targetBlockState) {
 		if (targetBlockState.getBlock() instanceof CauldronBlock) {

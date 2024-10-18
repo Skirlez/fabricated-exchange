@@ -23,6 +23,8 @@ public final class ModScreenHandlers {
 		new ScreenHandlerType<AlchemicalChestScreenHandler>(AlchemicalChestScreenHandler::new, FeatureSet.empty());
 	public static final ScreenHandlerType<EnergyCondenserScreenHandler> ENERGY_CONDENSER = 
 		new ExtendedScreenHandlerType<>(EnergyCondenserScreenHandler::clientConstructor);
+	public static final ScreenHandlerType<MercurialEyeScreenHandler> MERCURIAL_EYE =
+		new ScreenHandlerType<MercurialEyeScreenHandler>(MercurialEyeScreenHandler::clientConstructor, FeatureSet.empty());
 
 
 	public static void register() {

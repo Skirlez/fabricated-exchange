@@ -98,7 +98,10 @@
     "item.fabricated-exchange.gem_of_eternal_density.mode_5": "Red Matter",
     "item.fabricated-exchange.evertide_amulet": "Evertide Amulet",
     "item.fabricated-exchange.volcanite_amulet": "Volcanite Amulet",
-
+    "item.fabricated-exchange.mercurial_eye": "Unfinished Mercurial Eye",
+    "item.fabricated-exchange.mercurial_eye.corner_set": "Corner %d set to (%d, %d, %d)",
+    "item.fabricated-exchange.mercurial_eye.corner_set_player": "Corner %d set to player position at (%d, %d, %d)",
+    "item.fabricated-exchange.mercurial_eye.fail_protection": "Cannot transmute, this area is protected in some form!",
     "item.fabricated-exchange.black_hole_band": "Black Hole Band",
     "item.fabricated-exchange.no_emc": "Not enough EMC!",
 

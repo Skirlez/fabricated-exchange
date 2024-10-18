@@ -1,19 +1,8 @@
 package com.skirlez.fabricatedexchange.item.tools;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Consumer;
-
-import com.skirlez.fabricatedexchange.item.ChargeableItem;
-import com.skirlez.fabricatedexchange.item.EmcStoringItem;
-import com.skirlez.fabricatedexchange.item.FakeItemUsageContext;
-import com.skirlez.fabricatedexchange.item.ModToolMaterials;
-import com.skirlez.fabricatedexchange.item.OutliningItem;
+import com.skirlez.fabricatedexchange.item.*;
 import com.skirlez.fabricatedexchange.util.GeneralUtil;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -28,6 +17,9 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+
+import java.util.*;
+import java.util.function.Consumer;
 
 public class MatterAxe extends AxeItem implements ChargeableItem, OutliningItem, EmcStoringItem {
 
@@ -101,10 +93,7 @@ public class MatterAxe extends AxeItem implements ChargeableItem, OutliningItem,
 		return Registries.BLOCK.getEntry(state.getBlock()).isIn(BlockTags.LOGS);
 	}
 	
-	@Override
-	public boolean outlineEntryCondition(BlockState state) {
-		return isLog(state);
-	}
+
 
 	public void searchForLogs(World world, BlockPos pos, Set<BlockPos> positions, int depth) {
 		if (!positions.contains(pos))
@@ -126,13 +115,15 @@ public class MatterAxe extends AxeItem implements ChargeableItem, OutliningItem,
 	}
 	
 	@Override
-	public List<BlockPos> getPositionsToOutline(PlayerEntity player, ItemStack stack, BlockPos center) {
+	public List<BlockPos> getPositionsToOutline(PlayerEntity player, ItemStack stack, BlockPos selectedBlockPos) {
+		if (!isLog(player.getWorld().getBlockState(selectedBlockPos)))
+			return Collections.emptyList();
 		Set<BlockPos> positions = new HashSet<BlockPos>();
 		World world = player.getWorld();
 		int len = ChargeableItem.getCharge(stack);
-		searchForLogs(world, center, positions, len);
-		if (positions.contains(center))
-			positions.remove(center);
+		searchForLogs(world, selectedBlockPos, positions, len);
+		if (positions.contains(selectedBlockPos))
+			positions.remove(selectedBlockPos);
 		return new ArrayList<BlockPos>(positions);
 		/*
 		for (int y = 1; y < len; y++) {

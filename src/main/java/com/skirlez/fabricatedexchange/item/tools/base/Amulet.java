@@ -1,6 +1,7 @@
 package com.skirlez.fabricatedexchange.item.tools.base;
 
-import com.skirlez.fabricatedexchange.item.*;
+import com.skirlez.fabricatedexchange.item.ChargeableItem;
+import com.skirlez.fabricatedexchange.item.EmcStoringItem;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -69,6 +70,7 @@ public abstract class Amulet extends Item
 				BlockState blockState = world.getBlockState(offsetPos);
 				if (!blockState.canBucketPlace(liquid))
 					continue;
+
 				if (EmcStoringItem.takeStoredEmcOrConsume(getLiquidCost(), stack, player.getInventory())) {
 					world.setBlockState(offsetPos, liquid.getDefaultState().getBlockState(), 11);
 					success = true;

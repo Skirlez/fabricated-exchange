@@ -5,7 +5,6 @@ import com.skirlez.fabricatedexchange.block.AlchemicalChestBlockEntity;
 import com.skirlez.fabricatedexchange.block.EnergyCondenserBlockEntity;
 import com.skirlez.fabricatedexchange.block.ModBlockEntities;
 import com.skirlez.fabricatedexchange.block.ModBlocks;
-import com.skirlez.fabricatedexchange.entities.ModEntityRenderers;
 import com.skirlez.fabricatedexchange.event.KeyInputHandler;
 import com.skirlez.fabricatedexchange.item.ModItems;
 import com.skirlez.fabricatedexchange.item.rings.BlackHoleBand;
@@ -13,6 +12,7 @@ import com.skirlez.fabricatedexchange.item.rings.SwiftWolfsRendingGale;
 import com.skirlez.fabricatedexchange.item.rings.base.ShooterRing;
 import com.skirlez.fabricatedexchange.item.stones.GemOfEternalDensity;
 import com.skirlez.fabricatedexchange.packets.ModServerToClientPackets;
+import com.skirlez.fabricatedexchange.render.ModRenderers;
 import com.skirlez.fabricatedexchange.screen.ModScreens;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
 import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
@@ -51,9 +51,8 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 		ModScreens.register();
 		KeyInputHandler.register();
 		ModServerToClientPackets.register();
-		ModEntityRenderers.register();
+		ModRenderers.register();
 		ItemAbilityManager.registerClient();
-
 
 
 		// We can use the vanilla renderers due to the texture mixin, see ModTexturedRenderLayers
@@ -86,6 +85,7 @@ public class FabricatedExchangeClient implements ClientModInitializer {
 			ModelPredicateProviderRegistry.register(item, new Identifier(FabricatedExchange.MOD_ID, "state"),
 				(stack, world, entity, number) -> ShooterRing.shouldTurnOn(stack) ? 1f : 0f);
 		}
+
 
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
 				@Override

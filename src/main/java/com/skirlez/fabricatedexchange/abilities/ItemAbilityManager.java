@@ -68,7 +68,6 @@ public class ItemAbilityManager {
 			}
 		}
 
-
 		List<ItemAbility> previousAbilities = abilityMap.getOrDefault(player, new ArrayList<ItemAbility>());
 
 		// Abilities we had before, but don't anymore
