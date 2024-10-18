@@ -75,10 +75,6 @@ public abstract class FEHammer extends PickaxeItem implements ChargeableItem, Ou
 		}
 	}
 
-	@Override
-	public boolean outlineEntryCondition(BlockState state) {
-		return true;
-	}
 
 	protected List<BlockPos> getBlocksToMine(World world, ItemStack stack, Vec3d playerPos, BlockPos center, BlockState centerState) {
 		List<BlockPos> list = new ArrayList<>();
@@ -139,9 +135,9 @@ public abstract class FEHammer extends PickaxeItem implements ChargeableItem, Ou
 	}
 
 	@Override
-	public List<BlockPos> getPositionsToOutline(PlayerEntity player, ItemStack stack, BlockPos center) {
-		BlockState state = player.getWorld().getBlockState(center);
-		return getBlocksToMine(player.getWorld(), stack, player.getPos(), center, state);
+	public List<BlockPos> getPositionsToOutline(PlayerEntity player, ItemStack stack, BlockPos selectedBlockPos) {
+		BlockState state = player.getWorld().getBlockState(selectedBlockPos);
+		return getBlocksToMine(player.getWorld(), stack, player.getPos(), selectedBlockPos, state);
 	}
 
 	private boolean addToPlayerInventoryInReverse(PlayerEntity player, ItemStack itemStack) {

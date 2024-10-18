@@ -1,15 +1,7 @@
 package com.skirlez.fabricatedexchange.item.tools;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.skirlez.fabricatedexchange.item.ChargeableItem;
-import com.skirlez.fabricatedexchange.item.EmcStoringItem;
-import com.skirlez.fabricatedexchange.item.FakeItemUsageContext;
-import com.skirlez.fabricatedexchange.item.ModToolMaterials;
-import com.skirlez.fabricatedexchange.item.OutliningItem;
+import com.skirlez.fabricatedexchange.item.*;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.item.TooltipContext;
@@ -27,6 +19,10 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class MatterShovel extends ShovelItem implements ChargeableItem, OutliningItem, EmcStoringItem {
 	
@@ -97,20 +93,18 @@ public class MatterShovel extends ShovelItem implements ChargeableItem, Outlinin
 		return super.postMine(stack, world, state, pos, miner);
 	}
 
-	@Override
-	public boolean outlineEntryCondition(BlockState state) {
-		return isSuitableFor(state);
-	}
 
 	@Override
-	public List<BlockPos> getPositionsToOutline(PlayerEntity player, ItemStack stack, BlockPos center) {
+	public List<BlockPos> getPositionsToOutline(PlayerEntity player, ItemStack stack, BlockPos selectedBlockPos) {
+		if (!isSuitableFor(player.getWorld().getBlockState(selectedBlockPos)))
+			return Collections.emptyList();
 		List<BlockPos> list = new ArrayList<BlockPos>();
 		int size = ChargeableItem.getCharge(stack);
-		center = center.add(-size, 0, -size);
+		selectedBlockPos = selectedBlockPos.add(-size, 0, -size);
 		int len = size * 2 + 1;
 		for (int i = 0; i < len; i++) {
 			for (int j = 0; j < len; j++) {
-				BlockPos newPos = center.add(i, 0, j);
+				BlockPos newPos = selectedBlockPos.add(i, 0, j);
 				if (isSuitableFor(player.getWorld().getBlockState(newPos)))
 					list.add(newPos);
 			}

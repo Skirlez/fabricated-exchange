@@ -66,6 +66,11 @@ All of the code in this repository is licensed under the terms of the LGPLv3. I 
 - Covalence Dusts
 - Iron Band
 - Swiftwolf's Rending Gale
+- Ring of Ignition, Zero Ring
+- Gem of Eternal Density
+- Black Hole Band
+- Evertide / Volcanite Amulet
+- Divining Rods
 - Configurable EMC Mapper
 
 # NEW Features
@@ -75,7 +80,8 @@ All of the code in this repository is licensed under the terms of the LGPLv3. I 
 - Configurable support for items with NBT data in the Transmutation Table
 - Fancy animated Transmutation Table (Toggleable)
 - Config screen that can be opened with Mod Menu
+- Ring of Hydration
  
 # Screenshot
-![image](https://github.com/Skirlez/fabricated-exchange/assets/17904548/615b45d2-cbe0-4206-a2ed-d0192c6d8885)
+![image](https://github.com/user-attachments/assets/a5f6eeed-881f-4937-9e2a-1467698ce01b)
 

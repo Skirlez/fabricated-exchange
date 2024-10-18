@@ -1,7 +1,7 @@
 /*
  * Decompiled with CFR 0.2.1 (FabricMC 53fa44c9).
  */
-package com.skirlez.fabricatedexchange.entities;
+package com.skirlez.fabricatedexchange.render;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
