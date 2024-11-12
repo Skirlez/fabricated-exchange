@@ -1,5 +1,6 @@
 package com.skirlez.fabricatedexchange.block;
 
+import com.skirlez.fabricatedexchange.FabricatedExchange;
 import com.skirlez.fabricatedexchange.emc.EmcData;
 import com.skirlez.fabricatedexchange.screen.AntiMatterRelayScreen;
 import com.skirlez.fabricatedexchange.screen.AntiMatterRelayScreenHandler;
@@ -96,6 +97,10 @@ public class AntiMatterRelayBlockEntity extends BlockEntity implements ExtendedS
 		if (burnTime != null || !ModDataFiles.MAIN_CONFIG_FILE.antiMatterRelay_onlyAcceptFuelItems) {
 			if (!fuelStack.isEmpty()) {
 				long value = EmcData.getItemStackEmc(fuelStack.copyWithCount(1)).toLong(-1);
+				if(value == -1) {
+					FabricatedExchange.LOGGER.warn("Value too long");
+				}
+				value = (long)(value * ModDataFiles.MAIN_CONFIG_FILE.antiMatterRelay_efficiency[entity.level]);
 				if (entity.emc <= entity.maximumEmc - value) {
 					entity.emc += value;
 					fuelStack.decrement(1);
