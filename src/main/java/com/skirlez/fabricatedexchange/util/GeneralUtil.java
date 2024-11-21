@@ -243,11 +243,6 @@ public class GeneralUtil {
 			return Long.parseLong(str.substring(0, slash));
 		}
 	}
-
-	public static boolean canPlayerPlace(PlayerEntity player, BlockPos pos) {
-		return FactionsReflection.canPlayerPlace(player, pos) && player.canModifyAt(player.getWorld(), pos);
-	}
-
 }
 	
 

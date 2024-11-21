@@ -169,13 +169,23 @@ public abstract class FEHammer extends PickaxeItem implements ChargeableItem, Ou
 			BlockHitResult hitResult = world.raycast(new RaycastContext(player.getCameraPosVec(1.0F), rayTraceEnd, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, player));
 			BlockPos pos = hitResult.getBlockPos();
 
+			if (!player.canModifyAt(world, pos)) {
+				return TypedActionResult.fail(stack);
+			}
+
 			if (pos != null) {
 				BlockState blockState = world.getBlockState(pos);
 				if (isSuitableFor(blockState)) { // Check if the block is suitable to be broken
+
 					List<BlockPos> positionsToMine = getBlocksToMine(world, stack, player.getPos(), pos, blockState);
 
 					List<ItemStack> drops = new ArrayList<>();
 					for (BlockPos blockPos : positionsToMine) {
+
+						if (!player.canModifyAt(world, blockPos)) {
+							return TypedActionResult.fail(stack);
+						}
+
 						BlockState state = world.getBlockState(blockPos);
 						if (!state.isAir()) {
 							LootContext.Builder builder = new LootContext.Builder((ServerWorld) world)

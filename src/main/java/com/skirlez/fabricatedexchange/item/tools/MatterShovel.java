@@ -16,6 +16,7 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -62,10 +63,21 @@ public class MatterShovel extends ShovelItem implements ChargeableItem, Outlinin
 		if (charge == 0)
 			return super.useOnBlock(context);
 
+		PlayerEntity player = context.getPlayer();
 		World world = context.getWorld();
+
+		if (!player.canModifyAt(world, context.getBlockPos())) {
+			return ActionResult.FAIL;
+		}
+
 		boolean anySuccess = false;
 		List<BlockPos> positions = getPositionsToOutline(context.getPlayer(), context.getStack(), context.getBlockPos());
 		for (BlockPos newPos : positions) {
+
+			if (!player.canModifyAt(world, newPos)) {
+				return ActionResult.FAIL;
+			}
+
 			if (world.getBlockState(newPos.add(0, 1, 0)).getBlock().equals(Blocks.AIR)) {
 				FakeItemUsageContext fakeContext = 
 					new FakeItemUsageContext(context.getPlayer(), context.getHand(), newPos, Direction.UP);

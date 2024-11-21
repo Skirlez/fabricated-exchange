@@ -60,8 +60,20 @@ public class MatterAxe extends AxeItem implements ChargeableItem, OutliningItem,
 		if (charge == 0) 
 			return ActionResult.success(anySuccess);
 
-		List<BlockPos> positions = getPositionsToOutline(context.getPlayer(), context.getStack(), context.getBlockPos());
+		PlayerEntity player = context.getPlayer();
+		World world = context.getWorld();
+
+		if (!player.canModifyAt(world, context.getBlockPos())) {
+			return ActionResult.FAIL;
+		}
+
+		List<BlockPos> positions = getPositionsToOutline(player, context.getStack(), context.getBlockPos());
 		for (BlockPos newPos : positions) {
+
+			if (!player.canModifyAt(world, newPos)) {
+				return ActionResult.FAIL;
+			}
+
 			FakeItemUsageContext fakeContext = 
 				new FakeItemUsageContext(context.getPlayer(), context.getHand(), newPos, Direction.WEST);
 			anySuccess = (super.useOnBlock(fakeContext).isAccepted()) || anySuccess;
