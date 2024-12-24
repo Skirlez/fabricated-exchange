@@ -52,6 +52,8 @@ public class EqualTagsFile extends DataFile<HashSet<String>> {
 
     public boolean hasTag(TagKey<Item> tag) {
         Item[] items = GeneralUtil.getItemsFromTag(tag, Registry.ITEM);
+        if (items.length == 0)
+            return false;
         boolean hasFirst = tagGroups.containsKey(items[0]);
         if (items.length == 0 || hasFirst == false)
             return hasFirst;
