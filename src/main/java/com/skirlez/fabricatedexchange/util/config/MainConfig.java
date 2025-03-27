@@ -37,6 +37,7 @@ public class MainConfig extends AbstractConfigFile<Map<String, Object>> {
 	public boolean transmutationTable_floorButton;
 	public boolean antiMatterRelay_onlyAcceptFuelItems;
 	public final float[] antiMatterRelay_efficiency = new float[3];
+	public double energyCondenser_efficiency;
 	public boolean energyCollector_alwaysHaveEnergy;
 
 	/* Fetch the config and compare to the default config to see if any keys
@@ -97,6 +98,7 @@ public class MainConfig extends AbstractConfigFile<Map<String, Object>> {
 		antiMatterRelay_efficiency[0] = (float)(double)value.get("antiMatterRelay.efficiency.1");
 		antiMatterRelay_efficiency[1] = (float)(double)value.get("antiMatterRelay.efficiency.2");
 		antiMatterRelay_efficiency[2] = (float)(double)value.get("antiMatterRelay.efficiency.3");
+		energyCondenser_efficiency = (double)value.get("energyCondenser.efficiency");
 		energyCollector_alwaysHaveEnergy = (boolean)value.get("energyCollector.alwaysHaveEnergy");
 	}
 	

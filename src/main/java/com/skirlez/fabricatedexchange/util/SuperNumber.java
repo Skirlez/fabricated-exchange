@@ -2,6 +2,7 @@ package com.skirlez.fabricatedexchange.util;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -235,6 +236,14 @@ public class SuperNumber implements Comparable<SuperNumber> {
 		numerator = numerator.multiply(BigInteger.valueOf(other));
 		simplify();
 	}
+
+	public void multiply(double other) {
+		BigDecimal numDecimal = new BigDecimal(numerator);
+		BigDecimal result = numDecimal.multiply(BigDecimal.valueOf(other));
+		numerator = result.toBigInteger();
+		simplify();
+	}
+
 
 	public void multiply(SuperNumber other) {
 		if (denominator.equals(BigInteger.ONE)) {

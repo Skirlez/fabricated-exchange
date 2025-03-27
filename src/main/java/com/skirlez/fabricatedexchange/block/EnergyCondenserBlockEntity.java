@@ -5,6 +5,7 @@ import com.skirlez.fabricatedexchange.screen.EnergyCondenserScreen;
 import com.skirlez.fabricatedexchange.screen.EnergyCondenserScreenHandler;
 import com.skirlez.fabricatedexchange.util.SingleStackInventoryImpl;
 import com.skirlez.fabricatedexchange.util.SuperNumber;
+import com.skirlez.fabricatedexchange.util.config.ModDataFiles;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
@@ -105,6 +106,10 @@ public class EnergyCondenserBlockEntity extends BaseChestBlockEntity implements 
 					continue;
 				
 				SuperNumber stackEmc = EmcData.getItemStackEmc(stack);
+				double efficiency = ModDataFiles.MAIN_CONFIG_FILE.energyCondenser_efficiency;
+
+				stackEmc.multiply(efficiency);
+
 				if (stackEmc.equalsZero())
 					continue;
 				

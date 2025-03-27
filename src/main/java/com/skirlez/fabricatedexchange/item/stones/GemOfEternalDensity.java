@@ -58,10 +58,16 @@ public class GemOfEternalDensity extends Item
 
 	@Override
 	public int getModeAmount() {
-		return 5;
+		return 4;
 	}
 
-	private static Item[] targets = new Item[] { Items.IRON_INGOT, Items.GOLD_INGOT, Items.DIAMOND, ModItems.DARK_MATTER, ModItems.RED_MATTER };
+	private static Item[] targets = new Item[] { Items.RAW_IRON, Items.RAW_GOLD, Items.DIAMOND, ModItems.DARK_MATTER };
+	private static final Item[][] validItemsPerMode = new Item[][]{
+			{Items.DIORITE, Items.ANDESITE, Items.GRANITE, Items.TUFF, Items.COBBLESTONE, Items.STONE, Items.COBBLED_DEEPSLATE, Items.DEEPSLATE},
+			{Items.DIORITE, Items.ANDESITE, Items.GRANITE, Items.TUFF, Items.COBBLESTONE, Items.STONE, Items.COBBLED_DEEPSLATE, Items.DEEPSLATE, Items.RAW_IRON},
+			{Items.DIORITE, Items.ANDESITE, Items.GRANITE, Items.TUFF, Items.COBBLESTONE, Items.STONE, Items.COBBLED_DEEPSLATE, Items.DEEPSLATE, Items.RAW_IRON, Items.RAW_GOLD},
+			{Items.DIORITE, Items.ANDESITE, Items.GRANITE, Items.TUFF, Items.COBBLESTONE, Items.STONE, Items.COBBLED_DEEPSLATE, Items.DEEPSLATE, Items.RAW_IRON, Items.RAW_GOLD, Items.DIAMOND}
+	};
 	private static Item getTargetItem(ItemStack stack) {
 		return targets[ItemWithModes.getMode(stack)];
 	}
@@ -70,19 +76,26 @@ public class GemOfEternalDensity extends Item
 	@Override
 	public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
 		super.inventoryTick(stack, world, entity, slot, selected);
-		if (world.isClient)
+		if (world.isClient) {
 			return;
-		if (!(entity instanceof PlayerEntity player))
+		}
+		if (!(entity instanceof PlayerEntity player)) {
 			return;
+		}
+
 		NbtCompound gemNbt = stack.getOrCreateNbt();
 		if (isCondensing(stack)) {
 			PlayerInventory inventory = player.getInventory();
 
 			Item targetItem = getTargetItem(stack);
 			SuperNumber targetEmc = EmcData.getItemEmc(targetItem);
-			if (targetEmc.equalsZero())
+			if (targetEmc.equalsZero()) {
 				return;
+			}
 
+			// Get the valid items for the current mode
+			int currentMode = ItemWithModes.getMode(stack);
+			Item[] validItems = validItemsPerMode[currentMode];
 
 			NbtCompound itemsCompound = gemNbt.getCompound("items");
 
@@ -107,7 +120,6 @@ public class GemOfEternalDensity extends Item
 						countRequired.divide(itemEmc);
 						countRequired.ceil();
 
-
 						int countTaken = Math.min(countRequired.toInt(1), count);
 						itemEmc.multiply(countTaken);
 						sum.add(itemEmc);
@@ -123,15 +135,20 @@ public class GemOfEternalDensity extends Item
 					}
 				}
 
-			}
-			else {
+			} else {
 				for (int i = 0; i < inventory.size(); i++) {
 					ItemStack itemStack = inventory.getStack(i);
+					Item item = itemStack.getItem();
+
+					// Check if the item is in the validItems list for the current mode
 					if (itemStack.isEmpty()
-						|| itemStack.getMaxCount() == 1
-						|| itemStack.hasNbt()
-						|| itemStack.getItem() == targetItem)
+							|| itemStack.getMaxCount() == 1
+							|| itemStack.hasNbt()
+							|| item == targetItem
+							|| !Arrays.asList(validItems).contains(item)) { // Ensure item is valid for the mode
 						continue;
+					}
+
 					String itemId = Registries.ITEM.getId(itemStack.getItem()).toString();
 					int currentCount = itemsCompound.getInt(itemId);
 					EmcStoringItem.addStoredEmc(stack, EmcData.getItemEmc(itemStack.getItem()));
@@ -143,8 +160,7 @@ public class GemOfEternalDensity extends Item
 			}
 
 			gemNbt.put("items", itemsCompound);
-		}
-		else {
+		} else {
 			NbtCompound itemsCompound = gemNbt.getCompound("items");
 			String[] keys = getSortedKeyList(itemsCompound);
 			for (String key : keys) {
@@ -164,8 +180,9 @@ public class GemOfEternalDensity extends Item
 					baseCostCopy.multiply(amountGiven);
 					baseCostCopy.negate();
 					EmcStoringItem.addStoredEmc(stack, baseCostCopy);
-					if (newCount != 0)
+					if (newCount != 0) {
 						canFitMore = false;
+					}
 				}
 				if (canFitMore) {
 					ItemStack itemStack = new ItemStack(item, countRemainder);
@@ -177,10 +194,11 @@ public class GemOfEternalDensity extends Item
 					baseCostCopy.negate();
 					EmcStoringItem.addStoredEmc(stack, baseCostCopy);
 				}
-				if (count == 0)
+				if (count == 0) {
 					itemsCompound.remove(key);
-				else
+				} else {
 					itemsCompound.putInt(key, count);
+				}
 			}
 
 			gemNbt.put("items", itemsCompound);
